@@ -1,0 +1,97 @@
+import React from 'react'
+import axios from 'axios'
+import {API as APII} from '@env'
+import { AuthContext } from '@pn/provider/AuthProvider';
+
+const API = axios.create({
+    baseURL:APII,
+    timeout:10000
+})
+let tokens=null;
+
+export const fetcher=(url) => fetch(url, {...(tokens!==null ? {headers:{Authorization:`Bearer ${tokens}`},credentials: 'include'} : {})}).then(res=>res.json());
+
+export const setToken=token=>{
+    tokens=token
+    API.interceptors.request.use(function(config){
+        if(token===null) {
+            if(config.headers.Authorization) delete config.headers.Authorization;
+        } else {
+            config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
+    })
+}
+
+
+export default function useAPI(user){
+    const context = React.useContext(AuthContext)
+    const {setNotif} = context
+    
+    const PNpost=(url,data,formdata)=>{
+        return new Promise((res,rej)=>{
+            const baseURL =  user ? url : `/native${url}`
+            const qs=require('qs');
+            const dt=data===null ? "" : (formdata ? data : qs.stringify(data));
+            let opt={}
+            if(formdata) {
+                const {headers:otherHeader,...other}=formdata;
+                opt={
+                    headers:{
+                        ...otherHeader
+                    },
+                    ...other
+                }
+                //opt.headers['Content-Type']="multipart/form-data";
+            }
+            API.post(baseURL,dt,opt)
+            .then((response)=>{
+                if(response?.data?.error == 1) {
+                    console.log(response?.status)
+                    setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
+                }
+                res(response?.data);
+            })
+            .catch((err)=>{
+                if(err?.response?.data) {
+                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
+                }
+                else if(err?.response?.status===503) {
+                    setNotif("error","Error","Internal Server Error");
+                    //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
+                } else {
+                    setNotif("error","Error","Something went wrong")
+                }
+                rej();
+            })
+        })
+    }
+
+    const PNget=(url)=>{
+        return new Promise((res,rej)=>{
+            const baseURL =  user ? url : `/native${url}`
+            API.get(baseURL)
+            .then((response)=>{
+                if(response?.data?.error == 1) {
+                    console.log(response?.status)
+                    setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
+                }
+                res(response?.data);
+            })
+            .catch((err)=>{
+                if(err?.response?.data) {
+                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
+                }
+                else if(err?.response?.status===503) {
+                    setNotif("error","Error","Internal Server Error");
+                    //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
+                } else {
+                    setNotif("error","Error","Something went wrong")
+                }
+                rej();
+            })
+        })
+    }
+
+    return {PNpost,PNget}
+}

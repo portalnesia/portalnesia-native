@@ -1,0 +1,245 @@
+import React, { useState } from 'react';
+import {Alert} from 'react-native'
+import {useTheme} from '@react-navigation/native'
+import { StatusBar } from 'expo-status-bar';
+import {
+	ScrollView,
+	TouchableOpacity,
+	View,
+	KeyboardAvoidingView,
+	ActivityIndicator,
+	TextInput,
+	Image,
+	StyleSheet,
+} from 'react-native';
+//import * as firebase from 'firebase';
+
+import Layout from '../../components/global/Layout';
+import Text from '../../components/utils/UbuntuFont';
+//import Colors from '../../constants/colors';
+
+export default function ({ navigation }) {
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [loading, setLoading] = useState(false);
+	const {colors} = useTheme()
+	const text2 = React.useRef(null)
+
+	async function login() {
+		Alert.alert(
+			"Under Maintenance",
+			"This feature is under maintenance.",
+			[{
+				text:"OK",
+				onPress:()=>{}
+			}],
+			{cancelable:false}
+		)
+		//alert("Under Maintenance");
+		/*setLoading(true);
+		await firebase
+			.auth()
+			.signInWithEmailAndPassword(email, password)
+			.catch(function (error) {
+				// Handle Errors here.
+				var errorCode = error.code;
+				var errorMessage = error.message;
+				// ...
+				setLoading(false);
+				alert(errorMessage);
+			});*/
+	}
+	return (
+		<KeyboardAvoidingView behavior="height" enabled style={{ flex: 1 }}>
+			<StatusBar style="auto" translucent backgroundColor={colors.background} />
+			<Layout navigation={navigation}>
+				<ScrollView
+					contentContainerStyle={{
+						flexGrow: 1,
+					}}
+				>
+					<View
+						style={{
+							flex: 1,
+							justifyContent: 'center',
+							alignItems: 'center',
+							backgroundColor: colors.background,
+						}}
+					>
+						<Image
+							resizeMode="contain"
+							style={{
+								height: 220,
+								width: 220,
+							}}
+							source={require('../../assets/login.png')}
+						/>
+					</View>
+					<View
+						style={{
+							flex: 3,
+							paddingHorizontal: 20,
+							paddingBottom: 20,
+							backgroundColor: '#fff',
+						}}
+					>
+						<Text
+							bold
+							style={{
+								fontSize: 24,
+								color: colors.text,
+								alignSelf: 'center',
+								padding: 30,
+							}}
+						>
+							Login
+						</Text>
+						<Text style={{ color: colors.text, fontSize: 16 }}>Email</Text>
+						<View style={[styles.textInputContainer,{backgroundColor:colors.background,borderColor:colors.border}]}>
+							<TextInput
+								style={styles.textInput}
+								placeholder="Enter your email/username"
+								placeholderStyle={{
+									fontFamily: 'Ubuntu_400Regular',
+								}}
+								value={email}
+								autoCapitalize="none"
+								autoCompleteType="off"
+								autoCorrect={false}
+								//keyboardType="email-address"
+								blurOnSubmit={false}
+								onChangeText={(text) => setEmail(text)}
+								onSubmitEditing={()=>text2?.current?.focus()}
+							/>
+						</View>
+						<Text style={{ marginTop: 15, color: colors.text, fontSize: 16 }}>
+							Password
+						</Text>
+						<View style={[styles.textInputContainer,{backgroundColor:colors.background,borderColor:colors.border}]}>
+							<TextInput
+								ref={text2}
+								style={styles.textInput}
+								placeholder="Enter your password"
+								placeholderStyle={{
+									fontFamily: 'Ubuntu_400Regular',
+								}}
+								value={password}
+								autoCapitalize="none"
+								autoCompleteType="off"
+								autoCorrect={false}
+								secureTextEntry={true}
+								onChangeText={(text) => setPassword(text)}
+								onSubmitEditing={()=>{login()}}
+							/>
+						</View>
+						<TouchableOpacity
+							onPress={() => {
+								login();
+							}}
+							disabled={loading}
+							style={{
+								flexDirection: 'row',
+								marginTop: 20,
+							}}
+						>
+							<View style={[styles.button,{backgroundColor:colors.btnColor}]}>
+								{loading ? (
+									<ActivityIndicator color="#fff" />
+								) : (
+									<Text bold style={{ fontSize: 16, color: 'white' }}>
+										Continue
+									</Text>
+								)}
+							</View>
+						</TouchableOpacity>
+
+						<View
+							style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+								marginTop: 15,
+								justifyContent: 'center',
+							}}
+						>
+							<Text
+								style={{
+									color: colors.text,
+								}}
+							>
+								Don't have an account?
+							</Text>
+							<TouchableOpacity
+								onPress={() => {
+									navigation.navigate('Register');
+								}}
+							>
+								<Text
+									bold
+									style={{
+										marginLeft: 5,
+										color: colors.text,
+									}}
+								>
+									Register here
+								</Text>
+							</TouchableOpacity>
+						</View>
+						<View
+							style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+								marginTop: 15,
+								justifyContent: 'center',
+							}}
+						>
+							<TouchableOpacity
+								onPress={() => {
+									navigation.navigate('ForgetPassword');
+								}}
+							>
+								<Text
+									bold
+									style={{
+										color: colors.text,
+									}}
+								>
+									Forget password
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</ScrollView>
+			</Layout>
+		</KeyboardAvoidingView>
+	);
+}
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		flexDirection: 'column',
+	},
+	textInputContainer: {
+		marginTop: 15,
+		//backgroundColor: '#FFF',
+		//borderColor: '#d8d8d8',
+		borderWidth: 1,
+		borderRadius: 8,
+		flexDirection: 'row',
+	},
+	textInput: {
+		padding: 10,
+		paddingHorizontal: 20,
+		textAlign: 'left',
+		color: 'black',
+		flex: 1,
+		fontFamily: 'Ubuntu_400Regular',
+	},
+	button: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: 15,
+		//backgroundColor: Colors.primary,
+		borderRadius: 8,
+	},
+});
