@@ -2,14 +2,20 @@ import React from 'react'
 import axios from 'axios'
 import {API as APII} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
+import {Constants} from 'react-native-unimodules'
+import * as Application from 'expo-application'
 
 const API = axios.create({
     baseURL:APII,
-    timeout:10000
+    timeout:10000,
+    headers: {
+        'X-Application-Version': Constants.nativeAppVersion,
+        'X-Device-Id': Application.androidId
+    }
 })
 let tokens=null;
 
-export const fetcher=(url) => fetch(url, {...(tokens!==null ? {headers:{Authorization:`Bearer ${tokens}`},credentials: 'include'} : {})}).then(res=>res.json());
+export const fetcher=(url) => fetch(url, {...(tokens!==null ? {headers:{Authorization:`Bearer ${tokens}`},'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId,credentials: 'include'} : {headers:{'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId}})}).then(res=>res.json());
 
 export const setToken=token=>{
     tokens=token

@@ -78,6 +78,8 @@ buck-out/
 # CocoaPods
 /ios/Pods/
 
+metro.config.backup-hahahaha.js
+
 # Expo
 .expo/*
 web-build/
