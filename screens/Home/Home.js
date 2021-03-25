@@ -117,11 +117,11 @@ export default function HomeScreen({ navigation }) {
 						<About title="Twitter Thread Reader" txt="Read threads from Twitter easily." right  screen="Twitter"/>
 						{/*<About title="Twibbon" txt="Create your own twibbon or edit your photo to twibbon that is already available and share it easily." /> */}
 						<About title="Transform Coordinate" txt="Insert value pairs of geographic coordinates and transform them to different coordinate system or cartographic projection." right screen="GeodataTransform" />
-						<About title="Twitter Menfess" txt={`Send a message or just the words you want to convey to "someone" as anonymous without notifying the sender's identity.`} />
-						<About title="Quiz" txt="Create your own quiz and share with friends or answer a few quizzes." right />
-						<About title="Parse HTML" txt="Parse your HTML code into XML code compatible with all the Blogger templates or other blogs systems." />
+						{/*<About title="Twitter Menfess" txt={`Send a message or just the words you want to convey to "someone" as anonymous without notifying the sender's identity.`} />
+						<About title="Quiz" txt="Create your own quiz and share with friends or answer a few quizzes." right />*/}
+						<About title="Parse HTML" txt="Parse your HTML code into XML code compatible with all the Blogger templates or other blogs systems." screen="ParseHtml" />
 						<About title="Blog" txt="Turn your thoughts into writing and share it easily." right screen="Blog" />
-						<About title="Images Checker" txt="Online tools to help you quickly identify unseemly images." />
+						<About title="Images Checker" txt="Online tools to help you quickly identify unseemly images." screen="ImagesChecker" />
 						<About title="Others" txt="And some other services that are definitely useful." right last />
 					</Lay>
 				</Lay>
