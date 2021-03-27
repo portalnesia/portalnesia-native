@@ -4,7 +4,7 @@ import { Asset } from 'expo-asset';
 import { StyleSheet,LogBox } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Font from 'expo-font';
-//import {enableScreens} from 'react-native-screens'
+import {enableScreens} from 'react-native-screens'
 import 'moment/locale/id';
 import {StatusBar} from 'expo-status-bar'
 import {
@@ -21,12 +21,22 @@ import {
 import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './provider/AuthProvider';
 import {AppearanceProvider} from 'react-native-appearance'
+import RNFS from 'react-native-fs'
 
-//enableScreens();
+enableScreens();
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
 export default function App(props) {
 	const [isLoadingComplete, setLoadingComplete] = useState(false);
+
+	React.useEffect(()=>{
+		RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
+		.then((ada)=>{
+			if(!ada) {
+				RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
+			}
+		})
+	},[])
 
 	if (!isLoadingComplete && !props.skipLoadingScreen) {
 		return (

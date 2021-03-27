@@ -169,7 +169,7 @@ export default function HomeScreen({ navigation }) {
 						<Button style={{marginTop:10,marginBottom:40}} size="small">See More</Button>
 					</Lay>
 				*/}
-				<Lay style={{paddingTop:30,alignItems:'center'}}>
+				<Lay level="2" style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent Twitter Thread</Text>
 					{!data && !error ? (
 						<Spinner size='giant' />

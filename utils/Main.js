@@ -143,8 +143,7 @@ export const slug = function (text,func,lowercase) {
       else return res
 };
 
-export const number_size=(bytes,precision)=>{
-    precision = precision || 2;
+export const number_size=(bytes,precision=2)=>{
     if(typeof bytes !== 'number' || bytes===0 || bytes===null) return '-';
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     bytes=Math.max(bytes,0);

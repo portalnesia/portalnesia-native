@@ -1,6 +1,7 @@
 import React from 'react';
 import {Icon,Divider, TopNavigation,TopNavigationAction,Text} from '@ui-kitten/components'
 import {Animated,StatusBar} from 'react-native'
+import {useNavigationState} from '@react-navigation/native'
 
 const STATUS_BAR_HEIGHT = StatusBar.currentHeight
 
@@ -107,10 +108,21 @@ export const useHeader=(height=56)=>{
 }
 
 const Header = ({withBack,title,menu,navigation,align,children,height,subtitle})=>{
+	const index = useNavigationState(state=>state.index);
+
 	const RenderBackBtn=({navigation})=>{
 		if(withBack) {
 			return(
-				<TopNavigationAction icon={BackIcon} onPress={() => {navigation.goBack()}} />
+				<TopNavigationAction icon={BackIcon} onPress={() => {
+					if(index > 0) {
+						navigation.goBack();
+					} else {
+						navigation.reset({
+							index:0,
+							routes:[{name:"Main",screen:"MainTabs"}]
+						})
+					}
+				}} />
 			)
 		}
 		else return null;

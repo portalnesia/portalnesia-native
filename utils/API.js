@@ -53,12 +53,13 @@ export default function useAPI(user){
             API.post(baseURL,dt,opt)
             .then((response)=>{
                 if(response?.data?.error == 1) {
-                    console.log(response?.status)
+                    //console.log(response?.status)
                     setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
                 }
                 res(response?.data);
             })
             .catch((err)=>{
+                //console.log(err?.response)
                 if(err?.response?.data) {
                     setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
                 }

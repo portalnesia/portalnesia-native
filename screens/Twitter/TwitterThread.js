@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated,RefreshControl,useWindowDimensions,View,Image as IMG } from 'react-native';
 import {Layout as Lay,Text,useTheme,Divider,Icon,Spinner} from '@ui-kitten/components'
 import {openBrowserAsync} from 'expo-web-browser'
+import Skeleton from '@pn/components/global/Skeleton'
 
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -166,7 +167,9 @@ export default function({navigation,route}){
             </Animated.View>
         }>
             {!data && !error ? (
-                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
+                <View style={{height:'100%',paddingTop:heightHeader+8}}>
+                    <Skeleton type="article" />
+                </View>
             ) : error || data?.error ? (
                 <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
             ) : data ? (

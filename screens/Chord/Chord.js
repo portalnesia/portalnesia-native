@@ -1,12 +1,13 @@
 import React from 'react';
 import { Animated,RefreshControl,View,useWindowDimensions,FlatList } from 'react-native';
-import {Layout as Lay,Text,Card,Spinner,Tab,TabBar,useTheme,ViewPager} from '@ui-kitten/components'
+import {Layout as Lay,Text,Card,Tab,TabBar,useTheme,ViewPager} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 
 import Layout from '@pn/components/global/Layout';
 import Header,{useHeader,headerHeight,useHeaderV2} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
+import Skeleton from '@pn/components/global/Skeleton'
 
 const Recent=({headerHeight,navigation,...other})=>{
 	const {
@@ -56,14 +57,14 @@ const Recent=({headerHeight,navigation,...other})=>{
 
 	const Footer=()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore && data?.length > 0) return <Lay level="2" style={{flex:1,justifyContent:'center',alignItems:'center',marginBottom:40,marginTop:20}}><Spinner size='giant' /></Lay> 
+		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} gridStyle={{marginBottom:20}} /></View> 
 		else return null
 	}
 
 	return (
 		<>
 			{isLoadingInitialData ? (
-                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
+                <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
             ) : error ? (
 				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
@@ -144,14 +145,14 @@ const Popular=({headerHeight,navigation,...other})=>{
 
 	const Footer=()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore && data?.length > 0) return <Lay level="2" style={{flex:1,justifyContent:'center',alignItems:'center',marginBottom:40,marginTop:20}}><Spinner size='giant' /></Lay> 
+		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
 		else return null
 	}
 
 	return (
 		<>
 			{isLoadingInitialData ? (
-                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
+                <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
             ) : error ? (
 				<Lay style={{marginBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
@@ -213,7 +214,7 @@ export default function ({ navigation,route }) {
 				selectedIndex={selectedIndex}
 				onSelect={index => setSelectedIndex(index)}
 				shouldLoadComponent={shouldLoadComponent}
-				style={{flex:1,alignItems:'center',justifyContent:'center'}}
+				style={{flex:1,alignItems:'flex-start',justifyContent:'center'}}
 			>
 				<Lay level="2">
 					<Recent headerHeight={heightHeader} {...other} navigation={navigation} />

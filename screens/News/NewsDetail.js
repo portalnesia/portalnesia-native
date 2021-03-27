@@ -13,6 +13,7 @@ import {Parser} from '@pn/components/global/Parser'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {ucwords} from '@pn/utils/Main'
+import Skeleton from '@pn/components/global/Skeleton'
 //import {CONTENT_URL} from '@env'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
@@ -51,7 +52,9 @@ export default function({navigation,route}){
 			</Animated.View>
         }>
             {!data && !error ? (
-                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
+                <View style={{height:'100%',paddingTop:heightHeader+8}}>
+                    <Skeleton type="article" />
+                </View>
             ) : error || data?.error ? (
                 <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
             ) : data?.text ? (

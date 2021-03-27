@@ -3,6 +3,7 @@ import React from 'react';
 //import Text from '../utils/UbuntuFont';
 //import Colors from '../../constants/colors';
 //import { Ionicons } from '@expo/vector-icons';
+import {useNavigationState} from '@react-navigation/native'
 import {Icon,Divider, TopNavigation,TopNavigationAction,Text,useTheme} from '@ui-kitten/components'
 
 const BackIcon=(props)=>(
@@ -13,11 +14,21 @@ const CloseIcon=(props)=>(
 )
 
 export default function({withBack,title,menu,navigation,align,subtitle,withClose}){
+	const index = useNavigationState(state=>state.index);
 	const theme = useTheme()
 	const RenderBackBtn=({navigation})=>{
 		if(withClose) {
 			return(
-				<TopNavigationAction icon={CloseIcon} onPress={() => {navigation.goBack()}} />
+				<TopNavigationAction icon={CloseIcon} onPress={() => {{
+					if(index > 0) {
+						navigation.goBack();
+					} else {
+						navigation.reset({
+							index:0,
+							routes:[{name:"Main",screen:"MainTabs"}]
+						})
+					}
+				}}} />
 			)
 		} else if(withBack) {
 			return(

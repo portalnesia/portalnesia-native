@@ -32,17 +32,13 @@ export const linking = {
                     path:'chord/:slug',
                     exact:true
                 },
-                BlogStack:{
-                    screens:{
-                        Blog:{
-                            path:'blog',
-                            exact:true
-                        },
-                        BlogDetail:{
-                            path:'blog/:slug',
-                            exact:true
-                        }
-                    }
+                Blog:{
+                    path:'blog',
+                    exact:true
+                },
+                BlogDetail:{
+                    path:'blog/:slug',
+                    exact:true
                 },
                 Pages:{
                     path:'pages/:slug',

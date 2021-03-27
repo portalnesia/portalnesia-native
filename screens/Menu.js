@@ -13,7 +13,7 @@ import {menu} from '../constants/menu'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
-
+import RNFS from 'react-native-fs'
 
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
@@ -30,6 +30,10 @@ export default function({navigation}){
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub + 20
     const [loading,setLoading] = React.useState(false)
+
+    const debug = async()=>{
+        console.log(await RNFS.stat(`${RNFS.CachesDirectoryPath}`));
+    }
 
     const checkUpdates=()=>{
         setLoading(true)
@@ -72,7 +76,7 @@ export default function({navigation}){
         <>
         <Layout navigation={navigation} >
             <Animated.View style={{position:'absolute',backgroundColor: theme['color-basic-100'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopNavigationAction icon={SettingIcon} />}>
+				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopNavigationAction icon={SettingIcon} onPress={()=>navigation.navigate("Setting")} />}>
                     <Lay level="1" style={{height:100,paddingVertical:10,paddingHorizontal:15,alignItems:'center',flexDirection:'row'}}>
                         <Lay level="1" style={{marginRight:20}}><Avatar avatar size={60} /></Lay>
                         <Lay level="1" style={{marginRight:20}}>
@@ -100,6 +104,10 @@ export default function({navigation}){
                         </Lay>
                     </React.Fragment>
                 ))}
+                <View style={{paddingLeft:15,paddingRight:15,paddingBottom:20,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                    <Text style={{fontSize:12}} appearance="hint">{`v${Constants.nativeAppVersion}`}</Text>
+                    <Text style={{fontSize:12}} appearance="hint">{`Portalnesia © ${new Date().getFullYear()}`}</Text>
+                </View>
             </Animated.ScrollView>
         </Layout>
         <Backdrop loading visible={loading} />

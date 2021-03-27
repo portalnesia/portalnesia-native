@@ -1,6 +1,7 @@
 import React from 'react';
 import { View,useWindowDimensions,FlatList } from 'react-native';
 import {Layout as Lay,Text,Card,Spinner,useTheme} from '@ui-kitten/components'
+import Skeleton from '@pn/components/global/Skeleton'
 
 import Layout from '@pn/components/global/Layout';
 //import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'

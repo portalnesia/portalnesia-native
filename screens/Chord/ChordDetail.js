@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated,RefreshControl,ScrollView,useWindowDimensions,View } from 'react-native';
 import {Layout as Lay,Text,useTheme,Divider,Modal,Card,ButtonGroup,Icon,Spinner} from '@ui-kitten/components'
 import {useLinkTo} from '@react-navigation/native'
+import Skeleton from '@pn/components/global/Skeleton'
 
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -130,7 +131,9 @@ export default function({navigation,route}){
         }>
             
             {!data && !error ? (
-                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
+                <View style={{height:'100%',paddingTop:heightHeader+8}}>
+                    <Skeleton type="article" />
+                </View>
             ) : error || data?.error ? (
                 <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
             ) : data?.chord?.text ? (

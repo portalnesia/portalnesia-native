@@ -8,6 +8,8 @@ const LoadingBackdrop=({visible,onClose,text,theme,width})=>(
         isVisible={visible||false}
         style={{margin:0,justifyContent:'center'}}
         onBackdropPress={onClose}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
     >
         <View style={{maxWidth:width-20,flexDirection:'column',justifyContent:'center',alignItems:'center',margin:10,paddingVertical:20,paddingHorizontal:10,backgroundColor:theme['background-basic-color-1'],borderRadius:10}}>
             <Text style={{marginBottom:10}}>{text}</Text>
@@ -44,6 +46,8 @@ export default function Backdrop({progress,visible,onClose,loading,text="Loading
             isVisible={visible||false}
             style={{margin:0,justifyContent:'center'}}
             onBackdropPress={onClose}
+            animationIn="fadeIn"
+            animationOut="fadeOut"
         >
             <View style={{width:width-20,flexDirection:'column',justifyContent:'center',alignItems:'center',margin:10,paddingVertical:20,paddingHorizontal:10,backgroundColor:theme['background-basic-color-1'],borderRadius:10}}>
                 <Text style={{marginBottom:10}}>{text}</Text>

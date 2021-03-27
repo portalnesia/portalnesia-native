@@ -1,6 +1,7 @@
 import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,Spinner,Divider,useTheme} from '@ui-kitten/components'
+import Skeleton from '@pn/components/global/Skeleton'
 
 import Layout from '@pn/components/global/Layout';
 //import Image from '@pn/components/global/Image';
@@ -49,7 +50,9 @@ export default function({navigation,route}){
 			</Animated.View>
         }>
             {!data && !error ? (
-                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
+                <View style={{height:'100%',paddingTop:heightHeader+8}}>
+                    <Skeleton type="article" />
+                </View>
             ) : error || data?.error ? (
                 <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
             ) : data?.blog?.text ? (

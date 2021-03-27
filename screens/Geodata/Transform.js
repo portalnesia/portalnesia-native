@@ -2,7 +2,7 @@ import React from 'react';
 import {  View,ScrollView,useWindowDimensions,KeyboardAvoidingView } from 'react-native';
 import {Layout as Lay,Text,Card,Spinner,Input,List,ListItem,Divider,useTheme,Toggle} from '@ui-kitten/components'
 import useSWR from '@pn/utils/swr'
-import Modal from 'react-native-modal'
+import {Modalize} from 'react-native-modalize'
 
 //import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
@@ -45,13 +45,14 @@ export default function({navigation}){
     const [page,setPage]=React.useState(1)
     const [modal,setModal]=React.useState(null)
     const {data,error}=useSWR(`/geodata/epsg?page=${page}&q=${encodeURIComponent(search)}`,{},false)
-    const {height,width}=useWindowDimensions()
+    const {height}=useWindowDimensions()
     const [scrollOffset,setScrollOffset] = React.useState(null)
     const theme = useTheme()
     const [total,setTotal]=React.useState(1)
     const [sistem,setSistem]=React.useState({insrc:"EPSG:4326",outsrc:"EPSG:4326"})
     const [switchVal,setSwitch]=React.useState({switch:false,add_input:false})
     const captcha = React.useRef(null)
+    const modalRef = React.useRef(null)
 
     const onReceiveToken=(token)=>{
         setRecaptcha(token)
@@ -61,6 +62,7 @@ export default function({navigation}){
     const onModalChange=type=>value=>{
         setSistem({...sistem,[type]:value})
         setModal(null)
+        modalRef?.current?.close();
     }
 
     React.useEffect(()=>{
@@ -79,7 +81,7 @@ export default function({navigation}){
         {!data && !error && (
             <Lay style={{flex:1,alignItems:'center',justifyContent:'center',paddingVertical:70}}><Spinner size="giant" /></Lay>
         )}
-        <Lay style={{flexDirection:'row',justifyContent:'center',alignItems:'center',paddingBottom:40,paddingTop:10,paddingHorizontal:15}}>
+        <Lay style={{flexDirection:'row',justifyContent:'center',alignItems:'center',paddingBottom:20,paddingTop:10,paddingHorizontal:15}}>
             <Pagination page={page} total={total} onChange={(pg)=>setPage(pg)} />
         </Lay>
         </>
@@ -123,7 +125,12 @@ export default function({navigation}){
                             <Text style={{fontFamily:'Inter_SemiBold'}}>{`Input Coordinate System / Projection`}</Text>
                             <View style={{flexDirection:'row',alignItems:'center'}}>
                                 <Text style={{marginRight:10}}>{`${sistem.insrc}`}</Text>
-                                <Button appearance="ghost" status="basic" onPress={()=>!loading && setModal("insrc")}>Change</Button>
+                                <Button appearance="ghost" status="basic" onPress={()=>{
+                                    if(!loading) {
+                                        setModal("insrc")
+                                        modalRef?.current?.open()
+                                    }
+                                }}>Change</Button>
                             </View>
                             <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}><Toggle checked={switchVal.switch} disabled={loading} onChange={(val)=>setSwitch({...switchVal,switch:val})}>{`Switch X <--> Y`}</Toggle></View>
                             <Input
@@ -141,7 +148,12 @@ export default function({navigation}){
                             <Text style={{fontFamily:'Inter_SemiBold'}}>{`Output Coordinate System / Projection`}</Text>
                             <View style={{flexDirection:'row',alignItems:'center'}}>
                                 <Text style={{marginRight:10}}>{`${sistem.outsrc}`}</Text>
-                                <Button appearance="ghost" status="basic" onPress={()=>!loading && setModal("outsrc")}>Change</Button>
+                                <Button appearance="ghost" status="basic" onPress={()=>{
+                                    if(!loading) {
+                                        setModal("outsrc")
+                                        modalRef?.current?.open()
+                                    }
+                                }}>Change</Button>
                             </View>
                             <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}><Toggle disabled={loading} checked={switchVal.add_input} onChange={(val)=>setSwitch({...switchVal,add_input:val})}>{`Include input coordinates`}</Toggle></View>
                             <Input
@@ -168,38 +180,32 @@ export default function({navigation}){
                     </Lay>
                 </ScrollView>
             </Layout>
-            <Modal
-                isVisible={modal!==null}
-                onBackdropPress={()=>setModal(null)}
-                propagateSwipe
-                swipeDirection={['down']}
-                onSwipeComplete={()=>setModal(null)}
-                style={{justifyContent:'flex-end',margin:0}}
-                scrollTo={scrollTo}
-                onModalHide={()=>{
+            <Modalize
+                modalStyle={{
+                    backgroundColor:theme['background-basic-color-1'],
+                    borderTopLeftRadius:15,borderTopRightRadius:15
+                }}
+                snapPoint={300}
+                ref={modalRef}
+                onClosed={()=>{
                     setPage(1)
                     setSearch("")
+                    setModal(null)
                 }}
+                modalHeight={height-100}
             >
-                <KeyboardAvoidingView pointerEvents="box-none" behavior="height">
-                    <View style={{maxHeight:height-60}}>
-                        <View key={`view-0`} style={{alignItems:'center',justifyContent:'center',padding:9,backgroundColor:theme['background-basic-color-1'],borderTopRightRadius:25,borderTopLeftRadius:25}}>
-                            <View style={{width:60,height:7,backgroundColor:theme['text-hint-color'],borderRadius:5}} />
-                        </View>
-                        <View key={`view-1`}>
-                            <List
-                                ref={scrollRef}
-                                ListHeaderComponent={<HeaderModal search={search} setSearch={setSearch} setPage={setPage} />}
-                                ListFooterComponent={footerModal}
-                                data={data?.data||[]}
-                                renderItem={(props)=><RenderRow {...props} onChange={onModalChange(modal)} />}
-                                ItemSeparatorComponent={Divider}
-                                keyExtractor={(item)=>item.epsg}
-                            />
-                        </View>
-                    </View>
-                </KeyboardAvoidingView>
-            </Modal>
+                <View key={`view-1`} style={{borderTopLeftRadius:15,borderTopRightRadius:15,paddingTop:15}}>
+                    <List
+                        ref={scrollRef}
+                        ListHeaderComponent={<HeaderModal search={search} setSearch={setSearch} setPage={setPage} />}
+                        ListFooterComponent={footerModal}
+                        data={data?.data||[]}
+                        renderItem={(props)=><RenderRow {...props} onChange={onModalChange(modal)} />}
+                        ItemSeparatorComponent={Divider}
+                        keyExtractor={(item)=>item.epsg}
+                    />
+                </View>
+            </Modalize>
             <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
         </>
     )

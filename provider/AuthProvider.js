@@ -7,7 +7,7 @@ import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme} from 'react-native'
-import {setStatusBarStyle,setStatusBarBackgroundColor} from 'expo-status-bar'
+import * as SecureStore from 'expo-secure-store'
 
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
@@ -65,7 +65,11 @@ const AuthProvider = (props) => {
 	},[colorScheme,tema])
 
 	const setTheme=(val)=>{
-		if(['light','auto','dark'].indexOf(val)) setTema(val);
+		if(['light','auto','dark'].indexOf(val) !== -1) {
+			SecureStore.setItemAsync("theme",val)
+			.then(()=>setTema(val))
+			.catch(()=>setNotif(true,"Error","Something went wrong"))
+		}
 	}
 
 	const setNotif=(type,title,msg)=>{
@@ -77,6 +81,10 @@ const AuthProvider = (props) => {
 	}
 
 	useEffect(()=>{
+		SecureStore.getItemAsync("theme")
+		.then((res)=>{
+			if(res!==null) setTema(res);
+		})
 		dispatch({type:"LOGOUT"})
 	},[])
 	
@@ -89,7 +97,8 @@ const AuthProvider = (props) => {
 				utils,
 				setNotif,
 				setTheme,
-				theme:selectedTheme
+				theme:selectedTheme,
+				userTheme:tema
 			}}
 		>
 			<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />

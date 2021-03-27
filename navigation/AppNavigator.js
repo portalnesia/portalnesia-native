@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-//import {Animated,Easing} from 'react-native'
+import {useWindowDimensions} from 'react-native'
 //import * as firebase from 'firebase';
 import { NavigationContainer,DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
@@ -32,6 +32,8 @@ import ParseHtml from '../screens/Tools/ParseHtml'
 import ImagesChecker from '../screens/Tools/ImagesChecker'
 import UrlShortener from '../screens/UrlShortener'
 import Contact from '../screens/Contact'
+
+import Setting from '../screens/Setting/Setting'
 
 import { AuthContext } from '../provider/AuthProvider';
 
@@ -146,6 +148,7 @@ const MainStackScreen=()=>(
 			headerShown: false,
 			gestureEnabled:true,
 			gestureDirection:'horizontal',
+			cardStyle:{backgroundColor:'transparent'},
 			...TransitionPresets.SlideFromRightIOS
 		}}
 		initialRouteName="MainTabs"
@@ -166,6 +169,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="ImagesChecker" component={ImagesChecker} />
 		<MainStack.Screen name="UrlShortener" component={UrlShortener} />
 		<MainStack.Screen name="Contact" component={Contact} />
+		<MainStack.Screen name="Setting" component={Setting} />
 	</MainStack.Navigator>
 )
 

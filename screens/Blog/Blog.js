@@ -1,6 +1,7 @@
 import React from 'react';
 import {  View,FlatList,useWindowDimensions } from 'react-native';
 import {Layout as Lay,Text,Button,Card,Spinner} from '@ui-kitten/components'
+import Skeleton from '@pn/components/global/Skeleton'
 
 //import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
@@ -23,7 +24,7 @@ export default function ({ navigation }) {
 
 	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore) return <Lay level="2" style={{flex:1,justifyContent:'center',alignItems:'center',marginVertical:40,marginTop:20}}><Spinner size='giant' /></Lay> 
+		if(isLoadingMore) return <View paddingTop={20}><Skeleton type="grid" number={4} image /></View> 
 		else return null
 	},[isReachingEnd,isLoadingMore])
 
@@ -86,29 +87,31 @@ export default function ({ navigation }) {
 
 	return (
 		<Layout navigation={navigation} title="Blog">
-			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-				{isLoadingInitialData ? (
-                	<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
-            	) : error ? (
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
-				) : (
-					<FlatList
-						columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-						numColumns={2}
-						data={data}
-						renderItem={renderNews}
-						ListFooterComponent={Footer}
-						onRefresh={()=>{mutate()}}
-						refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
-						onEndReachedThreshold={0.01}
-						onEndReached={()=>{
-							if(!isReachingEnd && !isLoadingMore) {
-								setSize(size+1)
-							}
-						}}
-					/>
-				)}
-			</Lay>
+			{isLoadingInitialData ? (
+				<View style={{height:'100%'}}><Skeleton type="grid" number={4} image /></View>
+			) : (
+				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
+					{error ? (
+						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
+					) : (
+						<FlatList
+							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+							numColumns={2}
+							data={data}
+							renderItem={renderNews}
+							ListFooterComponent={Footer}
+							onRefresh={()=>{mutate()}}
+							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+							onEndReachedThreshold={0.01}
+							onEndReached={()=>{
+								if(!isReachingEnd && !isLoadingMore) {
+									setSize(size+1)
+								}
+							}}
+						/>
+					)}
+				</Lay>
+			)}
 		</Layout>
 	);
 }
