@@ -55,10 +55,11 @@ const onLinkPress=(e,href)=>{
 }
 
 const TextRender=(attribs,children,style,props)=>{
+    console.log(props?.domNode?.children?.[1])
     if(['a','img','picture'].indexOf(props?.domNode?.children?.[0]?.name) !== -1) return children
     if(props?.data && (props?.data?.length === 0 || props?.data == '&nbsp;')) return null
     return (
-        <Text selectable={props?.selectable||false} key={props?.key} style={[global_style.container,{marginVertical:10,flexWrap:'wrap',lineHeight:23}]}>{children||props?.data}</Text>
+        <Text selectable={props?.selectable||false} key={props?.key} style={[global_style.container,{marginVertical:10,flexWrap:'wrap',lineHeight:23}]}>{(props?.domNode?.data || props.data || children)}</Text>
     )
 }
 const TextViewRender=(attribs,children,style,props)=>{
@@ -85,9 +86,10 @@ const ARender=(attribs,children,style,props)=>{
                 selectable={props?.selectable||false}
                 onPress={onPress}
                 key={props?.key}
-                style={[global_style.container,style,{lineHeight:23}]}
+                style={[global_style.container,style,{lineHeight:23,textDecorationLine:"underline"}]}
+                status="info"
               >
-                {children || props.data}
+                {props?.domNode?.children?.[0]?.data || props?.domNode?.data || props.data || children}
               </Text>
             );
     }
@@ -309,8 +311,9 @@ export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
     const renderers={
         table:{renderer:TableRender,wrapper:"Text"},
         p:{renderer:TextRender,wrapper:'View'},
-        //p:{renderer:TextViewRender,wrapper:'View'},
+        //p:{renderer:TextRender,wrapper:'View'},
         a:{renderer:ARender,wrapper:"View"},
+        //a:{renderer:ARenderView,wrapper:"View"},
         h1:{renderer:HRender('h1'),wrapper:'Text'},
         h2:{renderer:HRender('h2'),wrapper:'Text'},
         h3:{renderer:HRender('h3'),wrapper:'Text'},
@@ -396,6 +399,13 @@ export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
                             backgroundColor: theme['text-basic-color'],
                         }}
                     />
+                ),
+                ol:(a,b,c,props)=>(
+                    <Text
+                        style={{ marginRight: 5, fontSize:15 }}
+                    >
+                        {props?.index + 1})
+                    </Text>
                 )
             }}
             renderersProps={rendererProps}

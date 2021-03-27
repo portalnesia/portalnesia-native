@@ -92,7 +92,7 @@ export default function ({ navigation,route }) {
 
 	const Footer=()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore && data?.length > 0) return <Lay level="2" style={{flex:1,justifyContent:'center',alignItems:'center',marginBottom:40,marginTop:20}}><Spinner size='giant' /></Lay> 
+		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
 		else return null
 	}
 
@@ -100,7 +100,7 @@ export default function ({ navigation,route }) {
 		<Layout navigation={navigation} title={slug ? `Chord By ${artist}` : "Chord Artists"}>
 			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 				{isLoadingInitialData ? (
-                	<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Spinner size="giant" /></Lay>
+                	<View style={{height:"100%"}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
             	) : error ? (
 					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
 				) : (

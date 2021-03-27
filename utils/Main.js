@@ -123,7 +123,7 @@ export const splice = function(text,idx, rem, str) {
     return text.slice(0, idx) + str + text.slice(idx + Math.abs(rem));
 };
 
-export const slug = function (text,func,lowercase) {
+export const PNslug = function (text,func,lowercase) {
     if(typeof text!=='string') return '';
     lowercase=typeof lowercase==='boolean'&&lowercase===true;
     let str,t=text;

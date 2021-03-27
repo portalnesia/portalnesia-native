@@ -19,6 +19,7 @@ import Chord from '../screens/Chord/Chord';
 import Menu from '../screens/Menu';
 import Loading from '../screens/utils/Loading';
 import BlogDetail from '../screens/Blog/BlogDetail';
+import BlogList from '../screens/Blog/BlogList';
 import NewsDetail from '../screens/News/NewsDetail';
 import Pages from '../screens/Pages';
 import ChordDetail from '../screens/Chord/ChordDetail';
@@ -170,6 +171,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="UrlShortener" component={UrlShortener} />
 		<MainStack.Screen name="Contact" component={Contact} />
 		<MainStack.Screen name="Setting" component={Setting} />
+		<MainStack.Screen name="BlogList" component={BlogList} />
 	</MainStack.Navigator>
 )
 

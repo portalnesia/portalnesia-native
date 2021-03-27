@@ -40,6 +40,10 @@ export const linking = {
                     path:'blog/:slug',
                     exact:true
                 },
+                BlogList:{
+                    path:'blog/:blogType/:slug',
+                    exact:true
+                },
                 Pages:{
                     path:'pages/:slug',
                     exact:true

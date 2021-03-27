@@ -1,6 +1,7 @@
 import React from 'react'
 import Skltn,{SkeletonPlaceholderItem} from 'react-native-skeleton-placeholder'
 import {useWindowDimensions,View} from 'react-native'
+import {useTheme} from '@ui-kitten/components'
 
 export type SkeletonProps={
     type:'paragraph'|'rect'|'text'|'grid'|'article'
@@ -12,9 +13,10 @@ export type SkeletonProps={
 }
 
 const PararaphSkeleton=({number}:SkeletonProps)=>{
+    const theme=useTheme();
     const {width} = useWindowDimensions();
     return (
-        <Skltn>
+        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item alignItems="center">
                 {[...Array(number).keys()].map((_,index)=>(
                     <Skltn.Item borderRadius={4} width={index===0 || index+1===number ? width-80 : width-30} marginLeft={index===0 ? 50 : 0} marginRight={index+1===number ? 50 : 0} height={20} key={index} marginBottom={index+1===number ? 0 : 5} />
@@ -25,20 +27,22 @@ const PararaphSkeleton=({number}:SkeletonProps)=>{
 }
 
 const TextSkeleton=(props: SkeletonPlaceholderItem)=>{
+    const theme=useTheme();
     const {width} = useWindowDimensions();
     const textWidth = props.width||width-30;
     return (
-        <Skltn>
+        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item height={20} justifyContent="flex-start" width={textWidth} borderRadius={4} {...props} />
         </Skltn>
     )
 }
 
 const RectSkeleton=({width=200}:{width?:number})=>{
+    const theme=useTheme();
     const {width:screenWidth} = useWindowDimensions();
     width = width||screenWidth;
     return (
-        <Skltn>
+        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item height={width} width={width} borderRadius={4} />
         </Skltn>
     )
@@ -46,7 +50,7 @@ const RectSkeleton=({width=200}:{width?:number})=>{
 
 const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
     const {width} = useWindowDimensions();
-
+    const theme=useTheme();
     const renderItemWithImage=(index: number)=>{
         const cardSize=(width/2)-7
         return(
@@ -84,7 +88,7 @@ const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,
     }
 
     return (
-        <Skltn>
+        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item>
                 {[...Array(Math.floor(number/2)).keys()].map((_,index)=>{
                     if(image) return renderItemWithImage(index);
@@ -96,10 +100,11 @@ const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,
 }
 
 const ArticleSkeleton=()=>{
+    const theme=useTheme();
     const {width} = useWindowDimensions();
     const number=5;
     return(
-        <Skltn>
+        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item flexDirection="column" alignItems="center">
                 <View />
                 <Skltn.Item height={30} width={width-30} borderRadius={4} marginBottom={2} />

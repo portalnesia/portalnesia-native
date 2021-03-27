@@ -80,7 +80,9 @@
     "border-basic-color": "$border-basic-color-2",
     "border-text-color": "$border-basic-color-4",
     "link-color":"#245dc1",
-    "color-indicator-bar":"$color-primary-500"
+    "color-indicator-bar":"$color-primary-500",
+    "skeleton-background-color":"#E1E9EE",
+    "skeleton-hightlight-color":"#F2F8FC"
   },
   "dark":{
     "color-primary-100": "#DBF7DD",
@@ -163,6 +165,8 @@
     "color-code-background" :"$color-primary-700",
     "color-code-border":"$color-primary-100",
     "link-color":"#c2d8ff",
-    "color-indicator-bar":"#69ffb2"
+    "color-indicator-bar":"#69ffb2",
+    "skeleton-background-color":"$background-basic-color-4",
+    "skeleton-hightlight-color":"$background-basic-color-3"
   }
 }

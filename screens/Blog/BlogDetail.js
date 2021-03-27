@@ -2,6 +2,7 @@ import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,Spinner,Divider,useTheme} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
+import {useLinkTo} from '@react-navigation/native'
 
 import Layout from '@pn/components/global/Layout';
 //import Image from '@pn/components/global/Image';
@@ -9,7 +10,7 @@ import NotFound from '@pn/components/global/NotFound'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
 import {Parser} from '@pn/components/global/Parser'
-import {ucwords} from '@pn/utils/Main'
+import {ucwords,PNslug} from '@pn/utils/Main'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import {CONTENT_URL} from '@env'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
@@ -25,6 +26,7 @@ export default function({navigation,route}){
     const heightt = {...headerHeight,sub:0}	
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
+    const linkTo = useLinkTo()
 
     React.useEffect(()=>{
         let timeout=null;
@@ -75,7 +77,19 @@ export default function({navigation,route}){
                         </Lay>
                     </Lay>
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
-                    <Lay style={{paddingBottom:50}}><Parser source={data?.blog?.text} selectable /></Lay>
+                    <Lay style={{paddingBottom:20}}><Parser source={data?.blog?.text} selectable /></Lay>
+                    <Divider style={{backgroundColor:theme['border-text-color']}} />
+                    <Lay style={[style.container,{paddingBottom:50,paddingTop:20}]}>
+                        <Text>Category: <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/category/${PNslug(data?.blog?.category)}`)} >{ucwords(data?.blog?.category)}</Text></Text>
+                        <Text><Text>Tags: </Text>
+                            {data?.blog?.tag?.map((dt,i)=>(
+                                <React.Fragment key={i}>
+                                    <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/tags/${PNslug(dt)}`)}>{`${dt}`}</Text>
+                                    {i+1 !== data?.blog?.tag?.length && <Text>, </Text>}
+                                </React.Fragment>
+                            ))}
+                        </Text>
+                    </Lay>
                 </Animated.ScrollView>
             ) : null}
         </Layout>
