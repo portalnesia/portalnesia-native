@@ -1,7 +1,6 @@
 import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,useTheme,Divider,Spinner} from '@ui-kitten/components'
-import {openBrowserAsync} from 'expo-web-browser'
 
 import Button from '@pn/components/global/Button';
 import Layout from '@pn/components/global/Layout';
@@ -12,7 +11,7 @@ import style from '@pn/components/global/style'
 import {Parser} from '@pn/components/global/Parser'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
-import {ucwords} from '@pn/utils/Main'
+import {ucwords,openBrowser} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 //import {CONTENT_URL} from '@env'
 
@@ -64,12 +63,12 @@ export default function({navigation,route}){
                         paddingTop:heightHeader+8
                     }}
                     {...other}
-                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
+                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
                 >
                     <Lay style={[style.container]}>
                         <Text category="h2" style={{paddingVertical:10}}>{data?.title}</Text>
                         <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text style={{fontSize:13}}>{`Last modified ${data?.date_string}`}</Text>
+                            <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.date_string}`}</Text>
                             <Text style={{fontSize:13}}>{`${data?.seen?.format} views`}</Text>
                         </Lay>
                     </Lay>
@@ -77,7 +76,7 @@ export default function({navigation,route}){
                     <Lay style={{paddingBottom:20}}><Parser source={data.text} selectable /></Lay>
                     <Lay>
                         <Lay style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-                            <Button onPress={()=>openBrowserAsync(data?.url)} appearance="ghost" status="basic">Artikel Asli</Button>
+                            <Button onPress={()=>openBrowser(data?.url)} appearance="ghost" status="basic">Artikel Asli</Button>
                         </Lay>
                     </Lay>
                     <Lay style={{paddingBottom:50}}></Lay>

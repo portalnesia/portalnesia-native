@@ -82,6 +82,9 @@ const Recent=({headerHeight,navigation,...other})=>{
 					onEndReachedThreshold={0.01}
 					refreshControl={
 						<RefreshControl
+							style={{zIndex:2}}
+							colors={['white']}
+							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
 							onRefresh={()=>mutate()}
 							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
@@ -170,6 +173,8 @@ const Popular=({headerHeight,navigation,...other})=>{
 					onEndReachedThreshold={0.01}
 					refreshControl={
 						<RefreshControl
+							colors={['white']}
+							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
 							onRefresh={()=>mutate()}
 							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
@@ -215,6 +220,7 @@ export default function ({ navigation,route }) {
 				onSelect={index => setSelectedIndex(index)}
 				shouldLoadComponent={shouldLoadComponent}
 				style={{flex:1,alignItems:'flex-start',justifyContent:'center'}}
+				swipeEnabled={false}
 			>
 				<Lay level="2">
 					<Recent headerHeight={heightHeader} {...other} navigation={navigation} />

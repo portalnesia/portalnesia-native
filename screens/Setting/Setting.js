@@ -36,8 +36,7 @@ export default function Setting({navigation}){
     }
 
     React.useEffect(()=>{
-        let totalSize=0;
-        const calculateCache=async (path=RNFS.CachesDirectoryPath)=>{
+        /*const calculateCacheOld=async (path=RNFS.CachesDirectoryPath)=>{
             const caches = await RNFS.readDir(path)
             await new Promise((res,rej)=>{
                 if (caches?.length > 0) {
@@ -51,10 +50,32 @@ export default function Setting({navigation}){
                     })
                 } else res();
             })
-            setCacheSize(totalSize===0 ? "0 KB" : number_size(totalSize))
+            //setCacheSize(totalSize===0 ? "0 KB" : number_size(totalSize))
+        }*/
+        async function childCalculate(caches){
+            let localSize=0;
+            if (caches?.length > 0) {
+                for(const cache of caches) {
+                    if (cache.isFile()) {
+                        localSize += Number(cache.size)
+                    } else {
+                        localSize += await calculateFolderSize(`${cache.path}`)
+                    }
+                }
+            }
+            return localSize;
         }
+        async function calculateFolderSize(path){
+            let localSize=0;
+            const caches = await RNFS.readDir(path)
+            localSize += await childCalculate(caches)
+            return localSize
+        }
+
         (async function(){
-            await calculateCache();
+            let totalSize=0;
+            totalSize += await calculateFolderSize(RNFS.CachesDirectoryPath);
+            setCacheSize(totalSize===0 ? "0 KB" : number_size(totalSize))
         })()
     },[])
 

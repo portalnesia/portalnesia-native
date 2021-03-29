@@ -1,4 +1,5 @@
-
+import {Alert} from 'react-native'
+import {openBrowserAsync} from 'expo-web-browser'
 
 
 export const clean=(text)=>{
@@ -231,4 +232,24 @@ export const extractMeta=(file)=>{
     const fileName = file.split("/").pop();
     const match = /\.(\w+)$/.exec(fileName);
     return {name:fileName,match}
+}
+
+export const openBrowser=(url)=>{
+    Alert.alert(
+        "Open external link?",
+        "We are not responsible for the content of that website",
+        [{
+            text:'Cancel',
+            onPress:()=>{}
+        },{
+            text:"Open",
+            onPress:()=>{
+                    openBrowserAsync(url,{
+                    enableDefaultShare:true,
+                    toolbarColor:'#2f6f4e',
+                    showTitle:true
+                })
+            }
+        }]
+    )
 }

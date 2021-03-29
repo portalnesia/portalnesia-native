@@ -1,5 +1,5 @@
 import React from 'react';
-import { View,useWindowDimensions,FlatList } from 'react-native';
+import { View,useWindowDimensions,FlatList,RefreshControl } from 'react-native';
 import {Layout as Lay,Text,Card,Spinner,useTheme} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 
@@ -113,8 +113,14 @@ export default function ({ navigation,route }) {
 							else return <RenderArtist item={item} index={index} width={width} data={data} navigation={navigation} />
 						}}
 						ListFooterComponent={Footer}
-						onRefresh={()=>{mutate()}}
-						refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+						refreshControl={
+							<RefreshControl
+								colors={['white']}
+								progressBackgroundColor="#2f6f4e"
+								onRefresh={()=>{mutate()}}
+								refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+							/>
+						}
 						onEndReachedThreshold={0.01}
 						onEndReached={()=>{
 							if(!isReachingEnd && !isLoadingMore) {

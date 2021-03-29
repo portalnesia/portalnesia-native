@@ -79,6 +79,10 @@ export const linking = {
                 Contact:{
                     path:'contact',
                     exact:true
+                },
+                User:{
+                    path:'user/:username/:slug?',
+                    exact:true
                 }
             }
         }

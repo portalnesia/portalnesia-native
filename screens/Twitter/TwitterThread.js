@@ -1,7 +1,6 @@
 import React from 'react';
 import { Animated,RefreshControl,useWindowDimensions,View,Image as IMG } from 'react-native';
 import {Layout as Lay,Text,useTheme,Divider,Icon,Spinner} from '@ui-kitten/components'
-import {openBrowserAsync} from 'expo-web-browser'
 import Skeleton from '@pn/components/global/Skeleton'
 
 import Layout from '@pn/components/global/Layout';
@@ -17,7 +16,7 @@ import {CONTENT_URL} from '@env'
 import WebView from 'react-native-autoheight-webview'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import Button from '@pn/components/global/Button'
-import {specialHTML,listToMatrix} from '@pn/utils/Main'
+import {specialHTML,listToMatrix,openBrowser} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'
 
 const MoreIcon=(props)=><Icon {...props} style={{...props?.style,marginHorizontal:0}} name="more-vertical" />
@@ -47,7 +46,7 @@ const RenderTwitter=React.memo(({item,index,setMenu})=>{
                     <Text key={`tweet-${index}`} style={{lineHeight:23}}>{specialHTML(item?.tweet)}</Text>
                     {item?.url?.length > 0 ? item?.url?.map((u,i)=>
                         u?.url.match(/^https?\:\/\/twitter\.com/)===null ? (
-                            <Text key={`url-${index}-${i}`} style={{fontSize:13,textDecorationLine:"underline",lineHeight:23}} status="info" onPress={()=>openBrowserAsync(u.url)} onLongPress={()=>copyText(u.url)} >{u?.text}</Text>
+                            <Text key={`url-${index}-${i}`} style={{fontSize:13,textDecorationLine:"underline",lineHeight:23}} status="info" onPress={()=>openBrowser(u.url)} onLongPress={()=>copyText(u.url)} >{u?.text}</Text>
                         ) : null
                     ) : null}
                 </Lay>
@@ -149,9 +148,7 @@ export default function({navigation,route}){
             <Lay key={0} style={[style.container,{paddingTop:10}]}>
                 <Text category="h3">{`Thread by @${data?.screen_name}`}</Text>
                 <Lay key="lay-0" style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Lay style={{flexDirection:'row',alignItems:'center'}}>
-                        <Text style={{fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>openBrowserAsync(`https://twitter.com/${data?.screen_name}/status/${data?.id}`) }>Original Thread</Text>
-                    </Lay>
+                    <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>openBrowser(`https://twitter.com/${data?.screen_name}/status/${data?.id}`) }>Original Thread</Text>
                     <Text style={{fontSize:13}}>{`${data?.seen?.format} views`}</Text>
                 </Lay>
             </Lay>
@@ -178,7 +175,7 @@ export default function({navigation,route}){
                         flexGrow: 1,
                         paddingTop:heightHeader + 8,
                     }}
-                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
+                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
                     data={data?.tweets}
                     ListHeaderComponent={HeaderComp}
                     renderItem={({item,index})=>(

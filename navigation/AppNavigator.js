@@ -33,7 +33,7 @@ import ParseHtml from '../screens/Tools/ParseHtml'
 import ImagesChecker from '../screens/Tools/ImagesChecker'
 import UrlShortener from '../screens/UrlShortener'
 import Contact from '../screens/Contact'
-
+import User from '../screens/User/User'
 import Setting from '../screens/Setting/Setting'
 
 import { AuthContext } from '../provider/AuthProvider';
@@ -172,6 +172,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="Contact" component={Contact} />
 		<MainStack.Screen name="Setting" component={Setting} />
 		<MainStack.Screen name="BlogList" component={BlogList} />
+		<MainStack.Screen name="User" component={User} />
 	</MainStack.Navigator>
 )
 

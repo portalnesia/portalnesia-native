@@ -32,7 +32,16 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 			)
 		} else if(withBack) {
 			return(
-				<TopNavigationAction icon={BackIcon} onPress={() => {navigation.goBack()}} />
+				<TopNavigationAction icon={BackIcon} onPress={() => {{
+					if(index > 0) {
+						navigation.goBack();
+					} else {
+						navigation.reset({
+							index:0,
+							routes:[{name:"Main",screen:"MainTabs"}]
+						})
+					}
+				}}} />
 			)
 		}
 		else return null;

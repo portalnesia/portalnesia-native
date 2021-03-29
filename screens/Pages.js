@@ -63,7 +63,7 @@ export default function({navigation,route}){
                             paddingTop:heightHeader+8
                         }}
                         {...other}
-                        {...((!data && !error) || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
+                        {...((!data && !error) || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
                     >
                     <Lay style={[style.container,{paddingVertical:20}]}>
                         <Text category="h2" style={{paddingVertical:10}}>{data?.pages?.title}</Text>

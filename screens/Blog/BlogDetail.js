@@ -64,17 +64,17 @@ export default function({navigation,route}){
                         paddingTop:heightHeader+8
                     }}
                     {...other}
-                    {...((!data && !error) || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
+                    {...((!data && !error) || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
                 >
                     <Lay style={[style.container,{paddingVertical:20}]}>
                         <Text category="h2" style={{paddingVertical:10}}>{data?.blog?.title}</Text>
                         <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text style={{fontSize:13}}>{`Last modified ${data?.blog?.date}`}</Text>
+                            <Text  numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.blog?.date}`}</Text>
                             <Text style={{fontSize:13}}>{`${data?.blog?.seen?.format} views`}</Text>
                         </Lay>
-                        <Lay style={{paddingBottom:5,flexDirection:'row'}}>
-                            <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}}>{data?.blog?.users?.name||"Portalnesia"}</Text>
-                        </Lay>
+                        <Text>
+                            <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.blog?.users?.username}`)}>{data?.blog?.users?.name||"Portalnesia"}</Text>
+                        </Text>
                     </Lay>
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
                     <Lay style={{paddingBottom:20}}><Parser source={data?.blog?.text} selectable /></Lay>

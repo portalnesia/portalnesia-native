@@ -12,7 +12,7 @@ export type SkeletonProps={
     gridStyle?:SkeletonPlaceholderItem
 }
 
-const PararaphSkeleton=({number}:SkeletonProps)=>{
+export const PararaphSkeleton=({number}:SkeletonProps)=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     return (
@@ -26,7 +26,7 @@ const PararaphSkeleton=({number}:SkeletonProps)=>{
     )
 }
 
-const TextSkeleton=(props: SkeletonPlaceholderItem)=>{
+export const TextSkeleton=(props: SkeletonPlaceholderItem)=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     const textWidth = props.width||width-30;
@@ -37,7 +37,7 @@ const TextSkeleton=(props: SkeletonPlaceholderItem)=>{
     )
 }
 
-const RectSkeleton=({width=200}:{width?:number})=>{
+export const RectSkeleton=({width=200}:{width?:number})=>{
     const theme=useTheme();
     const {width:screenWidth} = useWindowDimensions();
     width = width||screenWidth;
@@ -48,10 +48,11 @@ const RectSkeleton=({width=200}:{width?:number})=>{
     )
 }
 
-const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
+export const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
+    
     const {width} = useWindowDimensions();
     const theme=useTheme();
-    const renderItemWithImage=(index: number)=>{
+    const renderItemWithImage=(index:number)=>{
         const cardSize=(width/2)-7
         return(
             <Skltn.Item flexDirection="row" justifyContent="space-between" alignItems="center" key={index} {...gridStyle}>
@@ -71,7 +72,7 @@ const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,
         )
     }
 
-    const renderItemNoImage=(index: number)=>{
+    const renderItemNoImage=(index:number)=>{
         const cardSize=(width/2)-7
         return(
             <Skltn.Item flexDirection="row" justifyContent="space-between" alignItems="center" key={index} {...gridStyle}>
@@ -91,15 +92,15 @@ const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,
         <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item>
                 {[...Array(Math.floor(number/2)).keys()].map((_,index)=>{
-                    if(image) return renderItemWithImage(index);
-                    else return renderItemNoImage(index);
+                    if(image) return renderItemWithImage(index)
+                    else return renderItemNoImage(index)
                 })}
             </Skltn.Item>
         </Skltn>
     )
 }
 
-const ArticleSkeleton=()=>{
+export const ArticleSkeleton=()=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     const number=5;
@@ -139,6 +140,45 @@ const ArticleSkeleton=()=>{
                     </Skltn.Item>
                 </Skltn.Item>
             </Skltn.Item>
+        </Skltn>
+    )
+}
+
+export const ListSkeleton=({number=3,image=false}: {number?:number,image?:boolean})=>{
+    const theme=useTheme();
+    const {width} = useWindowDimensions();
+
+    const renderWithImage=(index: number)=>{
+
+        return (
+            <Skltn.Item key={index} flexDirection="row" justifyContent='flex-start' alignItems="center" marginBottom={15}>
+                <Skltn.Item height={60} width={60} borderRadius={30} marginRight={15} />
+                <Skltn.Item>
+                    <Skltn.Item height={25} width={width-50-60} marginBottom={5} borderRadius={5}  />
+                    <Skltn.Item height={15} width={(width-50-60)/2} borderRadius={5} />
+                </Skltn.Item>
+            </Skltn.Item>
+        )
+    }
+
+    const renderNoImage=(index: number)=>{
+
+        return (
+            <Skltn.Item key={index} flexDirection="row" justifyContent='space-between' alignItems="center" marginBottom={15}>
+                <Skltn.Item height={25} width={width-40} marginBottom={5} borderRadius={5} />
+                <Skltn.Item height={15} width={(width-40)/2} borderRadius={5} />
+            </Skltn.Item>
+        )
+    }
+
+    return (
+        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+            <View>
+                {[...Array(number).keys()].map((_,index)=>{
+                    if(image) return renderWithImage(index)
+                    else return renderNoImage(index)
+                })}
+            </View>
         </Skltn>
     )
 }

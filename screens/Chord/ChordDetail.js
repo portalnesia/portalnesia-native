@@ -1,8 +1,9 @@
 import React from 'react';
 import { Animated,RefreshControl,ScrollView,useWindowDimensions,View } from 'react-native';
-import {Layout as Lay,Text,useTheme,Divider,Modal,Card,ButtonGroup,Icon,Spinner} from '@ui-kitten/components'
+import {Layout as Lay,Text,useTheme,Divider,Card,ButtonGroup,Icon,Spinner} from '@ui-kitten/components'
 import {useLinkTo} from '@react-navigation/native'
 import Skeleton from '@pn/components/global/Skeleton'
+import Modal from 'react-native-modal'
 
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -13,6 +14,7 @@ import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import Chord from '@pn/components/global/Chord'
 import Button from '@pn/components/global/Button'
 import {ucwords} from '@pn/utils/Main'
+
 
 const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
@@ -143,31 +145,33 @@ export default function({navigation,route}){
                         paddingTop:heightHeader+8
                     }}
                     {...other}
-                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
+                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
                 >
                     <Lay key={0} style={[style.container,{paddingTop:10}]}>
                         <Text category="h3">{data?.chord?.title}</Text>
                         <Lay key="lay-0" style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Lay style={{flexDirection:'row',alignItems:'center'}}>
+                            <Text numberOfLines={1} style={{flex:1,marginRight:20}}>
                                 <Text style={{fontSize:13}}>Artist: </Text>
                                 <Text style={{fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>linkTo(`/chord/artist/${data?.chord?.slug_artist}`)} >{data?.chord?.artist}</Text>
-                            </Lay>
+                            </Text>
                             <Text style={{fontSize:13}}>{`${data?.chord?.seen?.format} views`}</Text>
                         </Lay>
                         <Lay key="lay-1" style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Lay style={{flexDirection:'row',alignItems:'center'}}>
-                                <Text style={{fontSize:13}}>Author: </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}}>{data?.chord?.users?.name||"Portalnesia"}</Text>
-                            </Lay>
+                            <Text numberOfLines={1} style={{flex:1,marginRight:20}}>
+                                <Text style={{fontSize:13}}>Author: </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.chord?.users?.username}`)}>{data?.chord?.users?.name||"Portalnesia"}</Text>
+                            </Text>
                             <Text style={{fontSize:13}}>{`${data?.chord?.date}`}</Text>
                         </Lay>
                     </Lay>
 
                     <Modal
-                        visible={showMenu!==null}
-                        backdropStyle={{backgroundColor:'rgba(0,0,0,0.5)'}}
+                        isVisible={showMenu!==null}
+                        style={{margin:0,justifyContent:'center',alignItems:'center'}}
                         onBackdropPress={()=>{setShowMenu(null)}}
+                        animationIn="fadeIn"
+                        animationOut="fadeOut"
                     >
-                        <Card disabled header={(props)=><View {...props}><Text>{ucwords(showMenu)}</Text></View>}>
+                        <Card style={{width:width-30,justifyContent:'center',alignItems:'center'}} disabled header={(props)=><View {...props}><Text>{ucwords(showMenu)}</Text></View>}>
                             <View style={{flexDirection:'row',alignItems:'center'}}>
                                 {showMenu === 'transpose' ? (
                                     <>

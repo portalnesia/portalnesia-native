@@ -5,16 +5,12 @@ import {API_URL,API_URL_2} from '@env'
 
 
 export default function usePagination(path,data_name,limit,news,user=false){
-    if (!path) {
-        throw new Error("Path is required")
-    }
-
-    const url = user ? API_URL_2 + path : API_URL + path
-    //console.log(url)
     const PAGE_LIMIT = limit||10
 
     const { data, error, size, setSize,mutate,isValidating } = useSWRInfinite(
         (index,previous)=>{
+            if(path===null) return null;
+            const url = user ? API_URL_2 + path : API_URL + path
             if(previous && previous?.load===false) return null
             if(index==0) return `${url}?page=${news ? 0 : 1}`
             if(previous && previous?.page) return `${url}?page=${news ? previous?.page : previous?.page+1}`

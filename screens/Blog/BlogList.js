@@ -1,12 +1,12 @@
 import React from 'react';
-import {  View,FlatList,useWindowDimensions } from 'react-native';
+import {  View,FlatList,useWindowDimensions,RefreshControl,Image } from 'react-native';
 import {Layout as Lay,Text,Button,Card,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 
 //import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
-import Image from '@pn/components/global/Image'
+//import Image from '@pn/components/global/Image'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {ucwords} from '@pn/utils/Main'
 
@@ -105,8 +105,14 @@ export default function BlogList({navigation,route}){
 							data={data}
 							renderItem={renderNews}
 							ListFooterComponent={Footer}
-							onRefresh={()=>{mutate()}}
-							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+							refreshControl={
+								<RefreshControl
+									colors={['white']}
+									progressBackgroundColor="#2f6f4e"
+									onRefresh={()=>{mutate()}}
+									refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+								/>
+							}
 							onEndReachedThreshold={0.01}
 							onEndReached={()=>{
 								if(!isReachingEnd && !isLoadingMore) {

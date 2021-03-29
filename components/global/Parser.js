@@ -4,8 +4,7 @@ import {Text,useTheme,Divider} from '@ui-kitten/components'
 import WebView from 'react-native-webview'
 import HTML,{IGNORED_TAGS,domNodeToHTMLString,getClosestNodeParentByTag} from 'react-native-render-html'
 import {CONTENT_URL,URL} from '@env'
-import {openBrowserAsync} from 'expo-web-browser'
-import Image from '@pn/components/global/Image'
+import {ImageFull as Image} from '@pn/components/global/Image'
 import {Buffer} from 'buffer'
 import TableRenderer,{IGNORED_TAGS as TABLE_IGNORED_TAGS} from '@native-html/table-plugin'
 import Syntax from 'react-native-syntax-highlighter'
@@ -14,6 +13,7 @@ import {androidstudio} from 'react-syntax-highlighter/styles/hljs'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import global_style from '@pn/components/global/style'
 import AutoHeightWebView from 'react-native-autoheight-webview'
+import {openBrowser} from '@pn/utils/Main'
 
 import { AuthContext } from '@pn/provider/AuthProvider';
 
@@ -28,34 +28,15 @@ const onLinkPress=(e,href)=>{
     if(
         !href?.match(/^mailto\:/)
         && !href?.match(/portalnesia\.com+/)
-        && !href?.match(/kakek\.c1\.biz\/+/)
         && !href?.match(/^javascript\:/)
         && !href?.match(/^\/+/)
     ) {
         url = `${URL}/link?u=${Buffer.from(encodeURIComponent(href)).toString('base64')}`
     }
-    Alert.alert(
-        "Open link?",
-        "We are not responsible for the content of that page",
-        [{
-            text:"Cancel",
-            onPress:()=>{}
-        },{
-            text:"Open",
-            onPress:async()=>{
-                await openBrowserAsync(url,{
-                    enableDefaultShare:true,
-                    toolbarColor:'#2f6f4e',
-                    showTitle:true
-                })
-            }
-        }],
-        {cancelable:false}
-    )
+    openBrowser(url)
 }
 
 const TextRender=(attribs,children,style,props)=>{
-    console.log(props?.domNode?.children?.[1])
     if(['a','img','picture'].indexOf(props?.domNode?.children?.[0]?.name) !== -1) return children
     if(props?.data && (props?.data?.length === 0 || props?.data == '&nbsp;')) return null
     return (
@@ -413,3 +394,27 @@ export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
         />
     )
 })
+
+export const Markdown=({source,skipHtml,selectable=false,iklan=true})=>{
+    const marked=require('marked');
+    const sanitizeHtml = require('sanitize-html')
+    const html = React.useMemo(()=>{
+        marked.setOptions({
+            breaks:true
+        })
+        const hhtm = marked(source)
+        const allowedTags=['p','h1','h2','h3','figcaption','b','strong','li','ul','ol','em','i','hr','pre','code','a','br','small','span','caption','table','tbody','thead','td','tr','tfoot'];
+        const allowed = skipHtml ? allowedTags : allowedTags.concat(['img','iframe']);
+        return sanitizeHtml(hhtm,{
+            allowedTags:allowed,
+            allowedSchemes:['https','mailto','tel','pn'],
+            allowedAttributes:false,
+            disallowedTagsMode:'escape',
+            allowedSchemesAppliedToAttributes:['href','src','cite','data-*','srcset'],
+        })
+        //return hhtm;
+        //return DOMpurify.sanitize(hhtm, {FORBID_TAGS: forb,USE_PROFILES: {html: true}})
+    },[source,skipHtml])
+
+    return <Parser source={html} selectable={selectable} iklan={iklan} />
+}

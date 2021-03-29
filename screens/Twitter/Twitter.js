@@ -81,6 +81,8 @@ const Recent=({headerHeight,navigation,...other})=>{
 					//onEndReachedThreshold={0.05}
 					refreshControl={
 						<RefreshControl
+							colors={['white']}
+							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
 							onRefresh={()=>mutate()}
 							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
@@ -168,6 +170,8 @@ const Popular=({headerHeight,navigation,...other})=>{
 					//onEndReachedThreshold={0.05}
 					refreshControl={
 						<RefreshControl
+							colors={['white']}
+							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
 							onRefresh={()=>mutate()}
 							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}

@@ -81,7 +81,9 @@ export const menu=[
             },
             {
                 title:"Check Update",
-                to:"CheckUpdate",
+                //to:"CheckUpdate",
+                to:"User",
+                params:{username:'putuaditya_sid'}
                 //icon:['update','material'],
             },
             {
