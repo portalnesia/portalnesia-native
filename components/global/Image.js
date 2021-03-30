@@ -1,9 +1,10 @@
 import React from 'react'
-import {Image as Img,useWindowDimensions,View} from 'react-native'
+import {useWindowDimensions,View} from 'react-native'
 import {useTheme} from '@ui-kitten/components'
 import ImageFullComp from './ImageFull'
 import Lightbox from '@pn/components/lightbox/index'
 import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
+import Img from 'react-native-fast-image'
 
 import { AuthContext } from '@pn/provider/AuthProvider';
 

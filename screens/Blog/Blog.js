@@ -1,7 +1,8 @@
 import React from 'react';
-import {  View,FlatList,useWindowDimensions,RefreshControl,Image } from 'react-native';
+import {  View,FlatList,useWindowDimensions,RefreshControl } from 'react-native';
 import {Layout as Lay,Text,Button,Card,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
+import Image from 'react-native-fast-image'
 
 //import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';

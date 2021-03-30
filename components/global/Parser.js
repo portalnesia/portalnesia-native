@@ -116,13 +116,13 @@ const ImageRender=(attribs,children,style,props)=>{
     const node = props?.domNode;
     const aa = getClosestNodeParentByTag(node,"a");
     const {src}=node?.attribs;
-    const srrrc=node?.attribs?.['data-src']||src;
-    const dtSrc = aa !== null && aa?.attribs?.['data-src'] ? aa?.attribs?.['data-src'] : srrrc;
-    const dtCaption = aa !== null && aa?.attribs?.['data-caption'] ? aa?.attribs?.['data-caption'] : "";
     const withPng = node?.attribs?.['data-png'] == "true";
+    const srrrc=node?.attribs?.['data-src']||src;
+    const dtSrc = aa !== null && aa?.attribs?.['data-src'] ? `${aa?.attribs?.['data-src']}${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
+    const dtCaption = aa !== null && aa?.attribs?.['data-caption'] ? aa?.attribs?.['data-caption'] : "";
     const srrc=!srrrc?.match(/portalnesia\.com\/+/) && !srrrc?.match(/^\/+/) ? `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=400${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
     let thumb;
-    if(!withPng) {
+    //if(!withPng) {
         if(!srrrc?.match(/portalnesia\.com\/+/) && !srrrc?.match(/^\/+/)) thumb = `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=50`;
         else {
             const UrlParse = new Url(srrrc,true);
@@ -131,7 +131,7 @@ const ImageRender=(attribs,children,style,props)=>{
             ssrc = imgWid ? srrrc.replace(`?size=${imgWid}`,'?') : srrrc;
             thumb = `${ssrc}&size=50`
         }
-    } else thumb=undefined
+    //} else thumb=undefined
     //console.log(thumb);
     return <View key={props?.key} style={{marginTop:10,justifyContent:'center',alignItems:'center'}}><GlobalImageRender src={srrc} dataSrc={dtSrc} thumbnail={thumb} caption={dtCaption} /></View>
 }

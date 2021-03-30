@@ -7,7 +7,7 @@ import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme} from 'react-native'
-import * as SecureStore from 'expo-secure-store'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
@@ -64,11 +64,14 @@ const AuthProvider = (props) => {
 		return 'light'
 	},[colorScheme,tema])
 
-	const setTheme=(val)=>{
+	const setTheme=async(val)=>{
 		if(['light','auto','dark'].indexOf(val) !== -1) {
-			SecureStore.setItemAsync("theme",val)
-			.then(()=>setTema(val))
-			.catch(()=>setNotif(true,"Error","Something went wrong"))
+			try {
+				await AsyncStorage.setItem("theme",val)
+				setTema(val)
+			} catch(e) {
+				setNotif(true,"Error","Something went wrong")
+			}
 		}
 	}
 
@@ -81,11 +84,11 @@ const AuthProvider = (props) => {
 	}
 
 	useEffect(()=>{
-		SecureStore.getItemAsync("theme")
-		.then((res)=>{
-			if(res!==null) setTema(res);
-		})
-		dispatch({type:"LOGOUT"})
+		(async function(){
+			const res = await AsyncStorage.getItem("theme")
+			if(res !== null) setTema(res);
+			dispatch({type:"LOGOUT"})
+		})();
 	},[])
 	
 

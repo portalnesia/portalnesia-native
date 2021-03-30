@@ -8,6 +8,9 @@ import {
 } from "react-native";
 import {Text,useTheme} from '@ui-kitten/components'
 import {PinchGestureHandler,State} from 'react-native-gesture-handler'
+import FastImage from 'react-native-fast-image'
+
+const AnimImage = Animated.createAnimatedComponent(FastImage)
 
 const defaultImageStyle = { resizeMode: "cover" };
 const emptyObject = {};
@@ -322,7 +325,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
 
   componentDidMount() {
     this.mounted = true;
-    this.fetchPhysicalImageDimensions();
+    //this.fetchPhysicalImageDimensions();
   }
 
   componentWillUnmount() {
@@ -353,20 +356,27 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
         requiredHeight: this.__cachedRequirements.height,
       });
     }
-    if (sourceHasChanged) {
+    /*if (sourceHasChanged) {
       if (
         this.__cachedRequirements.width === null ||
         this.__cachedRequirements.height === null
       ) {
         this.fetchPhysicalImageDimensions();
       }
-    }
+    }*/
     if (shouldRecomputeImageBox) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState((state, props) => ({
         imageBoxDimensions: this.computeImageBoxDimensions(props, state),
       }));
     }
+  }
+
+  onFastImageLoad(e){
+    const {nativeEvent} = e
+    console.log(nativeEvent)
+    const {width:imagePhysicalWidth,height:imagePhysicalHeight}=nativeEvent;
+    this.setState({imagePhysicalHeight,imagePhysicalWidth,error:false});
   }
 
   fetchPhysicalImageDimensions(props = this.props) {
@@ -424,10 +434,18 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
   }
 
   imageLoaded=()=>{
-    Animated.timing(this.imageAnimated,{
-      toValue:1,
-      useNativeDriver:true
-    }).start()
+    const {imageBoxDimensions} = this.state
+    if(imageBoxDimensions !== null) {
+      Animated.timing(this.thumbnailAnimated,{
+        toValue:0,
+        useNativeDriver:true
+      }).start(()=>{
+        Animated.timing(this.imageAnimated,{
+          toValue:1,
+          useNativeDriver:true
+        }).start()
+      })
+    }
   }
 
   onPinchEvent = Animated.event(
@@ -459,57 +477,58 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
         <>
           <Animated.Image
             source={thumbnail}
-            onError={() => this.setState({ error: true })}
             style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:contentWidth}),opacity:animated ? this.thumbnailAnimated : 1}]}
             testID="image-layout-thumbnail"
-            blurRadius={2}
-            onLoad={animated ? this.thumbnailLoaded : undefined}
+            blurRadius={5}
+            onLoadStart={animated ? this.thumbnailLoaded : undefined}
           />
-          {imageBoxDimensions !== null ? 
-            zoomable ? (
+          {zoomable ? (
               <PinchGestureHandler
                 onGestureEvent={this.onPinchEvent}
                 onHandlerStateChange={this.onPinchStateChange}
               >
-                <Animated.Image
+                <AnimImage
                   source={source}
                   onError={() => this.setState({ error: true })}
                   style={[styles.imageOverlay,defaultImageStyle, imageBoxDimensions, imageStyles,{opacity:this.imageAnimated,transform:[{scale:this.scaleZoom}]}]}
                   testID="image-layout"
-                  onLoad={animated ? this.imageLoaded : undefined}
+                  onLoadEnd={()=>animated && this.imageLoaded()}
+                  onLoad={(e)=>this.onFastImageLoad(e)}
                 />
               </PinchGestureHandler>
             ) : (
-              <Animated.Image
+              <AnimImage
                 source={source}
                 onError={() => this.setState({ error: true })}
                 style={[styles.imageOverlay,defaultImageStyle, imageBoxDimensions, imageStyles,{opacity:animated ? this.imageAnimated : 1}]}
                 testID="image-layout"
-                onLoad={animated ? this.imageLoaded : undefined}
+                onLoadEnd={()=>animated && this.imageLoaded()}
+                onLoad={(e)=>this.onFastImageLoad(e)}
               />
-            )
-          : null}
+            )}
         </>
       );
     } else {
       if(zoomable) {
         return (
-            <Animated.Image
+            <AnimImage
               source={source}
               onError={() => this.setState({ error: true })}
               style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:contentWidth,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1}]}
               testID="image-layout"
-              onLoad={animated ? this.imageLoaded : undefined}
+              onLoadEnd={()=>animated && this.imageLoaded()}
+              onLoad={(e)=>this.onFastImageLoad(e)}
             />
         )
       } else {
         return (
-          <Animated.Image
+          <AnimImage
             source={source}
             onError={() => this.setState({ error: true })}
             style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:contentWidth,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1}]}
             testID="image-layout"
-            onLoad={animated ? this.imageLoaded : undefined}
+            onLoadEnd={()=>animated && this.imageLoaded()}
+            onLoad={(e)=>this.onFastImageLoad(e)}
           />
         );
       }
