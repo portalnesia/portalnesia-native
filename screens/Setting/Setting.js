@@ -82,12 +82,9 @@ export default function Setting({navigation}){
     const handleCacheDelete=async()=>{
         RNFS.readdir(RNFS.CachesDirectoryPath)
         .then(async(caches)=>{
-            await new Promise(res=>{
-                caches.forEach(async(cache)=>{
-                    await RNFS.unlink(`${RNFS.CachesDirectoryPath}/${cache}`);
-                })
-                res();
-            })
+            for(const cache of caches) {
+                await RNFS.unlink(`${RNFS.CachesDirectoryPath}/${cache}`);
+            }
             setNotif(false,"Success","Caches deleted");
             setCacheSize("0 KB")
         })

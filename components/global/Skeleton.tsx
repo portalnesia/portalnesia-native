@@ -10,13 +10,18 @@ export type SkeletonProps={
     textProps?: SkeletonPlaceholderItem
     image?: boolean,
     gridStyle?:SkeletonPlaceholderItem
+    height?:number
 }
 
-export const PararaphSkeleton=({number}:SkeletonProps)=>{
+interface TextProps extends SkeletonPlaceholderItem{
+    rootHeight?:number
+}
+
+export const PararaphSkeleton=({number,height}:SkeletonProps)=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     return (
-        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item alignItems="center">
                 {[...Array(number).keys()].map((_,index)=>(
                     <Skltn.Item borderRadius={4} width={index===0 || index+1===number ? width-80 : width-30} marginLeft={index===0 ? 50 : 0} marginRight={index+1===number ? 50 : 0} height={20} key={index} marginBottom={index+1===number ? 0 : 5} />
@@ -26,29 +31,29 @@ export const PararaphSkeleton=({number}:SkeletonProps)=>{
     )
 }
 
-export const TextSkeleton=(props: SkeletonPlaceholderItem)=>{
+export const TextSkeleton=(props: TextProps)=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     const textWidth = props.width||width-30;
     return (
-        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+        <Skltn height={props.rootHeight} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item height={20} justifyContent="flex-start" width={textWidth} borderRadius={4} {...props} />
         </Skltn>
     )
 }
 
-export const RectSkeleton=({width=200}:{width?:number})=>{
+export const RectSkeleton=({width=200,height}:{width?:number,height:number})=>{
     const theme=useTheme();
     const {width:screenWidth} = useWindowDimensions();
     width = width||screenWidth;
     return (
-        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item height={width} width={width} borderRadius={4} />
         </Skltn>
     )
 }
 
-export const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
+export const GridSkeleton=({number=6,image,gridStyle={},height}:{height:number,number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
     
     const {width} = useWindowDimensions();
     const theme=useTheme();
@@ -89,7 +94,7 @@ export const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:b
     }
 
     return (
-        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item>
                 {[...Array(Math.floor(number/2)).keys()].map((_,index)=>{
                     if(image) return renderItemWithImage(index)
@@ -100,12 +105,12 @@ export const GridSkeleton=({number=6,image,gridStyle={}}:{number:number,image?:b
     )
 }
 
-export const ArticleSkeleton=()=>{
+export const ArticleSkeleton=({height}:{height:number})=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     const number=5;
     return(
-        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Skltn.Item flexDirection="column" alignItems="center">
                 <View />
                 <Skltn.Item height={30} width={width-30} borderRadius={4} marginBottom={2} />
@@ -144,7 +149,7 @@ export const ArticleSkeleton=()=>{
     )
 }
 
-export const ListSkeleton=({number=3,image=false}: {number?:number,image?:boolean})=>{
+export const ListSkeleton=({number=3,image=false,height}: {height:number,number?:number,image?:boolean})=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
 
@@ -172,8 +177,8 @@ export const ListSkeleton=({number=3,image=false}: {number?:number,image?:boolea
     }
 
     return (
-        <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
-            <View>
+        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+            <View style={{paddingHorizontal:15}}>
                 {[...Array(number).keys()].map((_,index)=>{
                     if(image) return renderWithImage(index)
                     else return renderNoImage(index)
@@ -183,11 +188,13 @@ export const ListSkeleton=({number=3,image=false}: {number?:number,image?:boolea
     )
 }
 
-export default function Skeleton({type,number=3,width,textProps,image,gridStyle}: SkeletonProps): React.ReactNode {
-    if(type==='paragraph') return <PararaphSkeleton type={type} number={number} />
-    else if(type==='rect') return <RectSkeleton width={width} />
-    else if(type==='text' && textProps) return <TextSkeleton {...textProps} />
-    else if(type==='grid') return <GridSkeleton number={number} image={image} gridStyle={gridStyle} />
-    else if(type==='article') return <ArticleSkeleton />
+export default function Skeleton({type,number=3,width,textProps,image,gridStyle,height}: SkeletonProps): React.ReactNode {
+    const {height:winHeight}=useWindowDimensions()
+    height=height||winHeight
+    if(type==='paragraph') return <PararaphSkeleton type={type} number={number} height={height} />
+    else if(type==='rect') return <RectSkeleton width={width} height={height} />
+    else if(type==='text' && textProps) return <TextSkeleton {...textProps} rootHeight={height} />
+    else if(type==='grid') return <GridSkeleton number={number} image={image} gridStyle={gridStyle} height={height} />
+    else if(type==='article') return <ArticleSkeleton height={height} />
     return null;
 }

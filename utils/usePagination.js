@@ -12,9 +12,10 @@ export default function usePagination(path,data_name,limit,news,user=false){
             if(path===null) return null;
             const url = user ? API_URL_2 + path : API_URL + path
             if(previous && previous?.load===false) return null
-            if(index==0) return `${url}?page=${news ? 0 : 1}`
-            if(previous && previous?.page) return `${url}?page=${news ? previous?.page : previous?.page+1}`
-            return `${url}?page=${news ? index : index + 1}` 
+            const ppath=path.match(/\?/) !== null ? '&page=' : '?page=';
+            if(index==0) return `${url}${ppath}${news ? 0 : 1}`
+            if(previous && previous?.page) return `${url}${ppath}${news ? previous?.page : previous?.page+1}`
+            return `${url}${ppath}${news ? index : index + 1}` 
         },
         fetcher
     )
@@ -25,7 +26,7 @@ export default function usePagination(path,data_name,limit,news,user=false){
             return [].concat(...arr)
         }
         else return []
-    },[data,data_name])
+    },[data,data_name,size])
 
     const isLoadingInitialData = !data && !error
     const isLoadingMore =

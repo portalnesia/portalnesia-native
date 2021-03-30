@@ -184,7 +184,7 @@ export default () => {
 
 	return (
 		<>
-			<StatusBar style={selectedTheme==='light' ? "dark" : "light"} translucent animated backgroundColor={theme['background-basic-color-1']} />
+			<StatusBar style={user === null ? 'light' : (selectedTheme==='light' ? "dark" : "light")} translucent animated backgroundColor={user === null ? theme['color-primary-500'] : theme['background-basic-color-1']} />
 			<NavigationContainer
 				linking={linking}
 			>

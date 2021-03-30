@@ -1,6 +1,6 @@
 import React from 'react'
-import {View,Dimensions,TouchableOpacity} from 'react-native'
-import {Layout as Lay,Text,useTheme,Icon,Divider,List,ListItem} from '@ui-kitten/components'
+import {View,Dimensions,TouchableOpacity,Animated,RefreshControl} from 'react-native'
+import {Layout as Lay,Text,useTheme,Icon,Divider,ListItem} from '@ui-kitten/components'
 import {useNavigation} from '@react-navigation/native'
 
 import Image from '@pn/components/global/Image'
@@ -11,6 +11,7 @@ import Avatar from '@pn/components/global/Avatar'
 import RenderPrivate,{RenderSuspend} from './PrivateUser'
 import { ucwords } from '@pn/utils/Main'
 import {ListSkeleton} from '@pn/components/global/Skeleton'
+import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
 
 const user=false;
 
@@ -28,7 +29,7 @@ const RenderUser=React.memo(({item,index,onOpen})=>{
     const navigation=useNavigation()
     return (
         <ListItem
-            key={index}
+            key={index.toString()}
             title={item?.name}
             description={`@${item?.username}`}
             accessoryLeft={()=><MemoAvatar item={item} />}
@@ -40,9 +41,7 @@ const RenderUser=React.memo(({item,index,onOpen})=>{
 const SkeletonFollow=()=>{
 
     return (
-        <Lay style={{padding:15,height:winHeight}}>
-            <ListSkeleton number={10} image />
-        </Lay>
+        <ListSkeleton height={winHeight} number={10} image />
     )
 }
 
@@ -83,28 +82,86 @@ class RenderFollowClass extends React.PureComponent{
     renderFooter(){
         const {isReachingEnd,isLoadingMore}=this.props;
         if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:10,textAlign:'center'}}>You have reach the bottom of the page</Text>
-        if(isLoadingMore) return <View paddingTop={20}><ListSkeleton number={3} image /></View>
+        if(isLoadingMore) return <View paddingTop={20}><ListSkeleton height={250} number={3} image /></View>
         return null
     }
 
     render(){
-        const {data,error,dt,theme,isLoadingInitialData,isLoadingMore,isReachingEnd}=this.props;
-        if((!data && !error) || (data?.error || error)) return <SkeletonFollow />
-        if(data?.users?.private===true) return <RenderPrivate data={data} />
-        if(data?.users?.suspend===true) return <RenderSuspend />
-        if(isLoadingInitialData) return <SkeletonFollow />
+        const {data,error,theme,dt,isValidating,isLoadingInitialData,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}=this.props
+
+        if(isLoadingInitialData || (!data && !error) || (data?.error || error) || data?.users?.private===true || data?.users?.suspend===true) {
+            return (
+                <Animated.ScrollView
+                    scrollToOverflowEnabled
+                    ref={onGetRef}
+                    onScroll={Animated.event(
+                        [
+                            {nativeEvent:{contentOffset:{y:scrollY}}}
+                        ],
+                        {
+                            useNativeDriver:true
+                        }
+                    )}
+                    onMomentumScrollBegin={onMomentumScrollBegin}
+                    onMomentumScrollEnd={onMomentumScrollEnd}
+                    onScrollEndDrag={onScrollEndDrag}
+                    contentContainerStyle={{
+                        paddingTop:HeaderHeight + TabBarHeight + 56,
+                        minHeight:winHeight + ContentMinHeight
+                    }}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                >
+                    {(!data && !error) || (data?.error || error) || isLoadingInitialData ? (
+                        <SkeletonFollow />
+                    ) : data?.users?.private===true ? (
+                        <RenderPrivate data={data} />
+                    ) : (
+                        <RenderSuspend />
+                    )}
+                </Animated.ScrollView>
+            )
+        }
         return (
-            <Lay style={{minHeight:winHeight}}>
-                <List
+                <Animated.FlatList
                     data={dt}
                     renderItem={(props)=> <RenderUser {...props} onOpen={this.handleOpenMenu.bind(this)} />}
                     ItemSeparatorComponent={Divider}
-                    contentContainerStyle={{backgroundColor:theme['background-basic-color-1']}}
-                    style={{backgroundColor:theme['background-basic-color-1']}}
-                    scrollEnabled={false}
                     ListFooterComponent={this.renderFooter()}
+                    scrollToOverflowEnabled
+                    ref={onGetRef}
+                    onScroll={Animated.event(
+                        [
+                            {nativeEvent:{contentOffset:{y:scrollY}}}
+                        ],
+                        {
+                            useNativeDriver:true
+                        }
+                    )}
+                    onMomentumScrollBegin={onMomentumScrollBegin}
+                    onMomentumScrollEnd={onMomentumScrollEnd}
+                    onScrollEndDrag={onScrollEndDrag}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{
+                        paddingTop:HeaderHeight + TabBarHeight + 56,
+                        minHeight:winHeight + ContentMinHeight
+                    }}
+                    refreshControl={
+                        <RefreshControl
+                            style={{zIndex:5}}
+                            colors={['white']}
+                            progressBackgroundColor="#2f6f4e"
+                            refreshing={data && isValidating}
+                            progressViewOffset={HeaderHeight + TabBarHeight + 56}
+                            title="Refreshing"
+                            onRefresh={()=>this.refresh()}
+                        />
+                    }
+                    keyExtractor={(_,i)=>i.toString()}
+                    onEndReached={()=>this.loadMore()}
+                    onEndReachedThreshold={0.02}
                 />
-            </Lay>
         )
     }
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import {View,Dimensions,TouchableOpacity,FlatList,Alert} from 'react-native'
+import {View,Dimensions,TouchableOpacity,RefreshControl,Alert, Animated} from 'react-native'
 import {Layout as Lay,Text,useTheme,Card} from '@ui-kitten/components'
 import {useNavigation} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
@@ -10,15 +10,14 @@ import Button from '@pn/components/global/Button'
 import {RenderMediaPrivate,RenderSuspend} from './PrivateUser'
 import { ucwords } from '@pn/utils/Main'
 import {GridSkeleton} from '@pn/components/global/Skeleton'
+import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 
 const SkeletonFollow=()=>{
 
     return (
-        <Lay style={{height:winHeight}}>
-            <GridSkeleton number={10} image />
-        </Lay>
+        <GridSkeleton height={winHeight} number={10} image />
     )
 }
 
@@ -116,30 +115,88 @@ class RenderMediaClass extends React.PureComponent{
     renderFooter(){
         const {isReachingEnd,isLoadingMore}=this.props;
         if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:10,textAlign:'center'}}>You have reach the bottom of the page</Text>
-        if(isLoadingMore) return <View paddingTop={20}><GridSkeleton number={4} image /></View>
+        if(isLoadingMore) return <View paddingTop={20}><GridSkeleton height={300} number={2} image /></View>
         return null
     }
 
     render(){
-        const {data,error,dt,isReachingEnd,isLoadingMore,isLoadingInitialData}=this.props
+        const {data,error,dt,isValidating,theme,isLoadingInitialData,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}=this.props
 
-        if((!data && !error) || (data?.error || error)) return <SkeletonFollow />
-        if(data?.users?.media_private===true) return <RenderMediaPrivate data={data} />
-        if(data?.users?.suspend===true) return <RenderSuspend />
-
-        if(isLoadingInitialData) return <SkeletonFollow />
+        if(isLoadingInitialData || (!data && !error) || (data?.error || error) || data?.users?.media_private===true || data?.users?.suspend===true) {
+            return (
+                <Animated.ScrollView
+                    scrollToOverflowEnabled
+                    ref={onGetRef}
+                    onScroll={Animated.event(
+                        [
+                            {nativeEvent:{contentOffset:{y:scrollY}}}
+                        ],
+                        {
+                            useNativeDriver:true
+                        }
+                    )}
+                    onMomentumScrollBegin={onMomentumScrollBegin}
+                    onMomentumScrollEnd={onMomentumScrollEnd}
+                    onScrollEndDrag={onScrollEndDrag}
+                    contentContainerStyle={{
+                        paddingTop:HeaderHeight + TabBarHeight + 56,
+                        minHeight:winHeight + ContentMinHeight
+                    }}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                >
+                    {isLoadingInitialData || (!data && !error) || (data?.error || error) ? (
+                        <SkeletonFollow />
+                    ) : data?.users?.media_private===true ? (
+                        <RenderMediaPrivate data={data} />
+                    ) : (
+                        <RenderSuspend />
+                    )}
+                </Animated.ScrollView>
+            )
+        }
         return (
-            <Lay level="2" style={{minHeight:winHeight}}>
-                <FlatList
-                    columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-                    data={dt}
-                    numColumns={2}
-                    renderItem={props=> <RenderNews {...props} data={dt} onOpen={this.handleOpenMenu} />}
-                    keyExtractor={(item)=>item?.title}
-                    scrollEnabled={false}
-                    ListFooterComponent={this.renderFooter()}
-                />
-            </Lay>
+            <Animated.FlatList
+                columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+                data={dt}
+                numColumns={2}
+                renderItem={props=> <RenderNews {...props} data={dt} onOpen={this.handleOpenMenu} />}
+                keyExtractor={(item)=>item?.title}
+                ListFooterComponent={this.renderFooter()}
+                scrollToOverflowEnabled
+                ref={(ref)=>onGetRef(ref)}
+                onScroll={Animated.event(
+                    [
+                        {nativeEvent:{contentOffset:{y:scrollY}}}
+                    ],
+                    {
+                        useNativeDriver:true
+                    }
+                )}
+                onMomentumScrollBegin={onMomentumScrollBegin}
+                onMomentumScrollEnd={onMomentumScrollEnd}
+                onScrollEndDrag={onScrollEndDrag}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                    paddingTop:HeaderHeight + TabBarHeight + 56,
+                    minHeight:winHeight + ContentMinHeight,
+                    backgroundColor:theme['background-basic-color-2']
+                }}
+                refreshControl={
+                    <RefreshControl
+                        style={{zIndex:5}}
+                        colors={['white']}
+                        progressBackgroundColor="#2f6f4e"
+                        refreshing={data && isValidating}
+                        progressViewOffset={HeaderHeight + TabBarHeight + 56}
+                        title="Refreshing"
+                        onRefresh={()=>this.refresh()}
+                    />
+                }
+                onEndReached={()=>this.loadMore()}
+                onEndReachedThreshold={0.02}
+            />
         )
     }
 }

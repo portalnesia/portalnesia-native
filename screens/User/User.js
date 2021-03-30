@@ -1,7 +1,7 @@
 import React from 'react'
 import {View,Dimensions,Animated,RefreshControl,Alert} from 'react-native'
-import {Layout as Lay,Text,useTheme,TopNavigation,TopNavigationAction,Icon,Divider,Menu,MenuItem,Tab,TabBar,ViewPager} from '@ui-kitten/components'
-import Header from 'react-native-sticky-parallax-header'
+import {Layout as Lay,Text,useTheme,TopNavigation,TopNavigationAction,Icon,Divider,Menu,MenuItem} from '@ui-kitten/components'
+import {TabView,TabBar,SceneMap} from 'react-native-tab-view'
 import {useNavigationState} from '@react-navigation/native'
 import {Modalize} from 'react-native-modalize'
 import Skltn from 'react-native-skeleton-placeholder'
@@ -11,16 +11,17 @@ import Layout from '@pn/components/global/Layout';
 import Image,{ImageFull} from '@pn/components/global/Image'
 import useSWR from '@pn/utils/swr'
 import Button from '@pn/components/global/Button'
+import {TabBarHeight,HeaderHeight} from './utils'
 
 import RenderFollow from './Follow'
 import RenderAbout from './About'
 import RenderMedia from './Media'
+import { ForceTouchGestureHandler } from 'react-native-gesture-handler'
 
 const user=false;
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 const {event,Value,createAnimatedComponent} = Animated
-const scrollY = new Value(0);
 
 const AnimText = createAnimatedComponent(Text);
 const AnimImage = createAnimatedComponent(Image)
@@ -51,29 +52,35 @@ const RenderBackButton=React.memo(({navigation})=>{
 const SkeletonHeader=()=>{
     const theme=useTheme();
     return (
-        <Lay style={{paddingHorizontal:15,paddingTop:60,paddingBottom:30}}>
-            <Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+        <Skltn height={240} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+            <Skltn.Item paddingHorizontal={15} paddingTop={70} justifyContent="flex-end" flexDirection="column">
                 <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                     <View>
                         <View style={{height:100,width:100,borderRadius:50}} />
                     </View>
-                    <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
+                    <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start',flexGrow:1}}>
                         <Skltn.Item height={30} width={(winWidth/2)/2} marginRight={10} borderRadius={5} />
                         <Skltn.Item height={30} width={30} borderRadius={5} />
                     </View>
                 </View>
-                <View style={{height:25,width:winWidth/2,marginTop:15,borderRadius:5}} />
-                <View  style={{height:15,width:winWidth/4,marginTop:5,borderRadius:5}} />
-            </Skltn>
-        </Lay>
+                <Skltn.Item alignItems="flex-start">
+                    <View style={{height:25,width:winWidth/2,marginTop:15,borderRadius:5}} />
+                    <View  style={{height:15,width:winWidth/4,marginTop:5,borderRadius:5}} />
+                </Skltn.Item>
+            </Skltn.Item>
+        </Skltn>
     )
 }
 
+
+
 const tabIndexArray=['about','follower','following','media'];
 export default function UserScreen({navigation,route}){
+    const scrollY = React.useRef(new Value(0)).current;
     const theme=useTheme();
     const {username,slug}=route.params;
-    const {data,error,mutate,isValidating:aboutValidating}=useSWR(`/user/${username}`,{},user)
+    const {data,error,mutate,isValidating}=useSWR(`/user/${username}`,{},user)
+    //const data=undefined,error=undefined;
     const [tabIndex,setTabIndex] = React.useState(()=>{
         if(slug) {
             const index = tabIndexArray.findIndex((val)=>val == slug);
@@ -81,9 +88,23 @@ export default function UserScreen({navigation,route}){
         }
         return 0;
     });
+    const [routes]=React.useState([
+        {key:'about',title:"About"},
+        {key:'follower',title:"Follower"},
+        {key:'following',title:"Following"},
+        {key:'media',title:"Media"}
+    ])
+
+    let listRefArr=React.useRef([
+        {key:'about',value:undefined},
+        {key:'follower',value:undefined},
+        {key:'following',value:undefined},
+        {key:'media',value:undefined}
+    ]);
+    let listOffset=React.useRef({});
+    let isListGliding = React.useRef(false);
+
     const [open,setOpen]=React.useState(null)
-    const indexName=tabIndexArray[tabIndex]
-    const [refreshing,setRefreshing] = React.useState(false);
 
     const ref={
         following:React.useRef(null),
@@ -93,74 +114,164 @@ export default function UserScreen({navigation,route}){
         scroll:React.useRef(null)
     }
 
+    React.useEffect(()=>{
+        scrollY.addListener(({value})=>{
+            const curRoute = routes[tabIndex].key;
+            listOffset.current[curRoute] = value
+        })
+        return ()=>scrollY.removeAllListeners();
+    },[routes,tabIndex])
+
+    const syncScrollOffset=()=>{
+        const curRouteKey = routes[tabIndex].key
+        /*const curRef = listRefArr.current.find(e=>e.key===curRouteKey);
+        if(curRef && curRef?.value) {
+            const y = scrollY._value;
+            const snapToEdgeThreshold = HeaderHeight / 2;
+            if (y < snapToEdgeThreshold) {
+                curRef?.value?.scrollTo ? curRef?.value?.scrollTo({x:0,y:0})
+                : curRef?.value?.scrollToOffset ? curRef?.value?.scrollToOffset({offset:0})
+                : undefined;
+            }
+            if (y >= snapToEdgeThreshold && y < HeaderHeight) {
+                curRef?.value?.scrollTo ? curRef?.value?.scrollTo({x:0,y:HeaderHeight+10})
+                    : curRef?.value?.scrollToOffset ? curRef?.value?.scrollToOffset({offset:HeaderHeight+10})
+                    : undefined;
+            }
+        }*/
+
+        listRefArr.current.filter(e=>e.value!==undefined).forEach((item)=>{
+            if(item.key !== curRouteKey) {
+                if(scrollY?._value < HeaderHeight && scrollY?._value >= 0) {
+                    item?.value?.scrollTo ? item?.value?.scrollTo({x:0,y:scrollY._value,animated:false})
+                    : item?.value?.scrollToOffset ? item?.value?.scrollToOffset({offset:scrollY._value,animated:false})
+                    : undefined;
+                    listOffset.current[item.key] = scrollY._value;
+                } else if(scrollY?._value >= HeaderHeight) {
+                    if(
+                        listOffset.current[item.key] < HeaderHeight ||
+                        listOffset.current[item.key] == null
+                    ) {
+                        item?.value?.scrollTo ? item?.value?.scrollTo({x:0,y:HeaderHeight,animated:false})
+                        : item?.value?.scrollToOffset ? item?.value?.scrollToOffset({offset:HeaderHeight,animated:false})
+                        : undefined;
+                        listOffset.current[item.key] = HeaderHeight;
+                    }
+                }
+            }
+        })
+    }
+
+    const onMomentumScrollBegin=()=>{
+        isListGliding.current = true;
+    }
+    const onMomentumScrollEnd=()=>{
+        isListGliding.current = false;
+        syncScrollOffset();
+    }
+    const onScrollEndDrag = ()=>{
+        syncScrollOffset();
+    }
+
     const renderNavbar=()=>{
         const opacity = scrollY.interpolate({
-            inputRange:[0,130,180],
+            inputRange:[0,200,250],
             outputRange:[0,0,1],
             extrapolate:'clamp'
         })
     
         return (
-            <TopNavigation
-                title={(evaProps) => <AnimText {...evaProps}  category="h1" style={{...evaProps?.style,marginHorizontal:50,opacity}} numberOfLines={1}>{data?.users?.username||""}</AnimText>}
-                accessoryLeft={()=><RenderBackButton navigation={navigation} />}
-                alignment="center"
-            />
+            <View style={{position:'absolute',top:0,width:'100%',zIndex:1}}>
+                <TopNavigation
+                    title={(evaProps) => <AnimText {...evaProps}  category="h1" style={{...evaProps?.style,marginHorizontal:50,opacity}} numberOfLines={1}>{data?.users?.username||""}</AnimText>}
+                    accessoryLeft={()=><RenderBackButton navigation={navigation} />}
+                    alignment="center"
+                />
+            </View>
         )
     }
 
-    const RenderHeader=()=>{
-        if((!data && !error) || (data?.error || error)) return <SkeletonHeader />
-
-        const opacityText = scrollY.interpolate({
-            inputRange:[0,76,164],
-            outputRange:[1,1,0],
+    const renderTabBar=(props)=>{
+        const translateY = scrollY.interpolate({
+            inputRange:[0,HeaderHeight],
+            outputRange:[0,-(HeaderHeight)],
+            extrapolateRight:'clamp',
+            extrapolateLeft:'clamp',
             extrapolate:'clamp'
         })
-
-        const opacityImage = scrollY.interpolate({
-            inputRange:[0,40,120],
-            outputRange:[1,1,0],
-            extrapolate:'clamp'
-        })
-
-        const imageSize = scrollY.interpolate({
-            inputRange:[0,40,150],
-            outputRange:[100,100,40],
-            extrapolate:'clamp'
-        })
-
         return (
-            <Lay style={{paddingHorizontal:15,justifyContent:'flex-end',flex:1,paddingBottom:30}}>
-                <Animated.View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',opacity:opacityImage}}>
-                    <View>
-                    {data?.users?.image && <AnimImage source={{uri:`${data?.users?.image}&size=100&watermark=no`}} dataSrc={{uri:`${data?.users?.image}&watermark=no`}} style={{height:imageSize,width:imageSize,borderRadius:50,opacity:opacityImage}} fancybox />}
-                    </View>
-                    <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
-                        <Button style={{marginRight:10}}>Follow</Button>
-                        <Button accessoryLeft={MsgIcon} status="basic" appearance="ghost" />
-                    </View>
-                </Animated.View>
-                <AnimText style={{fontSize:30,marginTop:10,fontFamily:"Inter_Bold",opacity:opacityText}}>{data?.users?.name||""}</AnimText>
-                <AnimText style={{fontSize:15,opacity:opacityText}}>{`@${data?.users?.username}`}</AnimText>
-            </Lay>
+            <Animated.View testID="Header-Test" style={{zIndex:1,top:56,left: 0,right: 0,position:'absolute',width:'100%',transform:[{translateY}]}}>
+                {(!data && !error) || (data?.error || error) ? (
+                    <SkeletonHeader />
+                ) : (
+                    <Lay style={{paddingHorizontal:15,height:HeaderHeight,justifyContent:'flex-end',flex:1,paddingBottom:10}}>
+                        <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                            <View>
+                                {data?.users?.image && <Image source={{uri:`${data?.users?.image}&size=100&watermark=no`}} dataSrc={{uri:`${data?.users?.image}&watermark=no`}} style={{height:100,width:100,borderRadius:50}} fancybox />}
+                            </View>
+                            <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
+                                <Button style={{marginRight:10}}>Follow</Button>
+                                <Button accessoryLeft={MsgIcon} status="basic" appearance="ghost" />
+                            </View>
+                        </View>
+                        <Text style={{fontSize:30,marginTop:10,fontFamily:"Inter_Bold"}}>{data?.users?.name||""}</Text>
+                        <Text style={{fontSize:15}}>{`@${data?.users?.username}`}</Text>
+                    </Lay>
+                )}
+                <TabBar
+                    {...props}
+                    onTabPress={({route,preventDefault})=>{
+                        if(isListGliding.current) preventDefault();
+                    }}
+                    style={{height:56,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
+                    indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
+                    renderLabel={({route,focused})=>{
+                        return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
+                    }}
+                    pressColor={theme['color-control-transparent-disabled']}
+                    pressOpacity={0.8}
+                />
+            </Animated.View>
         )
     }
 
-    const onChangeTab=({i})=>{
-        setTabIndex(i)
-        setRefreshing(false);
-    }
-
-    const onEndReach=()=>{
-        if(indexName !== 'about') {
-            ref?.[indexName]?.current?.loadMore();
+    const onGetRef=route=>(ref)=>{
+        if(ref) {
+            const found = listRefArr.current.findIndex((e)=>e.key === route.key);
+            if(found !== -1) {
+                listRefArr.current[found].value = ref
+            }
         }
     }
 
-    const onRefresh=()=>{
-        if(indexName === 'about') mutate()
-        else ref?.[indexName]?.current?.refresh();
+    const renderScene=({route})=>{
+        const props={
+            data,
+            error,
+            scrollY,
+            onMomentumScrollBegin,
+            onMomentumScrollEnd,
+            onScrollEndDrag,
+            onGetRef:onGetRef(route)
+        }
+        if(route.key == 'follower') return <RenderFollow type="follower" {...props} ref={ref.follower} onOpen={handleOpenMenu('follower')} />
+        if(route.key == 'following') return <RenderFollow type="following" {...props} ref={ref.following} onOpen={handleOpenMenu('following')} />
+        if(route.key == 'media') return <RenderMedia {...props} ref={ref.media} onOpen={handleOpenMenu('media')} />
+        if(route.key == 'about') return <RenderAbout {...props} mutate={mutate} isValidating={isValidating} />
+        return null;
+    }
+
+    const renderTabView=()=>{
+        return (
+            <TabView
+                onIndexChange={(index)=>setTabIndex(index)}
+                navigationState={{index:tabIndex,routes}}
+                renderScene={renderScene}
+                renderTabBar={renderTabBar}
+                initialLayout={{height:0,width:winWidth}}
+                lazy
+            />
+        )
     }
 
     const handleOpenMenu=(tipe)=>(data)=>{
@@ -168,94 +279,16 @@ export default function UserScreen({navigation,route}){
         setOpen({modal:tipe,...data})
         if(tipe !== 'media') setTimeout(ref.modal?.current?.open,100)
     }
-
+    
     const handleCloseMenu=()=>{
         setOpen(null)
     }
 
-    const onValidating=(tipe)=>(val)=>{
-        if(tipe == indexName) setRefreshing(val)
-    }
-
-    React.useEffect(()=>{
-        if(indexName == 'about' && data) setRefreshing(aboutValidating)
-    },[aboutValidating,data])
-
-    React.useEffect(()=>{
-        if(data?.error || error) {
-            Alert.alert(
-                "Ooopss",
-                data?.msg||error?.message||"Something went wrong",
-                [{
-                    text:"OK",
-                    onPress:()=>navigation.goBack()
-                }]
-            )
-        }
-    },[data,error])
-
-    /*React.useEffect(()=>{
-        scrollY.addListener(({value})=>scrollYRef.current=value)
-        return ()=>scrollY.removeAllListeners();
-    },[])*/
-    
     return (
         <>
-            <Layout navigation={navigation}>
-            <Header
-                    backgroundColor={theme['background-basic-color-1']}
-                    header={renderNavbar()}
-                    keyboardShouldPersistTaps="handled"
-                    headerHeight={56}
-                    bounces={false}
-                    snapToEdge={true}
-                    foreground={<RenderHeader />}
-                    parallaxHeight={250}
-                    headerSize={()=>{}}
-                    tabsContainerBackgroundColor={theme['background-basic-color-1']}
-                    tabTextStyle={{fontSize:16,lineHeight:20,color:theme['text-basic-color']}}
-                    tabTextContainerStyle={{backgroundColor:'transparent',borderRadius:18,paddingHorizontal:12,paddingVertical:8,marginHorizontal:5}}
-                    tabTextContainerActiveStyle={{backgroundColor:theme['background-basic-color-3']}}
-                    tabsContainerStyle={{borderBottomColor:theme['border-basic-color'],borderBottomWidth:2}}
-                    contentContainerStyles={{backgroundColor:theme['background-basic-color-2'],flexGrow:1}}
-                    tabWrapperStyle={{paddingBottom:10}}
-                    onChangeTab={onChangeTab}
-                    initialPage={tabIndex}
-                    onEndReached={onEndReach}
-                    //scrollRef={ref.scroll}
-                    refreshControl={
-                        <RefreshControl
-                            style={{zIndex:1}}
-                            colors={['white']}
-                            progressBackgroundColor="#2f6f4e"
-                            refreshing={refreshing}
-                            title="Refreshing"
-                            onRefresh={onRefresh}
-                        />
-                    }
-                    tabs={[
-                        {
-                            title:"About",
-                            content:<RenderAbout data={data} error={error} />
-                        },
-                        {
-                            title:"Follower",
-                            content:<RenderFollow type="follower" ref={ref.follower} data={data} error={error} onValidatingChange={onValidating('follower')}  />
-                        },
-                        {
-                            title:"Following",
-                            content:<RenderFollow type="following" ref={ref.following} data={data} error={error} onValidatingChange={onValidating('following')}  />
-                        },
-                        {
-                            title:"Media",
-                            content:<RenderMedia data={data} error={error} ref={ref.media} onValidatingChange={onValidating('media')} onOpen={handleOpenMenu('media')} />
-                        }
-                    ]}
-                    scrollEvent={event(
-                        [{nativeEvent:{contentOffset:{y:scrollY}}}],
-                        {useNativeDriver:false}
-                    )}
-                />
+            <Layout navigation={navigation} whiteBg>
+                {renderNavbar()}
+                {renderTabView()}
             </Layout>
             <Modalize
                 ref={ref.modal}

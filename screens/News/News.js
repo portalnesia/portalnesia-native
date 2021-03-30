@@ -31,7 +31,7 @@ export default function ({ navigation }) {
 
 	const Footer=()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} image /></View> 
+		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" height={300} number={2} image /></View> 
 		else return null
 	}
 
@@ -95,7 +95,7 @@ export default function ({ navigation }) {
 	return (
 		<Layout navigation={navigation} title="News" withBack={false}>
 			{isLoadingInitialData ? (
-				<View style={{height:'100%'}}><Skeleton type="grid" number={6} image /></View>
+				<View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
 			) : (
 				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 					{error ? (
@@ -115,7 +115,7 @@ export default function ({ navigation }) {
 									refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
 								/>
 							}
-							onEndReachedThreshold={0.01}
+							//onEndReachedThreshold={0.05}
 							ref={ref}
 							onEndReached={()=>{
 								if(!isReachingEnd && !isLoadingMore) {

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Animated,RefreshControl,View,useWindowDimensions } from 'react-native';
-import {Layout as Lay,Text,Card,Tab,TabBar,useTheme,ViewPager} from '@ui-kitten/components'
+import {Layout as Lay,Text,Card,Tab,useTheme} from '@ui-kitten/components'
+import {TabView,TabBar} from 'react-native-tab-view'
 
 import Layout from '@pn/components/global/Layout';
-import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
+import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {specialHTML} from '@pn/utils/Main'
@@ -18,7 +19,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 		setSize,
 		isReachingEnd,
 		mutate,isValidating,isLoadingInitialData
-	} = usePagination("/twitter","recent",20,false,false)
+	} = usePagination("/twitter?type=recent","data",20,false,false)
 	const {width}=useWindowDimensions()
 
 	const _renderItem=({item,index})=>{
@@ -57,7 +58,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 
 	const Footer=()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
+		if(isLoadingMore && data?.length > 0) return <View style={{paddingTop:20,height:'100%'}}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View> 
 		else return null
 	}
 
@@ -107,7 +108,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 		setSize,
 		isReachingEnd,
 		mutate,isValidating,isLoadingInitialData
-	} = usePagination("/twitter","popular",20,false,false)
+	} = usePagination("/twitter?type=popular","data",20,false,false)
 	const {width}=useWindowDimensions()
 
 	const _renderItem=({item,index})=>{
@@ -146,7 +147,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 
 	const Footer=()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
+		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
 		else return null
 	}
 
@@ -191,39 +192,59 @@ const Popular=({headerHeight,navigation,...other})=>{
 
 export default function ({ navigation,route }) {
 	const slug = route?.params?.slug
-	const [selectedIndex, setSelectedIndex] = React.useState(typeof slug === 'string' && slug === 'popular' ? 1 : 0);
-	const shouldLoadComponent = (index) => index === selectedIndex;
+	const [tabIndex,setTabIndex] = React.useState(typeof slug === 'string' && slug === 'popular' ? 1 : 0);
+	const [routes]=React.useState([
+        {key:'recent',title:"Recent"},
+        {key:'popular',title:"Popular"},
+    ])
 	const theme = useTheme()
-	const {translateY,...other} = useHeader()	
+	const {translateY,...other}=useHeader()
+	const {width}=useWindowDimensions()
+	const headerHeight={...headerHeightt,sub:46}
 	const heightHeader = headerHeight?.main + headerHeight?.sub
+
+	const renderTabBar=(props)=>{
+		
+		return (
+			<Animated.View style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
+				<Header title="Twitter Thread Reader" navigation={navigation} height={56} withBack>
+					<TabBar
+						{...props}
+						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
+						indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
+						renderLabel={({route,focused})=>{
+							return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
+						}}
+						pressColor={theme['color-control-transparent-disabled']}
+                    	pressOpacity={0.8}
+					/>
+				</Header>
+			</Animated.View>
+		)
+	}
+
+	const renderScene=({route})=>{
+        if(route.key == 'recent') return <Recent headerHeight={heightHeader} {...other} navigation={navigation} />
+        if(route.key == 'popular') return <Popular headerHeight={heightHeader} {...other} navigation={navigation} />
+        return null;
+    }
+
+	const renderTabView=()=>{
+        return (
+            <TabView
+                onIndexChange={(index)=>setTabIndex(index)}
+                navigationState={{index:tabIndex,routes}}
+                renderScene={renderScene}
+                renderTabBar={renderTabBar}
+                initialLayout={{height:0,width}}
+                lazy
+            />
+        )
+    }
 
 	return (
 		<Layout navigation={navigation}>
-			<Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title="Twitter Thread Reader" navigation={navigation} height={56} withBack>
-					<TabBar
-						selectedIndex={selectedIndex}
-						onSelect={index => setSelectedIndex(index)}
-						style={{flex:1,height:headerHeight?.sub}}
-					>
-						<Tab title='RECENT' />
-						<Tab title='POPULAR' />
-					</TabBar>
-				</Header>
-			</Animated.View>
-			<ViewPager
-				selectedIndex={selectedIndex}
-				onSelect={index => setSelectedIndex(index)}
-				shouldLoadComponent={shouldLoadComponent}
-				style={{flex:1,alignItems:'center',justifyContent:'center'}}
-			>
-				<Lay level="2">
-					<Recent headerHeight={heightHeader} {...other} navigation={navigation} />
-				</Lay>
-				<Lay level="2">
-					<Popular headerHeight={heightHeader} {...other} navigation={navigation} />
-				</Lay>
-			</ViewPager>
+			{renderTabView()}
 		</Layout>
 	);
 }

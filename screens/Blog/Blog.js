@@ -25,7 +25,7 @@ export default function ({ navigation }) {
 
 	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
-		if(isLoadingMore) return <View paddingTop={20}><Skeleton type="grid" number={4} image /></View> 
+		if(isLoadingMore) return <View paddingTop={20}><Skeleton height={300} type="grid" number={4} image /></View> 
 		else return null
 	},[isReachingEnd,isLoadingMore])
 
