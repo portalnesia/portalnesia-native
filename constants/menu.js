@@ -23,7 +23,7 @@ export const menu=[
                 menu:[
                     {
                         title:"QR Code Generator",
-                        //to:"QR_Code_Generator"
+                        to:"QrGenerator"
                     },
                     {
                         title:"Random Number Generator",

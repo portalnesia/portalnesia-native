@@ -23,6 +23,7 @@ const SettingIcon=(props)=><Icon {...props} name="settings-outline" />
 
 export default function({navigation}){
     const auth = React.useContext(AuthContext)
+    const {setNotif} = auth;
     const {user} = auth.state
     const {PNget} = useAPI(false)
     const theme = useTheme()
@@ -84,7 +85,7 @@ export default function({navigation}){
                             <Text style={{fontSize:12}}>{`© ${new Date().getFullYear()}`}</Text>
                         </Lay>
                         <Lay level="1" style={{flex:1}}>
-                            <View style={{alignItems:'flex-end'}}><Button>Login</Button></View>
+                            <View style={{alignItems:'flex-end'}}><Button onPress={()=>setNotif(true,"Under Maintenance","Sorry, this feature is under maintenance")}>Login</Button></View>
                         </Lay>
                     </Lay>
 				</Header>
@@ -155,7 +156,11 @@ const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
                             if(!it.link?.match(/https?\:\/\/+/)) {
                                 Linking.openURL(it.link)
                             } else {
-                                openBrowserAsync(it.link)
+                                openBrowserAsync(it.link,{
+                                    enableDefaultShare:true,
+                                    toolbarColor:'#2f6f4e',
+                                    showTitle:true
+                                })
                             }
                         }
                     }

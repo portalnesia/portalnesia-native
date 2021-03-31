@@ -1,13 +1,21 @@
 import React from 'react'
-import {useWindowDimensions,View} from 'react-native'
+import {useWindowDimensions,View,Share} from 'react-native'
 import {Icon,TopNavigationAction,Layout,Text,useTheme,Menu,MenuItem} from '@ui-kitten/components'
 import {Modalize} from 'react-native-modalize'
+import {openBrowserAsync} from 'expo-web-browser'
+
+import {URL} from '@env'
+import { AuthContext } from '@pn/provider/AuthProvider';
+import useClipboard from '@pn/utils/clipboard'
 
 const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
 export const MenuToggle=({onPress})=><TopNavigationAction icon={MoreIcon} onPress={onPress} />
 
-const MenuCont=({menu,visible,onClose,...props})=>{
+const MenuCont=({menu,visible,onClose,share,...props})=>{
+    const context = React.useContext(AuthContext)
+    const {setNotif} = context
+    const {copyText} = useClipboard()
     //const {width}=useWindowDimensions()
     const theme=useTheme()
     const ref = React.useRef(null)
@@ -22,6 +30,33 @@ const MenuCont=({menu,visible,onClose,...props})=>{
             ref?.current?.open();
         }
     },[visible])
+
+    const handleShare=React.useCallback((text,url,dialog)=>{
+        Share.share({
+            message:`${text} ${url}`,
+            url:url
+        },{
+            dialogTitle:dialog||"Share"
+        })
+    },[])
+
+    const handleOnPress=(dt)=>{
+        if(dt?.onPress) dt?.onPress();
+        else if(share) {
+            if(dt?.action === "share") {
+                handleShare(share?.title,`${URL}${share?.link}&utm_source=android&utm_medium=share`,share?.dialog);
+            } else if(dt?.action === "copy") {
+                copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`);
+            } else if(dt?.action === 'browser') {
+                openBrowserAsync(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,{
+                    enableDefaultShare:true,
+                    toolbarColor:'#2f6f4e',
+                    showTitle:true
+                });
+            }
+        }
+        ref?.current?.close();
+    }
 
     return (
         <Modalize
@@ -39,11 +74,7 @@ const MenuCont=({menu,visible,onClose,...props})=>{
                 <Layout style={{marginBottom:10}}>
                     <Menu appearance="noDivider">
                         {menu?.map((dt,i)=>{
-                            const onPress=()=>{
-                                dt?.onPress && dt?.onPress();
-                                ref?.current?.close();
-                            }
-                            return <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={dt.title} onPress={onPress} />
+                            return <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={dt.title||""} onPress={()=>handleOnPress(dt)} />
                             
                         })}
                     </Menu>

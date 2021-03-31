@@ -5,7 +5,7 @@ import {Layout as Lay,Text,Spinner,Input,useTheme} from '@ui-kitten/components'
 //import Modal from 'react-native-modal'
 import {openBrowserAsync} from 'expo-web-browser'
 
-//import Carousel from '@pn/components/global/Carousel';
+import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
@@ -24,6 +24,7 @@ export default function URLshortener({navigation}){
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const {copyText} = useClipboard()
+    const [open,setOpen]=React.useState(false)
     const [input,setInput] = React.useState({url:'',custom:'',recaptcha:''})
     const [loading,setLoading] = React.useState(false)
     const {height,width}=useWindowDimensions()
@@ -97,7 +98,7 @@ export default function URLshortener({navigation}){
 
     return (
         <>
-            <Layout navigation={navigation} title="URL Shortener" withBack>
+            <Layout navigation={navigation} title="URL Shortener" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
                 <ScrollView
                     contentContainerStyle={{
                         flexGrow: 1,
@@ -159,6 +160,26 @@ export default function URLshortener({navigation}){
                     </Lay>
                 </ScrollView>
             </Layout>
+            <MenuContainer
+                visible={open}
+                handleOpen={()=>setOpen(true)}
+                handleClose={()=>setOpen(false)}
+                onClose={()=>setOpen(false)}
+                share={{
+                    link:`/url?utm_campaign=tools`,
+                    title:`URL Shortener - Portalnesia`
+                }}
+                menu={[{
+                    action:"share",
+                    title:"Share",
+                },{
+                    title:"Copy link",
+                    action:'copy'
+                },{
+                    title:"Open in browser",
+                    action:'browser'
+                }]}
+            />
             <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
         </>
     )

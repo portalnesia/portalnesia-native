@@ -72,6 +72,10 @@ export const linking = {
                     path:'images-checker',
                     exact:true
                 },
+                QrGenerator:{
+                    path:'qr-code/:slug?',
+                    exact:true
+                },
                 UrlShortener:{
                     path:'url',
                     exact:true

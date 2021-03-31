@@ -99,11 +99,21 @@ export default function({navigation,route}){
                handleOpen={()=>setOpen(true)}
                handleClose={()=>setOpen(false)}
                onClose={()=>setOpen(false)}
+               share={{
+                   link:`/blog/${data?.blog?.slug}?utm_campaign=blog`,
+                   title:`${data?.blog?.title} - Portalnesia`,
+                   dialog:"Share Blog"
+               }}
                menu={[{
-                   title:"Share",
-               },{
-                   title:"Copy Link"
-               }]}
+                    action:"share",
+                    title:"Share",
+                },{
+                    title:"Copy link",
+                    action:'copy'
+                },{
+                    title:"Open in browser",
+                    action:'browser'
+                }]}
            />
        )}
         </>

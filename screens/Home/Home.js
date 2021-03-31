@@ -122,7 +122,7 @@ export default function HomeScreen({ navigation }) {
 						<About title="Parse HTML" txt="Parse your HTML code into XML code compatible with all the Blogger templates or other blogs systems." screen="ParseHtml" />
 						<About title="Blog" txt="Turn your thoughts into writing and share it easily." right screen="Blog" />
 						<About title="Images Checker" txt="Online tools to help you quickly identify unseemly images." screen="ImagesChecker" />
-						<About title="Others" txt="And some other services that are definitely useful." right last />
+						<About title="Others" txt="And some other services that are definitely useful." right screen="Menu" />
 					</Lay>
 				</Lay>
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">

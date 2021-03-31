@@ -374,7 +374,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
 
   onFastImageLoad(e){
     const {nativeEvent} = e
-    console.log(nativeEvent)
+    //console.log(nativeEvent)
     const {width:imagePhysicalWidth,height:imagePhysicalHeight}=nativeEvent;
     this.setState({imagePhysicalHeight,imagePhysicalWidth,error:false});
   }

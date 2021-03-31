@@ -29,6 +29,7 @@ import TwitterThread from '../screens/Twitter/TwitterThread';
 import GeodataTransform from '../screens/Geodata/Transform';
 import ImageModal from '../screens/Modal/Image'
 import NumberGenerator from '../screens/Tools/NumberGenerator'
+import QrGenerator from '../screens/Tools/QrGenerator'
 import ParseHtml from '../screens/Tools/ParseHtml'
 import ImagesChecker from '../screens/Tools/ImagesChecker'
 import UrlShortener from '../screens/UrlShortener'
@@ -168,6 +169,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="NumberGenerator" component={NumberGenerator} />
 		<MainStack.Screen name="ParseHtml" component={ParseHtml} />
 		<MainStack.Screen name="ImagesChecker" component={ImagesChecker} />
+		<MainStack.Screen name="QrGenerator" component={QrGenerator} />
 		<MainStack.Screen name="UrlShortener" component={UrlShortener} />
 		<MainStack.Screen name="Contact" component={Contact} />
 		<MainStack.Screen name="Setting" component={Setting} />

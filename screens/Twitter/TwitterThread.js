@@ -16,7 +16,7 @@ import {CONTENT_URL} from '@env'
 import WebView from 'react-native-autoheight-webview'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import Button from '@pn/components/global/Button'
-import {specialHTML,listToMatrix,openBrowser} from '@pn/utils/Main'
+import {specialHTML,listToMatrix,openBrowser,Ktruncate} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'
 
 const MoreIcon=(props)=><Icon {...props} style={{...props?.style,marginHorizontal:0}} name="more-vertical" />
@@ -194,10 +194,20 @@ export default function({navigation,route}){
                         handleOpen={()=>setOpen(true)}
                         handleClose={()=>setOpen(false)}
                         onClose={()=>setOpen(false)}
+                        share={{
+                            link:`/twitter/thread/${data?.id}?utm_campaign=news`,
+                            title:`${Ktruncate(specialHTML(data?.tweets?.[0]?.tweet),150)} - Portalnesia`,
+                            dialog:"Share Thread"
+                        }}
                         menu={[{
+                            action:"share",
                             title:"Share",
                         },{
-                            title:"Copy Link"
+                            title:"Copy link",
+                            action:'copy'
+                        },{
+                            title:"Open in browser",
+                            action:'browser'
                         }]}
                     />
                     <MenuContainer

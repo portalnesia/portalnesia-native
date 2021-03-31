@@ -5,6 +5,7 @@ import useSWR from '@pn/utils/swr'
 import {Modalize} from 'react-native-modalize'
 
 //import Carousel from '@pn/components/global/Carousel';
+import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
@@ -33,6 +34,7 @@ const HeaderModal=React.memo(({search,setSearch,setPage})=>{
 
 export default function({navigation}){
     const {PNpost} = useAPI(false)
+    const [open,setOpen]=React.useState(false)
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const [search,setSearch] = React.useState("")
@@ -109,7 +111,7 @@ export default function({navigation}){
 
     return (
         <>
-            <Layout navigation={navigation} title="Transform Coordinate" subtitle="Geodata" withBack>
+            <Layout navigation={navigation} title="Transform Coordinate" subtitle="Geodata" withBack menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />}>
                 <ScrollView
                     contentContainerStyle={{
                         flexGrow: 1
@@ -206,6 +208,26 @@ export default function({navigation}){
                     />
                 </View>
             </Modalize>
+            <MenuContainer
+                visible={open}
+                handleOpen={()=>setOpen(true)}
+                handleClose={()=>setOpen(false)}
+                onClose={()=>setOpen(false)}
+                share={{
+                    link:`/geodata/transform?utm_campaign=geodata`,
+                    title:`Transform Coordinate - Portalnesia`
+                }}
+                menu={[{
+                    action:"share",
+                    title:"Share",
+                },{
+                    title:"Copy link",
+                    action:'copy'
+                },{
+                    title:"Open in browser",
+                    action:'browser'
+                }]}
+            />
             <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
         </>
     )

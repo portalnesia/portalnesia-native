@@ -5,6 +5,7 @@ import {
 	Dimensions
 } from 'react-native';
 import {Spinner} from '@ui-kitten/components'
+import LottieView from 'lottie-react-native'
 const {width,height} = Dimensions.get('window')
 //import Text from '../../components/utils/UbuntuFont';
 //import Colors from '../../constants/colors';
@@ -26,7 +27,7 @@ export default function ({ navigation }) {
 				justifyContent: 'center',
 			}}
 		>
-			<Spinner size="giant" style={{borderColor:'white'}} />
+			<LottieView source={require('@pn/assets/animation/app-starting.json')} autoPlay loop />
 		</View>
 	);
 }

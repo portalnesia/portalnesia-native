@@ -4,6 +4,8 @@ import {Layout as Lay,Text,useTheme,Divider,Card,ButtonGroup,Icon,Spinner} from 
 import {useLinkTo} from '@react-navigation/native'
 import Skeleton from '@pn/components/global/Skeleton'
 import Modal from 'react-native-modal'
+import YoutubePlayer from 'react-native-youtube-iframe'
+import WebView from 'react-native-autoheight-webview'
 
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -93,9 +95,15 @@ export default function({navigation,route}){
         }
     }
 
-    /*React.useEffect(()=>{
+    const togglePlaying=React.useCallback(()=>{
+        setPlaying(prev=>!prev)
+    },[])
 
-    },[AS])*/
+    const onStateChange=React.useCallback((state)=>{
+        if(state==='ended') {
+            setPlaying(false)
+        }
+    },[])
 
     React.useEffect(()=>{
         let timeout=null;
@@ -111,7 +119,9 @@ export default function({navigation,route}){
 
     React.useEffect(()=>{
         if (slug === 'popular') return navigation.replace("MainTabs",{screen:"Chord",params:{slug:'popular'}})
-        return ()=>setReady(false)
+        return ()=>{
+            setReady(false)
+        }
     },[route])
 
     return (
@@ -218,10 +228,20 @@ export default function({navigation,route}){
                     handleOpen={()=>setOpen(true)}
                     handleClose={()=>setOpen(false)}
                     onClose={()=>setOpen(false)}
+                    share={{
+                        link:`/chord/${data?.chord?.slug}?utm_campaign=chord`,
+                        title:`Chord ${data?.chord?.artist} - ${data?.chord?.title}`,
+                        dialog:"Share Chord"
+                    }}
                     menu={[{
+                        action:"share",
                         title:"Share",
                     },{
-                        title:"Copy Link"
+                        title:"Copy link",
+                        action:'copy'
+                    },{
+                        title:"Open in browser",
+                        action:'browser'
                     }]}
                 />
             )}

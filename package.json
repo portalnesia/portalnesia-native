@@ -40,7 +40,6 @@
     "expo-device": "~2.4.0",
     "expo-document-picker": "~8.4.1",
     "expo-file-system": "~9.3.0",
-    "expo-firebase-analytics": "~2.6.0",
     "expo-font": "~8.4.0",
     "expo-image-manipulator": "~8.4.0",
     "expo-image-picker": "~9.2.0",

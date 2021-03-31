@@ -170,3 +170,14 @@ export default function downloadFile(url,filename,uri="pn://url",saveToAsset=fal
         .catch(()=>reject)
     })
 }
+
+export const saveBase64=async (data,filename)=>{
+    const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY);
+    await new Promise((res, rej) => {
+        if (status !== 'granted')
+            return rej({ message: "Sorry, we need camera roll permissions" });
+        return res();
+    });
+    await RNFS.writeFile(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${filename}`, data, 'base64');
+    //await checkAndCreateAlbum({saveToAsset:true,filename})
+}

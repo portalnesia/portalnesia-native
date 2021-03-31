@@ -7,6 +7,7 @@ import {Modalize} from 'react-native-modalize'
 import Skltn from 'react-native-skeleton-placeholder'
 import Modal from 'react-native-modal'
 
+import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image,{ImageFull} from '@pn/components/global/Image'
 import useSWR from '@pn/utils/swr'
@@ -80,6 +81,7 @@ export default function UserScreen({navigation,route}){
     const theme=useTheme();
     const {username,slug}=route.params;
     const {data,error,mutate,isValidating}=useSWR(`/user/${username}`,{},user)
+    const [openMenu,setOpenMenu]=React.useState(false)
     //const data=undefined,error=undefined;
     const [tabIndex,setTabIndex] = React.useState(()=>{
         if(slug) {
@@ -186,6 +188,7 @@ export default function UserScreen({navigation,route}){
                     title={(evaProps) => <AnimText {...evaProps}  category="h1" style={{...evaProps?.style,marginHorizontal:50,opacity}} numberOfLines={1}>{data?.users?.username||""}</AnimText>}
                     accessoryLeft={()=><RenderBackButton navigation={navigation} />}
                     alignment="center"
+                    accessoryRight={()=><MenuToggle onPress={()=>{setOpenMenu(true)}} />}
                 />
             </View>
         )
@@ -327,6 +330,28 @@ export default function UserScreen({navigation,route}){
                     ) : null}
                 </Lay>
             </Modal>
+            {data && (
+                <MenuContainer
+                    visible={openMenu}
+                    handleOpen={()=>setOpenMenu(true)}
+                    handleClose={()=>setOpenMenu(false)}
+                    onClose={()=>setOpenMenu(false)}
+                    share={{
+                        link:`/user/${data?.users?.username}?utm_campaign=user`,
+                        title:`${data?.users?.name} (@${data?.users?.username}) - Portalnesia`
+                    }}
+                    menu={[{
+                        action:"share",
+                        title:"Share",
+                    },{
+                        title:"Copy link",
+                        action:'copy'
+                    },{
+                        title:"Open in browser",
+                        action:'browser'
+                    }]}
+                />
+            )}
         </>
     )
 }

@@ -6,7 +6,7 @@ import * as FileSystem from 'expo-file-system'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
-//import Carousel from '@pn/components/global/Carousel';
+import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Backdrop from '@pn/components/global/Backdrop';
 import Image from '@pn/components/global/Image'
@@ -25,6 +25,7 @@ export default function({navigation}){
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const [loading,setLoading] = React.useState(false)
+    const [open,setOpen]=React.useState(false)
     //const {height,width}=useWindowDimensions()
     //const theme = useTheme()
     const [url,setUrl]=React.useState("");
@@ -150,7 +151,7 @@ export default function({navigation}){
 
     return (
         <>
-            <Layout navigation={navigation} title="Images Checker" subtitle="Tools" withBack>
+            <Layout navigation={navigation} title="Images Checker" subtitle="Tools" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
                 <ScrollView
                     contentContainerStyle={{
                         flexGrow: 1
@@ -208,6 +209,26 @@ export default function({navigation}){
                     </Lay>
                 </ScrollView>
             </Layout>
+            <MenuContainer
+                visible={open}
+                handleOpen={()=>setOpen(true)}
+                handleClose={()=>setOpen(false)}
+                onClose={()=>setOpen(false)}
+                share={{
+                    link:`/images-checker?utm_campaign=tools`,
+                    title:`Images Checker - Portalnesia`
+                }}
+                menu={[{
+                    action:"share",
+                    title:"Share",
+                },{
+                    title:"Copy link",
+                    action:'copy'
+                },{
+                    title:"Open in browser",
+                    action:'browser'
+                }]}
+            />
             <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
             <Backdrop
                 visible={backdrop}

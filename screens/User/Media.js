@@ -1,5 +1,5 @@
 import React from 'react'
-import {View,Dimensions,TouchableOpacity,RefreshControl,Alert, Animated} from 'react-native'
+import {View,Dimensions,TouchableOpacity,RefreshControl, Animated} from 'react-native'
 import {Layout as Lay,Text,useTheme,Card} from '@ui-kitten/components'
 import {useNavigation} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
@@ -11,6 +11,7 @@ import {RenderMediaPrivate,RenderSuspend} from './PrivateUser'
 import { ucwords } from '@pn/utils/Main'
 import {GridSkeleton} from '@pn/components/global/Skeleton'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
+import { AuthContext } from '@pn/provider/AuthProvider';
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 
@@ -65,11 +66,13 @@ const RenderNews=({item,index,data,onOpen})=>{
 }
 
 const RenderMedia=React.forwardRef((props,ref)=>{
+    const context = React.useContext(AuthContext)
+    const {setNotif} = context
     const theme=useTheme();
     const navigation = useNavigation();
     const {data:dt,error:err,...swrProps} = usePagination(props.data ? `/user/${props.data?.users?.username}/media` : null,'media',24,false,false)
     
-    return <RenderMediaClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} />
+    return <RenderMediaClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} setNotif={setNotif} />
 })
 
 class RenderMediaClass extends React.PureComponent{
@@ -99,16 +102,7 @@ class RenderMediaClass extends React.PureComponent{
     handleOpenMenu = (item)=>{
         if(item?.type === 'photo') this.props.onOpen && this.props.onOpen(item)
         else {
-            Alert.alert(
-                "Under Maintenance",
-                "Sorry, this feature is under maintenance.",
-                [
-                    {
-                        text:"OK",
-                        onPress:()=>{}
-                    }
-                ]
-            )
+            this.props.setNotif(true,"Under Maintenance","Sorry, this feature is under maintenance.");
         }
     }
 

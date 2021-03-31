@@ -3,7 +3,7 @@ import {  View,ScrollView,useWindowDimensions } from 'react-native';
 import {Layout as Lay,Text,Spinner,Input,useTheme} from '@ui-kitten/components'
 
 
-//import Carousel from '@pn/components/global/Carousel';
+import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
@@ -18,6 +18,7 @@ export default function({navigation}){
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const [result,setResult]=React.useState(0)
+    const [open,setOpen]=React.useState(false)
     const [value,setValue]=React.useState({min:0,max:0});
     const [error,setError]=React.useState({min:false,max:false});
     const [errText,setErrText]=React.useState({min:[],max:[]});
@@ -115,7 +116,7 @@ export default function({navigation}){
 
     return (
         <>
-            <Layout navigation={navigation} title="Random Number Generator" subtitle="Tools" withBack>
+            <Layout navigation={navigation} title="Random Number Generator" subtitle="Tools" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
                 <ScrollView
                     contentContainerStyle={{
                         flex:1,flexDirection:'column',justifyContent:'flex-start',
@@ -180,7 +181,26 @@ export default function({navigation}){
                     </Lay>
                 </ScrollView>
             </Layout>
-
+            <MenuContainer
+                visible={open}
+                handleOpen={()=>setOpen(true)}
+                handleClose={()=>setOpen(false)}
+                onClose={()=>setOpen(false)}
+                share={{
+                    link:`/random-number?utm_campaign=tools`,
+                    title:`Random Number Generator - Portalnesia`
+                }}
+                menu={[{
+                    action:"share",
+                    title:"Share",
+                },{
+                    title:"Copy link",
+                    action:'copy'
+                },{
+                    title:"Open in browser",
+                    action:'browser'
+                }]}
+            />
         </>
     )
 }
