@@ -3,6 +3,7 @@ import {useWindowDimensions,View,Share} from 'react-native'
 import {Icon,TopNavigationAction,Layout,Text,useTheme,Menu,MenuItem} from '@ui-kitten/components'
 import {Modalize} from 'react-native-modalize'
 import {openBrowserAsync} from 'expo-web-browser'
+import analytics from '@react-native-firebase/analytics'
 
 import {URL} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
@@ -12,7 +13,7 @@ const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
 export const MenuToggle=({onPress})=><TopNavigationAction icon={MoreIcon} onPress={onPress} />
 
-const MenuCont=({menu,visible,onClose,share,...props})=>{
+const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const {copyText} = useClipboard()
@@ -31,14 +32,21 @@ const MenuCont=({menu,visible,onClose,share,...props})=>{
         }
     },[visible])
 
-    const handleShare=React.useCallback((text,url,dialog)=>{
+    const handleShare=React.useCallback(async(text,url,dialog)=>{
         Share.share({
             message:`${text} ${url}`,
             url:url
         },{
             dialogTitle:dialog||"Share"
         })
-    },[])
+        if(type && item_id) {
+            await analytics().logShare({
+                content_type:type,
+                item_id:String(item_id),
+                method:"share_button"
+            })
+        }
+    },[type,item_id])
 
     const handleOnPress=(dt)=>{
         if(dt?.onPress) dt?.onPress();

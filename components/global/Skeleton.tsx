@@ -105,6 +105,44 @@ export const GridSkeleton=({number=6,image,gridStyle={},height}:{height:number,n
     )
 }
 
+export const ListSkeleton=({number=3,image=false,height}: {height:number,number?:number,image?:boolean})=>{
+    const theme=useTheme();
+    const {width} = useWindowDimensions();
+
+    const renderWithImage=(index: number)=>{
+
+        return (
+            <Skltn.Item key={index} flexDirection="row" justifyContent='flex-start' alignItems="center" marginBottom={15}>
+                <Skltn.Item height={60} width={60} borderRadius={30} marginRight={15} />
+                <Skltn.Item>
+                    <Skltn.Item height={25} width={width-50-60} marginBottom={5} borderRadius={5}  />
+                    <Skltn.Item height={15} width={(width-50-60)/2} borderRadius={5} />
+                </Skltn.Item>
+            </Skltn.Item>
+        )
+    }
+
+    const renderNoImage=(index: number)=>{
+        return (
+            <Skltn.Item key={index} flexDirection="row" justifyContent='space-between' alignItems="center" marginBottom={15}>
+                <Skltn.Item height={25} width={width-40} marginBottom={5} borderRadius={5} />
+                <Skltn.Item height={15} width={(width-40)/2} borderRadius={5} />
+            </Skltn.Item>
+        )
+    }
+
+    return (
+        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+            <View style={{paddingHorizontal:15}}>
+                {[...Array(number).keys()].map((_,index)=>{
+                    if(image) return renderWithImage(index)
+                    else return renderNoImage(index)
+                })}
+            </View>
+        </Skltn>
+    )
+}
+
 export const ArticleSkeleton=({height}:{height:number})=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
@@ -145,45 +183,6 @@ export const ArticleSkeleton=({height}:{height:number})=>{
                     </Skltn.Item>
                 </Skltn.Item>
             </Skltn.Item>
-        </Skltn>
-    )
-}
-
-export const ListSkeleton=({number=3,image=false,height}: {height:number,number?:number,image?:boolean})=>{
-    const theme=useTheme();
-    const {width} = useWindowDimensions();
-
-    const renderWithImage=(index: number)=>{
-
-        return (
-            <Skltn.Item key={index} flexDirection="row" justifyContent='flex-start' alignItems="center" marginBottom={15}>
-                <Skltn.Item height={60} width={60} borderRadius={30} marginRight={15} />
-                <Skltn.Item>
-                    <Skltn.Item height={25} width={width-50-60} marginBottom={5} borderRadius={5}  />
-                    <Skltn.Item height={15} width={(width-50-60)/2} borderRadius={5} />
-                </Skltn.Item>
-            </Skltn.Item>
-        )
-    }
-
-    const renderNoImage=(index: number)=>{
-
-        return (
-            <Skltn.Item key={index} flexDirection="row" justifyContent='space-between' alignItems="center" marginBottom={15}>
-                <Skltn.Item height={25} width={width-40} marginBottom={5} borderRadius={5} />
-                <Skltn.Item height={15} width={(width-40)/2} borderRadius={5} />
-            </Skltn.Item>
-        )
-    }
-
-    return (
-        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
-            <View style={{paddingHorizontal:15}}>
-                {[...Array(number).keys()].map((_,index)=>{
-                    if(image) return renderWithImage(index)
-                    else return renderNoImage(index)
-                })}
-            </View>
         </Skltn>
     )
 }

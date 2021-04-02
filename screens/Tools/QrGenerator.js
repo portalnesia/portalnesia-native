@@ -141,6 +141,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     disabled={disabled}
                     blurOnSubmit={false}
                     autoCompleteType="name"
+                    placeholder="John"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -154,6 +155,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     disabled={disabled}
                     blurOnSubmit={false}
                     autoCompleteType="name"
+                    placeholder="Doe"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -168,6 +170,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     blurOnSubmit={false}
                     autoCompleteType="tel"
                     keyboardType="phone-pad"
+                    placeholder="+628987654321"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -181,6 +184,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     disabled={disabled}
                     blurOnSubmit={false}
                     keyboardType="url"
+                    placeholder="https://portalnesia.com"
                 />
             </Lay>
             <Text style={{marginTop:15}}>Company Data</Text>
@@ -194,6 +198,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     onSubmitEditing={()=>text6?.current?.focus()}
                     disabled={disabled}
                     blurOnSubmit={false}
+                    placeholder="Company Example"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -206,6 +211,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     onSubmitEditing={()=>text7?.current?.focus()}
                     disabled={disabled}
                     blurOnSubmit={false}
+                    placeholder="CEO"
                 />
             </Lay>
             <Text style={{marginTop:15}}>Address Data</Text>
@@ -221,6 +227,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     blurOnSubmit={false}
                     multiline
                     textAlignVertical="top"
+                    placeholder="Jl. Pejanggik"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -233,6 +240,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     onSubmitEditing={()=>text9?.current?.focus()}
                     disabled={disabled}
                     blurOnSubmit={false}
+                    placeholder="Mataram"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -245,6 +253,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     onSubmitEditing={()=>text10?.current?.focus()}
                     disabled={disabled}
                     blurOnSubmit={false}
+                    placeholder="12345"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -255,6 +264,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     onChangeText={(e)=>onchange('country',e)}
                     returnKeyType="send"
                     disabled={disabled}
+                    placeholder="Indonesia"
                 />
             </Lay>
         </Lay>
@@ -323,6 +333,7 @@ const QRwifi=React.memo(({onchange,input,disabled})=>{
                     onChangeText={(e)=>onchange('ssid',e)}
                     disabled={disabled}
                     enablesReturnKeyAutomatically
+                    placeholder="@wifi...."
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -354,6 +365,7 @@ const QRsms=React.memo(({onchange,input,disabled})=>{
                     keyboardType="phone-pad"
                     autoCompleteType="tel"
                     enablesReturnKeyAutomatically
+                    placeholder="+628987654321"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -366,6 +378,7 @@ const QRsms=React.memo(({onchange,input,disabled})=>{
                     textStyle={{minHeight:200,maxHeight:400}}
                     textAlignVertical="top"
                     multiline
+                    placeholder="Hello, John Doe"
                 />
             </Lay>
         </Lay>
@@ -384,6 +397,7 @@ const QRtelephone=React.memo(({onchange,input,disabled})=>{
                 keyboardType="phone-pad"
                 autoCompleteType="tel"
                 enablesReturnKeyAutomatically
+                placeholder="+628987654321"
             />
         </Lay>
     )
@@ -406,6 +420,7 @@ const QRemail=React.memo(({onchange,input,disabled})=>{
                     keyboardType="email-address"
                     autoCompleteType="email"
                     enablesReturnKeyAutomatically
+                    placeholder="example@portalnesia.com"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -418,6 +433,7 @@ const QRemail=React.memo(({onchange,input,disabled})=>{
                     onSubmitEditing={()=>text3?.current?.focus()}
                     disabled={disabled}
                     blurOnSubmit={false}
+                    placeholder="This is subject of email"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -430,6 +446,7 @@ const QRemail=React.memo(({onchange,input,disabled})=>{
                     textStyle={{minHeight:200,maxHeight:400}}
                     textAlignVertical="top"
                     multiline
+                    placeholder="Hello, John Doe"
                 />
             </Lay>
         </Lay>
@@ -446,6 +463,7 @@ const QRtext=React.memo(({onchange,input,disabled})=>(
             textStyle={{minHeight:200,maxHeight:400}}
             textAlignVertical="top"
             multiline
+            placeholder="Example text"
         />
     </Lay>
 ))
@@ -459,6 +477,7 @@ const QRurl=React.memo(({onchange,input,disabled})=>(
             disabled={disabled}
             keyboardType='url'
             returnKeyType="send"
+            placeholder="https://portalnesia.com"
         />
     </Lay>
 ))
@@ -652,8 +671,10 @@ export default function QrCodeGenerator({navigation,route}){
                 handleOpen={()=>setOpenMenu(true)}
                 handleClose={()=>setOpenMenu(false)}
                 onClose={()=>setOpenMenu(false)}
+                type="tools"
+                item_id="qr_code_generator"
                 share={{
-                    link:`/qr-code?utm_campaign=user`,
+                    link:`/qr-code?utm_campaign=tools`,
                     title:`QR Code Generator - Portalnesia`
                 }}
                 menu={[{

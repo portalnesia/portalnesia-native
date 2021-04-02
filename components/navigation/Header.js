@@ -2,6 +2,8 @@ import React from 'react';
 import {Icon,Divider, TopNavigation,TopNavigationAction,Text} from '@ui-kitten/components'
 import {Animated,StatusBar} from 'react-native'
 import {useNavigationState} from '@react-navigation/native'
+import {AuthContext} from '@pn/provider/AuthProvider'
+import LottieView from 'lottie-react-native'
 
 const STATUS_BAR_HEIGHT = StatusBar.currentHeight
 
@@ -15,7 +17,15 @@ const BackIcon=(props)=>(
 	<Icon {...props} name='arrow-back' />
 )
 
-export const useHeader=(height=56)=>{
+const RefreshingHeight = 100;
+export const Lottie=({style={},...other})=>{
+	const context = React.useContext(AuthContext)
+	const {theme} = context
+
+	return <LottieView style={{height:RefreshingHeight,position:'absolute',top:5,left:0,right:0,...style}} autoPlay source={theme==='dark' ? require('@pn/assets/animation/loading-dark.json') : require('@pn/assets/animation/loading-dark.json')} {...other} />
+}
+
+export const useHeader=(height=56,refresh=false)=>{
 	const clampedScrollValue = React.useRef(0)
 	const offsetValue = React.useRef(0)
 	const scrollValue = React.useRef(0)

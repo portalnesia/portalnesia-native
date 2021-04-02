@@ -1,6 +1,7 @@
 import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,useTheme,Divider,Spinner} from '@ui-kitten/components'
+import analytics from '@react-native-firebase/analytics'
 
 import Button from '@pn/components/global/Button';
 import Layout from '@pn/components/global/Layout';
@@ -28,20 +29,19 @@ export default function({navigation,route}){
 	const heightHeader = heightt?.main + heightt?.sub
 
     React.useEffect(()=>{
-        let timeout=null;
-        if(!ready) {
-            timeout = setTimeout(()=>{
+        if(data && !data?.error && !ready) {
+            (async function(){
+                await analytics().logSelectContent({
+                    content_type:'news',
+                    item_id:String(data?.id)
+                })
                 setReady(true)
-            },500)
+            })()
         }
         return ()=>{
-            if(timeout !== null) clearTimeout(timeout);
+            if(ready) setReady(false)
         }
-    },[data,ready])
-
-    React.useEffect(()=>{
-        return ()=>setReady(false)
-    },[])
+    },[data,ready,title])
 
     return (
         <>
@@ -55,7 +55,7 @@ export default function({navigation,route}){
                     <Skeleton type="article" />
                 </View>
             ) : error || data?.error ? (
-                <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
+                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
             ) : data?.text ? (
                 <Animated.ScrollView
                     contentContainerStyle={{
@@ -89,6 +89,8 @@ export default function({navigation,route}){
                 handleOpen={()=>setOpen(true)}
                 handleClose={()=>setOpen(false)}
                 onClose={()=>setOpen(false)}
+                type="news"
+                item_id={data?.id}
                 share={{
                     link:`/news/${source}/${title}?utm_campaign=news`,
                     title:`${data?.title} - Portalnesia`,

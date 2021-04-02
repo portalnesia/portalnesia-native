@@ -22,6 +22,12 @@ const Recent=({headerHeight,navigation,...other})=>{
 	} = usePagination("/twitter?type=recent","data",20,false,false)
 	const {width}=useWindowDimensions()
 
+	const [refreshing,setRefreshing]=React.useState(false)
+
+	React.useEffect(()=>{
+		if(!isValidating) setRefreshing(false);
+	},[isValidating])
+
 	const _renderItem=({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 28;
@@ -85,8 +91,8 @@ const Recent=({headerHeight,navigation,...other})=>{
 							colors={['white']}
 							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
-							onRefresh={()=>mutate()}
-							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+							refreshing={refreshing}
 						/>	
 					}
 					onEndReached={()=>{
@@ -110,6 +116,12 @@ const Popular=({headerHeight,navigation,...other})=>{
 		mutate,isValidating,isLoadingInitialData
 	} = usePagination("/twitter?type=popular","data",20,false,false)
 	const {width}=useWindowDimensions()
+
+	const [refreshing,setRefreshing]=React.useState(false)
+
+	React.useEffect(()=>{
+		if(!isValidating) setRefreshing(false);
+	},[isValidating])
 
 	const _renderItem=({item,index})=>{
 		const angka = index % 2;
@@ -174,8 +186,8 @@ const Popular=({headerHeight,navigation,...other})=>{
 							colors={['white']}
 							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
-							onRefresh={()=>mutate()}
-							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+							refreshing={refreshing}
 						/>	
 					}
 					onEndReached={()=>{

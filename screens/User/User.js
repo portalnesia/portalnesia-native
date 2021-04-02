@@ -6,6 +6,7 @@ import {useNavigationState} from '@react-navigation/native'
 import {Modalize} from 'react-native-modalize'
 import Skltn from 'react-native-skeleton-placeholder'
 import Modal from 'react-native-modal'
+import analytics from '@react-native-firebase/analytics'
 
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -77,11 +78,22 @@ const SkeletonHeader=()=>{
 
 const tabIndexArray=['about','follower','following','media'];
 export default function UserScreen({navigation,route}){
+    const [ready,setReady]=React.useState(false)
     const scrollY = React.useRef(new Value(0)).current;
     const theme=useTheme();
     const {username,slug}=route.params;
     const {data,error,mutate,isValidating}=useSWR(`/user/${username}`,{},user)
     const [openMenu,setOpenMenu]=React.useState(false)
+    const [refreshing,setRefreshing]=React.useState(false)
+	React.useEffect(()=>{
+		if(!isValidating) setRefreshing(false);
+	},[isValidating])
+    const handleRefreshing=()=>{
+        if(!isValidating) {
+            setRefreshing(true);
+            mutate();
+        }
+    }
     //const data=undefined,error=undefined;
     const [tabIndex,setTabIndex] = React.useState(()=>{
         if(slug) {
@@ -260,7 +272,7 @@ export default function UserScreen({navigation,route}){
         if(route.key == 'follower') return <RenderFollow type="follower" {...props} ref={ref.follower} onOpen={handleOpenMenu('follower')} />
         if(route.key == 'following') return <RenderFollow type="following" {...props} ref={ref.following} onOpen={handleOpenMenu('following')} />
         if(route.key == 'media') return <RenderMedia {...props} ref={ref.media} onOpen={handleOpenMenu('media')} />
-        if(route.key == 'about') return <RenderAbout {...props} mutate={mutate} isValidating={isValidating} />
+        if(route.key == 'about') return <RenderAbout {...props} mutate={handleRefreshing} isValidating={refreshing} />
         return null;
     }
 
@@ -286,6 +298,22 @@ export default function UserScreen({navigation,route}){
     const handleCloseMenu=()=>{
         setOpen(null)
     }
+
+    React.useEffect(()=>{
+        if(data && !data?.error && !ready) {
+            (async function(){
+                await analytics().logSelectContent({
+                    content_type:'user',
+                    item_id:String(data?.users?.id)
+                })
+                setReady(true)
+            })()
+        }
+
+        return ()=>{
+            if(ready) setReady(false)
+        }
+    },[data,username,ready])
 
     return (
         <>
@@ -336,6 +364,8 @@ export default function UserScreen({navigation,route}){
                     handleOpen={()=>setOpenMenu(true)}
                     handleClose={()=>setOpenMenu(false)}
                     onClose={()=>setOpenMenu(false)}
+                    type="user"
+                    item_id={data?.users?.id}
                     share={{
                         link:`/user/${data?.users?.username}?utm_campaign=user`,
                         title:`${data?.users?.name} (@${data?.users?.username}) - Portalnesia`

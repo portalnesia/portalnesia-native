@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated,RefreshControl,useWindowDimensions,View,Image as IMG } from 'react-native';
 import {Layout as Lay,Text,useTheme,Divider,Icon,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
+import analytics from '@react-native-firebase/analytics'
 
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -127,20 +128,22 @@ export default function({navigation,route}){
     const {copyText} = useClipboard()
 
     React.useEffect(()=>{
-        let timeout=null;
-        if(!ready) {
-            timeout = setTimeout(()=>{
+        if(data && !data?.error && !ready) {
+            (async function(){
+                await analytics().logSelectContent({
+                    content_type:'twitter_thread',
+                    item_id:String(data?.id)
+                })
                 setReady(true)
-            },500)
+            })()
         }
         return ()=>{
-            if(timeout !== null) clearTimeout(timeout);
+            if(ready) setReady(false)
         }
-    },[data,ready])
+    },[data,ready,route])
 
     React.useEffect(()=>{
         if (slug === 'popular') return navigation.replace("Twitter",{slug:'popular'})
-        return ()=>setReady(false)
     },[route])
 
     const HeaderComp = ()=>(
@@ -168,7 +171,7 @@ export default function({navigation,route}){
                     <Skeleton type="article" />
                 </View>
             ) : error || data?.error ? (
-                <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
+                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
             ) : data ? (
                 <Animated.FlatList
                     ListHeaderComponentStyle={{
@@ -194,6 +197,8 @@ export default function({navigation,route}){
                         handleOpen={()=>setOpen(true)}
                         handleClose={()=>setOpen(false)}
                         onClose={()=>setOpen(false)}
+                        type="twitter_thread"
+                        item_id={data?.id}
                         share={{
                             link:`/twitter/thread/${data?.id}?utm_campaign=news`,
                             title:`${Ktruncate(specialHTML(data?.tweets?.[0]?.tweet),150)} - Portalnesia`,

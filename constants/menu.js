@@ -41,10 +41,10 @@ export const menu=[
                         title:"Images Checker",
                         to:"ImagesChecker"
                     },
-                    {
+                    /*{
                         title:"Twitter Menfess",
                         //to:"Twitter Menfess"
-                    },
+                    },*/
                 ]
             },
             /*{
@@ -81,9 +81,9 @@ export const menu=[
             },
             {
                 title:"Check Update",
-                //to:"CheckUpdate",
-                to:"User",
-                params:{username:'putuaditya_sid'}
+                to:"CheckUpdate",
+                //to:"User",
+                //params:{username:'putuaditya_sid'}
                 //icon:['update','material'],
             },
             {

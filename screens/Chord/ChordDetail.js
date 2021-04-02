@@ -6,6 +6,7 @@ import Skeleton from '@pn/components/global/Skeleton'
 import Modal from 'react-native-modal'
 import YoutubePlayer from 'react-native-youtube-iframe'
 import WebView from 'react-native-autoheight-webview'
+import analytics from '@react-native-firebase/analytics'
 
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -106,22 +107,22 @@ export default function({navigation,route}){
     },[])
 
     React.useEffect(()=>{
-        let timeout=null;
-        if(!ready) {
-            timeout = setTimeout(()=>{
+        if(data && !data?.error && !ready) {
+            (async function(){
+                await analytics().logSelectContent({
+                    content_type:'chord',
+                    item_id:String(data?.chord?.id)
+                })
                 setReady(true)
-            },500)
+            })()
         }
         return ()=>{
-            if(timeout !== null) clearTimeout(timeout);
+            if(ready) setReady(false)
         }
-    },[data,ready])
+    },[data,ready,route])
 
     React.useEffect(()=>{
         if (slug === 'popular') return navigation.replace("MainTabs",{screen:"Chord",params:{slug:'popular'}})
-        return ()=>{
-            setReady(false)
-        }
     },[route])
 
     return (
@@ -147,7 +148,7 @@ export default function({navigation,route}){
                     <Skeleton type="article" />
                 </View>
             ) : error || data?.error ? (
-                <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
+                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
             ) : data?.chord?.text ? (
                 <Animated.ScrollView
                     contentContainerStyle={{
@@ -228,6 +229,8 @@ export default function({navigation,route}){
                     handleOpen={()=>setOpen(true)}
                     handleClose={()=>setOpen(false)}
                     onClose={()=>setOpen(false)}
+                    type="chord"
+                    item_id={data?.chord?.id}
                     share={{
                         link:`/chord/${data?.chord?.slug}?utm_campaign=chord`,
                         title:`Chord ${data?.chord?.artist} - ${data?.chord?.title}`,

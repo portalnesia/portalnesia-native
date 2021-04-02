@@ -43,7 +43,8 @@
 				"foregroundImage":"./assets/adaptive-icon.png",
 				"backgroundColor":"#2f6f4e"
 			},
-			"useNextNotificationsApi":true
+			"useNextNotificationsApi":true,
+			"googleServicesFile": "./android/app/google-services.json"
 		}
 	}
 }

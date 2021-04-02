@@ -5,7 +5,7 @@ import {useScrollToTop} from '@react-navigation/native'
 import {TabView,TabBar} from 'react-native-tab-view'
 
 import Layout from '@pn/components/global/Layout';
-import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
+import Header,{useHeader,headerHeight as headerHeightt,Lottie} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
@@ -23,6 +23,12 @@ const Recent=({headerHeight,navigation,...other})=>{
 	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
+
+	const [refreshing,setRefreshing]=React.useState(false)
+
+	React.useEffect(()=>{
+		if(!isValidating) setRefreshing(false);
+	},[isValidating])
 
 	const _renderItem=({item,index})=>{
 		const angka = index % 2;
@@ -80,19 +86,21 @@ const Recent=({headerHeight,navigation,...other})=>{
 					renderItem={_renderItem}
 					//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 					ListFooterComponent={Footer}
-					onEndReachedThreshold={0.01}
+					//onEndReachedThreshold={0.01}
 					refreshControl={
 						<RefreshControl
 							style={{zIndex:2}}
 							colors={['white']}
 							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
-							onRefresh={()=>mutate()}
-							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+							refreshing={refreshing}
 						/>	
 					}
 					onEndReached={()=>{
-						if(!isLoadingMore) setSize(size+1)
+						if(!isLoadingMore) {
+							setSize(size+1)
+						}
 					}}
 					{...other}
 				/>
@@ -114,6 +122,12 @@ const Popular=({headerHeight,navigation,...other})=>{
 	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
+
+	const [refreshing,setRefreshing]=React.useState(false)
+
+	React.useEffect(()=>{
+		if(!isValidating) setRefreshing(false);
+	},[isValidating])
 
 	const _renderItem=({item,index})=>{
 		const angka = index % 2;
@@ -177,8 +191,8 @@ const Popular=({headerHeight,navigation,...other})=>{
 							colors={['white']}
 							progressBackgroundColor="#2f6f4e"
 							progressViewOffset={headerHeight}
-							onRefresh={()=>mutate()}
-							refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+							refreshing={refreshing}
 						/>	
 					}
 					onEndReached={()=>{

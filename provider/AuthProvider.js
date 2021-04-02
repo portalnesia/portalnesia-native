@@ -5,32 +5,46 @@ import {EvaIconsPack} from '@ui-kitten/eva-icons'
 import DropdownAlert from 'react-native-dropdownalert'
 import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
+import * as Applications from 'expo-application'
+import axios from 'axios'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import {getDevicePushTokenAsync} from 'expo-notifications'
+import {Constants} from 'react-native-unimodules'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
 import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
-//import colors from 'constants/colors';
-//import * as firebase from 'firebase';
+import {API as APII} from '@env'
+
+const API = axios.create({
+    baseURL:APII,
+    timeout:10000,
+    headers: {
+        'X-Application-Version': Constants.nativeAppVersion,
+        'X-Device-Id': Applications.androidId,
+		'X-Session-Id':Applications.androidId
+    }
+})
 const AuthContext = createContext();
 
 const reducer=(prevState,action)=>{
-	switch(action.type){
+	switch(action?.type){
 		case "LOGIN":
 			return {
 				...prevState,
 				user:action.payload.user,
 				token:action.payload.token
 			}
-		case "LOGOUT":{
+		case "LOGOUT":
+			return {...prevState,user:false,token:null}
+		case "SESSION":
+			return {...prevState,session:action.payload}
+		case "MANUAL":
 			return {
 				...prevState,
-				user:false,
-				token:null
+				...action.payload
 			}
-		}
 		default:
 			return {...prevState}
 	}
@@ -38,7 +52,8 @@ const reducer=(prevState,action)=>{
 
 const initialState={
 	user:null,
-	token:null
+	token:null,
+	session:null
 }
 
 const AuthProvider = (props) => {
@@ -87,10 +102,12 @@ const AuthProvider = (props) => {
 		(async function(){
 			const res = await AsyncStorage.getItem("theme")
 			if(res !== null) setTema(res);
-			dispatch({type:"LOGOUT"})
+			const notif_token = (await getDevicePushTokenAsync()).data
+			API.post('/native/send_notification_token',`token=${notif_token}`)
+			dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
 		})();
+		
 	},[])
-	
 
 	return (
 		<AuthContext.Provider
@@ -108,7 +125,6 @@ const AuthProvider = (props) => {
 			<ApplicationProvider {...eva} theme={{...eva[selectedTheme],...theme[selectedTheme]}} customMapping={mapping}>
 				{props.children}
 				<DropdownAlert
-					tapToCloseEnabled={false}
 					successColor='#2f6f4e'
 					activeStatusBarStyle='light-content'
 					inactiveStatusBarStyle={selectedTheme==='light' ? "dark-content" : "light-content"}

@@ -214,6 +214,8 @@ export default function({navigation}){
                 handleOpen={()=>setOpen(true)}
                 handleClose={()=>setOpen(false)}
                 onClose={()=>setOpen(false)}
+                type="tools"
+                item_id="images_checker"
                 share={{
                     link:`/images-checker?utm_campaign=tools`,
                     title:`Images Checker - Portalnesia`

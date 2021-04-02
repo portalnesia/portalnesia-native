@@ -23,6 +23,12 @@ export default function ({ navigation }) {
 		mutate,isValidating,isLoadingInitialData
 	} = usePagination("/blog/get","blog",15,false,false)
 
+	const [refreshing,setRefreshing]=React.useState(false)
+
+	React.useEffect(()=>{
+		if(!isValidating) setRefreshing(false);
+	},[isValidating])
+
 	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
 		if(isLoadingMore) return <View paddingTop={20}><Skeleton height={300} type="grid" number={4} image /></View> 
@@ -105,8 +111,8 @@ export default function ({ navigation }) {
 								<RefreshControl
 									colors={['white']}
 									progressBackgroundColor="#2f6f4e"
-									onRefresh={()=>{mutate()}}
-									refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+									onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+									refreshing={refreshing}
 								/>
 							}
 							onEndReachedThreshold={0.01}

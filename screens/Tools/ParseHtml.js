@@ -91,6 +91,8 @@ export default function({navigation}){
                 handleOpen={()=>setOpen(true)}
                 handleClose={()=>setOpen(false)}
                 onClose={()=>setOpen(false)}
+                type="tools"
+                item_id="parse_html"
                 share={{
                     link:`/parse-html?utm_campaign=tools`,
                     title:`Parse HTML - Portalnesia`

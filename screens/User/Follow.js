@@ -56,6 +56,9 @@ class RenderFollowClass extends React.PureComponent{
         super(props)
         this.refresh=this.refresh.bind(this)
         this.loadMore=this.loadMore.bind(this)
+        this.state={
+            refreshing:false
+        }
     }
 
     handleOpenMenu = (item)=>{
@@ -64,7 +67,10 @@ class RenderFollowClass extends React.PureComponent{
 
     refresh=()=>{
         const {mutate,isValidating}=this.props;
-        if(!isValidating) mutate();
+        if(!isValidating) {
+            this.setState({refreshing:true})
+            mutate();
+        }
     }
 
     loadMore=()=>{
@@ -75,7 +81,10 @@ class RenderFollowClass extends React.PureComponent{
     componentDidUpdate(prevProps){
         const {isValidating,onValidatingChange,dt,isLoadingMore}=this.props
         if(prevProps.isValidating != isValidating && dt?.length > 0 && !isLoadingMore) {
-            return onValidatingChange && onValidatingChange(isValidating)
+            if(onValidatingChange) onValidatingChange(isValidating)
+        }
+        if(!isValidating) {
+            this.setState({refreshing:false})
         }
     }
 
@@ -152,7 +161,7 @@ class RenderFollowClass extends React.PureComponent{
                             style={{zIndex:5}}
                             colors={['white']}
                             progressBackgroundColor="#2f6f4e"
-                            refreshing={data && isValidating}
+                            refreshing={this.state.refreshing}
                             progressViewOffset={HeaderHeight + TabBarHeight + 56}
                             title="Refreshing"
                             onRefresh={()=>this.refresh()}

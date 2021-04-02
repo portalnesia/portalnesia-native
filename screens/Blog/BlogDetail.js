@@ -3,6 +3,7 @@ import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,Spinner,Divider,useTheme} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import {useLinkTo} from '@react-navigation/native'
+import analytics from '@react-native-firebase/analytics'
 
 import Layout from '@pn/components/global/Layout';
 //import Image from '@pn/components/global/Image';
@@ -29,20 +30,19 @@ export default function({navigation,route}){
     const linkTo = useLinkTo()
 
     React.useEffect(()=>{
-        let timeout=null;
-        if(!ready) {
-            timeout = setTimeout(()=>{
+        if(data && !data?.error && !ready) {
+            (async function(){
+                await analytics().logSelectContent({
+                    content_type:'blog',
+                    item_id:String(data?.blog?.id)
+                })
                 setReady(true)
-            },500)
+            })()
         }
         return ()=>{
-            if(timeout !== null) clearTimeout(timeout);
+            if(ready) setReady(false)
         }
-    },[data,ready])
-
-    React.useEffect(()=>{
-        return ()=>setReady(false)
-    },[route])
+    },[data,ready,slug])
 
     return (
         <>
@@ -56,7 +56,7 @@ export default function({navigation,route}){
                     <Skeleton type="article" />
                 </View>
             ) : error || data?.error ? (
-                <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
+                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
             ) : data?.blog?.text ? (
                 <Animated.ScrollView
                     contentContainerStyle={{
@@ -99,6 +99,8 @@ export default function({navigation,route}){
                handleOpen={()=>setOpen(true)}
                handleClose={()=>setOpen(false)}
                onClose={()=>setOpen(false)}
+               type="blog"
+               item_id={data?.blog?.id}
                share={{
                    link:`/blog/${data?.blog?.slug}?utm_campaign=blog`,
                    title:`${data?.blog?.title} - Portalnesia`,

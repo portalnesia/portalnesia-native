@@ -186,6 +186,8 @@ export default function({navigation}){
                 handleOpen={()=>setOpen(true)}
                 handleClose={()=>setOpen(false)}
                 onClose={()=>setOpen(false)}
+                type="tools"
+                item_id="number_generator"
                 share={{
                     link:`/random-number?utm_campaign=tools`,
                     title:`Random Number Generator - Portalnesia`

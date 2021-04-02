@@ -1,21 +1,24 @@
-import {useMemo} from 'react'
+import React,{useMemo} from 'react'
 import { useSWRInfinite } from "swr"
-import {fetcher} from './API'
-import {API_URL,API_URL_2} from '@env'
-
+import useAPI from './API'
+import { AuthContext } from '@pn/provider/AuthProvider';
 
 export default function usePagination(path,data_name,limit,news,user=false){
+    const {fetcher}=useAPI()
+    const context = React.useContext(AuthContext)
+    const {state}=context
+    const {user:stateUser,session}=state;
     const PAGE_LIMIT = limit||10
 
     const { data, error, size, setSize,mutate,isValidating } = useSWRInfinite(
         (index,previous)=>{
+            if(stateUser===null || session === null) return null;
             if(path===null) return null;
-            const url = user ? API_URL_2 + path : API_URL + path
             if(previous && previous?.load===false) return null
             const ppath=path.match(/\?/) !== null ? '&page=' : '?page=';
-            if(index==0) return `${url}${ppath}${news ? 0 : 1}`
-            if(previous && previous?.page) return `${url}${ppath}${news ? previous?.page : previous?.page+1}`
-            return `${url}${ppath}${news ? index : index + 1}` 
+            if(index==0) return `${path}${ppath}${news ? 0 : 1}`
+            if(previous && previous?.page) return `${path}${ppath}${news ? previous?.page : previous?.page+1}`
+            return `${path}${ppath}${news ? index : index + 1}` 
         },
         fetcher
     )

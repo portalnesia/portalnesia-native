@@ -6,6 +6,7 @@
       "isolatedModules": true,
       "jsx": "react",
       "lib": ["es6"],
+      "module": "es2015",
       "moduleResolution": "node",
       "strict": true,
       "target": "esnext",

@@ -2,6 +2,7 @@ node_modules/**/*
 .expo/*
 npm-debug.*
 *.jks
+*.jks.old
 *.p8
 *.p12
 *.key
@@ -47,6 +48,7 @@ build/
 local.properties
 *.iml
 *.hprof
+android/app/google-services.json
 
 # node.js
 #

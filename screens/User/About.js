@@ -63,10 +63,10 @@ function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumSc
                     style={{zIndex:5}}
                     colors={['white']}
                     progressBackgroundColor="#2f6f4e"
-                    refreshing={data && isValidating}
+                    refreshing={isValidating}
                     progressViewOffset={HeaderHeight + TabBarHeight + 56}
                     title="Refreshing"
-                    onRefresh={()=>!isValidating && mutate()}
+                    onRefresh={mutate}
                 />
             }
         >

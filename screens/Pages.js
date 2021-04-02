@@ -2,6 +2,7 @@ import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,Divider,useTheme,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
+import analytics from '@react-native-firebase/analytics'
 
 import Layout from '@pn/components/global/Layout';
 //import Image from '@pn/components/global/Image';
@@ -27,20 +28,19 @@ export default function({navigation,route}){
 	const heightHeader = heightt?.main + heightt?.sub
 
     React.useEffect(()=>{
-        let timeout=null;
-        if(!ready) {
-            timeout = setTimeout(()=>{
+        if(data && !data?.error && !ready) {
+            (async function(){
+                await analytics().logSelectContent({
+                    content_type:'user',
+                    item_id:String(data?.users?.id)
+                })
                 setReady(true)
-            },500)
+            })()
         }
         return ()=>{
-            if(timeout !== null) clearTimeout(timeout);
+            if(ready) setReady(false)
         }
-    },[data,ready])
-
-    React.useEffect(()=>{
-        return ()=>setReady(false)
-    },[])
+    },[data,ready,route])
 
     return (
         <>
@@ -55,7 +55,7 @@ export default function({navigation,route}){
                         <Skeleton type="article" />
                     </View>
                 ) : error || data?.error ? (
-                    <NotFound {...(data?.error ? {children:<Text>{data?.msg}</Text>} : {})} />
+                    <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
                 ) : data?.pages?.text ? (
                     <Animated.ScrollView
                         contentContainerStyle={{
@@ -86,6 +86,8 @@ export default function({navigation,route}){
                     handleOpen={()=>setOpen(true)}
                     handleClose={()=>setOpen(false)}
                     onClose={()=>setOpen(false)}
+                    type="pages"
+                    item_id={data?.pages?.id}
                     share={{
                         link:`/pages/${data?.pages?.slug}?utm_campaign=pages`,
                         title:`${data?.pages?.title} - Portalnesia`

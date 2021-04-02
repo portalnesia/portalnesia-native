@@ -1,11 +1,11 @@
 import React from 'react'
 import axios from 'axios'
-import {API as APII} from '@env'
+import {API as APII,API_URL,API_URL_2} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import {Constants} from 'react-native-unimodules'
 import * as Application from 'expo-application'
 
-const API = axios.create({
+export const API = axios.create({
     baseURL:APII,
     timeout:10000,
     headers: {
@@ -29,14 +29,14 @@ export const setToken=token=>{
     })
 }
 
-
-export default function useAPI(user){
+export default function useAPI(){
     const context = React.useContext(AuthContext)
-    const {setNotif} = context
+    const {setNotif,state} = context
+    const {user,session,token}=state
     
     const PNpost=(url,data,formdata)=>{
         return new Promise((res,rej)=>{
-            const baseURL =  user ? url : `/native${url}`
+            const baseURL =  user !== false ? url : `/native${url}`
             const qs=require('qs');
             const dt=data===null ? "" : (formdata ? data : qs.stringify(data));
             let opt={}
@@ -44,11 +44,18 @@ export default function useAPI(user){
                 const {headers:otherHeader,...other}=formdata;
                 opt={
                     headers:{
+                        'X-Session-Id':session,
                         ...otherHeader
                     },
                     ...other
                 }
                 //opt.headers['Content-Type']="multipart/form-data";
+            } else {
+                opt={
+                    headers:{
+                        'X-Session-Id':state?.session
+                    },
+                }
             }
             API.post(baseURL,dt,opt)
             .then((response)=>{
@@ -76,8 +83,13 @@ export default function useAPI(user){
 
     const PNget=(url)=>{
         return new Promise((res,rej)=>{
-            const baseURL =  user ? url : `/native${url}`
-            API.get(baseURL)
+            const baseURL =  user !== false ? url : `/native${url}`
+            const opt={
+                headers:{
+                    'X-Session-Id':state?.session
+                },
+            }
+            API.get(baseURL,opt)
             .then((response)=>{
                 if(response?.data?.error == 1) {
                     console.log(response?.status)
@@ -100,5 +112,28 @@ export default function useAPI(user){
         })
     }
 
-    return {PNpost,PNget}
+    const fetcher=(path) => {
+        return new Promise((resolve,reject)=>{
+            const baseURL =  user !== false ? path : `/native${path}`
+            const opt={
+                headers:{
+                    'X-Session-Id':state?.session
+                },
+            }
+            API.get(baseURL,opt)
+            .then(res=>{
+                return new Promise((resol,reje)=>{
+                    const data = res.data;
+                    if(data?.error) resol({message:data?.msg||"Something went wrong",...data});
+                    else resol(data);
+                })
+            })
+            .then(resolve)
+            .catch(err=>{
+                if(err?.response?.data) resolve(err?.response?.data)
+                else reject(err)
+            });
+        })
+    }
+    return {PNpost,PNget,fetcher}
 }

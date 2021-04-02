@@ -90,6 +90,12 @@ export default function ({ navigation,route }) {
 		mutate,isValidating,isLoadingInitialData
 	} = usePagination(`/chord/artist${slug ? `/${slug}` : ""}`,"chord",20,false,false)
 
+	const [refreshing,setRefreshing]=React.useState(false)
+
+	React.useEffect(()=>{
+		if(!isValidating) setRefreshing(false);
+	},[isValidating])
+
 	const Footer=()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
@@ -117,11 +123,10 @@ export default function ({ navigation,route }) {
 							<RefreshControl
 								colors={['white']}
 								progressBackgroundColor="#2f6f4e"
-								onRefresh={()=>{mutate()}}
-								refreshing={(isValidating && !isLoadingMore) || isLoadingInitialData}
+								onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+								refreshing={refreshing}
 							/>
 						}
-						onEndReachedThreshold={0.01}
 						onEndReached={()=>{
 							if(!isReachingEnd && !isLoadingMore) {
 								setSize(size+1)

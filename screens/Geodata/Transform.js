@@ -213,6 +213,8 @@ export default function({navigation}){
                 handleOpen={()=>setOpen(true)}
                 handleClose={()=>setOpen(false)}
                 onClose={()=>setOpen(false)}
+                type="geodata"
+                item_id="transform_coordinate"
                 share={{
                     link:`/geodata/transform?utm_campaign=geodata`,
                     title:`Transform Coordinate - Portalnesia`

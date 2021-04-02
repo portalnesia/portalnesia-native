@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import {StatusBar} from 'expo-status-bar'
 import {BottomNavigation,BottomNavigationTab,Icon,useTheme} from '@ui-kitten/components'
+import analytics from '@react-native-firebase/analytics'
 
 
 import {linking} from './Linking'
@@ -179,15 +180,31 @@ const MainStackScreen=()=>(
 )
 
 export default () => {
+	const navigationRef=React.useRef(null)
+	const routeNameRef = React.useRef(null)
 	const auth = useContext(AuthContext);
 	const {state,theme:selectedTheme} = auth;
 	const {user} = state
 	const theme=useTheme()
-
+	
 	return (
 		<>
 			<StatusBar style={user === null ? 'light' : (selectedTheme==='light' ? "dark" : "light")} translucent animated backgroundColor={user === null ? theme['color-primary-500'] : theme['background-basic-color-1']} />
 			<NavigationContainer
+				ref={navigationRef}
+				onReady={()=>{
+					routeNameRef.current = navigationRef.current.getCurrentRoute().name
+				}}
+				onStateChange={async()=>{
+					const prevRouteName = routeNameRef.current;
+					const currentRouteName = navigationRef.current.getCurrentRoute().name
+					if(prevRouteName !== currentRouteName) {
+						await analytics().logScreenView({
+							screen_class: currentRouteName,
+							screen_name: currentRouteName
+						})
+					}
+				}}
 				linking={linking}
 			>
 				{user == null && <Loading />}
