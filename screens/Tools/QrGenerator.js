@@ -142,6 +142,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     blurOnSubmit={false}
                     autoCompleteType="name"
                     placeholder="John"
+                    textContentType="name"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -156,6 +157,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     blurOnSubmit={false}
                     autoCompleteType="name"
                     placeholder="Doe"
+                    textContentType="nameSuffix"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -171,6 +173,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     autoCompleteType="tel"
                     keyboardType="phone-pad"
                     placeholder="+628987654321"
+                    textContentType="telephoneNumber"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -185,6 +188,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     blurOnSubmit={false}
                     keyboardType="url"
                     placeholder="https://portalnesia.com"
+                    textContentType="URL"
                 />
             </Lay>
             <Text style={{marginTop:15}}>Company Data</Text>
@@ -199,6 +203,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     disabled={disabled}
                     blurOnSubmit={false}
                     placeholder="Company Example"
+                    textContentType="organizationName"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -228,6 +233,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     multiline
                     textAlignVertical="top"
                     placeholder="Jl. Pejanggik"
+                    textContentType="fullStreetAddress"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -241,6 +247,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     disabled={disabled}
                     blurOnSubmit={false}
                     placeholder="Mataram"
+                    textContentType="addressCity"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -254,6 +261,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     disabled={disabled}
                     blurOnSubmit={false}
                     placeholder="12345"
+                    textContentType="postalCode"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -265,6 +273,7 @@ const QRvcard=React.memo(({onchange,input,disabled})=>{
                     returnKeyType="send"
                     disabled={disabled}
                     placeholder="Indonesia"
+                    textContentType="countryName"
                 />
             </Lay>
         </Lay>
@@ -366,6 +375,7 @@ const QRsms=React.memo(({onchange,input,disabled})=>{
                     autoCompleteType="tel"
                     enablesReturnKeyAutomatically
                     placeholder="+628987654321"
+                    textContentType="telephoneNumber"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -398,6 +408,7 @@ const QRtelephone=React.memo(({onchange,input,disabled})=>{
                 autoCompleteType="tel"
                 enablesReturnKeyAutomatically
                 placeholder="+628987654321"
+                textContentType="telephoneNumber"
             />
         </Lay>
     )
@@ -421,6 +432,7 @@ const QRemail=React.memo(({onchange,input,disabled})=>{
                     autoCompleteType="email"
                     enablesReturnKeyAutomatically
                     placeholder="example@portalnesia.com"
+                    textContentType="emailAddress"
                 />
             </Lay>
             <Lay style={{marginVertical:5}}>
@@ -478,6 +490,7 @@ const QRurl=React.memo(({onchange,input,disabled})=>(
             keyboardType='url'
             returnKeyType="send"
             placeholder="https://portalnesia.com"
+            textContentType="URL"
         />
     </Lay>
 ))

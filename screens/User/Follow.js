@@ -46,7 +46,7 @@ const SkeletonFollow=()=>{
 }
 
 const RenderFollow=React.forwardRef((props,ref)=>{
-    const {data:dt,error:err,...swrProps} = usePagination(props.data ? `/user/${props.data?.users?.username}/${props.type}` : null,props.type,20,false,false)
+    const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/${props.type}` : null,props.type,20,false,false)
     const theme=useTheme()
     return <RenderFollowClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} />
 })
@@ -121,12 +121,12 @@ class RenderFollowClass extends React.PureComponent{
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                 >
-                    {(!data && !error) || (data?.error || error) || isLoadingInitialData ? (
-                        <SkeletonFollow />
-                    ) : data?.users?.private===true ? (
+                    {data?.users?.private==true ? (
                         <RenderPrivate data={data} />
-                    ) : (
+                    ) : data?.users?.suspend==true ? (
                         <RenderSuspend />
+                    ) :  (
+                        <SkeletonFollow />
                     )}
                 </Animated.ScrollView>
             )

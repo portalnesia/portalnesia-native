@@ -59,7 +59,7 @@ export default function ({ navigation }) {
 					) : null}
 					<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
 						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("Main",{screen:"NewsDetail",params:{source:item?.source,title:encodeURIComponent(item?.title)}})} header={(props)=>(
-							<View {...props} {...props} style={{...props?.style,padding:0}}>
+							<View {...props} style={{...props?.style,padding:0}}>
 								<Image
 									style={{
 										height:cardSize,

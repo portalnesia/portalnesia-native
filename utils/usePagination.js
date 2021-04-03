@@ -39,5 +39,5 @@ export default function usePagination(path,data_name,limit,news,user=false){
     const isReachingEnd =
         isEmpty || (data && data[data.length - 1]?.[data_name]?.length < PAGE_LIMIT)
 
-    return { data:posts, error, isLoadingMore, size, setSize, isReachingEnd,response:data,mutate,isValidating,isLoadingInitialData}
+    return { data:posts, error, isLoadingMore, size, setSize, isReachingEnd,response:data,mutate,isValidating,isLoadingInitialData,originalData:data}
 }

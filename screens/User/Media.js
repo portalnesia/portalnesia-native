@@ -70,7 +70,7 @@ const RenderMedia=React.forwardRef((props,ref)=>{
     const {setNotif} = context
     const theme=useTheme();
     const navigation = useNavigation();
-    const {data:dt,error:err,...swrProps} = usePagination(props.data ? `/user/${props.data?.users?.username}/media` : null,'media',24,false,false)
+    const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.media_private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/media` : null,'media',24,false,false)
     
     return <RenderMediaClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} setNotif={setNotif} />
 })
@@ -148,12 +148,12 @@ class RenderMediaClass extends React.PureComponent{
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                 >
-                    {isLoadingInitialData || (!data && !error) || (data?.error || error) ? (
-                        <SkeletonFollow />
-                    ) : data?.users?.media_private===true ? (
+                    {data?.users?.media_private==true ? (
+                        <RenderMediaPrivate data={data} />
+                    ) : data?.users?.suspend==true ? (
                         <RenderMediaPrivate data={data} />
                     ) : (
-                        <RenderSuspend />
+                        <SkeletonFollow />
                     )}
                 </Animated.ScrollView>
             )

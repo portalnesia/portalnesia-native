@@ -12,7 +12,7 @@ import analytics from '@react-native-firebase/analytics'
 
 
 import {linking} from './Linking'
-
+import NotFound from '../screens/NotFound'
 import Home from '../screens/Home/Home';
 import Blog from '../screens/Blog/Blog';
 import News from '../screens/News/News';
@@ -37,6 +37,8 @@ import UrlShortener from '../screens/UrlShortener'
 import Contact from '../screens/Contact'
 import User from '../screens/User/User'
 import Setting from '../screens/Setting/Setting'
+import Search from '../screens/SearchLike/Search'
+import SearchFilter from '../screens/SearchLike/SearchFilter'
 
 import { AuthContext } from '../provider/AuthProvider';
 
@@ -107,6 +109,10 @@ const MenuIcon=(props)=>{
 	const {selected,...other}=props
 	return <Icon {...other} name="menu" />
 }
+const SearchIcon=(props)=>{
+	const {selected,...other}=props
+	return <Icon {...other} name="search" />
+}
 
 const BottomTabBar = ({navigation,state})=>{
 	const onPress=(index)=>{
@@ -125,7 +131,8 @@ const BottomTabBar = ({navigation,state})=>{
 		<BottomNavigation selectedIndex={state.index} onSelect={index=>onPress(index)}>
 			<BottomNavigationTab title="HOME" icon={(props)=><HomeIcon {...props} selected={state.index===0} />} />
 			<BottomNavigationTab title="NEWS" icon={(props)=><NewsIcon {...props} selected={state.index===1} />} />
-			<BottomNavigationTab title="CHORD" icon={(props)=><MusicIcon {...props} selected={state.index===2} />} />
+			<BottomNavigationTab title="SEARCH" icon={(props)=><SearchIcon {...props} selected={state.index===2} />} />
+			<BottomNavigationTab title="CHORD" icon={(props)=><MusicIcon {...props} selected={state.index===3} />} />
 			<BottomNavigationTab title="MENU" icon={(props)=><MenuIcon {...props} />} />
 		</BottomNavigation>
 	)
@@ -135,6 +142,7 @@ const MainTabs=()=>(
 	<Tabs.Navigator initialRouteName="Home" tabBar={props=><BottomTabBar {...props} />}>
 		<Tabs.Screen name="Home" component={Home} />
 		<Tabs.Screen name="News" component={News} />
+		<Tabs.Screen name="Search" component={Search} />
 		<Tabs.Screen name="Chord" component={Chord} />
 		<Tabs.Screen name="Menu" component={Menu} />
 	</Tabs.Navigator>
@@ -157,6 +165,7 @@ const MainStackScreen=()=>(
 		initialRouteName="MainTabs"
 		
 	>
+		<MainStack.Screen name="NotFound" component={NotFound} />
 		<MainStack.Screen name="MainTabs" component={MainTabs} />
 		<MainStack.Screen name="NewsDetail" component={NewsDetail} />
 		<MainStack.Screen name="ChordDetail" component={ChordDetail} />
@@ -176,6 +185,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="Setting" component={Setting} />
 		<MainStack.Screen name="BlogList" component={BlogList} />
 		<MainStack.Screen name="User" component={User} />
+		<MainStack.Screen name="SearchFilter" component={SearchFilter} />
 	</MainStack.Navigator>
 )
 
