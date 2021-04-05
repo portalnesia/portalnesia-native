@@ -253,3 +253,5 @@ export const openBrowser=(url)=>{
         }]
     )
 }
+
+export const randomInt=(total=2)=>Math.floor(Math.random() * total);

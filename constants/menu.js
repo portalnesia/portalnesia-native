@@ -61,7 +61,7 @@ export const menu=[
                 title:"URL Shortener",
                 //to:"ImageModal",
                 to:"UrlShortener",
-                //link:"exp://192.168.1.6:19000/--/pages/terms-of-service",
+                //link:"pn://pages/terms-of-service",
                 icon:['link','font_awesome'],
             },
             {

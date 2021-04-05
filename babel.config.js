@@ -12,7 +12,8 @@ module.exports = function(api) {
           "@pn/utils": "./utils",
           "@pn/screens": "./screens",
           "@pn/assets": "./assets",
-          "@pn/provider":"./provider"
+          "@pn/provider":"./provider",
+          "@pn/module":"./module"
         }
       }]
     ]

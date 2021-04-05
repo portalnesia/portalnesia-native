@@ -1,4 +1,5 @@
-import {createURL,getInitialURL as expoGetInitialURL,addEventListener as ExpoAddListener} from 'expo-linking'
+import {createURL,getInitialURL as expoGetInitialURL,addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener} from 'expo-linking'
+import {addNotificationResponseReceivedListener} from 'expo-notifications'
 
 export const linking = {
     prefixes:[createURL('/'),'https://portalnesia.com'],
@@ -17,6 +18,10 @@ export const linking = {
                             },
                             Chord:{
                                 path:'chord',
+                                exact:true
+                            },
+                            Search:{
+                                path:'search',
                                 exact:true
                             },
                         }
@@ -89,10 +94,6 @@ export const linking = {
                         path:'user/:username/:slug?',
                         exact:true
                     },
-                    User:{
-                        path:'search',
-                        exact:true
-                    },
                     NotFound: '*',
                 }
             }
@@ -104,10 +105,21 @@ export const linking = {
     },
     subcribe(listener){
         const onReceiveURL = ({url})=>{
-            console.log(url)
             return listener(url)
+        }
+        const notificationFunction = (data) =>{
+            if(data?.notification?.request?.content?.data?.url) {
+                const url = data?.notification?.request?.content?.data?.url
+                return listener(url);
+            }
         }
 
         ExpoAddListener('url',onReceiveURL)
+        const notificationListener = addNotificationResponseReceivedListener(notificationFunction)
+
+        return ()=>{
+            ExpoRemoveListener('url',onReceiveURL);
+            notificationListener.remove();
+        }
     }
 }

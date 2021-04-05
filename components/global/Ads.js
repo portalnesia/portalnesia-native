@@ -36,22 +36,17 @@ export const AdsBanners=(props)=>{
     )
 }
 
-export const useAdsInterstisial=()=>{
+export async function showInterstisial(){
     const intersTestID = ['ca-app-pub-3940256099942544/1033173712','ca-app-pub-3940256099942544/8691691433'];
     const random = Math.floor(Math.random() * 2);
     const productionID = 'ca-app-pub-5345145600516995/1493513267';
     // Is a real device and running in production.
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : intersTestID[random];
 
-    return {
-        showAds:async()=>{
-            const isThere = await isAvailableAsync()
-            if(isThere) {
-                await AdMobInterstitial.setAdUnitID(adUnitID); // Test ID, Replace with your-admob-unit-id
-                await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true});
-                await AdMobInterstitial.showAdAsync();
-            }
-            
-        }
+    const isThere = await isAvailableAsync()
+    if(isThere) {
+        await AdMobInterstitial.setAdUnitID(adUnitID); // Test ID, Replace with your-admob-unit-id
+        await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true});
+        await AdMobInterstitial.showAdAsync();
     }
 }

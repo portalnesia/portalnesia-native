@@ -9,7 +9,7 @@ import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/nav
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import {ImageFull} from '@pn/components/global/Image'
-import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
+import {AdsBanner,AdsBanners,showInterstisial} from '@pn/components/global/Ads'
 import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
@@ -17,6 +17,7 @@ import { AuthContext } from '@pn/provider/AuthProvider';
 import { ucwords,extractMeta } from '@pn/utils/Main';
 import Recaptcha from '@pn/components/global/Recaptcha'
 import {saveBase64} from '@pn/utils/Download'
+import {randomInt} from '@pn/utils/Main'
 
 const {width:winWidth,height:winHeight} = Dimensions.get("window")
 
@@ -530,6 +531,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight,recaptch
         .then(()=>{
             return PNpost(`/qrcode`,{...input,recaptcha}).then((res)=>{
                 if(!res.error) {
+                    if(randomInt(2) == 0) showInterstisial();
                     const sl=route?.key||'url'
                     setInput(getDefaultValue(sl))
                     onProcess && onProcess(res.data)
@@ -579,6 +581,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight,recaptch
                     <Text style={{marginBottom:5}}>- Information you provide will not be stored on our server.</Text>
                 </Lay>
             </Lay>
+            <AdsBanners />
             <Lay style={{padding:15}}>
                 <Button onPress={handleSubmit} disabled={loading} loading={loading}>Send</Button>
             </Lay>

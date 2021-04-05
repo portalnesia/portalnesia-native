@@ -9,7 +9,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {StatusBar} from 'expo-status-bar'
 import {BottomNavigation,BottomNavigationTab,Icon,useTheme} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
-
+import useRootNavigation from '../navigation/useRootNavigation'
+import {showInterstisial} from '../components/global/Ads'
 
 import {linking} from './Linking'
 import NotFound from '../screens/NotFound'
@@ -189,8 +190,10 @@ const MainStackScreen=()=>(
 	</MainStack.Navigator>
 )
 
+let screenChange=0;
+const disableAdsArr = ["Setting","Contact","Pages",'NotFound','ImageModal'];
 export default () => {
-	const navigationRef=React.useRef(null)
+	const {navigationRef} = useRootNavigation();
 	const routeNameRef = React.useRef(null)
 	const auth = useContext(AuthContext);
 	const {state,theme:selectedTheme} = auth;
@@ -213,6 +216,13 @@ export default () => {
 							screen_class: currentRouteName,
 							screen_name: currentRouteName
 						})
+					}
+					if(screenChange === 4) {
+						const random = Math.floor(Math.random() * 3);
+						screenChange = 0;
+						if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) await showInterstisial();
+					} else {
+						screenChange += 1;
 					}
 				}}
 				linking={linking}

@@ -7,14 +7,6 @@ import BackgroundService from 'react-native-background-actions'
 import RNFS from 'react-native-fs'
 import * as MediaLibrary from 'expo-media-library'
 
-Notifications.setNotificationHandler({
-    handleNotification: async()=>({
-        shouldShowAlert:true,
-        shouldPlaySound:false,
-        shouldSetBadge:false
-    })
-})
-
 const baseNotificationRequestInput = {
     identifier: '',
     content: {
@@ -135,29 +127,8 @@ export default function downloadFile(url,filename,uri="pn://url",saveToAsset=fal
                 indeterminate:true
             }
         }
-        const chanOption={
-            name:"Download",
-            importance:Notifications.AndroidImportance.HIGH,
-            lockscreenVisibility:Notifications.AndroidNotificationVisibility.PUBLIC,
-            sound:'default',
-            vibrationPattern:[250],
-            enableVibrate:true
-        }
-        const loadingInfo = async ()=>{
-            const chanel = await Notifications.getNotificationChannelAsync("Download");
-            return await new Promise((res) => {
-                if (chanel === null) {
-                    Notifications.setNotificationChannelAsync("Download", chanOption)
-                        .then(() => res);
-                }
-                res();
-            });
-        }
         
-        loadingInfo()
-        .then(()=>{
-            return Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY)
-        })
+        Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY)
         .then(({status})=>{
             return new Promise((res,rej)=>{
                 if(status!=='granted') return rej({message:"Sorry, we need camera roll permissions"})

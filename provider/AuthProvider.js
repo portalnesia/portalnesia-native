@@ -7,15 +7,33 @@ import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import axios from 'axios'
+import useRootNavigation from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {getDevicePushTokenAsync} from 'expo-notifications'
+import * as Notifications from 'expo-notifications'
 import {Constants} from 'react-native-unimodules'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
 import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
 import {API as APII} from '@env'
+
+Notifications.setNotificationHandler({
+    handleNotification: async()=>({
+        shouldShowAlert:true,
+        shouldPlaySound:true,
+        shouldSetBadge:true
+    })
+})
+
+const getNotifOption=(id)=>({
+	name:id,
+	importance:Notifications.AndroidImportance.HIGH,
+	lockscreenVisibility:Notifications.AndroidNotificationVisibility.PUBLIC,
+	sound:'default',
+	vibrationPattern:[250],
+	enableVibrate:true
+})
 
 const API = axios.create({
     baseURL:APII,
@@ -61,6 +79,8 @@ const AuthProvider = (props) => {
 	const [state,dispatch]=useReducer(reducer,initialState)
 	const colorScheme = useColorScheme()
 	const [tema,setTema]=React.useState('auto')
+	const {linkTo} = useRootNavigation();
+	const lastNotif = Notifications.useLastNotificationResponse()
 
 	const utils=useMemo(
 		()=>({
@@ -90,24 +110,92 @@ const AuthProvider = (props) => {
 		}
 	}
 
-	const setNotif=(type,title,msg)=>{
+	const setNotif=(type,title,msg,data={})=>{
 		let tipe=type;
 		if(typeof type === 'boolean') {
 			tipe = type===true ? 'error' : 'success'
 		}
-		dropdownRef.current.alertWithType(tipe||'success',title||"Title",msg,{type:'alert'});
+		dropdownRef.current.alertWithType(tipe||'success',title||"Title",msg,{type:'alert',...data});
 	}
 
 	useEffect(()=>{
-		(async function(){
-			const res = await AsyncStorage.getItem("theme")
-			if(res !== null) setTema(res);
-			const notif_token = (await getDevicePushTokenAsync()).data
-			API.post('/native/send_notification_token',`token=${notif_token}`)
-			dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
-		})();
+		function registerNotificationToken(token){
+			API.post('/native/send_notification_token',`token=${token?.data}`)
+		}
+		async function asyncTask(){
+			try {
+				const res = await AsyncStorage.getItem("theme")
+				if(res !== null) setTema(res);
+				const {status:existingStatus} = await Notifications.getPermissionsAsync();
+				let finalStatus = existingStatus;
+				if(finalStatus !== 'granted') {
+					const {status} = await Notifications.requestPermissionsAsync();
+					finalStatus = status;
+				}
+				if(finalStatus === 'granted') {
+					const notif_token = await Notifications.getDevicePushTokenAsync();
+					registerNotificationToken(notif_token);
+				}
+				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
+			} catch(err){
+				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
+			}
+		};
+		function showLocalBannerNotification(data){
+			if(data?.request?.content?.title && data?.request?.content?.body) {
+				setNotif("info",data?.request?.content?.title,data?.request?.content?.body,data?.request?.content?.data);
+			}
+		}
+		function showPushNotification(data){
+			if(data?.notification?.request?.content?.data?.url) {
+                const urls = data?.notification?.request?.content?.data?.url
+                if(urls?.match(/portalnesia\.com+/) !== null) {
+                    const url = urls.split("//portalnesia.com")
+                    linkTo(url[1]);
+                }
+            }
+		}
+
+		async function setNotificationChannel(){
+			await Promise.all([
+				Notifications.setNotificationChannelAsync("Download", getNotifOption("Download")),
+				Notifications.setNotificationChannelAsync("General", getNotifOption("General")),
+				Notifications.setNotificationChannelAsync("Security", getNotifOption("Security")),
+				Notifications.setNotificationChannelAsync("News", getNotifOption("News")),
+			])
+		}
 		
+		asyncTask();
+		setNotificationChannel();
+
+		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
+		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
+		//const notificationResponseListener = Notifications.addNotificationResponseReceivedListener(showPushNotification)
+
+		return ()=>{
+			tokenChangeListener.remove();
+			foregroundListener.remove();
+			//notificationResponseListener.remove();
+		}
 	},[])
+
+	React.useEffect(()=>{
+		async function checkNotification(){
+			if(lastNotif && lastNotif?.notification?.request?.content?.data?.url) {
+				const id = lastNotif?.notification?.request?.identifier;
+				const res = await AsyncStorage.getItem("last_notification")
+				if(res !== id) {
+					const urls = lastNotif?.notification?.request?.content?.data?.url
+					if(urls?.match(/portalnesia\.com+/) !== null) {
+						const url = urls.split("//portalnesia.com")
+						linkTo(url[1]);
+					}
+					await AsyncStorage.setItem("last_notification",id);
+				}
+			}
+		}
+		setTimeout(checkNotification,500)
+	},[lastNotif])
 
 	return (
 		<AuthContext.Provider
@@ -136,5 +224,7 @@ const AuthProvider = (props) => {
 		</AuthContext.Provider>
 	);
 };
+
+
 
 export { AuthContext, AuthProvider };

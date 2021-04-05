@@ -1,6 +1,5 @@
 import React from 'react'
 import {useWindowDimensions,View} from 'react-native'
-import Image from '@pn/components/global/Image'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import LottieView from 'lottie-react-native'
 

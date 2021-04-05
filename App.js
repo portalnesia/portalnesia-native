@@ -23,7 +23,7 @@ import { AuthProvider } from './provider/AuthProvider';
 import {AppearanceProvider} from 'react-native-appearance'
 import RNFS from 'react-native-fs'
 
-enableScreens();
+//enableScreens();
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
 export default function App(props) {

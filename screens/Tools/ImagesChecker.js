@@ -10,12 +10,12 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Backdrop from '@pn/components/global/Backdrop';
 import Image from '@pn/components/global/Image'
-import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
+import {AdsBanner,AdsBanners,showInterstisial} from '@pn/components/global/Ads'
 import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
-import { ucwords,extractMeta } from '@pn/utils/Main';
+import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
 import Recaptcha from '@pn/components/global/Recaptcha'
 
 const {width:screenWidth} = Dimensions.get("window")
@@ -91,6 +91,7 @@ export default function({navigation}){
             .then((res)=>{
                 setNotif(Boolean(res.error),res.msg)
                 if(!res.error) {
+                    if(randomInt(3) == 0) showInterstisial();
                     setResult(res.result)
                     setTimeout(()=>{
                         if(yOffset !== null) {

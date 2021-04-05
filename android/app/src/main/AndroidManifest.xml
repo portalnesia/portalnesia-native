@@ -41,7 +41,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="pn"/>
-        <data android:scheme="com.portalnesia.app"/>
+        <data android:host="portalnesia.com"/>
       </intent-filter>
     </activity>
     <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity" android:theme="@style/Base.Theme.AppCompat" />

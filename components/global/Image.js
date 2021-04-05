@@ -2,7 +2,7 @@ import React from 'react'
 import {useWindowDimensions,View} from 'react-native'
 import {useTheme} from '@ui-kitten/components'
 import ImageFullComp from './ImageFull'
-import Lightbox from '@pn/components/lightbox/index'
+import ImageModal from '@pn/components/ImageModal/index'
 import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
 import Img from 'react-native-fast-image'
 
@@ -23,21 +23,6 @@ export const ImageFull=React.memo(({source,style,fullSize,alt,contentWidth,fancy
         setStatusBarBackgroundColor(theme['background-basic-color-1'])
     };
 
-    const RenderDataSrc=(
-        <ImageFull
-            contentWidth={screenWidth}
-            source={dataSrc||source}
-            alt={alt}
-            imagesInitialDimensions={{
-                width:300,
-                height:300
-            }}
-            zoomable
-            thumbnail={thumbnail}
-            animated={animated}
-        />
-    )
-
     const ImageComponent=()=>(
         <ImageFullComp
             contentWidth={contentWidth||screenWidth}
@@ -52,12 +37,12 @@ export const ImageFull=React.memo(({source,style,fullSize,alt,contentWidth,fancy
             animated={animated}
         />
     )
-
+    //navigator={dataSrc?.uri ? dataSrc?.uri : forceFancybox && source?.uri ? source?.uri : undefined}
     if(fancybox) {
         return (
-            <Lightbox onOpen={onOpen} onClose={onClose} {...(dataSrc || forceFancybox ? {renderContent:RenderDataSrc} : {})} >
+            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source}>
                 <ImageComponent />
-            </Lightbox>
+            </ImageModal>
         )
     } else return <ImageComponent />
 })
@@ -77,20 +62,22 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
         setStatusBarBackgroundColor(theme['background-basic-color-1'])
     };
 
-    const RenderDataSrc=(
-        <ImageFull
-            contentWidth={screenWidth}
-            source={dataSrc||source}
-            alt={alt}
-            imagesInitialDimensions={{
-                width:300,
-                height:300
-            }}
-            zoomable
-            thumbnail={thumbnail}
-            animated={animated}
-        />
-    )
+    const RenderDataSrc=React.useMemo(()=>{
+        return (
+            <ImageFull
+                contentWidth={screenWidth}
+                source={dataSrc||source}
+                alt={alt}
+                imagesInitialDimensions={{
+                    width:300,
+                    height:300
+                }}
+                zoomable
+                thumbnail={thumbnail}
+                animated={animated}
+            />
+        )
+    },[dataSrc,source])
 
 
     let ImageComponent;
@@ -116,9 +103,9 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
 
     if(fancybox) {
         return (
-            <Lightbox onOpen={onOpen} onClose={onClose} {...(dataSrc || forceFancybox ? {renderContent:RenderDataSrc} : {})} >
+            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source}>
                 <ImageComponent />
-            </Lightbox>
+            </ImageModal>
         )
     } else return <ImageComponent />
 }

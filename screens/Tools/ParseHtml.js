@@ -6,12 +6,13 @@ import {Layout as Lay,Text,Card,Spinner,Input,List,ListItem,Divider,useTheme,Tog
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image'
-import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
+import {AdsBanner,AdsBanners,showInterstisial} from '@pn/components/global/Ads'
 import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import Recaptcha from '@pn/components/global/Recaptcha'
+import {randomInt} from '@pn/utils/Main'
 
 export default function({navigation}){
     const {PNpost} = useAPI(false)
@@ -36,7 +37,10 @@ export default function({navigation}){
         setLoading(true);
         PNpost(`/parse_html`,{html:input,recaptcha})
         .then((res)=>{
-            setInput(res.encode);
+            if(!res?.error) {
+                if(randomInt(3) == 0) showInterstisial();
+                setInput(res.encode);
+            }
         })
         .finally(()=>{
             setLoading(false)

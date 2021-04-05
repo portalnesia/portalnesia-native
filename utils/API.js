@@ -36,7 +36,7 @@ export default function useAPI(){
     
     const PNpost=(url,data,formdata)=>{
         return new Promise((res,rej)=>{
-            const baseURL =  user !== false ? url : `/native${url}`
+            const baseURL =  user === false || user === null ?  `/native${url}` :  url
             const qs=require('qs');
             const dt=data===null ? "" : (formdata ? data : qs.stringify(data));
             let opt={}
@@ -53,7 +53,7 @@ export default function useAPI(){
             } else {
                 opt={
                     headers:{
-                        'X-Session-Id':state?.session
+                        'X-Session-Id':(state?.session !== null ? state?.session : Application.androidId) 
                     },
                 }
             }
@@ -83,10 +83,10 @@ export default function useAPI(){
 
     const PNget=(url)=>{
         return new Promise((res,rej)=>{
-            const baseURL =  user !== false ? url : `/native${url}`
+            const baseURL =  user === false || user === null ?  `/native${url}` :  url
             const opt={
                 headers:{
-                    'X-Session-Id':state?.session
+                    'X-Session-Id':(state?.session !== null ? state?.session : Application.androidId) 
                 },
             }
             API.get(baseURL,opt)

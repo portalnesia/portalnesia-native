@@ -203,7 +203,7 @@ export default function Search({navigation,route}){
         try {
             if(index === -1) {
                 his.unshift(text);
-                his.splice(5,1)
+                his.splice(9,1)
                 setHistory(his)
                 await AsyncStorage.setItem("search_history",JSON.stringify(his));
             } else {
@@ -216,7 +216,7 @@ export default function Search({navigation,route}){
         }
     }
 
-    const getData=async(se)=>{
+    const getData=(se)=>{
         setError(false);
         setEmpty(false)
         setData([])
@@ -284,11 +284,65 @@ export default function Search({navigation,route}){
 
 
     React.useEffect(()=>{
+        const getDataa=(text)=>{
+            setError(false);
+            setEmpty(false)
+            if(text?.match(/\S/) !== null) {
+                setLoading(true)
+                Promise.all([
+                    PNget(`/search?q=${encodeURIComponent(text)}`),
+                    analytics().logSearch({search_term:text})
+                ])
+                .then((result)=>{
+                    const res = result[0];
+                    if(!res?.error) {
+                        //console.log(res?.data?.[2]?.data);
+                        if(res?.data?.length === 0) setEmpty(true)
+                        setData(res?.data)
+                    } else {
+                        setError(true)
+                    }
+                })
+                .catch(()=>setError(true))
+                .finally(()=>{
+                    setLoading(false)
+                })
+            }
+        }
         async function getInitialData(){
             const dt = await AsyncStorage.getItem("search_history");
-            if(dt !== null) {
-                setHistory(JSON.parse(dt))
-            }
+            await new Promise(async(res)=>{
+                if(dt !== null) {
+                    const his = JSON.parse(dt);
+                    if(q) {
+                        const qq = decodeURIComponent(q);
+                        const index=his.findIndex((it)=>it.toLowerCase() === qq.toLowerCase() );
+                        if(index === -1) {
+                            his.unshift(qq);
+                            his.splice(9,1)
+                            setHistory(his)
+                            await AsyncStorage.setItem("search_history",JSON.stringify(his));
+                            res()
+                        } else {
+                            arrayMove.mutate(his,index,0);
+                            setHistory(his)
+                            await AsyncStorage.setItem("search_history",JSON.stringify(his));
+                            res()
+                        }
+                    } else {
+                        setHistory(his)
+                        res()
+                    }
+                } else {
+                    res()
+                }
+            })
+            setTimeout(()=>{
+                if(q) {
+                    getDataa(decodeURIComponent(q));
+                }
+            },100)
+            
         }
         getInitialData();
 

@@ -94,6 +94,7 @@ export default function UserScreen({navigation,route}){
             mutate();
         }
     }
+    //React.useEffect(()=>console.log(data?.users),[data]);
     //const data=undefined,error=undefined;
     const [tabIndex,setTabIndex] = React.useState(()=>{
         if(slug) {
