@@ -26,6 +26,7 @@ export const Lottie=({style={},...other})=>{
 }
 
 export const useHeader=(height=56,refresh=false)=>{
+	const index = useNavigationState(state=>state.index);
 	const clampedScrollValue = React.useRef(0)
 	const offsetValue = React.useRef(0)
 	const scrollValue = React.useRef(0)
@@ -46,25 +47,6 @@ export const useHeader=(height=56,refresh=false)=>{
 		height
 	)
 
-	React.useEffect(()=>{
-		scrollAnim.addListener(({ value }) => {
-            const diff = value - scrollValue.current;
-            scrollValue.current = value;
-            clampedScrollValue.current = Math.min(
-                Math.max(clampedScrollValue.current + diff, 0),
-                height
-            );
-        });
-		offsetAnim.addListener(({ value }) => {
-            offsetValue.current = value;
-        });
-
-		return ()=>{
-			scrollAnim.removeAllListeners()
-			offsetAnim.removeAllListeners()
-		}
-	},[])
-
 	const onScrollEndDrag=()=>{
 		scrollEndTimer.current = setTimeout(onMomentumScrollEnd,250)
 	}
@@ -74,11 +56,12 @@ export const useHeader=(height=56,refresh=false)=>{
     };
 
 	const onMomentumScrollEnd = () => {
-        const statusAndToolbarHeight = height + STATUS_BAR_HEIGHT;
+        const statusAndToolbarHeight = height;
         const targetOffset = isToolbarNearHidingPosition()
             ? offsetValue.current + statusAndToolbarHeight
             : offsetValue.current - statusAndToolbarHeight ;
 
+		//console.log(isToolbarNearHidingPosition(),targetOffset)
         Animated.timing(offsetAnim, {
             toValue: targetOffset,
             duration: 350,
@@ -88,7 +71,7 @@ export const useHeader=(height=56,refresh=false)=>{
 
 	const isToolbarNearHidingPosition=()=>{
         const toolbarHeight = height;
-        const statusAndToolbarHeight = height + STATUS_BAR_HEIGHT;
+        const statusAndToolbarHeight = height;
         return scrollValue.current > statusAndToolbarHeight &&
             clampedScrollValue.current > (toolbarHeight) / 2;
     }
@@ -114,10 +97,29 @@ export const useHeader=(height=56,refresh=false)=>{
 		extrapolate:'clamp'
 	})
 
+	React.useEffect(()=>{
+		scrollAnim.addListener(({ value }) => {
+            const diff = value - scrollValue.current;
+            scrollValue.current = value;
+            clampedScrollValue.current = Math.min(
+                Math.max(clampedScrollValue.current + diff, 0),
+                height
+            );
+        });
+		offsetAnim.addListener(({ value }) => {
+            offsetValue.current = value;
+        });
+
+		return ()=>{
+			scrollAnim.removeAllListeners()
+			offsetAnim.removeAllListeners()
+		}
+	})
+
 	return {onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag,onScroll,translateY,scrollEventThrottle:5}
 }
 
-const Header = ({withBack,title,menu,navigation,align,children,height,subtitle})=>{
+const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,margin})=>{
 	const index = useNavigationState(state=>state.index);
 
 	const RenderBackBtn=({navigation})=>{
@@ -142,8 +144,8 @@ const Header = ({withBack,title,menu,navigation,align,children,height,subtitle})
 		<>
 		<TopNavigation
             style={{height:(height||56)}}
-			title={evaProps => <Text {...evaProps} style={{...evaProps?.style,marginHorizontal:50}} numberOfLines={1} >{title}</Text>}
-			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginHorizontal:50}} numberOfLines={1}>{subtitle}</Text>} : {})}
+			title={evaProps => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
+			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
 			alignment={align}
 			{...(withBack ? {accessoryLeft:()=><RenderBackBtn navigation={navigation} />} : {})}
 			{...(menu ? {accessoryRight:menu} : {})}

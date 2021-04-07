@@ -94,6 +94,14 @@ export const linking = {
                         path:'user/:username/:slug?',
                         exact:true
                     },
+                    Twibbon:{
+                        path:'twibbon',
+                        exact:true
+                    },
+                    TwibbonDetail:{
+                        path:'twibbon/:slug',
+                        exact:true
+                    },
                     NotFound: '*',
                 }
             }

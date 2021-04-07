@@ -13,7 +13,7 @@ const CloseIcon=(props)=>(
 	<Icon {...props} name='close' />
 )
 
-export default function({withBack,title,menu,navigation,align,subtitle,withClose}){
+export default function({withBack,title,menu,navigation,align,subtitle,withClose,margin}){
 	const index = useNavigationState(state=>state.index);
 	const theme = useTheme()
 	const RenderBackBtn=({navigation})=>{
@@ -51,8 +51,8 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 		<>
 		<TopNavigation 
 			{...(withClose ? {style:{backgroundColor:theme['background-basic-color-2']}} : {})}
-			title={evaProps => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginHorizontal:50}} numberOfLines={1}>{title}</Text>}
-			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginHorizontal:50}} numberOfLines={1}>{subtitle}</Text>} : {})}
+			title={evaProps => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
+			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
 			alignment={align}
 			{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn navigation={navigation} />} : {})}
 			{...(menu ? {accessoryRight:menu} : {})}

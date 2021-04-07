@@ -17,6 +17,7 @@ const Laylay = (props)=>{
 					subtitle={props.subtitle}
 					menu={props.menu}
 					withClose={props.withClose}
+					margin={props?.margin}
 				/>
 			) : null}
 

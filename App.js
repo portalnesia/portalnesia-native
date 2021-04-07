@@ -75,6 +75,7 @@ async function loadResourcesAsync() {
 			require('./assets/404.png'),
 			require('./assets/avatar.png'),
 			require('./assets/landing.png'),
+			require('./assets/transparent.png'),
 		]),
 		Font.loadAsync({
 			Inter_100Thin,

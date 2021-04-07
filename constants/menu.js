@@ -59,7 +59,6 @@ export const menu=[
             },*/
             {
                 title:"URL Shortener",
-                //to:"ImageModal",
                 to:"UrlShortener",
                 //link:"pn://pages/terms-of-service",
                 icon:['link','font_awesome'],
@@ -68,6 +67,11 @@ export const menu=[
                 title:"Blog",
                 to:"Blog",
                 icon:['article','material'],
+            },
+            {
+                title:"Twibbon",
+                to:"Twibbon",
+                icon:['ios-image','ionicons'],
             },
         ]
     },
@@ -82,8 +86,6 @@ export const menu=[
             {
                 title:"Check Update",
                 to:"CheckUpdate",
-                //to:"User",
-                //params:{username:'putuaditya_sid'}
                 //icon:['update','material'],
             },
             {

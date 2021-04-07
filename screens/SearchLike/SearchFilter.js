@@ -29,7 +29,7 @@ export default function SearchFilter({navigation,route}){
 	} = usePagination( filter && q ? `/search?q=${q}&filter=${filter}` : null,"data",18)
 
     const renderItem=(prop)=>{
-        if(['news','blog','users','media'].indexOf(filter) !== -1) return <RenderWithImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} withType={false} navigation={navigation} data={data} />
+        if(['news','blog','users','media','twibbon'].indexOf(filter) !== -1) return <RenderWithImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} withType={false} navigation={navigation} data={data} />
         if(['chord','thread'].indexOf(filter) !== -1) return <RenderNoImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} withType={false} navigation={navigation} data={data} />
         return null;
     }

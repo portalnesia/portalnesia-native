@@ -16,7 +16,7 @@ import {specialHTML} from '@pn/utils/Main'
 
 //const CONTENT_URL='https://content.portalnesia.com',API_URL='https://api.portalnesia.com'
 
-const RenderNews = React.memo(({item:dt, index:i}) => {
+const RenderNews = React.memo(({item:dt, index:i,navigation}) => {
 	return (
 		<Card key={i} onPress={()=>navigation.navigate("NewsDetail",{source:dt?.source,title:encodeURIComponent(dt.title)})}>
 			<View style={{alignItems:'center'}}>
@@ -35,7 +35,7 @@ const RenderNews = React.memo(({item:dt, index:i}) => {
 	);
 })
 
-const RenderChord = React.memo(({item:dt, index:i}) => {
+const RenderChord = React.memo(({item:dt, index:i,navigation}) => {
 	return (
 		<Card style={{borderWidth:2}} key={i} onPress={()=>navigation.navigate("ChordDetail",{slug:dt?.slug})}>
 			<Text category="p1" style={{fontWeight:"700"}}>{`${dt.title} - ${dt.artist}`}</Text>
@@ -44,9 +44,9 @@ const RenderChord = React.memo(({item:dt, index:i}) => {
 	);
 })
 
-const RenderTwibbon = React.memo(({item:dt, index:i}) => {
+const RenderTwibbon = React.memo(({item:dt, index:i,navigation}) => {
 	return (
-		<Card key={i}>
+		<Card key={i} onPress={()=>navigation.navigate("TwibbonDetail",{slug:dt?.slug})}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"
@@ -63,7 +63,7 @@ const RenderTwibbon = React.memo(({item:dt, index:i}) => {
 	);
 })
 
-const RenderThread = React.memo(({item:dt, index:i}) => {
+const RenderThread = React.memo(({item:dt, index:i,navigation}) => {
 	return (
 		<Card style={{borderWidth:2}} key={i} onPress={()=>navigation.navigate("TwitterThread",{slug:dt?.tweet_id})}>
 			<Text category="p1" style={{fontWeight:"700"}}>{`Thread by @${dt.screen_name}`}</Text>
@@ -91,7 +91,7 @@ const About=React.memo(({title,txt,right,last,screen,navigation})=>{
 
 export default function HomeScreen({ navigation }) {
 	const [loading,setLoading] = React.useState(true)
-	const [data,setData]=React.useState({})
+	const [data,setData]=React.useState()
 	const [error,setError] = React.useState(false)
 	const {PNget} = useAPI();
 	
@@ -129,7 +129,7 @@ export default function HomeScreen({ navigation }) {
 						<About title="Chord" txt="A collection of guitar chords with transpose tools, auto scroll, font sizer, and print features that make it easy to learn guitar." right screen="Chord" navigation={navigation} />
 						<About title="URL Shortener" txt="Shorten your long URLs so that it's easy to share with others." navigation={navigation} />
 						<About title="Twitter Thread Reader" txt="Read threads from Twitter easily." right  screen="Twitter" navigation={navigation} />
-						{/*<About title="Twibbon" txt="Create your own twibbon or edit your photo to twibbon that is already available and share it easily." /> */}
+						<About title="Twibbon" txt="Create your own twibbon or edit your photo to twibbon that is already available and share it easily."  screen="Twibbon" navigation={navigation} />
 						<About title="Transform Coordinate" txt="Insert value pairs of geographic coordinates and transform them to different coordinate system or cartographic projection." right screen="GeodataTransform" navigation={navigation} />
 						{/*<About title="Twitter Menfess" txt={`Send a message or just the words you want to convey to "someone" as anonymous without notifying the sender's identity.`} />
 						<About title="Quiz" txt="Create your own quiz and share with friends or answer a few quizzes." right />*/}
@@ -167,25 +167,23 @@ export default function HomeScreen({ navigation }) {
 					)}
 					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Chord")}>See More</Button>
 				</Lay>
-				{/*
-					<Lay style={{marginTop:30,alignItems:'center'}} level="2">
-						<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent Twibbon</Text>
-						{!data && !error ? (
-							<Spinner size='giant' />
-						) : error || data?.error == 1 ? (
-							<Text>Something went wrong</Text>
-						) : (
-							<Carousel
-								data={data?.twibbon}
-								renderItem={_renderTwibbon}
-							/>
-						)}
-						<Button style={{marginTop:10,marginBottom:40}} size="small">See More</Button>
-					</Lay>
-				*/}
-				<Lay level="2" style={{paddingTop:30,alignItems:'center'}}>
+				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
+					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent Twibbon</Text>
+					{!data && !error ? (
+						<Spinner size='giant' />
+					) : error || data?.error == 1 ? (
+						<Text>Something went wrong</Text>
+					) : (
+						<Carousel
+							data={data?.twibbon}
+							renderItem={(props)=><RenderTwibbon {...props} navigation={navigation} />}
+						/>
+					)}
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Main",{screen:"Twibbon"})}>See More</Button>
+				</Lay>
+				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent Twitter Thread</Text>
-					{loading ? (
+					{loading || !data ? (
 						<Spinner size='giant' />
 					) : error ? (
 						<Text>Something went wrong</Text>
@@ -201,50 +199,3 @@ export default function HomeScreen({ navigation }) {
 		</Layout>
 	);
 }
-
-/*
-<View
-				style={{
-					flex: 1,
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				{ This text using ubuntu font/}
-				<Text bold>Hello World</Text>
-				<Text>This text using ubuntu font</Text>
-				<TouchableOpacity
-					onPress={() => {
-						navigation.navigate('SecondScreen');
-					}}
-					style={{
-						backgroundColor: Colors.primary,
-						padding: 10,
-						paddingHorizontal: 20,
-						marginTop: 10,
-						borderRadius: 10,
-					}}
-				>
-					<Text style={{ color: 'white' }} bold>
-						Go to second screen
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					onPress={() => {
-						setNotif('error',"Under Maintenance","This feature is under maintenance")
-						//firebase.auth().signOut();
-					}}
-					style={{
-						backgroundColor: '#FF3A3A',
-						padding: 10,
-						paddingHorizontal: 20,
-						marginTop: 10,
-						borderRadius: 10,
-					}}
-				>
-					<Text style={{ color: 'white' }} bold>
-						Logout
-					</Text>
-				</TouchableOpacity>
-			</View>
-*/

@@ -40,6 +40,8 @@ import User from '../screens/User/User'
 import Setting from '../screens/Setting/Setting'
 import Search from '../screens/SearchLike/Search'
 import SearchFilter from '../screens/SearchLike/SearchFilter'
+import Twibbon from '../screens/Twibbon/Twibbon'
+import TwibbonDetail from '../screens/Twibbon/TwibbonDetail'
 
 import { AuthContext } from '../provider/AuthProvider';
 
@@ -187,6 +189,9 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="BlogList" component={BlogList} />
 		<MainStack.Screen name="User" component={User} />
 		<MainStack.Screen name="SearchFilter" component={SearchFilter} />
+		<MainStack.Screen name="Twibbon" component={Twibbon} />
+		<MainStack.Screen name="TwibbonDetail" component={TwibbonDetail} />
+
 	</MainStack.Navigator>
 )
 
@@ -197,48 +202,50 @@ export default () => {
 	const routeNameRef = React.useRef(null)
 	const auth = useContext(AuthContext);
 	const {state,theme:selectedTheme} = auth;
-	const {user} = state
+	const {user,session} = state
 	const theme=useTheme()
 	
 	return (
 		<>
-			<StatusBar style={user === null ? 'light' : (selectedTheme==='light' ? "dark" : "light")} translucent animated backgroundColor={user === null ? theme['color-primary-500'] : theme['background-basic-color-1']} />
-			<NavigationContainer
-				ref={navigationRef}
-				onReady={()=>{
-					routeNameRef.current = navigationRef.current.getCurrentRoute().name
-				}}
-				onStateChange={async()=>{
-					const prevRouteName = routeNameRef.current;
-					const currentRouteName = navigationRef.current.getCurrentRoute().name
-					if(prevRouteName !== currentRouteName) {
-						await analytics().logScreenView({
-							screen_class: currentRouteName,
-							screen_name: currentRouteName
-						})
-					}
-					if(screenChange === 4) {
-						const random = Math.floor(Math.random() * 3);
-						screenChange = 0;
-						if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) await showInterstisial();
-					} else {
-						screenChange += 1;
-					}
-				}}
-				linking={linking}
-			>
-				{user == null && <Loading />}
-				<RootStack.Navigator mode="modal" initialRouteName="Main" screenOptions={{headerShown:false}}>
-					<RootStack.Screen name="Main" component={MainStackScreen} />
-					<RootStack.Screen name="ImageModal" component={ImageModal} options={{
-						headerShown: false,
-						gestureEnabled:true,
-						gestureDirection:'vertical',
-						//...TransitionPresets.ModalPresentationIOS,
-						...TransitionPresets.ModalSlideFromBottomIOS
-					}} />
-				</RootStack.Navigator>
-			</NavigationContainer>
+			<StatusBar style={user === null || session == null ? 'light' : (selectedTheme==='light' ? "dark" : "light")} translucent animated backgroundColor={user === null || session == null ? theme['color-primary-500'] : theme['background-basic-color-1']} />
+			{user == null || session == null ? <Loading /> : (
+				<NavigationContainer
+					ref={navigationRef}
+					onReady={()=>{
+						routeNameRef.current = navigationRef.current.getCurrentRoute().name
+					}}
+					onStateChange={async()=>{
+						const prevRouteName = routeNameRef.current;
+						const currentRouteName = navigationRef.current.getCurrentRoute().name
+						if(prevRouteName !== currentRouteName) {
+							await analytics().logScreenView({
+								screen_class: currentRouteName,
+								screen_name: currentRouteName
+							})
+						}
+						if(screenChange === 4) {
+							const random = Math.floor(Math.random() * 3);
+							screenChange = 0;
+							if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) await showInterstisial();
+						} else {
+							screenChange += 1;
+						}
+					}}
+					linking={linking}
+				>
+					{user == null && <Loading />}
+					<RootStack.Navigator mode="modal" initialRouteName="Main" screenOptions={{headerShown:false}}>
+						<RootStack.Screen name="Main" component={MainStackScreen} />
+						<RootStack.Screen name="ImageModal" component={ImageModal} options={{
+							headerShown: false,
+							gestureEnabled:true,
+							gestureDirection:'vertical',
+							//...TransitionPresets.ModalPresentationIOS,
+							...TransitionPresets.ModalSlideFromBottomIOS
+						}} />
+					</RootStack.Navigator>
+				</NavigationContainer>
+			)}
 		</>
 	);
 };

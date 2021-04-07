@@ -7,6 +7,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@benjeau/react-native-draw": "^0.3.3",
     "@eva-design/eva": "^2.0.0",
     "@expo-google-fonts/inter": "^0.1.0",
     "@expo-google-fonts/ubuntu": "^0.1.0",

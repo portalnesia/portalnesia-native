@@ -37,7 +37,7 @@ const onLinkPress=(e,href)=>{
 }
 
 const TextRender=(attribs,children,style,props)=>{
-    if(['img','picture'].indexOf(props?.domNode?.children?.[0]?.name) !== -1) return children;
+    if(['img','picture'].indexOf(props?.domNode?.children?.[0]?.name) !== -1 || ['a'].indexOf(props?.domNode?.children?.[0]?.name) !== -1 && typeof props?.domNode?.children?.[0]?.attribs?.['data-fancybox'] === 'string') return children;
     if(['a'].indexOf(props?.domNode?.children?.[0]?.name) !== -1) return <Text selectable={props?.selectable||false} key={props?.key} style={[global_style.container,{marginVertical:10,flexWrap:'wrap',lineHeight:23}]}>{children}</Text>
     if(props?.data && (props?.data?.length === 0 || props?.data == '&nbsp;')) return null
     return (
@@ -71,7 +71,7 @@ const ARender=(attribs,children,style,props)=>{
                 style={[global_style.container,style,{lineHeight:23,textDecorationLine:"underline"}]}
                 status="info"
               >
-                {props?.domNode?.children?.[0]?.data || props?.domNode?.data || props.data || children}
+                {props?.domNode?.children?.[0]?.data || props?.domNode?.data || props.data}
               </Text>
             );
     }

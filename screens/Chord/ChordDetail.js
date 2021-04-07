@@ -49,23 +49,27 @@ export default function({navigation,route}){
     },[tools.transpose])
 
     const handleTranspose=(type)=>()=>{
-        if(type==='min') {
-            if(transpose > -12) setTools({...tools,transpose:transpose-1})
-        } else if(type === 'plus') {
-            if(transpose < 12) setTools({...tools,transpose:transpose+1})
-        } else {
-            setTools({...tools,transpose:0})
-        }
+        requestAnimationFrame(()=>{
+            if(type==='min') {
+                if(transpose > -12) setTools({...tools,transpose:transpose-1})
+            } else if(type === 'plus') {
+                if(transpose < 12) setTools({...tools,transpose:transpose+1})
+            } else {
+                setTools({...tools,transpose:0})
+            }
+        })
     }
 
     const handleFont=(type)=>()=>{
-        if(type==='min') {
-            if(fSize > 0) setTools({...tools,fontSize:fSize-1})
-        } else if(type === 'plus') {
-            if(fSize < 8) setTools({...tools,fontSize:fSize+1})
-        } else {
-            setTools({...tools,fontSize:4})
-        }
+        requestAnimationFrame(()=>{
+            if(type==='min') {
+                if(fSize > 0) setTools({...tools,fontSize:fSize-1})
+            } else if(type === 'plus') {
+                if(fSize < 8) setTools({...tools,fontSize:fSize+1})
+            } else {
+                setTools({...tools,fontSize:4})
+            }
+        })
     }
 
     const fSize = React.useMemo(()=>{

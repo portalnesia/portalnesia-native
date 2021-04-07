@@ -134,7 +134,7 @@ export default function URLshortener({navigation}){
                             <Lay>
                                 {result !== null && (
                                     <View style={style.container}>
-                                        <View style={{flexDirection:'column',alignItems:'center'}}>
+                                        <View style={{flex:1,flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                                             <Image fancybox source={{uri:`${CONTENT_URL}/qr/url/${result.custom}`}} fullSize contentWidth={200} animated={false} forceFancybox />
                                         </View>
                                         <Text category="h5" style={{marginVertical:10}}>{result.status==0 ? "URL has been successfully shortened." : "URL already been shortened by others."}</Text>

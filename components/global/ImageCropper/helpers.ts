@@ -1,5 +1,30 @@
 import Animated, { add } from 'react-native-reanimated';
 
+interface ITimingAnimation {
+    state: Animated.TimingState;
+    config: Animated.TimingConfig;
+}
+
+interface IAnimateParams<S, C> {
+    clock: Animated.Clock;
+    fn: (
+      clock: Animated.Clock,
+      state: S,
+      config: C,
+    ) => Animated.Adaptable<number>;
+    state: S;
+    config: C;
+    from: Animated.Adaptable<number>;
+}
+
+export interface ITimingParams {
+    clock?: Animated.Clock;
+    from?: Animated.Adaptable<number>;
+    to?: Animated.Adaptable<number>;
+    duration?: Animated.Adaptable<number>;
+    easing?: (v: Animated.Adaptable<number>) => Animated.Node<number>;
+}
+
 const {
   Clock,
   Value,
@@ -14,13 +39,13 @@ const {
 } = Animated;
 
 
-const animate=({
+const animate = <T extends ITimingAnimation>({
   fn,
   clock,
   state,
   config,
   from,
-}) =>
+}: IAnimateParams<T['state'], T['config']>) =>
   block([
     cond(not(clockRunning(clock)), [
       set(state.finished, 0),
@@ -31,19 +56,19 @@ const animate=({
     fn(clock, state, config),
     cond(state.finished, stopClock(clock)),
     state.position,
-  ]);
+]);
 
-export const timing = (params) => {
+export const timing = (params: ITimingParams) => {
   const { clock, easing, duration, from, to } = {
     clock: new Clock(),
     duration: 250,
     from: 0,
     to: 1,
-    easing: (v) => add(v, 0),
+    easing: (v: Animated.Adaptable<number>) => add(v, 0),
     ...params,
   };
 
-  const state = {
+  const state: Animated.TimingState = {
     finished: new Value(0),
     position: new Value(0),
     time: new Value(0),
@@ -61,7 +86,7 @@ export const timing = (params) => {
       set(config.toValue, to),
       set(state.frameTime, 0),
     ]),
-    animate({
+    animate<ITimingAnimation>({
       clock,
       fn: reTiming,
       state,
@@ -71,10 +96,10 @@ export const timing = (params) => {
   ]);
 };
 
-export const getPercentFromNumber = (percent, numberFrom) =>
-  (numberFrom / 100) * percent;
+export const getPercentFromNumber = (percent: number, numberFrom: number): number =>
+(numberFrom / 100) * percent;
 
 export const getPercentDiffNumberFromNumber = (
-  number,
-  numberFrom,
-) => (number / numberFrom) * 100;
+  number: number,
+  numberFrom: number,
+): number => (number / numberFrom) * 100;

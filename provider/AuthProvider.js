@@ -190,6 +190,10 @@ const AuthProvider = (props) => {
 						const url = urls.split("//portalnesia.com")
 						linkTo(url[1]);
 					}
+					if(urls?.match(/pn\:\/\/+/) !== null) {
+						const url = urls.split("pn:/")
+						linkTo(url[1]);
+					}
 					await AsyncStorage.setItem("last_notification",id);
 				}
 			}

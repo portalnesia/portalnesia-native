@@ -48,7 +48,7 @@ build/
 local.properties
 *.iml
 *.hprof
-android/app/google-services.json
+**/google-services.json
 
 # node.js
 #
@@ -61,7 +61,7 @@ package-lock.json
 buck-out/
 \.buckd/
 *.keystore
-!debug.keystore
+**/debug.keystore
 
 # fastlane
 #

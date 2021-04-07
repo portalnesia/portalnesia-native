@@ -36,43 +36,51 @@ function initBaseNotificationRequestInput(filename, channelId) {
     return baseNotificationRI;
 }
 
-const errorNotification = (baseNotificationRI) =>({
+const errorNotification = (identifier,baseNotificationRI,uri) =>({
     ...baseNotificationRI,
-    identifier:`err${baseNotificationRI.content.title}`,
+    identifier:`err${baseNotificationRI.content.title}_${identifier}`,
     content: {
         ...baseNotificationRI.content,
         body:'Failed to download',
-        sticky:false
+        sticky:false,
+        data:{
+            url:uri
+        }
     }
 });
-const finnishNotification = (baseNotificationRI) =>({
+const finnishNotification = (identifier,baseNotificationRI,uri) =>({
     ...baseNotificationRI,
-    identifier:`fin${baseNotificationRI.content.title}`,
+    identifier:`fin${baseNotificationRI.content.title}_${identifier}`,
     content: {
         ...baseNotificationRI.content,
         body:'Download completed!',
-        sticky:false
+        sticky:false,
+        data:{
+            url:uri
+        }
     }
 });
 
-const checkAndCreateAlbum=(argument)=>{
-    return new Promise(async(rere)=>{
-        if(argument?.saveToAsset) {
-            const asset = await MediaLibrary.createAssetAsync(`file://${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${argument?.filename}`)
-            const album = await MediaLibrary.getAlbumAsync("Portalnesia")
-            if(album == null) {
-                MediaLibrary.createAlbumAsync("Portalnesia",asset,false).then(rere)
-            } else {
-                MediaLibrary.addAssetsToAlbumAsync([asset],album,false).then(rere)
-            }
-        } else rere();
-    })
+export const checkAndCreateAlbum=async(argument)=>{
+    if(argument?.saveToAsset) {
+        const asset = await MediaLibrary.createAssetAsync(`file://${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${argument?.filename}`)
+        const album = await MediaLibrary.getAlbumAsync("Portalnesia")
+        if(album == null) {
+            await MediaLibrary.createAlbumAsync("Portalnesia",asset,false)
+        } else {
+            await MediaLibrary.addAssetsToAlbumAsync([asset],album,false)
+        }
+        return;
+    } else {
+        return;
+    }
 }
 
 const downloadTask = async(argument) =>{
+    const identifier = new Date().getTime();
     const baseNotificationRI = initBaseNotificationRequestInput(argument.filename, "Download");
-    const errorNot = errorNotification(baseNotificationRI)
-    const finnishNot = finnishNotification(baseNotificationRI)
+    const errorNot = errorNotification(identifier,baseNotificationRI,argument.uri)
+    const finnishNot = finnishNotification(identifier,baseNotificationRI,argument.uri)
 
     await new Promise((resolve,reject)=>{
         RNDownloader.download({
@@ -118,7 +126,8 @@ export default function downloadFile(url,filename,uri="pn://url",saveToAsset=fal
             parameters:{
                 url,
                 filename,
-                saveToAsset
+                saveToAsset,
+                uri
             },
             linkingURI:uri,
             progressBar:{

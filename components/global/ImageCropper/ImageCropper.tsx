@@ -1,12 +1,44 @@
-import React, { PureComponent, ReactNode } from 'react';
+import React, { PureComponent, ReactNode,RefObject } from 'react';
 import { Image, Dimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-//import ImageEditor from '@react-native-community/image-editor';
 import ImageViewer from './ImageViewer';
+import ViewShot from 'react-native-view-shot'
 import {
   getPercentFromNumber,
   getPercentDiffNumberFromNumber,
 } from './helpers';
+import {
+  ICropperParams,
+  ICropParams,
+  IImageViewerData,
+  ISizeData,
+} from './types';
+
+interface IProps {
+  imageUri: string;
+  cropAreaWidth?: number;
+  cropAreaHeight?: number;
+  containerColor?: string;
+  areaColor?: string;
+  areaOverlay?: ReactNode;
+  setCropperParams?: (params: ICropperParams) => void;
+  background?: ReactNode;
+  captureRef?: RefObject<ViewShot>
+  rotation:number
+}
+
+export interface IState {
+  positionX: number;
+  positionY: number;
+  scale: number;
+  minScale: number;
+  srcSize: ISizeData;
+  fittedSize: ISizeData;
+  width: number;
+  height: number;
+  loading: boolean;
+  prevImageUri: string;
+}
 
 const window = Dimensions.get('window');
 const w = window.width;
@@ -18,8 +50,8 @@ const defaultProps = {
   areaColor: 'black',
 };
 
-class ImageCropper extends PureComponent {
-  static crop = (params) => {
+class ImageCropper extends PureComponent<IProps, IState> {
+  static crop = (params: ICropParams): void => {
     const {
       positionX,
       positionY,
@@ -96,14 +128,13 @@ class ImageCropper extends PureComponent {
     };
 
     /*return new Promise((resolve, reject) =>
-    
-      //ImageEditor.cropImage(imageUri, cropData).then(resolve).catch(reject),
+      ImageEditor.cropImage(imageUri, cropData).then(resolve).catch(reject),
     );*/
   };
 
   static defaultProps = defaultProps;
 
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps(props: IProps, state: IState) {
     if (props.imageUri !== state.prevImageUri) {
       return {
         prevImageUri: props.imageUri,
@@ -120,7 +151,7 @@ class ImageCropper extends PureComponent {
     width: 0,
     height: 0,
     scale: 1,
-    minScale: 1,
+    minScale: 0.5,
     loading: true,
     srcSize: {
       width: 0,
@@ -137,7 +168,7 @@ class ImageCropper extends PureComponent {
     this.init();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: IProps) {
     const { imageUri } = this.props;
     if (imageUri && prevProps.imageUri !== imageUri) {
       this.init();
@@ -152,8 +183,8 @@ class ImageCropper extends PureComponent {
       (width, height) => {
         const { setCropperParams, cropAreaWidth, cropAreaHeight } = this.props;
 
-        const areaWidth = cropAreaWidth;
-        const areaHeight = cropAreaHeight;
+        const areaWidth = cropAreaWidth!;
+        const areaHeight = cropAreaHeight!;
 
         const srcSize = { width, height };
         const fittedSize = { width: 0, height: 0 };
@@ -172,32 +203,38 @@ class ImageCropper extends PureComponent {
           fittedSize.height = w;
         }
 
-        if (areaWidth < areaHeight || areaWidth === areaHeight) {
+        //if (areaWidth < areaHeight || areaWidth === areaHeight) {
           if (width < height) {
             if (fittedSize.height < areaHeight) {
               scale = Math.ceil((areaHeight / fittedSize.height) * 10) / 10;
             } else {
               scale = Math.ceil((areaWidth / fittedSize.width) * 10) / 10;
             }
+          } else if(height > width) {
+            if (fittedSize.width < areaWidth) {
+              scale = Math.ceil((areaWidth / fittedSize.width) * 10) / 10;
+            } else {
+              scale = Math.ceil((areaHeight / fittedSize.height) * 10) / 10;
+            }
           } else {
             scale = Math.ceil((areaHeight / fittedSize.height) * 10) / 10;
           }
-        }
+        //}
 
-        scale = scale < 1 ? 1 : scale;
-
+        //scale = scale < 1 ? 1 : scale;
+        
         this.setState(
           (prevState) => ({
             ...prevState,
             srcSize,
             fittedSize,
-            minScale: scale,
+            scale,
             loading: false,
           }),
           () => {
             const { positionX, positionY } = this.state;
 
-            setCropperParams({
+            setCropperParams && setCropperParams({
               positionX,
               positionY,
               scale,
@@ -211,7 +248,7 @@ class ImageCropper extends PureComponent {
     );
   };
 
-  handleMove = ({ positionX, positionY, scale }) => {
+  handleMove = ({ positionX, positionY, scale }: IImageViewerData) => {
     const { setCropperParams } = this.props;
 
     this.setState(
@@ -224,7 +261,7 @@ class ImageCropper extends PureComponent {
       () => {
         const { srcSize, fittedSize } = this.state;
 
-        setCropperParams({
+        setCropperParams && setCropperParams({
           positionX,
           positionY,
           scale,
@@ -236,7 +273,7 @@ class ImageCropper extends PureComponent {
   };
 
   render() {
-    const { loading, fittedSize, minScale } = this.state;
+    const { loading, fittedSize, minScale,scale } = this.state;
     const {
       imageUri,
       cropAreaWidth,
@@ -244,10 +281,13 @@ class ImageCropper extends PureComponent {
       containerColor,
       areaColor,
       areaOverlay,
+      background,
+      captureRef,
+      rotation
     } = this.props;
 
-    const areaWidth = cropAreaWidth;
-    const areaHeight = cropAreaHeight;
+    const areaWidth = cropAreaWidth!;
+    const areaHeight = cropAreaHeight!;
 
     const imageWidth = fittedSize.width;
     const imageHeight = fittedSize.height;
@@ -262,10 +302,14 @@ class ImageCropper extends PureComponent {
             imageWidth={imageWidth}
             imageHeight={imageHeight}
             minScale={minScale}
+            scale={scale}
             onMove={this.handleMove}
             containerColor={containerColor}
             imageBackdropColor={areaColor}
             overlay={areaOverlay}
+            background={background}
+            captureRef={captureRef}
+            rotation={rotation}
           />
         ) : null}
       </GestureHandlerRootView>

@@ -8,6 +8,25 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { Easing } from 'react-native-reanimated';
 import { timing } from './helpers';
+import { IImageViewerData } from './types';
+import ViewShot from 'react-native-view-shot'
+
+interface IProps {
+  image: string;
+  areaWidth: number;
+  areaHeight: number;
+  imageWidth: number;
+  imageHeight: number;
+  minScale: number;
+  scale:number;
+  onMove: ({ positionX, positionY, scale }: IImageViewerData) => void;
+  containerColor?: string;
+  imageBackdropColor?: string;
+  overlay?: ReactNode;
+  background?:ReactNode;
+  captureRef?:RefObject<ViewShot>;
+  rotation:number
+}
 
 const defaultProps = {
   containerColor: 'black',
@@ -30,6 +49,9 @@ const {
   multiply,
   divide,
   call,
+  Extrapolate,
+  timing:AniTiming,
+  Clock,
 } = Animated;
 
 const styles = StyleSheet.create({
@@ -48,21 +70,51 @@ const styles = StyleSheet.create({
   image: {},
 });
 
-class ImageViewer extends Component {
+class ImageViewer extends Component<IProps> {
+  pinchRef: RefObject<PinchGestureHandler>;
+  dragRef: RefObject<PanGestureHandler>;
+  tapRef: RefObject<TapGestureHandler>;
+  dragZoomRef: RefObject<PanGestureHandler>;
+
+  translateX: Animated.Value<number>;
+
+  translateY: Animated.Value<number>;
+
+  clock: Animated.Clock=new Clock();
+
+  rotation: Animated.Value<number>;
+  _rotate: Animated.Node<number>
+
+  scale: Animated.Value<number>;
+
+  onTapGestureEvent: (...args: any[]) => void;
+
+  onPanGestureEvent: (...args: any[]) => void;
+
+  onPinchGestureEvent: (...args: any[]) => void;
+
+  onDragGestureEvent: (...args: any[]) => void;
 
   static defaultProps = defaultProps;
 
-  constructor(props) {
+  constructor(props: IProps) {
     super(props);
 
-    const { areaWidth, areaHeight, imageWidth, imageHeight, minScale } = props;
-
+    const { areaWidth, areaHeight, imageWidth, imageHeight, minScale,scale,rotation } = props;
     this.pinchRef = React.createRef();
     this.dragRef = React.createRef();
+    this.tapRef = React.createRef();
+    this.dragZoomRef = React.createRef();
 
     this.translateX = new Value(0);
+    this.rotation = new Value(rotation);
     this.translateY = new Value(0);
-    this.scale = new Value(minScale);
+    this.scale = new Value(scale);
+
+    this._rotate = this.rotation.interpolate({
+      inputRange:[0,360],
+      outputRange:['0deg','360deg']
+    })
 
     const timingDefaultParams = {
       duration: 200,
@@ -73,7 +125,7 @@ class ImageViewer extends Component {
 
     const offsetX = new Value(0);
     const offsetY = new Value(0);
-    const offsetZ = new Value(minScale);
+    const offsetZ = new Value(scale);
 
     const viewerAreaWidth = new Value(areaWidth);
     const viewerAreaHeight = new Value(areaHeight);
@@ -102,40 +154,42 @@ class ImageViewer extends Component {
 
     this.onTapGestureEvent = event([
       {
-        nativeEvent: ({ state }) =>
+        nativeEvent: ({ state }: { state: State }) =>
           block([
-            cond(eq(state, State.END), [
-              set(offsetZ, new Value(minScale)),
-              set(offsetX, new Value(0)),
-              set(offsetY, new Value(0)),
+            cond(
+              eq(state, State.END),[
+                set(offsetZ, new Value(minScale)),
+                set(offsetX, new Value(0)),
+                set(offsetY, new Value(0)),
 
-              set(
-                this.scale,
-                timing({
-                  from: this.scale,
-                  to: minScale,
-                  ...timingDefaultParams,
-                }),
-              ),
+                set(
+                  this.scale,
+                  timing({
+                    from: this.scale,
+                    to: minScale,
+                    ...timingDefaultParams,
+                  }),
+                ),
 
-              set(
-                this.translateX,
-                timing({
-                  from: this.translateX,
-                  to: 0,
-                  ...timingDefaultParams,
-                }),
-              ),
+                set(
+                  this.translateX,
+                  timing({
+                    from: this.translateX,
+                    to: 0,
+                    ...timingDefaultParams,
+                  }),
+                ),
 
-              set(
-                this.translateY,
-                timing({
-                  from: this.translateY,
-                  to: 0,
-                  ...timingDefaultParams,
-                }),
-              ),
-            ]),
+                set(
+                  this.translateY,
+                  timing({
+                    from: this.translateY,
+                    to: 0,
+                    ...timingDefaultParams,
+                  }),
+                ),
+              ]
+            ),
           ]),
       },
     ]);
@@ -146,6 +200,10 @@ class ImageViewer extends Component {
           translationX,
           translationY,
           state,
+        }: {
+          translationX: number;
+          translationY: number;
+          state: State;
         }) =>
           block([
             cond(eq(state, State.ACTIVE), [
@@ -165,7 +223,7 @@ class ImageViewer extends Component {
               set(negMaxY, multiply(verticalMax, new Value(-1))),
             ]),
 
-            cond(
+            /*cond(
               and(
                 eq(state, State.END),
                 greaterOrEq(scaledWidth, viewerAreaWidth),
@@ -245,7 +303,7 @@ class ImageViewer extends Component {
                   ],
                 ),
               ),
-            ),
+            ),*/
 
             cond(
               and(
@@ -260,7 +318,7 @@ class ImageViewer extends Component {
 
     this.onPinchGestureEvent = event([
       {
-        nativeEvent: ({ scale, state }) =>
+        nativeEvent: ({ scale, state }: { scale: number; state: State }) =>
           block([
             cond(
               and(
@@ -300,9 +358,23 @@ class ImageViewer extends Component {
           ]),
       },
     ]);
+
+    this.onDragGestureEvent = event([
+      {
+        nativeEvent:({translateY,state}: {translateY: number,state: State})=>
+          block([
+            cond(
+              eq(state, State.ACTIVE),
+              [
+                set(this.scale, translateY)
+              ]
+            )
+          ])
+      }
+    ])
   }
 
-  handleMove = (args)=> {
+  handleMove = (args: readonly number[]): void => {
     const { onMove } = this.props;
 
     const positionX = args[0];
@@ -311,6 +383,12 @@ class ImageViewer extends Component {
 
     onMove({ positionX, positionY, scale });
   };
+
+  componentDidUpdate(prevProps: IProps){
+    if(prevProps.rotation !== this.props.rotation) {
+      AniTiming(this.rotation,{toValue: this.props.rotation,duration:200,easing:Easing.linear}).start();
+    }
+  }
 
   render() {
     const {
@@ -322,6 +400,8 @@ class ImageViewer extends Component {
       containerColor,
       imageBackdropColor,
       overlay,
+      background,
+      captureRef
     } = this.props;
 
     const imageSrc = {
@@ -329,7 +409,7 @@ class ImageViewer extends Component {
     };
 
     const containerStyles = [
-      styles.panGestureInner,
+      //styles.panGestureInner,
       {
         backgroundColor: containerColor,
       },
@@ -342,7 +422,7 @@ class ImageViewer extends Component {
     };
 
     const overlayContainerStyle = {
-      position: 'absolute',
+      position: 'absolute' as 'absolute',
       top: 0,
       left: 0,
       height: areaHeight,
@@ -366,6 +446,9 @@ class ImageViewer extends Component {
           {
             translateY: this.translateY,
           },
+          {
+            rotate:this._rotate
+          }
         ],
       },
     ];
@@ -382,37 +465,47 @@ class ImageViewer extends Component {
             ])
           }
         </Animated.Code>
-        <PanGestureHandler
-          ref={this.dragRef}
-          simultaneousHandlers={this.pinchRef}
-          minPointers={1}
-          maxPointers={2}
-          avgTouches
-          onGestureEvent={this.onPanGestureEvent}
-          onHandlerStateChange={this.onPanGestureEvent}
-        >
           <Animated.View style={containerStyles}>
             <TapGestureHandler
+              ref={this.tapRef}
               numberOfTaps={2}
               onHandlerStateChange={this.onTapGestureEvent}
             >
-              <Animated.View style={areaStyles}>
-                <PinchGestureHandler
-                  ref={this.pinchRef}
-                  onGestureEvent={this.onPinchGestureEvent}
-                  onHandlerStateChange={this.onPinchGestureEvent}
-                >
-                  <Animated.View style={imageWrapperStyles} collapsable={false}>
-                    <Animated.Image style={imageStyles} source={imageSrc} />
-                    {overlay && (
-                      <View style={overlayContainerStyle}>{overlay}</View>
-                    )}
+                  <Animated.View style={containerStyles}>
+                    <PanGestureHandler
+                      ref={this.dragRef}
+                      simultaneousHandlers={this.pinchRef}
+                      minPointers={1}
+                      maxPointers={2}
+                      avgTouches
+                      onGestureEvent={this.onPanGestureEvent}
+                      onHandlerStateChange={this.onPanGestureEvent}
+                    >
+                      <Animated.View style={areaStyles}>
+                        <PinchGestureHandler
+                          ref={this.pinchRef}
+                          onGestureEvent={this.onPinchGestureEvent}
+                          onHandlerStateChange={this.onPinchGestureEvent}
+                        >
+                          <Animated.View style={imageWrapperStyles} collapsable={false}>
+                            {background && (
+                              <View style={overlayContainerStyle}>{background}</View>
+                            )}
+                            <ViewShot ref={captureRef} options={{format:'png',quality:0.7}}>
+                              <Animated.View style={imageWrapperStyles} collapsable={false}>
+                                <Animated.Image style={imageStyles} source={imageSrc} />
+                                {overlay && (
+                                  <View style={overlayContainerStyle}>{overlay}</View>
+                                )}
+                              </Animated.View>
+                            </ViewShot>
+                          </Animated.View>
+                        </PinchGestureHandler>
+                      </Animated.View>
+                    </PanGestureHandler>
                   </Animated.View>
-                </PinchGestureHandler>
-              </Animated.View>
             </TapGestureHandler>
           </Animated.View>
-        </PanGestureHandler>
       </>
     );
   }
