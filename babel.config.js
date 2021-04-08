@@ -16,6 +16,13 @@ module.exports = function(api) {
           "@pn/module":"./module"
         }
       }]
-    ]
+    ],
+    env:{
+      production:{
+        plugins:[
+          "transform-remove-console"
+        ]
+      }
+    }
   };
 };

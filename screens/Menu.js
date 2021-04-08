@@ -42,19 +42,29 @@ export default function({navigation}){
         .then((res)=>{
             if(!res.error) {
                 if(res?.data?.version != Constants.nativeAppVersion || res?.data?.versionCode != Constants.nativeBuildVersion) {
+                    const url = res?.data?.url || false;
+                    let btn=[
+                        {
+                            text:"Later",
+                            onPress:()=>{}
+                        }
+                    ];
+                    if(url) {
+                        btn = btn.concat({
+                            text:"UPDATE",
+                            onPress:()=>{
+                                openBrowserAsync(url,{
+                                    enableDefaultShare:true,
+                                    toolbarColor:'#2f6f4e',
+                                    showTitle:true
+                                })
+                            }
+                        })
+                    }
                     Alert.alert(
                         "New Version Available",
                         `v${res?.data?.version}`,
-                        [
-                            {
-                                title:"OK",
-                                onPress:()=>{}
-                            },
-                            {
-                                title:"UPDATE",
-                                onPress:()=>{}
-                            }
-                        ]
+                        btn
                     )
                 } else {
                     Alert.alert(
@@ -62,7 +72,7 @@ export default function({navigation}){
                         `v${res?.data?.version}`,
                         [
                             {
-                                title:"OK",
+                                text:"OK",
                                 onPress:()=>{}
                             }
                         ]

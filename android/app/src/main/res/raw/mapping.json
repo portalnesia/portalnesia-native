@@ -1,0 +1,123 @@
+{
+    "strict":{
+        "text-font-family":"Inter_Regular",
+
+        "text-heading-1-font-family":"Inter_Bold",
+        "text-heading-1-font-size":30,
+        "text-heading-1-font-weight":"700",
+
+        "text-heading-2-font-family":"Inter_SemiBold",
+        "text-heading-2-font-size":26,
+        "text-heading-2-font-weight":"600",
+
+        "text-heading-3-font-family":"Inter_SemiBold",
+        "text-heading-3-font-size":24,
+        "text-heading-3-font-weight":"600",
+
+        "text-heading-4-font-family":"Inter_Medium",
+        "text-heading-4-font-size":22,
+        "text-heading-4-font-weight":"600",
+
+        "text-heading-5-font-family":"Inter_Medium",
+        "text-heading-5-font-size":20,
+        "text-heading-5-font-weight":"600"
+    },
+    "components":{
+        "Divider":{
+            "appearances": {
+                "default": {
+                    "mapping": {
+                        "height": 2,
+                        "backgroundColor": "border-basic-color"
+                    }
+                }
+            }
+        },
+        "Text":{
+            "appearances":{
+                "default":{
+                    "variantGroups":{
+                        "status":{
+                            "info":{
+                                "color":"link-color"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "TabBar":{
+            "appearances":{
+                "default":{
+                    "mapping":{
+                        "indicatorHeight":2,
+                        "indicatorBackgroundColor":"color-indicator-bar"
+                    }
+                }
+            }
+        },
+        "Tab":{
+            "appearances":{
+                "default":{
+                    "mapping":{
+                        "state":{
+                            "selected": {
+                                "textColor": "color-indicator-bar",
+                                "iconTintColor": "color-indicator-bar"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BottomNavigation":{
+            "appearances":{
+                "default":{
+                    "mapping":{
+                        "indicatorHeight":3,
+                        "indicatorBackgroundColor":"color-indicator-bar"
+                    }
+                }
+            }
+        },
+        "BottomNavigationTab":{
+            "appearances":{
+                "default":{
+                    "mapping":{
+                        "state":{
+                            "selected": {
+                                "textColor": "color-indicator-bar",
+                                "iconTintColor": "color-indicator-bar"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "Spinner":{
+            "appearances":{
+                "default":{
+                    "variantGroups":{
+                        "status":{
+                            "primary": {
+                                "borderColor": "color-indicator-bar"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "Toggle":{
+            "appearances":{
+                "default":{
+                    "mapping":{
+                        "height":25,
+                        "width":45,
+                        "thumbHeight":21,
+                        "thumbWidth":21
+                    }
+                }
+            }
+        }
+    }
+}

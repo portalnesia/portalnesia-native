@@ -37,6 +37,13 @@ export const ImageFull=React.memo(({source,style,fullSize,alt,contentWidth,fancy
             animated={animated}
         />
     )
+    React.useEffect(()=>{
+        if(dataSrc?.uri) {
+            Img.preload([
+                {uri:dataSrc.uri}
+            ])
+        }
+    },[dataSrc])
     //navigator={dataSrc?.uri ? dataSrc?.uri : forceFancybox && source?.uri ? source?.uri : undefined}
     if(fancybox) {
         return (
@@ -101,6 +108,14 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
         ImageComponent=()=><Img ref={ref} {...other} source={source} style={style} />
     }
 
+    React.useEffect(()=>{
+        if(dataSrc?.uri) {
+            Img.preload([
+                {uri:dataSrc.uri}
+            ])
+        }
+    },[dataSrc])
+    
     if(fancybox) {
         return (
             <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source}>

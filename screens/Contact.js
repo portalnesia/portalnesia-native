@@ -197,7 +197,7 @@ export default function Contact({navigation,route}){
                                 </KeyboardAvoidingView>
                             </Lay>
                             <Lay style={{justifyContent:'flex-end'}}>
-                                <Lay style={[style.container,{paddingVertical:5}]}>
+                                <Lay style={[style.container,{paddingVertical:5,paddingBottom:15}]}>
                                     <Button loading={loading} disabled={loading} onPress={handleSubmit}>Send</Button>
                                 </Lay>
                             </Lay>

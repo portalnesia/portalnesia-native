@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import {useWindowDimensions} from 'react-native'
 //import * as firebase from 'firebase';
-import { NavigationContainer,DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
 //import {createNativeStackNavigator} from 'react-native-screens/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -204,6 +204,30 @@ export default () => {
 	const {state,theme:selectedTheme} = auth;
 	const {user,session} = state
 	const theme=useTheme()
+	const [ready,setReady]=React.useState(false);
+
+	function onReady(){
+		setReady(true);
+		routeNameRef.current = navigationRef.current.getCurrentRoute().name
+	}
+
+	async function onStateChange(){
+		const prevRouteName = routeNameRef.current;
+		const currentRouteName = navigationRef.current.getCurrentRoute().name
+		if(prevRouteName !== currentRouteName) {
+			await analytics().logScreenView({
+				screen_class: currentRouteName,
+				screen_name: currentRouteName
+			})
+		}
+		if(screenChange === 7) {
+			const random = Math.floor(Math.random() * 2);
+			screenChange = 0;
+			if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) await showInterstisial();
+		} else {
+			screenChange += 1;
+		}
+	}
 	
 	return (
 		<>
@@ -211,29 +235,11 @@ export default () => {
 			{user == null || session == null ? <Loading /> : (
 				<NavigationContainer
 					ref={navigationRef}
-					onReady={()=>{
-						routeNameRef.current = navigationRef.current.getCurrentRoute().name
-					}}
-					onStateChange={async()=>{
-						const prevRouteName = routeNameRef.current;
-						const currentRouteName = navigationRef.current.getCurrentRoute().name
-						if(prevRouteName !== currentRouteName) {
-							await analytics().logScreenView({
-								screen_class: currentRouteName,
-								screen_name: currentRouteName
-							})
-						}
-						if(screenChange === 4) {
-							const random = Math.floor(Math.random() * 3);
-							screenChange = 0;
-							if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) await showInterstisial();
-						} else {
-							screenChange += 1;
-						}
-					}}
+					onReady={onReady}
+					onStateChange={onStateChange}
 					linking={linking}
 				>
-					{user == null && <Loading />}
+					{!ready && <Loading /> }
 					<RootStack.Navigator mode="modal" initialRouteName="Main" screenOptions={{headerShown:false}}>
 						<RootStack.Screen name="Main" component={MainStackScreen} />
 						<RootStack.Screen name="ImageModal" component={ImageModal} options={{

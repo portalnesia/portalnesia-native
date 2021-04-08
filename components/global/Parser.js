@@ -244,6 +244,24 @@ const BlockRender=(attribs,children,style,props)=>{
             />
         )
     }
+    if(attribs?.class == "instagram-media") {
+        let ht = domNodeToHTMLString(props?.domNode);
+        let html=`<script async src="https://www.instagram.com/static/bundles/metro/EmbedSDK.js/33cd2c5d5d59.js"></script>${ht}`;
+        return (
+            <AutoHeightWebView
+                key={props?.key}
+                style={{ width: props?.renderersProps?.screenWidth - 10, marginVertical: 20,marginHorizontal:5 }}
+                source={{html,baseUrl:"https://www.instagram.com"}}
+                javaScriptEnabled
+                injectedJavaScript={`
+                    window.onload=function(){
+                        instgrm.Embeds.process();
+                    }
+                `}
+                viewportContent={'width=device-width, user-scalable=no'}
+            />
+        )
+    }
     let data
     if(props?.domNode?.children?.[0]?.data && props?.domNode?.children?.[0]?.data.match(/\S/g) !== null) {
         data = props?.domNode?.children?.[0]?.data

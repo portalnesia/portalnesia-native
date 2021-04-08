@@ -20,7 +20,7 @@ import {randomInt} from '@pn/utils/Main'
 
 const HeaderModal=React.memo(({search,setSearch,setPage})=>{
     return (
-        <Lay style={{padding:5}}>
+        <Lay style={{padding:5,paddingTop:15,borderTopLeftRadius:15,borderTopRightRadius:15}}>
             <Input
                 placeholder="Type EPSG or name or area to search..."
                 value={search}
@@ -72,13 +72,6 @@ export default function({navigation}){
         if(data) setTotal(data?.total_page)
     },[data])
 
-    const scrollRef = React.useRef(null)
-
-    const scrollTo=p=>{
-        if(scrollRef.current.scrollToOffset) {
-            scrollRef.current.scrollToOffset(p)
-        }
-    }
     const footerModal=()=>(
         <>
         {!data && !error && (
@@ -193,25 +186,22 @@ export default function({navigation}){
                 }}
                 snapPoint={300}
                 ref={modalRef}
+                flatListProps={{
+                    ListHeaderComponent:<HeaderModal search={search} setSearch={setSearch} setPage={setPage} />,
+                    ListFooterComponent:footerModal,
+                    data:(data?.data||[]),
+                    stickyHeaderIndices:[0],
+                    renderItem:(props)=><RenderRow key={props?.item?.epsg} {...props} onChange={onModalChange(modal)} />,
+                    ItemSeparatorComponent:Divider,
+                    keyExtractor:(item)=>item.epsg,
+                }}
                 onClosed={()=>{
                     setPage(1)
                     setSearch("")
                     setModal(null)
                 }}
                 modalHeight={height-100}
-            >
-                <View key={`view-1`} style={{borderTopLeftRadius:15,borderTopRightRadius:15,paddingTop:15}}>
-                    <List
-                        ref={scrollRef}
-                        ListHeaderComponent={<HeaderModal search={search} setSearch={setSearch} setPage={setPage} />}
-                        ListFooterComponent={footerModal}
-                        data={data?.data||[]}
-                        renderItem={(props)=><RenderRow key={props?.item?.epsg} {...props} onChange={onModalChange(modal)} />}
-                        ItemSeparatorComponent={Divider}
-                        keyExtractor={(item)=>item.epsg}
-                    />
-                </View>
-            </Modalize>
+            />
             <MenuContainer
                 visible={open}
                 handleOpen={()=>setOpen(true)}

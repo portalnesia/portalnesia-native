@@ -210,7 +210,7 @@ export default function UserScreen({navigation,route}){
     const renderTabBar=(props)=>{
         const translateY = scrollY.interpolate({
             inputRange:[0,HeaderHeight],
-            outputRange:[0,-(HeaderHeight)],
+            outputRange:[0,-(HeaderHeight+1)],
             extrapolateRight:'clamp',
             extrapolateLeft:'clamp',
             extrapolate:'clamp'

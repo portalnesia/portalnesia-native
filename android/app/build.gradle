@@ -79,7 +79,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: false
+    enableHermes: true
 ]
 
 apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
@@ -146,7 +146,7 @@ android {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
+            universalApk true  // If true, also generate a universal APK
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
@@ -212,7 +212,7 @@ dependencies {
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.flipper'
     }
-    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite']])
+    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-background-fetch','expo-error-recovery','expo-image-manipulator','expo-task-manager']])
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

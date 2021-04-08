@@ -6,6 +6,7 @@ import DropdownAlert from 'react-native-dropdownalert'
 import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
+import NetInfo from '@react-native-community/netinfo'
 import axios from 'axios'
 import useRootNavigation from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
@@ -76,6 +77,7 @@ const initialState={
 
 const AuthProvider = (props) => {
 	const dropdownRef=useRef(null)
+	const currentInternet=useRef(true);
 	const [state,dispatch]=useReducer(reducer,initialState)
 	const colorScheme = useColorScheme()
 	const [tema,setTema]=React.useState('auto')
@@ -164,18 +166,27 @@ const AuthProvider = (props) => {
 				Notifications.setNotificationChannelAsync("News", getNotifOption("News")),
 			])
 		}
+
+		const netInfoListener = NetInfo.addEventListener(state=>{
+			if(state.isInternetReachable && !currentInternet.current) {
+				setNotif(false,"You are online!");
+				currentInternet.current=true;
+			} else if(!state.isInternetReachable && currentInternet.current) {
+				setNotif(true,"You are offline!");
+				currentInternet.current=false;
+			}
+		})
 		
 		asyncTask();
 		setNotificationChannel();
 
 		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
 		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
-		//const notificationResponseListener = Notifications.addNotificationResponseReceivedListener(showPushNotification)
 
 		return ()=>{
 			tokenChangeListener.remove();
 			foregroundListener.remove();
-			//notificationResponseListener.remove();
+			netInfoListener();
 		}
 	},[])
 
