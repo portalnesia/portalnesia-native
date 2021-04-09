@@ -8,6 +8,7 @@ import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import { ucwords } from '@pn/utils/Main';
+import i18n from 'i18n-js'
 
 const RenderChord=React.memo(({item,index,width,data,navigation})=>{
 	const angka = index % 2;
@@ -97,7 +98,7 @@ export default function ({ navigation,route }) {
 	},[isValidating])
 
 	const Footer=()=>{
-		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
+		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
 		else return null
 	}
@@ -108,7 +109,7 @@ export default function ({ navigation,route }) {
 				{isLoadingInitialData ? (
                 	<View style={{height:"100%"}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
             	) : error ? (
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
+					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
 				) : (
 					<FlatList
 						columnWrapperStyle={{flexWrap:'wrap',flex:1}}

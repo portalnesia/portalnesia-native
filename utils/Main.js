@@ -1,6 +1,6 @@
 import {Alert} from 'react-native'
 import {openBrowserAsync} from 'expo-web-browser'
-
+import i18n from 'i18n-js'
 
 export const clean=(text)=>{
     if(typeof text!=='string') return '';
@@ -236,13 +236,13 @@ export const extractMeta=(file)=>{
 
 export const openBrowser=(url)=>{
     Alert.alert(
-        "Open external link?",
-        "We are not responsible for the content of that website",
+        i18n.t('title_external_link'),
+        i18n.t('desc_external_link'),
         [{
-            text:'Cancel',
+            text:i18n.t('cancel'),
             onPress:()=>{}
         },{
-            text:"Open",
+            text:i18n.t("open"),
             onPress:()=>{
                     openBrowserAsync(url,{
                     enableDefaultShare:true,

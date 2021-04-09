@@ -3,7 +3,7 @@ import {  View,ScrollView,useWindowDimensions,KeyboardAvoidingView } from 'react
 import {Layout as Lay,Text,Card,Spinner,Input,List,ListItem,Divider,useTheme,Toggle} from '@ui-kitten/components'
 import useSWR from '@pn/utils/swr'
 import {Modalize} from 'react-native-modalize'
-
+import i18n from 'i18n-js'
 //import Carousel from '@pn/components/global/Carousel';
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -22,7 +22,7 @@ const HeaderModal=React.memo(({search,setSearch,setPage})=>{
     return (
         <Lay style={{padding:5,paddingTop:15,borderTopLeftRadius:15,borderTopRightRadius:15}}>
             <Input
-                placeholder="Type EPSG or name or area to search..."
+                placeholder={i18n.t('search_epsg')}
                 value={search}
                 onChangeText={(text)=>{
                     setSearch(text)
@@ -84,7 +84,7 @@ export default function({navigation}){
     )
 
     const onSubmit=()=>{
-        if(input?.match(/\S+/g) === null) return  setNotif("error","Input cannot be empty")
+        if(input?.match(/\S+/g) === null) return  setNotif("error",i18n.t('form_validation',{type:"Input"}))
         const post={
             ...switchVal,
             ...sistem,
@@ -116,12 +116,12 @@ export default function({navigation}){
                 >
                     <Lay key={0} style={{paddingTop:10,paddingBottom:40}}>
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text style={{marginBottom:15}}>This on-line tool allows you to insert value pairs of geographic coordinates and transform them to different coordinate system or cartographic projection. You can insert value pairs to the text area labeled as "Input coordinate pairs" - also by using copy/paste even from MS Excell or similar programs. This tool accepts various input formats of value pairs - only what you need is to have one pair by a row. Please see examples in the input text area window.</Text>
-                            <Text>It is necessary to set appropriate input coordinate system and to set desired output coordinate system to which you want to transform the input coordinate pairs.</Text>
+                            <Text style={{marginBottom:15}}>{i18n.t('transform_desc_1')}</Text>
+                            <Text>{i18n.t('transform_desc_2')}</Text>
                         </Lay>
                         <AdsBanner />
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text style={{fontFamily:'Inter_SemiBold'}}>{`Input Coordinate System / Projection`}</Text>
+                            <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('transform_input_label')}</Text>
                             <View style={{flexDirection:'row',alignItems:'center'}}>
                                 <Text style={{marginRight:10}}>{`${sistem.insrc}`}</Text>
                                 <Button appearance="ghost" status="basic" onPress={()=>{
@@ -129,11 +129,11 @@ export default function({navigation}){
                                         setModal("insrc")
                                         modalRef?.current?.open()
                                     }
-                                }}>Change</Button>
+                                }}>{i18n.t('change')}</Button>
                             </View>
                             <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}><Toggle checked={switchVal.switch} disabled={loading} onChange={(val)=>setSwitch({...switchVal,switch:val})}>{`Switch X <--> Y`}</Toggle></View>
                             <Input
-                                label="Input Coordinate Pairs*"
+                                label={`${i18n.t('transform_input_label_2')}*`}
                                 value={input}
                                 onChangeText={(text)=>setInput(text)}
                                 multiline
@@ -144,7 +144,7 @@ export default function({navigation}){
                             />
                         </Lay>
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text style={{fontFamily:'Inter_SemiBold'}}>{`Output Coordinate System / Projection`}</Text>
+                            <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('transform_output_label')}</Text>
                             <View style={{flexDirection:'row',alignItems:'center'}}>
                                 <Text style={{marginRight:10}}>{`${sistem.outsrc}`}</Text>
                                 <Button appearance="ghost" status="basic" onPress={()=>{
@@ -152,11 +152,11 @@ export default function({navigation}){
                                         setModal("outsrc")
                                         modalRef?.current?.open()
                                     }
-                                }}>Change</Button>
+                                }}>{i18n.t('change')}</Button>
                             </View>
                             <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}><Toggle disabled={loading} checked={switchVal.add_input} onChange={(val)=>setSwitch({...switchVal,add_input:val})}>{`Include input coordinates`}</Toggle></View>
                             <Input
-                                label="Output Coordinate Pairs"
+                                label={i18n.t('transform_output_label_2')}
                                 value={output}
                                 multiline
                                 editable={false}
@@ -170,7 +170,7 @@ export default function({navigation}){
                             />
                         </Lay>
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text><Text style={{fontFamily:'Inter_Bold'}}>Beware!</Text> <Text>Inserted values pairs needs to be in order X-coordinate and then Y-coordinate. If you are inserting latitude/longitude values in decimal format, then the longitude should be first value of the pair (X-coordinate) and latitude the second value (Y-coordinate). Otherwise you can use choice "Switch XY" bellow the input text area window.</Text></Text>
+                            <Text><Text style={{fontFamily:'Inter_Bold'}}>{i18n.t('beware_1')}</Text> <Text>{i18n.t('beware_2')}</Text></Text>
                         </Lay>
                         <AdsBanners />
                         <Lay style={[style.container,{paddingVertical:10}]}>
@@ -215,12 +215,12 @@ export default function({navigation}){
                 }}
                 menu={[{
                     action:"share",
-                    title:"Share",
+                    title:i18n.t('share'),
                 },{
-                    title:"Copy link",
+                    title:i18n.t('copy_link'),
                     action:'copy'
                 },{
-                    title:"Open in browser",
+                    title:i18n.t('open_in_browser'),
                     action:'browser'
                 }]}
             />

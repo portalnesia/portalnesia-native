@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PNModules extends ReactContextBaseJavaModule {
@@ -26,4 +27,16 @@ public class PNModules extends ReactContextBaseJavaModule {
         constants.put("URL", "https://portalnesia.com");
         return constants;
     }
+
+    @ReactMethod
+    public String getLanguage() {
+        return Locale.getDefault().getLanguage();
+    }
+
+    @ReactMethod
+    public String getCountry() {
+        return Locale.getDefault().getCountry();
+    }
+
+
 }

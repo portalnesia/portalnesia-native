@@ -1,3 +1,15 @@
+import i18n from 'i18n-js'
+import {default as en_locale} from '@pn/locale/en.json'
+import {default as id_locale} from '@pn/locale/id.json'
+
+i18n.defaultLocale = "en-US"
+i18n.locale = 'en-US';
+i18n.translations = {
+	en:en_locale,
+	id:id_locale
+};
+i18n.fallbacks = true;
+
 export const menu=[
     {
         title:"Menu",
@@ -79,17 +91,17 @@ export const menu=[
         title:"Others",
         menu:[
             {
-                title:"Contact",
+                title:i18n.t("contact"),
                 to:"Contact",
                 //icon:['contact-support','material'],
             },
             {
-                title:"Check Update",
+                title:i18n.t("check_update"),
                 to:"CheckUpdate",
                 //icon:['update','material'],
             },
             {
-                title:"Terms of Services",
+                title:i18n.t("terms_of_service"),
                 to:"Pages",
                 params:{
                     navbar:"Terms of Service",
@@ -97,7 +109,7 @@ export const menu=[
                 }
             },
             {
-                title:"Privacy Policy",
+                title:i18n.t("privacy_policy"),
                 to:"Pages",
                 params:{
                     slug:"privacy-policy",
@@ -106,7 +118,7 @@ export const menu=[
                 //icon:['privacy-tip','material'],
             },
             {
-                title:"Donate",
+                title:i18n.t("donate"),
                 link:"https://paypal.me/adityatranasuta",
                 //icon:['donate','font_awesome'],
             }

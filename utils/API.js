@@ -4,6 +4,7 @@ import {API as APII,API_URL,API_URL_2} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import {Constants} from 'react-native-unimodules'
 import * as Application from 'expo-application'
+import i18n from 'i18n-js'
 
 export const API = axios.create({
     baseURL:APII,
@@ -61,20 +62,20 @@ export default function useAPI(){
             .then((response)=>{
                 if(response?.data?.error == 1) {
                     //console.log(response?.status)
-                    setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
+                    setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('error'));
                 }
                 res(response?.data);
             })
             .catch((err)=>{
                 //console.log(err?.response)
                 if(err?.response?.data) {
-                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
+                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('error'));
                 }
                 else if(err?.response?.status===503) {
-                    setNotif("error","Error","Internal Server Error");
+                    setNotif("error","Error",i18n.t('server_error'));
                     //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
                 } else {
-                    setNotif("error","Error","Something went wrong")
+                    setNotif("error","Error",i18n.t('error'))
                 }
                 rej();
             })
@@ -102,10 +103,10 @@ export default function useAPI(){
                     setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
                 }
                 else if(err?.response?.status===503) {
-                    setNotif("error","Error","Internal Server Error");
+                    setNotif("error","Error",i18n.t('server_error'));
                     //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
                 } else {
-                    setNotif("error","Error","Something went wrong")
+                    setNotif("error","Error",i18n.t('error'))
                 }
                 rej();
             })
@@ -124,7 +125,7 @@ export default function useAPI(){
             .then(res=>{
                 return new Promise((resol,reje)=>{
                     const data = res.data;
-                    if(data?.error) resol({message:data?.msg||"Something went wrong",...data});
+                    if(data?.error) resol({message:data?.msg||i18n.t('error'),...data});
                     else resol(data);
                 })
             })

@@ -15,7 +15,7 @@ import {ucwords,PNslug} from '@pn/utils/Main'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import {CONTENT_URL} from '@env'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
-
+import i18n from 'i18n-js'
 //const ShareIcon=(props)=><Icon {...props} name="ios-share" pack="material" />
 
 export default function({navigation,route}){
@@ -104,16 +104,16 @@ export default function({navigation,route}){
                share={{
                    link:`/blog/${data?.blog?.slug}?utm_campaign=blog`,
                    title:`${data?.blog?.title} - Portalnesia`,
-                   dialog:"Share Blog"
+                   dialog:i18n.t('share_type',{type:"blog"})
                }}
                menu={[{
                     action:"share",
-                    title:"Share",
+                    title:i18n.t('share'),
                 },{
-                    title:"Copy link",
+                    title:i18n.t('copy_link'),
                     action:'copy'
                 },{
-                    title:"Open in browser",
+                    title:i18n.t('open_in_browser'),
                     action:'browser'
                 }]}
            />

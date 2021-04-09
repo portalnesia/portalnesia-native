@@ -21,7 +21,17 @@ import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './provider/AuthProvider';
 import {AppearanceProvider} from 'react-native-appearance'
 import RNFS from 'react-native-fs'
+import i18n from 'i18n-js'
+import {default as en_locale} from '@pn/locale/en.json'
+import {default as id_locale} from '@pn/locale/id.json'
 
+i18n.defaultLocale = "en-US"
+i18n.locale = 'en-US';
+i18n.translations = {
+	en:en_locale,
+	id:id_locale
+};
+i18n.fallbacks = true;
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
 export default function App(props) {

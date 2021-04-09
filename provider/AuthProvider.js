@@ -18,6 +18,7 @@ import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
 import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
 import {API as APII} from '@env'
+import i18n from 'i18n-js'
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -107,7 +108,7 @@ const AuthProvider = (props) => {
 				await AsyncStorage.setItem("theme",val)
 				setTema(val)
 			} catch(e) {
-				setNotif(true,"Error","Something went wrong")
+				setNotif(true,"Error",i18n.t('error'))
 			}
 		}
 	}
@@ -169,10 +170,10 @@ const AuthProvider = (props) => {
 
 		const netInfoListener = NetInfo.addEventListener(state=>{
 			if(state.isInternetReachable && !currentInternet.current) {
-				setNotif(false,"You are online!");
+				setNotif(false,i18n.t('net_online'));
 				currentInternet.current=true;
 			} else if(!state.isInternetReachable && currentInternet.current) {
-				setNotif(true,"You are offline!");
+				setNotif(true,i18n.t('net_offline'));
 				currentInternet.current=false;
 			}
 		})

@@ -9,7 +9,7 @@ import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
 //import Image from '@pn/components/global/Image'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
-
+import i18n from 'i18n-js'
 
 export default function ({ navigation }) {
     const { width } = useWindowDimensions();
@@ -30,7 +30,7 @@ export default function ({ navigation }) {
 	},[isValidating])
 
 	const Footer=React.useCallback(()=>{
-		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
+		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore) return <View paddingTop={20}><Skeleton height={300} type="grid" number={4} image /></View> 
 		else return null
 	},[isReachingEnd,isLoadingMore])
@@ -99,7 +99,7 @@ export default function ({ navigation }) {
 			) : (
 				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 					{error ? (
-						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
+						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
 					) : (
 						<FlatList
 							columnWrapperStyle={{flexWrap:'wrap',flex:1}}

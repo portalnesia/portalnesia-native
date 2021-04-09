@@ -1,5 +1,5 @@
 import React from 'react'
-//import Constants from 'expo-constants';
+import Constants from 'expo-constants';
 import {
     AdMobBanner,
     AdMobInterstitial,
@@ -13,8 +13,8 @@ const testID = 'ca-app-pub-3940256099942544/6300978111';
 export const AdsBanner=React.memo((props)=>{
     const productionID = 'ca-app-pub-5345145600516995/9016780060';
     // Is a real device and running in production.
-    const adUnitID = productionID;
-    //const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+    //const adUnitID = productionID;
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
     return (
             <AdMobBanner
                 {...props}
@@ -27,8 +27,8 @@ export const AdsBanner=React.memo((props)=>{
 
 export const AdsBanners=React.memo((props)=>{
     const productionID = 'ca-app-pub-5345145600516995/9535680462';
-    const adUnitID = productionID
-    //const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
+    //const adUnitID = productionID
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
     return (
         <AdMobBanner
             {...props}
@@ -43,8 +43,8 @@ export async function showInterstisial(){
     const random = Math.floor(Math.random() * 2);
     const productionID = 'ca-app-pub-5345145600516995/1493513267';
     // Is a real device and running in production.
-    const adUnitID = productionID
-    //const adUnitID = Constants.isDevice && !__DEV__ ? productionID : intersTestID[random];
+    //const adUnitID = productionID
+    const adUnitID = Constants.isDevice && !__DEV__ ? productionID : intersTestID[random];
 
     const isThere = await isAvailableAsync()
     if(isThere) {

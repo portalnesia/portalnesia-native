@@ -17,7 +17,7 @@ import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import Chord from '@pn/components/global/Chord'
 import Button from '@pn/components/global/Button'
 import {ucwords} from '@pn/utils/Main'
-
+import i18n from 'i18n-js'
 
 const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
@@ -238,16 +238,16 @@ export default function({navigation,route}){
                     share={{
                         link:`/chord/${data?.chord?.slug}?utm_campaign=chord`,
                         title:`Chord ${data?.chord?.artist} - ${data?.chord?.title}`,
-                        dialog:"Share Chord"
+                        dialog:i18n.t('share_type',{type:"chord"})
                     }}
                     menu={[{
                         action:"share",
-                        title:"Share",
+                        title:i18n.t('share'),
                     },{
-                        title:"Copy link",
+                        title:i18n.t('copy_link'),
                         action:'copy'
                     },{
-                        title:"Open in browser",
+                        title:i18n.t('open_in_browser'),
                         action:'browser'
                     }]}
                 />

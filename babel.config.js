@@ -13,7 +13,8 @@ module.exports = function(api) {
           "@pn/screens": "./screens",
           "@pn/assets": "./assets",
           "@pn/provider":"./provider",
-          "@pn/module":"./module"
+          "@pn/module":"./module",
+          "@pn/locale":"./locale"
         }
       }]
     ],

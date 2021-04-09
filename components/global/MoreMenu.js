@@ -8,6 +8,7 @@ import analytics from '@react-native-firebase/analytics'
 import {URL} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import useClipboard from '@pn/utils/clipboard'
+import i18n from 'i18n-js'
 
 const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
@@ -37,7 +38,7 @@ const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
             message:`${text} ${url}`,
             url:url
         },{
-            dialogTitle:dialog||"Share"
+            dialogTitle:dialog||i18n.t('share')
         })
         if(type && item_id) {
             await analytics().logShare({

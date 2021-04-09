@@ -9,6 +9,7 @@ import Header,{useHeader,headerHeight as headerHeightt,Lottie} from '@pn/compone
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
+import i18n from 'i18n-js'
 
 const Recent=({headerHeight,navigation,...other})=>{
 	const {
@@ -63,7 +64,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 	}
 
 	const Footer=()=>{
-		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
+		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View style={{paddingTop:20,height:'100%'}}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View> 
 		else return null
 	}
@@ -74,7 +75,7 @@ const Recent=({headerHeight,navigation,...other})=>{
                 <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
             ) : error ? (
 				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
+					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
 				</Lay>
 			) : (
 				<Animated.FlatList
@@ -162,7 +163,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 	}
 
 	const Footer=()=>{
-		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
+		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
 		else return null
 	}
@@ -173,7 +174,7 @@ const Popular=({headerHeight,navigation,...other})=>{
                 <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
             ) : error ? (
 				<Lay style={{marginBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
+					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
 				</Lay>
 			) : (
 				<Animated.FlatList
@@ -213,8 +214,8 @@ export default function ({ navigation,route }) {
 	const slug = route?.params?.slug
 	const [tabIndex,setTabIndex] = React.useState(typeof slug === 'string' && slug === 'popular' ? 1 : 0);
 	const [routes]=React.useState([
-        {key:'recent',title:"Recent"},
-        {key:'popular',title:"Popular"},
+        {key:'recent',title:i18n.t('recent')},
+        {key:'popular',title:i18n.t('popular')},
     ])
 	const theme = useTheme()
 	const {translateY,...other}=useHeader()
