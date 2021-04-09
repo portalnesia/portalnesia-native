@@ -4,7 +4,8 @@
     "android": "npx react-native run-android",
     "ios": "react-native run-ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "postinstall": "npm-license-crawler -onlyDirectDependencies -json licenses.json"
   },
   "dependencies": {
     "@benjeau/react-native-draw": "^0.3.3",
@@ -59,6 +60,7 @@
     "expo-web-browser": "~8.6.0",
     "firebase": "7.9.0",
     "hermes-engine": "^0.5.2-rc1",
+    "i18n-js": "^3.8.0",
     "initials": "^3.1.1",
     "lodash": "^4.17.20",
     "lottie-react-native": "^3.5.0",

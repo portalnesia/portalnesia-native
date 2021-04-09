@@ -1,0 +1,607 @@
+{
+    "@benjeau/react-native-draw@0.3.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/BenJeau/react-native-draw",
+        "licenseUrl": "https://github.com/BenJeau/react-native-draw/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@eva-design/eva@2.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/eva-design/eva",
+        "licenseUrl": "https://github.com/eva-design/eva",
+        "parents": "portal-native"
+    },
+    "@expo-google-fonts/inter@0.1.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/google-fonts",
+        "licenseUrl": "https://github.com/expo/google-fonts",
+        "parents": "portal-native"
+    },
+    "@expo-google-fonts/ubuntu@0.1.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/google-fonts",
+        "licenseUrl": "https://github.com/expo/google-fonts",
+        "parents": "portal-native"
+    },
+    "@expo/vector-icons@12.0.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/vector-icons",
+        "licenseUrl": "https://github.com/expo/vector-icons/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@native-html/table-plugin@3.1.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/native-html/plugins",
+        "licenseUrl": "https://github.com/native-html/plugins",
+        "parents": "portal-native"
+    },
+    "@react-native-async-storage/async-storage@1.14.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-async-storage/async-storage",
+        "licenseUrl": "https://github.com/react-native-async-storage/async-storage/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-native-community/datetimepicker@3.0.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/datetimepicker",
+        "licenseUrl": "https://github.com/react-native-community/datetimepicker/raw/master/LICENSE.md",
+        "parents": "portal-native"
+    },
+    "@react-native-community/masked-view@0.1.10": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/react-native-masked-view",
+        "licenseUrl": "https://github.com/react-native-community/react-native-masked-view",
+        "parents": "portal-native"
+    },
+    "@react-native-community/netinfo@5.9.7": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/react-native-netinfo",
+        "licenseUrl": "https://github.com/react-native-community/react-native-netinfo/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-native-community/slider@3.0.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/react-native-slider",
+        "licenseUrl": "https://github.com/react-native-community/react-native-slider",
+        "parents": "portal-native"
+    },
+    "@react-native-firebase/analytics@11.2.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/analytics",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/analytics/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-native-firebase/app@11.2.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/app",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/app/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-navigation/bottom-tabs@5.11.8": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-navigation/react-navigation",
+        "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-navigation/drawer@5.12.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-navigation/react-navigation",
+        "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-navigation/native@5.9.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-navigation/react-navigation",
+        "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-navigation/stack@5.14.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-navigation/react-navigation",
+        "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@ui-kitten/components@5.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/akveo/react-native-ui-kitten",
+        "licenseUrl": "https://github.com/akveo/react-native-ui-kitten",
+        "parents": "portal-native"
+    },
+    "@ui-kitten/eva-icons@5.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/akveo/react-native-ui-kitten",
+        "licenseUrl": "https://github.com/akveo/react-native-ui-kitten",
+        "parents": "portal-native"
+    },
+    "array-move@3.0.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/sindresorhus/array-move",
+        "licenseUrl": "https://github.com/sindresorhus/array-move/raw/master/license",
+        "parents": "portal-native"
+    },
+    "axios@0.21.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/axios/axios",
+        "licenseUrl": "https://github.com/axios/axios/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "buffer@5.7.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/feross/buffer",
+        "licenseUrl": "https://github.com/feross/buffer/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "expo-ads-admob@8.4.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-app-loading@1.0.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-application@2.4.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-asset@8.2.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-auth-session@3.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-av@8.7.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-clipboard@1.0.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-constants@9.3.5": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-crypto@8.4.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-device@2.4.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-document-picker@8.4.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-file-system@9.3.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-font@8.4.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-image-picker@9.2.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-linking@2.0.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-local-authentication@9.5.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-location@10.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-media-library@10.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-notifications@0.8.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-permissions@10.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-random@10.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-secure-store@9.3.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-splash-screen@0.8.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-status-bar@1.0.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-updates@0.4.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-video-player@1.6.1": {
+        "licenses": "MIT",
+        "licenseUrl": "https://github.com/ihmpavel/expo-video-player",
+        "parents": "portal-native"
+    },
+    "expo-web-browser@8.6.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo@40.0.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "firebase@7.9.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/firebase/firebase-js-sdk",
+        "licenseUrl": "https://github.com/firebase/firebase-js-sdk",
+        "parents": "portal-native"
+    },
+    "hermes-engine@0.5.2-rc1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/facebook/hermes",
+        "licenseUrl": "https://github.com/facebook/hermes",
+        "parents": "portal-native"
+    },
+    "i18n-js@3.8.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/fnando/i18n-js",
+        "licenseUrl": "https://github.com/fnando/i18n-js",
+        "parents": "portal-native"
+    },
+    "initials@3.1.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/gr2m/initials",
+        "licenseUrl": "https://github.com/gr2m/initials/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "lodash@4.17.21": {
+        "licenses": "MIT",
+        "repository": "https://github.com/lodash/lodash",
+        "licenseUrl": "https://github.com/lodash/lodash/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "lottie-react-native@3.5.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/react-native-community/lottie-react-native",
+        "licenseUrl": "https://github.com/react-native-community/lottie-react-native/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "marked@2.0.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/markedjs/marked",
+        "licenseUrl": "https://github.com/markedjs/marked/raw/master/LICENSE.md",
+        "parents": "portal-native"
+    },
+    "moment@2.29.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/moment/moment",
+        "licenseUrl": "https://github.com/moment/moment/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "qs@6.9.6": {
+        "licenses": "BSD-3-Clause",
+        "repository": "https://github.com/ljharb/qs",
+        "licenseUrl": "https://github.com/ljharb/qs/raw/master/LICENSE.md",
+        "parents": "portal-native"
+    },
+    "react-dom@16.13.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/facebook/react",
+        "licenseUrl": "https://github.com/facebook/react/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-hook-form@6.15.5": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-hook-form/react-hook-form",
+        "licenseUrl": "https://github.com/react-hook-form/react-hook-form/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-appearance@0.3.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/react-native-appearance",
+        "licenseUrl": "https://github.com/expo/react-native-appearance/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-autoheight-webview@1.5.8": {
+        "licenses": "ISC",
+        "repository": "https://github.com/iou90/react-native-autoheight-webview",
+        "licenseUrl": "https://github.com/iou90/react-native-autoheight-webview/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-background-actions@2.6.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/Rapsssito/react-native-background-actions",
+        "licenseUrl": "https://github.com/Rapsssito/react-native-background-actions/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-background-downloader@2.3.4": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/EkoLabs/react-native-background-downloader",
+        "licenseUrl": "https://github.com/EkoLabs/react-native-background-downloader/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-dotenv@2.5.3": {
+        "licenses": "MIT",
+        "repository": "github:goatandsheep/react-native-dotenv",
+        "licenseUrl": "github:goatandsheep/react-native-dotenv",
+        "parents": "portal-native"
+    },
+    "react-native-dropdownalert@4.3.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/testshallpass/react-native-dropdownalert",
+        "licenseUrl": "https://github.com/testshallpass/react-native-dropdownalert/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-fast-image@8.3.4": {
+        "licenses": "(MIT AND Apache-2.0)",
+        "repository": "https://github.com/DylanVann/react-native-fast-image",
+        "licenseUrl": "https://github.com/DylanVann/react-native-fast-image/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-fs@2.16.6": {
+        "licenses": "MIT",
+        "repository": "https://github.com/itinance/react-native-fs",
+        "licenseUrl": "https://github.com/itinance/react-native-fs/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-gesture-handler@1.8.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/software-mansion/react-native-gesture-handler",
+        "licenseUrl": "https://github.com/software-mansion/react-native-gesture-handler/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-lightbox-v2@0.8.7": {
+        "licenses": "MIT",
+        "repository": "https://github.com/cbbfcd/react-native-lightbox",
+        "licenseUrl": "https://github.com/cbbfcd/react-native-lightbox/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-modal@11.7.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/react-native-modal",
+        "licenseUrl": "https://github.com/react-native-community/react-native-modal/raw/master/LICENSE.md",
+        "parents": "portal-native"
+    },
+    "react-native-modalize@2.0.8": {
+        "licenses": "MIT",
+        "repository": "https://github.com/jeremybarbet/react-native-modalize",
+        "licenseUrl": "https://github.com/jeremybarbet/react-native-modalize/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-pager-view@5.1.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/callstack/react-native-pager-view",
+        "licenseUrl": "https://github.com/callstack/react-native-pager-view/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-pkce-challenge@3.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/drophive/react-native-pkce-challenge",
+        "licenseUrl": "https://github.com/drophive/react-native-pkce-challenge/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-reanimated@1.13.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/software-mansion/react-native-reanimated",
+        "licenseUrl": "https://github.com/software-mansion/react-native-reanimated/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-render-html@5.1.0": {
+        "licenses": "BSD-2-Clause",
+        "repository": "https://github.com/meliorence/react-native-render-html",
+        "licenseUrl": "https://github.com/meliorence/react-native-render-html/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-safe-area-context@3.1.9": {
+        "licenses": "MIT",
+        "repository": "https://github.com/th3rdwave/react-native-safe-area-context",
+        "licenseUrl": "https://github.com/th3rdwave/react-native-safe-area-context/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-screens@2.15.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/kmagiera/react-native-screens",
+        "licenseUrl": "https://github.com/kmagiera/react-native-screens/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-skeleton-placeholder@3.0.4": {
+        "licenses": "ISC",
+        "repository": "https://github.com/chramos/react-native-skeleton-placeholder",
+        "licenseUrl": "https://github.com/chramos/react-native-skeleton-placeholder",
+        "parents": "portal-native"
+    },
+    "react-native-snap-carousel@3.9.1": {
+        "licenses": "BSD-3-Clause",
+        "repository": "github.com/archriss/react-native-snap-carousel",
+        "licenseUrl": "github.com/archriss/react-native-snap-carousel/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-sticky-parallax-header@0.4.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/netguru/sticky-parallax-header",
+        "licenseUrl": "https://github.com/netguru/sticky-parallax-header/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-super-grid@4.1.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/saleel97/react-native-super-grid",
+        "licenseUrl": "https://github.com/saleel97/react-native-super-grid/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-svg@12.1.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/react-native-svg",
+        "licenseUrl": "https://github.com/react-native-community/react-native-svg/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-syntax-highlighter@2.1.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/conorhastings/react-native-syntax-highlighter",
+        "licenseUrl": "https://github.com/conorhastings/react-native-syntax-highlighter",
+        "parents": "portal-native"
+    },
+    "react-native-tab-view@3.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/satya164/react-native-tab-view",
+        "licenseUrl": "https://github.com/satya164/react-native-tab-view/raw/master/LICENSE.md",
+        "parents": "portal-native"
+    },
+    "react-native-track-player@1.2.7": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/react-native-kit/react-native-track-player",
+        "licenseUrl": "https://github.com/react-native-kit/react-native-track-player/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-unimodules@0.12.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo/raw/master/LICENSE.md",
+        "parents": "portal-native"
+    },
+    "react-native-video@5.1.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/react-native-video",
+        "licenseUrl": "https://github.com/react-native-community/react-native-video/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-view-shot@3.1.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/gre/react-native-view-shot",
+        "licenseUrl": "https://github.com/gre/react-native-view-shot/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-web@0.13.18": {
+        "licenses": "MIT",
+        "repository": "https://github.com/necolas/react-native-web",
+        "licenseUrl": "https://github.com/necolas/react-native-web",
+        "parents": "portal-native"
+    },
+    "react-native-webview@11.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/react-native-community/react-native-webview",
+        "licenseUrl": "https://github.com/react-native-community/react-native-webview/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-youtube-iframe@1.4.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/LonelyCpp/react-native-youtube-iframe",
+        "licenseUrl": "https://github.com/LonelyCpp/react-native-youtube-iframe/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native@0.63.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/facebook/react-native",
+        "licenseUrl": "https://github.com/facebook/react-native/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-syntax-highlighter@6.1.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/conorhastings/react-syntax-highlighter",
+        "licenseUrl": "https://github.com/conorhastings/react-syntax-highlighter/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react@16.13.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/facebook/react",
+        "licenseUrl": "https://github.com/facebook/react/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "sanitize-html@2.3.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/apostrophecms/sanitize-html",
+        "licenseUrl": "https://github.com/apostrophecms/sanitize-html/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "swr@0.4.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/vercel/swr",
+        "licenseUrl": "https://github.com/vercel/swr/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "url-parse@1.5.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/unshiftio/url-parse",
+        "licenseUrl": "https://github.com/unshiftio/url-parse/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "url@0.11.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/defunctzombie/node-url",
+        "licenseUrl": "https://github.com/defunctzombie/node-url/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "use-count-up@2.3.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/vydimitrov/use-count-up",
+        "licenseUrl": "https://github.com/vydimitrov/use-count-up",
+        "parents": "portal-native"
+    }
+}
