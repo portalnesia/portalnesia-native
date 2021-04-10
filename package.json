@@ -48,7 +48,6 @@
     "expo-image-picker": "~9.2.0",
     "expo-linking": "~2.0.1",
     "expo-local-authentication": "~9.5.0",
-    "expo-localization": "^10.0.0",
     "expo-location": "~10.0.0",
     "expo-media-library": "~10.0.0",
     "expo-notifications": "~0.8.2",
@@ -91,6 +90,7 @@
     "react-native-render-html": "^5.1.0",
     "react-native-safe-area-context": "3.1.9",
     "react-native-screens": "~2.15.0",
+    "react-native-share-menu": "^5.0.3",
     "react-native-skeleton-placeholder": "^3.0.4",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-sticky-parallax-header": "^0.4.0",
@@ -128,5 +128,5 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

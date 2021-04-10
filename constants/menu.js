@@ -1,16 +1,4 @@
-import i18n from 'i18n-js'
-import {default as en_locale} from '@pn/locale/en.json'
-import {default as id_locale} from '@pn/locale/id.json'
-
-i18n.defaultLocale = "en-US"
-i18n.locale = 'en-US';
-i18n.translations = {
-	en:en_locale,
-	id:id_locale
-};
-i18n.fallbacks = true;
-
-export const menu=[
+export const menu=(i18n)=>([
     {
         title:"Menu",
         menu:[
@@ -121,7 +109,11 @@ export const menu=[
                 title:i18n.t("donate"),
                 link:"https://paypal.me/adityatranasuta",
                 //icon:['donate','font_awesome'],
+            },
+            {
+                title:"Open Source Libraries",
+                to:"OpenSource",
             }
         ]
     },
-]
+])

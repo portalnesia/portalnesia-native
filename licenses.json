@@ -101,6 +101,12 @@
         "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@types/i18n-js@3.8.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+        "licenseUrl": "https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@ui-kitten/components@5.0.0": {
         "licenses": "MIT",
         "repository": "https://github.com/akveo/react-native-ui-kitten",
@@ -470,6 +476,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/kmagiera/react-native-screens",
         "licenseUrl": "https://github.com/kmagiera/react-native-screens/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-share-menu@5.0.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/meedan/react-native-share-menu",
+        "licenseUrl": "https://github.com/meedan/react-native-share-menu/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-skeleton-placeholder@3.0.4": {

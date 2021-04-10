@@ -24,13 +24,14 @@ import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
+import Localization from '@pn/module/Localization'
 
 i18n.defaultLocale = "en-US"
-i18n.locale = 'en-US';
 i18n.translations = {
 	en:en_locale,
 	id:id_locale
 };
+i18n.locale = Localization.getLocales()[0].languageTag;
 i18n.fallbacks = true;
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
@@ -38,12 +39,22 @@ export default function App(props) {
 	const [isLoadingComplete, setLoadingComplete] = useState(false);
 
 	React.useEffect(()=>{
+		function onLocalization(){
+			i18n.locale = Localization.getLocales()[0].languageTag;
+		}
+
 		RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
 		.then((ada)=>{
 			if(!ada) {
 				RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
 			}
 		})
+
+		Localization.addEventListener('localizationChange',onLocalization)
+
+		return ()=>{
+			Localization.removeEventListener('localizationChange',onLocalization)
+		}
 	},[])
 
 	if (!isLoadingComplete && !props.skipLoadingScreen) {

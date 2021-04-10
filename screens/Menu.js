@@ -9,12 +9,12 @@ import Backdrop from '@pn/components/global/Backdrop';
 import Layout from '@pn/components/global/Layout'
 import Avatar from '@pn/components/global/Avatar'
 import {AuthContext} from '@pn/provider/AuthProvider'
-import {menu} from '../constants/menu'
+import {menu as getMenu} from '../constants/menu'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
 import RNFS from 'react-native-fs'
-
+import i18n from 'i18n-js'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
@@ -31,6 +31,7 @@ export default function({navigation}){
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub + 20
     const [loading,setLoading] = React.useState(false)
+    const menu = getMenu(i18n)
 
     const debug = async()=>{
         console.log(await RNFS.stat(`${RNFS.CachesDirectoryPath}`));
@@ -41,7 +42,9 @@ export default function({navigation}){
         PNget('/check_update')
         .then((res)=>{
             if(!res.error) {
-                if(res?.data?.version != Constants.nativeAppVersion || res?.data?.versionCode != Constants.nativeBuildVersion) {
+                const currVers = parseInt(Constants.nativeAppVersion.replace(/\-debug/g,"").replace(/\./g,""));
+                const servVers = parseInt(res?.data?.version.replace(/\./g,""));
+                if(currVers < servVers) {
                     const url = res?.data?.url || false;
                     let btn=[
                         {

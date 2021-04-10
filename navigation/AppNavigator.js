@@ -42,6 +42,9 @@ import Search from '../screens/SearchLike/Search'
 import SearchFilter from '../screens/SearchLike/SearchFilter'
 import Twibbon from '../screens/Twibbon/Twibbon'
 import TwibbonDetail from '../screens/Twibbon/TwibbonDetail'
+import OpenSource from '../screens/OpenSource/OpenSource'
+import OpenSourceDetail from '../screens/OpenSource/OpenSourceDetail'
+
 
 import { AuthContext } from '../provider/AuthProvider';
 
@@ -191,7 +194,8 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="SearchFilter" component={SearchFilter} />
 		<MainStack.Screen name="Twibbon" component={Twibbon} />
 		<MainStack.Screen name="TwibbonDetail" component={TwibbonDetail} />
-
+		<MainStack.Screen name="OpenSource" component={OpenSource} />
+		<MainStack.Screen name="OpenSourceDetail" component={OpenSourceDetail} />
 	</MainStack.Navigator>
 )
 
