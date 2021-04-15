@@ -156,9 +156,16 @@ export const number_size=(bytes,precision=2)=>{
     //const parsed=Number(Math.round(bytes + "e" + decimalPlaces) + "e-" + precision)
     return parsed+' '+units[pow];
 }
+
+const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   
-export const generateRandom=()=>{
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+export const generateRandom=(number=10)=>{
+    let result='';
+    const charLength = CHARS.length;
+    for (let i = 0; i < number; i++) {
+        result += CHARS.charAt(Math.floor(Math.random() * charLength))
+    }
+    return result;
 }
 
 export const time_ago=(seconds)=>{

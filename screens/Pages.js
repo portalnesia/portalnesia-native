@@ -3,6 +3,7 @@ import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,Divider,useTheme,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
+import i18n from 'i18n-js'
 
 import Layout from '@pn/components/global/Layout';
 //import Image from '@pn/components/global/Image';
@@ -93,15 +94,15 @@ export default function({navigation,route}){
                         title:`${data?.pages?.title} - Portalnesia`
                     }}
                     menu={[{
-                         action:"share",
-                         title:"Share",
-                     },{
-                         title:"Copy link",
-                         action:'copy'
-                     },{
-                         title:"Open in browser",
-                         action:'browser'
-                     }]}
+                        action:"share",
+                        title:i18n.t('share'),
+                    },{
+                        title:i18n.t('copy_link'),
+                        action:'copy'
+                    },{
+                        title:i18n.t('open_in_browser'),
+                        action:'browser'
+                    }]}
                 />
             )}
         </>

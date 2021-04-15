@@ -1,24 +1,27 @@
 import React from 'react'
 import axios from 'axios'
-import {API as APII,API_URL,API_URL_2} from '@env'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import {API as APII,CLIENT_ID} from '@env'
+import { AuthContext } from '@pn/provider/Context';
 import {Constants} from 'react-native-unimodules'
 import * as Application from 'expo-application'
 import i18n from 'i18n-js'
+import {GraphQLClient} from 'graphql-request'
 
 export const API = axios.create({
     baseURL:APII,
     timeout:10000,
     headers: {
         'X-Application-Version': Constants.nativeAppVersion,
-        'X-Device-Id': Application.androidId
+        'X-Device-Id': Application.androidId,
+        'X-Session-Id':Application.androidId
     }
 })
-let tokens=null;
 
-export const fetcher=(url) => fetch(url, {...(tokens!==null ? {headers:{Authorization:`Bearer ${tokens}`},'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId,credentials: 'include'} : {headers:{'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId}})}).then(res=>res.json());
+//let tokens=null;
 
-export const setToken=token=>{
+//export const fetcher=(url) => fetch(url, {...(tokens!==null ? {headers:{Authorization:`Bearer ${tokens}`},'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId,credentials: 'include'} : {headers:{'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId}})}).then(res=>res.json());
+
+/*export const setToken=token=>{
     tokens=token
     API.interceptors.request.use(function(config){
         if(token===null) {
@@ -28,7 +31,7 @@ export const setToken=token=>{
         }
         return config
     })
-}
+}*/
 
 export default function useAPI(){
     const context = React.useContext(AuthContext)
@@ -37,7 +40,7 @@ export default function useAPI(){
     
     const PNpost=(url,data,formdata)=>{
         return new Promise((res,rej)=>{
-            const baseURL =  user === false || user === null ?  `/native${url}` :  url
+            const baseURL =  user === false || user === null ?  `/native${url}` :  `/native_secure${url}`
             const qs=require('qs');
             const dt=data===null ? "" : (formdata ? data : qs.stringify(data));
             let opt={}
@@ -46,6 +49,7 @@ export default function useAPI(){
                 opt={
                     headers:{
                         'X-Session-Id':session,
+                        ...(user === false || user === null ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                         ...otherHeader
                     },
                     ...other
@@ -54,7 +58,8 @@ export default function useAPI(){
             } else {
                 opt={
                     headers:{
-                        'X-Session-Id':(state?.session !== null ? state?.session : Application.androidId) 
+                        'X-Session-Id':(state?.session !== null ? state?.session : Application.androidId),
+                        ...(user === false || user === null ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                     },
                 }
             }
@@ -84,21 +89,23 @@ export default function useAPI(){
 
     const PNget=(url)=>{
         return new Promise((res,rej)=>{
-            const baseURL =  user === false || user === null ?  `/native${url}` :  url
+            console.log("TOKEN",token.accessToken)
+            const baseURL =  user === false || user === null ?  `/native${url}` :  `/native_secure${url}`
             const opt={
                 headers:{
-                    'X-Session-Id':(state?.session !== null ? state?.session : Application.androidId) 
+                    'X-Session-Id':(session !== null ? session : Application.androidId),
+                    ...(user === false || user === null ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                 },
             }
             API.get(baseURL,opt)
             .then((response)=>{
                 if(response?.data?.error == 1) {
-                    console.log(response?.status)
                     setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
                 }
                 res(response?.data);
             })
             .catch((err)=>{
+                console.log(`PNGET: ${url}`,err?.response?.data,opt)
                 if(err?.response?.data) {
                     setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
                 }
@@ -115,10 +122,11 @@ export default function useAPI(){
 
     const fetcher=(path) => {
         return new Promise((resolve,reject)=>{
-            const baseURL =  user !== false ? path : `/native${path}`
+            const baseURL =  user !== false ? `/native_secure${path}` : `/native${path}`
             const opt={
                 headers:{
-                    'X-Session-Id':state?.session
+                    'X-Session-Id':state?.session,
+                    ...(user === false || user === null ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                 },
             }
             API.get(baseURL,opt)
@@ -136,5 +144,36 @@ export default function useAPI(){
             });
         })
     }
-    return {PNpost,PNget,fetcher}
+
+    const PNgraph=(url,query)=>{
+        return new Promise((result,rej)=>{
+            const baseURL =  user !== false ? `${APII}/native_secure${url}` : `${APII}/native${url}`
+            const headers={
+                'X-Application-Version': Constants.nativeAppVersion,
+                'X-Device-Id': Application.androidId,
+                'X-Session-Id':state?.session,
+                ...(user === false || user === null ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
+            };
+            const graphQL=new GraphQLClient(baseURL,{
+                headers
+            })
+            graphQL.request(query).then((res)=>{
+                if(res?.error && res?.error==1) {
+                    console.log("GRAPH_RES1",res);
+                    rej({message:res?.msg||"Something went wrong"})
+                }
+                else if(res?.errors && res?.errors?.[0]?.message) {
+                    console.log("GRAPH_RES2",res);
+                    rej({message:res?.errors?.[0]?.message})
+                }
+                else {
+                    result(res);
+                }
+            }).catch((err)=>{
+                rej(err)
+            })
+        })
+    }
+
+    return {PNpost,PNget,fetcher,PNgraph}
 }

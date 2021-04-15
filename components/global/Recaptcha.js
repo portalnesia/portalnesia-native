@@ -28,7 +28,7 @@ const getInvisibleRecaptchaContent = (siteKey, action) => {
       </head></html>`
 }
 
-export default class Recaptcha extends React.Component{
+export default class Recaptcha extends React.PureComponent{
 
     constructor(props){
         super(props)
@@ -51,20 +51,21 @@ export default class Recaptcha extends React.Component{
     render() {
         return (
             <View style={{flex: 0.0001, width: 0, height: 0}}>
-            <WebView
-                ref={this.webViewRef}
-                javaScriptEnabled
-                originWhitelist={['*']}
-                automaticallyAdjustContentInsets
-                mixedContentMode={'always'}
-                injectedJavaScript={patchPostMessageJsCode}
-                source={{
-                    html: getInvisibleRecaptchaContent("6LdeqPYUAAAAAL-nPJZjgAE0gYD5DeyH7-i-_Hee", this.props.action),
-                    baseUrl: 'https://portalnesia.com'
-                }}
-                onMessage={(e) => {
-                    this.props.onReceiveToken(e.nativeEvent.data)
-                }}/>
+                <WebView
+                    ref={this.webViewRef}
+                    javaScriptEnabled
+                    originWhitelist={['*']}
+                    automaticallyAdjustContentInsets
+                    mixedContentMode={'always'}
+                    injectedJavaScript={patchPostMessageJsCode}
+                    source={{
+                        html: getInvisibleRecaptchaContent("6LdeqPYUAAAAAL-nPJZjgAE0gYD5DeyH7-i-_Hee", this.props.action),
+                        baseUrl: 'https://portalnesia.com'
+                    }}
+                    onMessage={(e) => {
+                        this.props.onReceiveToken(e.nativeEvent.data)
+                    }}
+                />
             </View>
         )
     }

@@ -44,54 +44,10 @@ import Twibbon from '../screens/Twibbon/Twibbon'
 import TwibbonDetail from '../screens/Twibbon/TwibbonDetail'
 import OpenSource from '../screens/OpenSource/OpenSource'
 import OpenSourceDetail from '../screens/OpenSource/OpenSourceDetail'
+import Comments from '../screens/Modal/Comments'
 
 
-import { AuthContext } from '../provider/AuthProvider';
-
-/*let SlideFromRight = (index, position, width) => {
-	const inputRange = [index - 1, index, index + 1];
-	const translateX = position.interpolate({
-	  inputRange,
-	  outputRange: [width, 0, 0]
-	})
-	const slideFromRight = { transform: [{ translateX }] }
-	return slideFromRight
-};
-
-const TransitionConfiguration = () => {
-  return {
-    transitionSpec: {
-      duration: 750,
-      easing: Easing.out(Easing.poly(4)),
-      timing: Animated.timing,
-      useNativeDriver: true,
-    },
-    screenInterpolator: (sceneProps) => {
-      const { layout, position, scene } = sceneProps;
-      const width = layout.initWidth;
-      const { index, route } = scene
-      const params = route.params || {}; // <- That's new
-      const transition = params.transition || 'default'; // <- That's new
-      return {
-        default: SlideFromRight(index, position, width),
-      }[transition];
-    },
-  }
-}*/
-
-/*const firebaseConfig = {
-	apiKey: '',
-	authDomain: '',
-	databaseURL: '',
-	projectId: '',
-	storageBucket: '',
-	messagingSenderId: '',
-	appId: '',
-};
-if (firebase.apps.length === 0) {
-	firebase.initializeApp(firebaseConfig);
-}
-*/
+import { AuthContext } from '../provider/Context';
 
 
 /* CREATE BOTTOM NAVIGATOR */
@@ -243,14 +199,18 @@ export default () => {
 					onStateChange={onStateChange}
 					linking={linking}
 				>
-					{!ready && <Loading /> }
 					<RootStack.Navigator mode="modal" initialRouteName="Main" screenOptions={{headerShown:false}}>
 						<RootStack.Screen name="Main" component={MainStackScreen} />
 						<RootStack.Screen name="ImageModal" component={ImageModal} options={{
 							headerShown: false,
 							gestureEnabled:true,
 							gestureDirection:'vertical',
-							//...TransitionPresets.ModalPresentationIOS,
+							...TransitionPresets.ModalSlideFromBottomIOS
+						}} />
+						<RootStack.Screen name="Comments" component={Comments} options={{
+							headerShown: false,
+							gestureEnabled:true,
+							gestureDirection:'vertical',
 							...TransitionPresets.ModalSlideFromBottomIOS
 						}} />
 					</RootStack.Navigator>

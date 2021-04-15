@@ -7,18 +7,21 @@ import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
-import axios from 'axios'
 import useRootNavigation from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Secure from 'expo-secure-store'
+import {PortalProvider} from'@gorhom/portal'
+
 import * as Notifications from 'expo-notifications'
-import {Constants} from 'react-native-unimodules'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
 import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
-import {API as APII} from '@env'
 import i18n from 'i18n-js'
+import {AuthContext} from './Context'
+import {API} from '@pn/utils/API'
+import {refreshToken} from '@pn/utils/Login'
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -37,7 +40,7 @@ const getNotifOption=(id)=>({
 	enableVibrate:true
 })
 
-const API = axios.create({
+/*const API = axios.create({
     baseURL:APII,
     timeout:10000,
     headers: {
@@ -45,8 +48,7 @@ const API = axios.create({
         'X-Device-Id': Applications.androidId,
 		'X-Session-Id':Applications.androidId
     }
-})
-const AuthContext = createContext();
+})*/
 
 const reducer=(prevState,action)=>{
 	switch(action?.type){
@@ -54,10 +56,11 @@ const reducer=(prevState,action)=>{
 			return {
 				...prevState,
 				user:action.payload.user,
-				token:action.payload.token
+				token:action.payload.token,
+				session:action.payload.session
 			}
 		case "LOGOUT":
-			return {...prevState,user:false,token:null}
+			return {...prevState,user:false,token:null,session:Applications.androidId}
 		case "SESSION":
 			return {...prevState,session:action.payload}
 		case "MANUAL":
@@ -85,18 +88,6 @@ const AuthProvider = (props) => {
 	const {linkTo} = useRootNavigation();
 	const lastNotif = Notifications.useLastNotificationResponse()
 
-	const utils=useMemo(
-		()=>({
-			login: async data=>{
-
-			},
-			logout: async()=>{
-
-			}
-		}),
-		[]
-	)
-
 	const selectedTheme = React.useMemo(()=>{
 		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
 		return 'light'
@@ -122,13 +113,22 @@ const AuthProvider = (props) => {
 	}
 
 	useEffect(()=>{
-		function registerNotificationToken(token){
-			API.post('/native/send_notification_token',`token=${token?.data}`)
+		function registerNotificationToken(token,user){
+			API.post('/native/send_notification_token',`token=${token?.data}`,{...(user !==null ? {headers:{'X-Session-Id':user?.session_id}} : {})})
 		}
 		async function asyncTask(){
 			try {
-				const res = await AsyncStorage.getItem("theme")
+				let [user,res] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme")])
+
+				const token = await refreshToken()
+				console.log(token);
+				if(user !== null) {
+					user = JSON.parse(user);
+				}
+				//Set Theme
 				if(res !== null) setTema(res);
+
+				//Init Notification
 				const {status:existingStatus} = await Notifications.getPermissionsAsync();
 				let finalStatus = existingStatus;
 				if(finalStatus !== 'granted') {
@@ -136,27 +136,29 @@ const AuthProvider = (props) => {
 					finalStatus = status;
 				}
 				if(finalStatus === 'granted') {
-					const notif_token = await Notifications.getDevicePushTokenAsync();
-					registerNotificationToken(notif_token);
+					try {
+						const notif_token = await Notifications.getDevicePushTokenAsync();
+						registerNotificationToken(notif_token,user);
+					} catch(err) {
+						console.log(err.message);
+					}
 				}
-				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
+				//Dispatch reducer
+				if(token !== null) {
+					dispatch({ type:"MANUAL",payload:{user:user,token:token,session:user?.session_id}})
+				} else {
+					dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
+				}
 			} catch(err){
+				console.log("ERR",err);
 				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
 			}
 		};
+
 		function showLocalBannerNotification(data){
 			if(data?.request?.content?.title && data?.request?.content?.body) {
 				setNotif("info",data?.request?.content?.title,data?.request?.content?.body,data?.request?.content?.data);
 			}
-		}
-		function showPushNotification(data){
-			if(data?.notification?.request?.content?.data?.url) {
-                const urls = data?.notification?.request?.content?.data?.url
-                if(urls?.match(/portalnesia\.com+/) !== null) {
-                    const url = urls.split("//portalnesia.com")
-                    linkTo(url[1]);
-                }
-            }
 		}
 
 		async function setNotificationChannel(){
@@ -218,7 +220,6 @@ const AuthProvider = (props) => {
 			value={{
 				state,
 				dispatch,
-				utils,
 				setNotif,
 				setTheme,
 				theme:selectedTheme,
@@ -227,7 +228,9 @@ const AuthProvider = (props) => {
 		>
 			<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />
 			<ApplicationProvider {...eva} theme={{...eva[selectedTheme],...theme[selectedTheme]}} customMapping={mapping}>
-				{props.children}
+				<PortalProvider>
+					{props.children}
+				</PortalProvider>
 				<DropdownAlert
 					successColor='#2f6f4e'
 					activeStatusBarStyle='light-content'

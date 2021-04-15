@@ -24,6 +24,10 @@ export const linking = {
                                 path:'search',
                                 exact:true
                             },
+                            Menu:{
+                                path:'login-callback',
+                                exact:true
+                            },
                         }
                     },
                     NewsDetail:{

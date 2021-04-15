@@ -19,7 +19,8 @@
         "@pn/assets/*": ["assets/*"],
         "@pn/provider/*":["provider/*"],
         "@pn/module/*":["module/*"],
-        "@pn/locale/*":["locale/*"]
+        "@pn/locale/*":["locale/*"],
+        "@pn/types/*":["types/*"]
       }
     },
     "exclude": ["node_modules","android","babel.config.js","metro.config.js","jest.config.js"],

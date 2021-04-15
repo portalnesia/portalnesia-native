@@ -3,7 +3,7 @@ import {  View,ScrollView,Dimensions,LogBox } from 'react-native';
 import {Layout as Lay,Text,Card,Input,List,ListItem,Divider,useTheme} from '@ui-kitten/components'
 import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
-
+import i18n from 'i18n-js'
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
@@ -65,7 +65,7 @@ export default function({navigation}){
 
     const uploadImage=()=>{
         setResult([])
-        if(file===null && url.trim().match(/^https?\:\/\//i) === null) setNotif(true,"Error","Please select image first");
+        if(file===null && url.trim().match(/^https?\:\/\//i) === null) setNotif(true,"Error",i18n.t('error_image'));
         else {
             setLoading(true)
             setProgress(0)
@@ -73,7 +73,7 @@ export default function({navigation}){
             const form=new FormData();
             if(file !== null) {
                 const {name,match} = extractMeta(file)
-                if(!match) return setNotif(true,"Error","Sorry, error while uploading your image");
+                if(!match) return setNotif(true,"Error",i18n.t('error_upload'));
                 form.append('file',{uri:file,name,type:`image/${match[1]}`});
             }
             form.append('url',url);
@@ -115,7 +115,7 @@ export default function({navigation}){
         ImagePicker.requestMediaLibraryPermissionsAsync()
         .then(({status})=>{
             return new Promise((res,rej)=>{
-                if(status !== 'granted') return rej({type:1,message:"Sorry, we need camera roll permissions"})
+                if(status !== 'granted') return rej({type:1,message:i18n.t('permission_storage')})
                 return res();
             })
         })
@@ -135,12 +135,12 @@ export default function({navigation}){
         })
         .then((result)=>{
             return new Promise((res,rej)=>{
-                if(!result.exists) return rej({type:1,message:"Cannot find image"})
+                if(!result.exists) return rej({type:1,message:i18n.t('error_no_image')})
                 return res(result)
             })
         })
         .then((result)=>{
-            if(result?.size > 5242880) return setNotif(true,"Error","Sorry, your file is too large. Maximum images size is 5 MB")
+            if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('error_size_image'))
             setFile(result?.uri)
             setDataFile(result?.uri)
         })
@@ -247,7 +247,7 @@ const RenderImage=React.memo(({dataFile,openImage})=>{
         return (
             <Card onPress={openImage} style={[style.container,{width:screenWidth-20,height:screenWidth-20,borderRadius:10,margin:10,flexDirection:'column',justifyContent:'center',alignItems:'center'}]}>
                 <View>
-                    <Text>Select image</Text>
+                    <Text>{i18n.t('select',{type:i18n.t('image')})}</Text>
                 </View>
             </Card>
         )

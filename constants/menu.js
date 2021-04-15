@@ -112,7 +112,7 @@ export const menu=(i18n)=>([
             },
             {
                 title:"Open Source Libraries",
-                to:"OpenSource",
+                to:"OpenSource"
             }
         ]
     },

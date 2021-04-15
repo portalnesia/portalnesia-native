@@ -4,6 +4,8 @@ import {Layout as Lay,Text,useTheme,Divider,Icon,Spinner} from '@ui-kitten/compo
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
 
+import Comment from '@pn/components/global/Comment'
+import CountUp from '@pn/components/global/Countup'
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
 import VideoPlayer from '@pn/components/global/VideoPlayer'
@@ -152,12 +154,25 @@ export default function({navigation,route}){
                 <Text category="h3">{`Thread by @${data?.screen_name}`}</Text>
                 <Lay key="lay-0" style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                     <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>openBrowser(`https://twitter.com/${data?.screen_name}/status/${data?.id}`) }>Original Thread</Text>
-                    <Text style={{fontSize:13}}>{`${data?.seen?.format} views`}</Text>
+                    <Text style={{fontSize:13}}><Text><CountUp data={data?.seen} /></Text> <Text>views</Text></Text>
                 </Lay>
             </Lay>
             <Divider style={{marginVertical:20,marginBottom:0,backgroundColor:theme['border-text-color']}} />
         </Lay>
     )
+
+    const RenderFooter=()=>{
+        if(data && data?.id){
+            return (
+                <>
+                    <Lay style={{paddingBottom:50,paddingTop:20}}>
+                        <Comment navigation={navigation} total={data?.comment_count} type="news" posId={data?.id} posUrl={`twitter/thread/${data?.id}`} />
+                    </Lay>
+                </>
+            )
+        }
+        return null;
+    }
 
     return (
         <>
@@ -185,6 +200,7 @@ export default function({navigation,route}){
                         <RenderTwitter index={index} item={item} setMenu={setMenu} />
                     )}
                     keyExtractor={(item, index) => 'twitter-thread-'+index}
+                    ListFooterComponent={RenderFooter}
                     {...other}
                 />
             ) : null }

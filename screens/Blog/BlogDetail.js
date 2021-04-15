@@ -5,12 +5,14 @@ import Skeleton from '@pn/components/global/Skeleton'
 import {useLinkTo} from '@react-navigation/native'
 import analytics from '@react-native-firebase/analytics'
 
+import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
 //import Image from '@pn/components/global/Image';
 import NotFound from '@pn/components/global/NotFound'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
 import {Parser} from '@pn/components/global/Parser'
+import CountUp from '@pn/components/global/Countup'
 import {ucwords,PNslug} from '@pn/utils/Main'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import {CONTENT_URL} from '@env'
@@ -70,7 +72,7 @@ export default function({navigation,route}){
                         <Text category="h2" style={{paddingVertical:10}}>{data?.blog?.title}</Text>
                         <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                             <Text  numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.blog?.date}`}</Text>
-                            <Text style={{fontSize:13}}>{`${data?.blog?.seen?.format} views`}</Text>
+                            <Text style={{fontSize:13}}><Text><CountUp data={data?.blog?.seen} /></Text> <Text>views</Text></Text>
                         </Lay>
                         <Text>
                             <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.blog?.users?.username}`)}>{data?.blog?.users?.name||"Portalnesia"}</Text>
@@ -79,7 +81,7 @@ export default function({navigation,route}){
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
                     <Lay style={{paddingBottom:20}}><Parser source={data?.blog?.text} selectable /></Lay>
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
-                    <Lay style={[style.container,{paddingBottom:50,paddingTop:20}]}>
+                    <Lay style={[style.container,{paddingBottom:20,paddingTop:20}]}>
                         <Text>Category: <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/category/${PNslug(data?.blog?.category)}`)} >{ucwords(data?.blog?.category)}</Text></Text>
                         <Text><Text>Tags: </Text>
                             {data?.blog?.tag?.map((dt,i)=>(
@@ -90,6 +92,14 @@ export default function({navigation,route}){
                             ))}
                         </Text>
                     </Lay>
+                    {data && data?.blog?.id ? (
+                        <>
+                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                            <Lay style={{paddingBottom:50}}>
+                                <Comment navigation={navigation} total={data?.blog?.comment_count} type="chord" posId={data?.blog?.id} posUrl={`chord/${data?.blog?.slug}`} />
+                            </Lay>
+                        </>
+                    ): null}
                 </Animated.ScrollView>
             ) : null}
         </Layout>

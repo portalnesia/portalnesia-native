@@ -29,6 +29,12 @@
         "licenseUrl": "https://github.com/expo/vector-icons/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@gorhom/portal@1.0.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/gorhom/react-native-portal",
+        "licenseUrl": "https://github.com/gorhom/react-native-portal/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@native-html/table-plugin@3.1.1": {
         "licenses": "MIT",
         "repository": "https://github.com/native-html/plugins",
@@ -135,6 +141,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/feross/buffer",
         "licenseUrl": "https://github.com/feross/buffer/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "compare-versions@3.6.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/omichelsen/compare-versions",
+        "licenseUrl": "https://github.com/omichelsen/compare-versions/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "expo-ads-admob@8.4.0": {
@@ -310,6 +322,12 @@
         "licenseUrl": "https://github.com/firebase/firebase-js-sdk",
         "parents": "portal-native"
     },
+    "graphql-request@3.4.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/prisma/graphql-request",
+        "licenseUrl": "https://github.com/prisma/graphql-request/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "hermes-engine@0.5.2-rc1": {
         "licenses": "MIT",
         "repository": "https://github.com/facebook/hermes",
@@ -422,12 +440,6 @@
         "licenses": "MIT",
         "repository": "https://github.com/software-mansion/react-native-gesture-handler",
         "licenseUrl": "https://github.com/software-mansion/react-native-gesture-handler/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
-    "react-native-lightbox-v2@0.8.7": {
-        "licenses": "MIT",
-        "repository": "https://github.com/cbbfcd/react-native-lightbox",
-        "licenseUrl": "https://github.com/cbbfcd/react-native-lightbox/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-modal@11.7.0": {

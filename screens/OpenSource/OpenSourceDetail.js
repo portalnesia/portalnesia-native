@@ -1,6 +1,6 @@
 import React from 'react'
 import {Dimensions,ScrollView} from 'react-native'
-import {Layout as Lay, Text} from '@ui-kitten/components'
+import {useTheme,Layout as Lay, Text} from '@ui-kitten/components'
 import axios from 'axios';
 import {openBrowserAsync} from 'expo-web-browser'
 
@@ -17,6 +17,7 @@ export default function OpenSourceDetailScreen({navigation,route}){
 
     const [data,setData] = React.useState();
     const [error,setError] = React.useState(false);
+    const theme = useTheme();
 
     React.useEffect(()=>{
         axios.get(route?.params?.url)
@@ -29,11 +30,6 @@ export default function OpenSourceDetailScreen({navigation,route}){
             setError(true)
             setData(null);
         });
-
-        return ()=>{
-            setData(undefined)
-            setError(false)
-        }
     },[])
 
     const onPress=()=>{
@@ -45,7 +41,7 @@ export default function OpenSourceDetailScreen({navigation,route}){
     }
 
     return (
-        <Layout navigation={navigation} withBack title={route?.params?.title}>
+        <Layout navigation={navigation} withBack title="Open Source Libraries" subtitle={route?.params?.title} {...(data !== null && data !== undefined && !error ? {whiteBg:true} : {})}>
             {data === undefined ? (
                 <Skeleton type="article" />
             ) : error || data === null ? (

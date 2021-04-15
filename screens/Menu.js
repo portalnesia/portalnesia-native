@@ -3,6 +3,8 @@ import {Animated,Image,View,LogBox,Alert} from 'react-native'
 import {useTheme,Layout as Lay, Text,Divider, MenuGroup,MenuItem,Menu, Icon,TopNavigationAction} from '@ui-kitten/components'
 import * as Linking from 'expo-linking'
 import {openBrowserAsync} from 'expo-web-browser'
+import {useLinkTo} from '@react-navigation/native'
+import compareVersion from 'compare-versions'
 
 import Button from '@pn/components/global/Button'
 import Backdrop from '@pn/components/global/Backdrop';
@@ -15,6 +17,7 @@ import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
+import useLogin from '@pn/utils/Login'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
@@ -24,7 +27,7 @@ const SettingIcon=(props)=><Icon {...props} name="settings-outline" />
 export default function({navigation}){
     const auth = React.useContext(AuthContext)
     const {setNotif} = auth;
-    const {user} = auth.state
+    const user = auth.state.user
     const {PNget} = useAPI(false)
     const theme = useTheme()
     const heightt = {...headerHeight,sub:100}
@@ -32,9 +35,22 @@ export default function({navigation}){
 	const heightHeader = heightt?.main + heightt?.sub + 20
     const [loading,setLoading] = React.useState(false)
     const menu = getMenu(i18n)
+    const linkTo = useLinkTo();
+    const {login} = useLogin();
 
-    const debug = async()=>{
-        console.log(await RNFS.stat(`${RNFS.CachesDirectoryPath}`));
+    const handleLogin = async()=>{
+        const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"2.0.0",">=");
+        if(isUpdated) {
+            if(user !== false) {
+                return linkTo(`/user/${user?.username}`)
+            } else {
+                setLoading(true)
+                await login();
+                setLoading(false);
+            }
+        } else {
+            setNotif(true,"Under Maintenance","This feature is under maintenance");
+        }
     }
 
     const checkUpdates=()=>{
@@ -42,9 +58,8 @@ export default function({navigation}){
         PNget('/check_update')
         .then((res)=>{
             if(!res.error) {
-                const currVers = parseInt(Constants.nativeAppVersion.replace(/\-debug/g,"").replace(/\./g,""));
-                const servVers = parseInt(res?.data?.version.replace(/\./g,""));
-                if(currVers < servVers) {
+                const isUpdated = compareVersion.compare(Constants.nativeAppVersion,res?.data?.version,"<");
+                if(isUpdated) {
                     const url = res?.data?.url || false;
                     let btn=[
                         {
@@ -92,13 +107,13 @@ export default function({navigation}){
             <Animated.View style={{position:'absolute',backgroundColor: theme['color-basic-100'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
 				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopNavigationAction icon={SettingIcon} onPress={()=>navigation.navigate("Setting")} />}>
                     <Lay level="1" style={{height:100,paddingVertical:10,paddingHorizontal:15,alignItems:'center',flexDirection:'row'}}>
-                        <Lay level="1" style={{marginRight:20}}><Avatar avatar size={60} /></Lay>
+                        <Lay level="1" style={{marginRight:20}}><Avatar size={60} {...(user !== false ? {src:`${user?.picture}&watermark=no`} : {avatar:true})} /></Lay>
                         <Lay level="1" style={{marginRight:20}}>
-                            <Text style={{fontWeight:'700'}}>portalnesia.com</Text>
-                            <Text style={{fontSize:12}}>{`© ${new Date().getFullYear()}`}</Text>
+                            <Text style={{fontWeight:'700'}}>{user!==false ? user?.name : "portalnesia.com"}</Text>
+                            <Text style={{fontSize:12}}>{user !==false ? `@${user?.username}` : `© ${new Date().getFullYear()}`}</Text>
                         </Lay>
                         <Lay level="1" style={{flex:1}}>
-                            <View style={{alignItems:'flex-end'}}><Button onPress={()=>setNotif(true,"Under Maintenance","Sorry, this feature is under maintenance")}>Login</Button></View>
+                            <View style={{alignItems:'flex-end'}}><Button onPress={handleLogin}>{user === false ? "Login" : "Profile"}</Button></View>
                         </Lay>
                     </Lay>
 				</Header>

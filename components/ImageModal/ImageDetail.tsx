@@ -60,6 +60,8 @@ const Styles = StyleSheet.create({
     shadowRadius: 1.5,
     shadowColor: 'black',
     shadowOpacity: 0.8,
+    marginTop:10,
+    marginLeft:10
   },
 });
 

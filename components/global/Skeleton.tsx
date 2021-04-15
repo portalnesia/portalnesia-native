@@ -4,7 +4,7 @@ import {useWindowDimensions,View} from 'react-native'
 import {useTheme} from '@ui-kitten/components'
 
 export type SkeletonProps={
-    type:'paragraph'|'rect'|'text'|'grid'|'article'
+    type:'paragraph'|'rect'|'text'|'grid'|'article'|'list'
     number:number,
     width?:number,
     textProps?: SkeletonPlaceholderItem
@@ -105,7 +105,7 @@ export const GridSkeleton=({number=6,image,gridStyle={},height}:{height:number,n
     )
 }
 
-export const ListSkeleton=({number=3,image=false,height}: {height:number,number?:number,image?:boolean})=>{
+export const ListSkeleton=({number=3,image=false,imageSize=60,height}: {height:number,number?:number,image?:boolean,imageSize?:number})=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
 
@@ -113,10 +113,10 @@ export const ListSkeleton=({number=3,image=false,height}: {height:number,number?
 
         return (
             <Skltn.Item key={index} flexDirection="row" justifyContent='flex-start' alignItems="center" marginBottom={15}>
-                <Skltn.Item height={60} width={60} borderRadius={30} marginRight={15} />
+                <Skltn.Item height={imageSize} width={imageSize} borderRadius={30} marginRight={15} />
                 <Skltn.Item>
-                    <Skltn.Item height={25} width={width-50-60} marginBottom={5} borderRadius={5}  />
-                    <Skltn.Item height={15} width={(width-50-60)/2} borderRadius={5} />
+                    <Skltn.Item height={25} width={width-50-imageSize} marginBottom={5} borderRadius={5}  />
+                    <Skltn.Item height={15} width={(width-50-imageSize)/2} borderRadius={5} />
                 </Skltn.Item>
             </Skltn.Item>
         )
@@ -187,7 +187,7 @@ export const ArticleSkeleton=({height}:{height:number})=>{
     )
 }
 
-export default function Skeleton({type,number=3,width,textProps,image,gridStyle,height}: SkeletonProps): React.ReactNode {
+export default function Skeleton({type,number=3,width,textProps,image,gridStyle,height}: SkeletonProps): JSX.Element|null {
     const {height:winHeight}=useWindowDimensions()
     height=height||winHeight
     if(type==='paragraph') return <PararaphSkeleton type={type} number={number} height={height} />
@@ -195,5 +195,6 @@ export default function Skeleton({type,number=3,width,textProps,image,gridStyle,
     else if(type==='text' && textProps) return <TextSkeleton {...textProps} rootHeight={height} />
     else if(type==='grid') return <GridSkeleton number={number} image={image} gridStyle={gridStyle} height={height} />
     else if(type==='article') return <ArticleSkeleton height={height} />
+    else if(type==='list') return <ListSkeleton height={height} number={number} image={image} />
     return null;
 }

@@ -151,7 +151,9 @@ export default function Contact({navigation,route}){
                                             onSubmitEditing={()=>emailRef?.current?.focus()}
                                             autoCapitalize="words"
                                             autoCompleteType="name"
+                                            textContentType="name"
                                             blurOnSubmit={false}
+                                            enablesReturnKeyAutomatically
                                         />
                                     </Lay>
                                     <Lay>
@@ -161,10 +163,12 @@ export default function Contact({navigation,route}){
                                             onChangeText={handleInputChange('email')}
                                             disabled={user!==null||loading}
                                             ref={emailRef}
-                                            placeholder="example@portalnesia.com"
                                             keyboardType="email-address"
-                                            returnKeyType="next"
                                             autoCompleteType="email"
+                                            enablesReturnKeyAutomatically
+                                            placeholder="example@portalnesia.com"
+                                            textContentType="emailAddress"
+                                            returnKeyType="next"
                                             onSubmitEditing={()=>subjectRef?.current?.focus()}
                                             blurOnSubmit={false}
                                         />
@@ -180,6 +184,7 @@ export default function Contact({navigation,route}){
                                             ref={subjectRef}
                                             onSubmitEditing={()=>msgRef?.current?.focus()}
                                             blurOnSubmit={false}
+                                            enablesReturnKeyAutomatically
                                         />
                                     </Lay>
                                     <Lay>
@@ -192,6 +197,7 @@ export default function Contact({navigation,route}){
                                             multiline
                                             textStyle={{minHeight:150,maxHeight:350}}
                                             textAlignVertical="top"
+                                            enablesReturnKeyAutomatically
                                         />
                                     </Lay>
                                 </KeyboardAvoidingView>

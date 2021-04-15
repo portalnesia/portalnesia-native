@@ -3,6 +3,7 @@ import {  View,FlatList,useWindowDimensions,RefreshControl } from 'react-native'
 import {Layout as Lay,Text,Card} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
+import i18n from 'i18n-js'
 
 import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
@@ -23,7 +24,7 @@ export default function ({ navigation }) {
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
+		mutate,isValidating,isLoadingInitialData,response
 	} = usePagination("/news","data",24,true,false)
 	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
@@ -36,7 +37,7 @@ export default function ({ navigation }) {
 	},[isValidating])
 
 	const Footer=()=>{
-		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
+		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" height={300} number={2} image /></View> 
 		else return null
 	}
@@ -98,6 +99,15 @@ export default function ({ navigation }) {
 		}
 	}
 
+	const renderEmpty=()=>{
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
+	}
+
+	React.useEffect(()=>{
+		console.log(data)
+	},[data])
+
 	return (
 		<Layout navigation={navigation} title="News" withBack={false}>
 			{isLoadingInitialData ? (
@@ -105,9 +115,10 @@ export default function ({ navigation }) {
 			) : (
 				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 					{error ? (
-						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
+						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
 					) : (
 						<FlatList
+							ListEmptyComponent={renderEmpty}
 							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 							data={data}
 							renderItem={renderNews}

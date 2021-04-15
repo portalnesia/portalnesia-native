@@ -1,7 +1,6 @@
 import React from 'react'
-import {Button as Btn} from '@ui-kitten/components'
-import {Spinner} from '@ui-kitten/components'
-import {View} from 'react-native'
+import {Spinner,Button as Btn,useTheme} from '@ui-kitten/components'
+import {View,Pressable} from 'react-native'
 
 const LoadingComponent=(props)=>(
     <View style={[props.style,{justifyContent:'center',alignItems:'center'}]}>
@@ -9,17 +8,58 @@ const LoadingComponent=(props)=>(
     </View>
 )
 
-const Button=({size,disabled,loading,status,appearance,outlined,children,...others})=>{
-    const stat = outlined ? "basic" : status;
-    const appear = outlined ? "outline" : appearance;
+const Button=({size,onPress,disabled,loading,status,appearance,outlined,children,text,accessoryLeft: accessLeft,accessoryRight: accessRight,...others})=>{
+    const stat = outlined ? "basic" : text ? "basic" : status;
+    const appear = outlined ? "outline" : text ? "ghost" : appearance;
+    const theme = useTheme();
+    
+    const accessoryLeft = (props)=>{
+        if(typeof children === 'undefined') {
+            if(loading) return <LoadingComponent {...props} />
+        }
+        return accessLeft ? accessLeft(props) : null;
+    }
+    const accessoryRight=(props)=>{
+        if(typeof children !== 'undefined') {
+            if(loading) return <LoadingComponent {...props} />
+        }
+        return accessRight ? accessRight(props) : null;
+    }
 
+    if(text || (appearance==='ghost' && status==='basic')) {
+        return (
+            <View style={{borderRadius:4,overflow:'hidden'}}>
+                <Pressable
+                    disabled={disabled}
+                    onPress={onPress}
+                    android_ripple={{color:theme['riple-color'],borderless:false}}
+                >
+                    <View pointerEvents="none">
+                        <Btn
+                            size={size}
+                            status={stat}
+                            appearance={appear}
+                            disabled={disabled}
+                            accessoryLeft={accessoryLeft}
+                            accessoryRight={accessoryRight}
+                            {...others}
+                        >
+                            {children}
+                        </Btn>
+                    </View>
+                </Pressable>
+            </View>
+        )
+    }
     return (
         <Btn
             size={size}
             status={stat}
             appearance={appear}
             disabled={disabled}
-            {...(loading ? {accessoryRight:LoadingComponent} : {})}
+            accessoryLeft={accessoryLeft}
+            accessoryRight={accessoryRight}
+            onPress={onPress}
             {...others}
         >
             {children}

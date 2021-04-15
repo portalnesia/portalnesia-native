@@ -55,7 +55,7 @@ const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
             if(dt?.action === "share") {
                 handleShare(share?.title,`${URL}${share?.link}&utm_source=android&utm_medium=share`,share?.dialog);
             } else if(dt?.action === "copy") {
-                copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`);
+                copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`,i18n.t('url'));
             } else if(dt?.action === 'browser') {
                 openBrowserAsync(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,{
                     enableDefaultShare:true,

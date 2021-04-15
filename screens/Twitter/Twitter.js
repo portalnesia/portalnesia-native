@@ -68,6 +68,11 @@ const Recent=({headerHeight,navigation,...other})=>{
 		else return null
 	}
 
+	const renderEmpty=()=>{
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
+	}
+
 	return (
 		<>
 			{isLoadingInitialData ? (
@@ -79,6 +84,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 			) : (
 				<Animated.FlatList
 					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+					ListEmptyComponent={renderEmpty}
 					contentContainerStyle={{paddingTop: headerHeight+8}}
 					numColumns={2}
 					data={data}
@@ -163,6 +169,11 @@ const Popular=({headerHeight,navigation,...other})=>{
 		else return null
 	}
 
+	const renderEmpty=()=>{
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
+	}
+
 	return (
 		<>
 			{isLoadingInitialData ? (
@@ -174,6 +185,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 			) : (
 				<Animated.FlatList
 					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+					ListEmptyComponent={renderEmpty}
 					contentContainerStyle={{paddingTop: headerHeight+8}}
 					numColumns={2}
 					data={data}

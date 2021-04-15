@@ -4,15 +4,15 @@ import {Layout as Lay, Text,Card,Spinner,useTheme} from '@ui-kitten/components'
 import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
 import {CONTENT_URL,API_URL} from '@env'
-//import * as firebase from 'firebase';
+import i18n from 'i18n-js'
 
+import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
 import Image from '@pn/components/global/Image'
 import style from '@pn/components/global/style'
 import Layout from '@pn/components/global/Layout';
 import {specialHTML} from '@pn/utils/Main'
 //import Text from '../components/utils/UbuntuFont';
-//mport { AuthContext } from '@pn/provider/AuthProvider';
 
 //const CONTENT_URL='https://content.portalnesia.com',API_URL='https://api.portalnesia.com'
 
@@ -89,24 +89,23 @@ const About=React.memo(({title,txt,right,last,screen,navigation})=>{
 	)
 })
 
-export default function HomeScreen({ navigation }) {
-	const [loading,setLoading] = React.useState(true)
-	const [data,setData]=React.useState()
-	const [error,setError] = React.useState(false)
-	const {PNget} = useAPI();
-	
-	React.useEffect(()=>{
-		PNget('/home')
-		.then(res=>{
-			setError(Boolean(res?.error))
-			if(!res?.error) {
-				setData(res);
-			}
-		})
-		.catch(()=>setError(true))
-		.finally(()=>setLoading(false));
-	},[])
-	
+const Dashboard=({loading,data,error,navigation})=>{
+
+	return (
+		<Layout navigation={navigation}>
+			<ScrollView
+				contentContainerStyle={{
+					flexGrow: 1,
+				}}
+			>
+                <Text>Login Dashboard</Text>
+            </ScrollView>
+        </Layout>
+	)
+}
+
+const NotLogin=({loading,data,error,navigation})=>{
+
 	return (
 		<Layout navigation={navigation}>
 			<ScrollView
@@ -125,77 +124,108 @@ export default function HomeScreen({ navigation }) {
 					<Text category="h1" style={{textAlign:'center'}}>The Future Platform</Text>
 					<Text category="p1">A multi-functional website to accompany you to surf the internet. Sign up to get more features.</Text>
 					<Lay style={{marginTop:20}}>
-						<About title="News" txt="A collection of news that is updated every day." screen="News" navigation={navigation} />
-						<About title="Chord" txt="A collection of guitar chords with transpose tools, auto scroll, font sizer, and print features that make it easy to learn guitar." right screen="Chord" navigation={navigation} />
-						<About title="URL Shortener" txt="Shorten your long URLs so that it's easy to share with others." navigation={navigation} />
-						<About title="Twitter Thread Reader" txt="Read threads from Twitter easily." right  screen="Twitter" navigation={navigation} />
-						<About title="Twibbon" txt="Create your own twibbon or edit your photo to twibbon that is already available and share it easily."  screen="Twibbon" navigation={navigation} />
-						<About title="Transform Coordinate" txt="Insert value pairs of geographic coordinates and transform them to different coordinate system or cartographic projection." right screen="GeodataTransform" navigation={navigation} />
+						<About title="News" txt={i18n.t('home_news')} screen="News" navigation={navigation} />
+						<About title="Chord" txt={i18n.t('home_chord')} right screen="Chord" navigation={navigation} />
+						<About title="URL Shortener" txt={i18n.t('home_url')} screen="UrlShortener" navigation={navigation} />
+						<About title="Twitter Thread Reader" txt={i18n.t('home_twitter')} right  screen="Twitter" navigation={navigation} />
+						<About title="Twibbon" txt={i18n.t('home_twibbon')}  screen="Twibbon" navigation={navigation} />
+						<About title="Transform Coordinate" txt={i18n.t('home_transform')} right screen="GeodataTransform" navigation={navigation} />
 						{/*<About title="Twitter Menfess" txt={`Send a message or just the words you want to convey to "someone" as anonymous without notifying the sender's identity.`} />
 						<About title="Quiz" txt="Create your own quiz and share with friends or answer a few quizzes." right />*/}
-						<About title="Parse HTML" txt="Parse your HTML code into XML code compatible with all the Blogger templates or other blogs systems." screen="ParseHtml" navigation={navigation} />
-						<About title="Blog" txt="Turn your thoughts into writing and share it easily." right screen="Blog" navigation={navigation} />
-						<About title="Images Checker" txt="Online tools to help you quickly identify unseemly images." screen="ImagesChecker" navigation={navigation} />
-						<About title="Others" txt="And some other services that are definitely useful." right screen="Menu" navigation={navigation} />
+						<About title="Parse HTML" txt={i18n.t('home_html')} screen="ParseHtml" navigation={navigation} />
+						<About title="Blog" txt={i18n.t('home_blog')} right screen="Blog" navigation={navigation} />
+						<About title="Images Checker" txt={i18n.t('home_images_checker')} screen="ImagesChecker" navigation={navigation} />
+						<About title="Others" txt={i18n.t('home_others')} right screen="Menu" navigation={navigation} />
 					</Lay>
 				</Lay>
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
-					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent News</Text>
+					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('news')})}</Text>
 					{loading ? (
 						<Spinner size='giant' />
 					) : error ? (
-						<Text>Something went wrong</Text>
+						<Text>{i18n.t('error')}</Text>
 					) : (
 						<Carousel
 							data={data?.news}
 							renderItem={(props)=><RenderNews {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} onPress={()=>navigation.navigate("News")}>See More</Button>
+					<Button style={{marginTop:10,marginBottom:40}} onPress={()=>navigation.navigate("News")}>{i18n.t('see_more')}</Button>
 				</Lay>
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
-					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent Chord</Text>
+					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
 					{loading ? (
 						<Spinner size='giant' />
 					) : error ? (
-						<Text>Something went wrong</Text>
+						<Text>{i18n.t('error')}</Text>
 					) : (
 						<Carousel
 							data={data?.chord}
 							renderItem={(props)=><RenderChord {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Chord")}>See More</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Chord")}>{i18n.t('see_more')}</Button>
 				</Lay>
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
-					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent Twibbon</Text>
+					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:"Twibbon"})}</Text>
 					{!data && !error ? (
 						<Spinner size='giant' />
 					) : error || data?.error == 1 ? (
-						<Text>Something went wrong</Text>
+						<Text>{i18n.t('error')}</Text>
 					) : (
 						<Carousel
 							data={data?.twibbon}
 							renderItem={(props)=><RenderTwibbon {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Main",{screen:"Twibbon"})}>See More</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Main",{screen:"Twibbon"})}>{i18n.t('see_more')}</Button>
 				</Lay>
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
-					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>Recent Twitter Thread</Text>
+					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
 					{loading || !data ? (
 						<Spinner size='giant' />
 					) : error ? (
-						<Text>Something went wrong</Text>
+						<Text>{i18n.t('error')}</Text>
 					) : (
 						<Carousel
 							data={data?.thread}
 							renderItem={(props)=><RenderThread {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Main",{screen:"Twitter"})}>See More</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Main",{screen:"Twitter"})}>{i18n.t('see_more')}</Button>
 				</Lay>
 			</ScrollView>
 		</Layout>
-	);
+	)
+}
+
+export default function HomeScreen({ navigation }) {
+	const context = React.useContext(AuthContext);
+	const {user} = context.state
+	const [loading,setLoading] = React.useState(true)
+	const [data,setData]=React.useState()
+	const [error,setError] = React.useState(false)
+	const {PNget} = useAPI();
+	
+	React.useEffect(()=>{
+		setTimeout(()=>{
+			PNget('/home')
+			.then(res=>{
+				setError(Boolean(res?.error))
+				if(!res?.error) {
+					setData(res);
+				}
+			})
+			.catch(()=>setError(true))
+			.finally(()=>setLoading(false));
+		},200)
+
+		return ()=>{
+			setLoading(true);
+			setError(false)
+		}
+	},[user])
+
+	if(user !== false) return <Dashboard loading={loading} data={data} error={error} navigation={navigation} />
+	else return <NotLogin loading={loading} data={data} error={error} navigation={navigation} />
 }

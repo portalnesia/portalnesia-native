@@ -14,7 +14,8 @@ module.exports = function(api) {
           "@pn/assets": "./assets",
           "@pn/provider":"./provider",
           "@pn/module":"./module",
-          "@pn/locale":"./locale"
+          "@pn/locale":"./locale",
+          "@pn/types":"./types"
         }
       }]
     ],

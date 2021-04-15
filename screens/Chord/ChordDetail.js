@@ -4,12 +4,12 @@ import {Layout as Lay,Text,useTheme,Divider,Card,ButtonGroup,Icon,Spinner} from 
 import {useLinkTo} from '@react-navigation/native'
 import Skeleton from '@pn/components/global/Skeleton'
 import Modal from 'react-native-modal'
-import YoutubePlayer from 'react-native-youtube-iframe'
-import WebView from 'react-native-autoheight-webview'
 import analytics from '@react-native-firebase/analytics'
 
+import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
+import CountUp from '@pn/components/global/Countup'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
@@ -169,7 +169,7 @@ export default function({navigation,route}){
                                 <Text style={{fontSize:13}}>Artist: </Text>
                                 <Text style={{fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>linkTo(`/chord/artist/${data?.chord?.slug_artist}`)} >{data?.chord?.artist}</Text>
                             </Text>
-                            <Text style={{fontSize:13}}>{`${data?.chord?.seen?.format} views`}</Text>
+                            <Text style={{fontSize:13}}><Text><CountUp data={data?.chord?.seen} /></Text> <Text>views</Text></Text>
                         </Lay>
                         <Lay key="lay-1" style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                             <Text numberOfLines={1} style={{flex:1,marginRight:20}}>
@@ -211,7 +211,7 @@ export default function({navigation,route}){
                         </Card>
                     </Modal>
 
-                    <Lay key={1} style={{paddingBottom:30}}>
+                    <Lay key={1} style={{paddingBottom:20}}>
                         <Divider style={{marginVertical:10,height:2,backgroundColor:theme['border-text-color']}} />
                         <ScrollView
                             horizontal
@@ -224,6 +224,14 @@ export default function({navigation,route}){
                             </Lay>
                         </ScrollView>
                     </Lay>
+                    {data && data?.chord?.id ? (
+                        <>
+                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                            <Lay style={{paddingBottom:50}}>
+                                <Comment navigation={navigation} total={data?.chord?.comment_count} type="chord" posId={data?.chord?.id} posUrl={`chord/${data?.chord?.slug}`} />
+                            </Lay>
+                        </>
+                    ): null}
                 </Animated.ScrollView>
             ) : null}
         </Layout>
@@ -238,7 +246,7 @@ export default function({navigation,route}){
                     share={{
                         link:`/chord/${data?.chord?.slug}?utm_campaign=chord`,
                         title:`Chord ${data?.chord?.artist} - ${data?.chord?.title}`,
-                        dialog:i18n.t('share_type',{type:"chord"})
+                        dialog:i18n.t('share_type',{type:i18n.t('chord')})
                     }}
                     menu={[{
                         action:"share",

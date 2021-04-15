@@ -6,12 +6,13 @@ import {
     //AdMobRewarded,
     isAvailableAsync
 } from 'expo-ads-admob';
+import {ADS_BANNER,ADS_BANNER_2,ADS_INTERSTISIAL} from '@env'
 //import {View,useWindowDimensions} from 'react-native'
 
 const testID = 'ca-app-pub-3940256099942544/6300978111';
 
 export const AdsBanner=React.memo((props)=>{
-    const productionID = 'ca-app-pub-5345145600516995/9016780060';
+    const productionID = ADS_BANNER;
     // Is a real device and running in production.
     //const adUnitID = productionID;
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
@@ -26,7 +27,7 @@ export const AdsBanner=React.memo((props)=>{
 })
 
 export const AdsBanners=React.memo((props)=>{
-    const productionID = 'ca-app-pub-5345145600516995/9535680462';
+    const productionID = ADS_BANNER_2;
     //const adUnitID = productionID
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : testID;
     return (
@@ -41,7 +42,7 @@ export const AdsBanners=React.memo((props)=>{
 export async function showInterstisial(){
     const intersTestID = ['ca-app-pub-3940256099942544/1033173712','ca-app-pub-3940256099942544/8691691433'];
     const random = Math.floor(Math.random() * 2);
-    const productionID = 'ca-app-pub-5345145600516995/1493513267';
+    const productionID = ADS_INTERSTISIAL;
     // Is a real device and running in production.
     //const adUnitID = productionID
     const adUnitID = Constants.isDevice && !__DEV__ ? productionID : intersTestID[random];

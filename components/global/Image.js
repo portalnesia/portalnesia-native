@@ -47,7 +47,7 @@ export const ImageFull=React.memo(({source,style,fullSize,alt,contentWidth,fancy
     //navigator={dataSrc?.uri ? dataSrc?.uri : forceFancybox && source?.uri ? source?.uri : undefined}
     if(fancybox) {
         return (
-            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source}>
+            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid>
                 <ImageComponent />
             </ImageModal>
         )
@@ -118,7 +118,7 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
     
     if(fancybox) {
         return (
-            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source}>
+            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid>
                 <ImageComponent />
             </ImageModal>
         )

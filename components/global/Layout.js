@@ -18,6 +18,7 @@ const Laylay = (props)=>{
 					menu={props.menu}
 					withClose={props.withClose}
 					margin={props?.margin}
+					whiteBg={props.whiteBg}
 				/>
 			) : null}
 

@@ -92,6 +92,11 @@ export default function ({ navigation }) {
 		}
 	}
 
+	const renderEmpty=()=>{
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		return <View style={{height:'100%'}}><Skeleton type="grid" number={4} image /></View>
+	}
+
 	return (
 		<Layout navigation={navigation} title="Blog">
 			{isLoadingInitialData ? (
@@ -102,6 +107,7 @@ export default function ({ navigation }) {
 						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
 					) : (
 						<FlatList
+							ListEmptyComponent={renderEmpty}
 							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 							numColumns={2}
 							data={data}

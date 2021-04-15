@@ -13,6 +13,7 @@
     "@expo-google-fonts/inter": "^0.1.0",
     "@expo-google-fonts/ubuntu": "^0.1.0",
     "@expo/vector-icons": "^12.0.0",
+    "@gorhom/portal": "^1.0.4",
     "@native-html/table-plugin": "^3.1.1",
     "@react-native-async-storage/async-storage": "^1.14.1",
     "@react-native-community/datetimepicker": "3.0.4",
@@ -31,6 +32,7 @@
     "array-move": "^3.0.1",
     "axios": "^0.21.1",
     "buffer": "^5.7.1",
+    "compare-versions": "^3.6.0",
     "expo": "^40.0.0",
     "expo-ads-admob": "~8.4.0",
     "expo-app-loading": "^1.0.1",
@@ -60,6 +62,7 @@
     "expo-video-player": "^1.6.1",
     "expo-web-browser": "~8.6.0",
     "firebase": "7.9.0",
+    "graphql-request": "^3.4.0",
     "hermes-engine": "^0.5.2-rc1",
     "i18n-js": "^3.8.0",
     "initials": "^3.1.1",
@@ -81,7 +84,6 @@
     "react-native-fast-image": "^8.3.4",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "~1.8.0",
-    "react-native-lightbox-v2": "^0.8.7",
     "react-native-modal": "^11.7.0",
     "react-native-modalize": "^2.0.8",
     "react-native-pager-view": "^5.1.2",
@@ -128,5 +130,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "1.0.1"
+  "version": "1.1.0",
+  "author": "Putu Aditya <aditya@portalnesia.com>",
+  "license": "MIT"
 }

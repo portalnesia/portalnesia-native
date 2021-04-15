@@ -118,6 +118,11 @@ export default function Twibbon({ navigation }) {
 		}
 	}
 
+	const renderEmpty=()=>{
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
+	}
+
 	return (
 		<Layout navigation={navigation} title="Twibbon" withBack>
 			{isLoadingInitialData ? (
@@ -129,6 +134,7 @@ export default function Twibbon({ navigation }) {
 					) : (
 						<FlatList
 							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+							ListEmptyComponent={renderEmpty}
 							data={data}
 							renderItem={renderNews}
 							ListFooterComponent={Footer}

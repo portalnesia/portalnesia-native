@@ -2,7 +2,9 @@ import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,useTheme,Divider,Spinner} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
+import i18n from 'i18n-js'
 
+import CountUp from '@pn/components/global/Countup'
 import Button from '@pn/components/global/Button';
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image';
@@ -14,6 +16,7 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {ucwords,openBrowser} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
+import Comment from '@pn/components/global/Comment'
 //import {CONTENT_URL} from '@env'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
@@ -69,17 +72,24 @@ export default function({navigation,route}){
                         <Text category="h2" style={{paddingVertical:10}}>{data?.title}</Text>
                         <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                             <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.date_string}`}</Text>
-                            <Text style={{fontSize:13}}>{`${data?.seen?.format} views`}</Text>
+                            <Text style={{fontSize:13}}><Text><CountUp data={data?.seen} /></Text> <Text>views</Text></Text>
                         </Lay>
                     </Lay>
                     <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
                     <Lay style={{paddingBottom:20}}><Parser source={data.text} selectable /></Lay>
                     <Lay>
                         <Lay style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
-                            <Button onPress={()=>openBrowser(data?.url)} appearance="ghost" status="basic">Artikel Asli</Button>
+                            <Button onPress={()=>openBrowser(data?.url)} text>Artikel Asli</Button>
                         </Lay>
                     </Lay>
-                    <Lay style={{paddingBottom:50}}></Lay>
+                    {data && data?.id ? (
+                        <>
+                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                            <Lay style={{paddingBottom:50}}>
+                                <Comment navigation={navigation} total={data?.comment_count} type="news" posId={data?.id} posUrl={`news/${source}/${title}`} />
+                            </Lay>
+                        </>
+                    ): null}
                 </Animated.ScrollView>
             ) : null}
         </Layout>
@@ -94,18 +104,18 @@ export default function({navigation,route}){
                 share={{
                     link:`/news/${source}/${title}?utm_campaign=news`,
                     title:`${data?.title} - Portalnesia`,
-                    dialog:"Share News"
+                    dialog:i18n.t('share_type',{type:i18n.t('news')})
                 }}
                 menu={[{
-                     action:"share",
-                     title:"Share",
-                 },{
-                     title:"Copy link",
-                     action:'copy'
-                 },{
-                     title:"Open in browser",
-                     action:'browser'
-                 }]}
+                    action:"share",
+                    title:i18n.t('share'),
+                },{
+                    title:i18n.t('copy_link'),
+                    action:'copy'
+                },{
+                    title:i18n.t('open_in_browser'),
+                    action:'browser'
+                }]}
             />
         )}
         </>
