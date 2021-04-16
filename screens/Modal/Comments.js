@@ -2,6 +2,7 @@ import React from 'react'
 import {View} from 'react-native'
 import {Text} from '@ui-kitten/components'
 import {PortalHost} from '@gorhom/portal'
+import i18n from 'i18n-js'
 
 import Layout from '@pn/components/global/Layout';
 import Button from '@pn/components/global/Button';
@@ -11,7 +12,7 @@ export default function CommentModal({navigation,route}){
     const {type,posId,posUrl,comment_id} = route.params;
     return (
         <>
-            <Layout navigation={navigation} withClose whiteBg title="Comments">
+            <Layout navigation={navigation} withClose whiteBg title={i18n.t('comments')}>
                 <Comments posId={posId} posUrl={posUrl} type={type} comment_id={comment_id} />
             </Layout>
             <PortalHost name="comment-option" />

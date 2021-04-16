@@ -3,6 +3,8 @@
     "server_error":"Internal server error",
     "net_online":"You are online!",
     "net_offline":"You are offline!",
+    "name":"Name",
+    "email":"Email",
     "clipboard":"%{type} copied",
     "permission_storage":"Sorry, we need storage permissions",
     "download_complete":"Download completed!",
@@ -18,6 +20,7 @@
     "reach_end":"You have reach the bottom of the page",
     "share_type":"Share %{type}",
     "copy_link":"Copy link",
+    "copy":"Copy",
     "open_in_browser":"Open in browser",
     "cancel":"Cancel",
     "open":"Open",
@@ -66,5 +69,12 @@
     "error_no_image":"Cannot find image",
     "error_size_image":"Sorry, your file is too large. Maximum images size is 5 MB",
     "image":"Image",
-    "select":"Select ${type}"
+    "select":"Select %{type}",
+    "load_more":"Load more",
+    "comments":"Comments",
+    "reply":"Reply",
+    "delete":"Delete",
+    "add_type":"Add %{type}",
+    "no_comment":"There are no comments yet.",
+    "no_reply":"There are no reply yet."
 }

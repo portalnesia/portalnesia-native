@@ -89,7 +89,6 @@ export default function useAPI(){
 
     const PNget=(url)=>{
         return new Promise((res,rej)=>{
-            console.log("TOKEN",token.accessToken)
             const baseURL =  user === false || user === null ?  `/native${url}` :  `/native_secure${url}`
             const opt={
                 headers:{
@@ -105,7 +104,7 @@ export default function useAPI(){
                 res(response?.data);
             })
             .catch((err)=>{
-                console.log(`PNGET: ${url}`,err?.response?.data,opt)
+                //console.log(`PNGET: ${url}`,err?.response?.data,opt)
                 if(err?.response?.data) {
                     setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
                 }
@@ -159,11 +158,11 @@ export default function useAPI(){
             })
             graphQL.request(query).then((res)=>{
                 if(res?.error && res?.error==1) {
-                    console.log("GRAPH_RES1",res);
+                    //console.log("GRAPH_RES1",res);
                     rej({message:res?.msg||"Something went wrong"})
                 }
                 else if(res?.errors && res?.errors?.[0]?.message) {
-                    console.log("GRAPH_RES2",res);
+                    //console.log("GRAPH_RES2",res);
                     rej({message:res?.errors?.[0]?.message})
                 }
                 else {

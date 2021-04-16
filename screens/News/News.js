@@ -104,10 +104,6 @@ export default function ({ navigation }) {
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
 	}
 
-	React.useEffect(()=>{
-		console.log(data)
-	},[data])
-
 	return (
 		<Layout navigation={navigation} title="News" withBack={false}>
 			{isLoadingInitialData ? (
@@ -132,7 +128,6 @@ export default function ({ navigation }) {
 									refreshing={refreshing}
 								/>
 							}
-							//onEndReachedThreshold={0.05}
 							ref={ref}
 							onEndReached={()=>{
 								if(!isReachingEnd && !isLoadingMore) {

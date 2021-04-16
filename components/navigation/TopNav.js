@@ -4,7 +4,8 @@ import React from 'react';
 //import Colors from '../../constants/colors';
 //import { Ionicons } from '@expo/vector-icons';
 import {useNavigationState} from '@react-navigation/native'
-import {Icon,Divider, TopNavigation,TopNavigationAction,Text,useTheme} from '@ui-kitten/components'
+import {Icon,Divider, TopNavigation,Text,useTheme} from '@ui-kitten/components'
+import TopNavigationAction from './TopAction'
 
 const BackIcon=(props)=>(
 	<Icon {...props} name='arrow-back' />

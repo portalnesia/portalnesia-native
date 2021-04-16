@@ -22,6 +22,17 @@ import i18n from 'i18n-js'
 import {AuthContext} from './Context'
 import {API} from '@pn/utils/API'
 import {refreshToken} from '@pn/utils/Login'
+import Localization from '@pn/module/Localization'
+import {default as en_locale} from '@pn/locale/en.json'
+import {default as id_locale} from '@pn/locale/id.json'
+
+i18n.defaultLocale = "en-US"
+i18n.translations = {
+	en:en_locale,
+	id:id_locale
+};
+i18n.locale = Localization.getLocales()[0].languageTag;
+i18n.fallbacks = true;
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -40,15 +51,7 @@ const getNotifOption=(id)=>({
 	enableVibrate:true
 })
 
-/*const API = axios.create({
-    baseURL:APII,
-    timeout:10000,
-    headers: {
-        'X-Application-Version': Constants.nativeAppVersion,
-        'X-Device-Id': Applications.androidId,
-		'X-Session-Id':Applications.androidId
-    }
-})*/
+
 
 const reducer=(prevState,action)=>{
 	switch(action?.type){
@@ -179,9 +182,14 @@ const AuthProvider = (props) => {
 				currentInternet.current=false;
 			}
 		})
+
+		function onLocalizationChange(){
+			i18n.locale = Localization.getLocales()[0].languageTag;
+		}
 		
 		asyncTask();
 		setNotificationChannel();
+		Localization.addEventListener('localizationChange',onLocalizationChange)
 
 		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
 		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
@@ -190,6 +198,7 @@ const AuthProvider = (props) => {
 			tokenChangeListener.remove();
 			foregroundListener.remove();
 			netInfoListener();
+			Localization.removeEventListener('localizationChange',onLocalizationChange)
 		}
 	},[])
 

@@ -1,9 +1,10 @@
 import React from 'react';
-import {Icon,Divider, TopNavigation,TopNavigationAction,Text} from '@ui-kitten/components'
+import {Icon,Divider, TopNavigation,Text} from '@ui-kitten/components'
 import {Animated,StatusBar} from 'react-native'
 import {useNavigationState} from '@react-navigation/native'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import LottieView from 'lottie-react-native'
+import TopNavigationAction from './TopAction'
 
 const STATUS_BAR_HEIGHT = StatusBar.currentHeight
 
@@ -16,6 +17,8 @@ export const headerHeight = {
 const BackIcon=(props)=>(
 	<Icon {...props} name='arrow-back' />
 )
+
+export const TopAction = TopNavigationAction;
 
 const RefreshingHeight = 100;
 export const Lottie=({style={},...other})=>{

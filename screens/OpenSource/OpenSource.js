@@ -1,11 +1,12 @@
 import React from 'react'
 import {FlatList} from 'react-native'
-import {useTheme,Layout as Lay, Text,Divider,ListItem, Icon} from '@ui-kitten/components'
+import {useTheme,Layout as Lay, Text,Divider,Icon} from '@ui-kitten/components'
 import {openBrowserAsync} from 'expo-web-browser'
 import {Constants} from 'react-native-unimodules'
 
 import Layout from '@pn/components/global/Layout'
 import {default as licenseArr} from '../../licenses.json';
+import ListItem from '@pn/components/global/ListItem'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
@@ -72,6 +73,7 @@ export default function OpenSourceScreen({navigation}){
                     renderItem={(props)=> <RenderItem {...props} navigation={navigation} />}
                     ItemSeparatorComponent={Divider}
                     keyExtractor={(item)=>item.title}
+                    contentContainerStyle={{paddingBottom:65}}
                 />
             </Lay>
         </Layout>

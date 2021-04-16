@@ -1,6 +1,6 @@
 import React from 'react'
 import {Animated,Image,View,LogBox,Alert} from 'react-native'
-import {useTheme,Layout as Lay, Text,Divider, MenuGroup,MenuItem,Menu, Icon,TopNavigationAction} from '@ui-kitten/components'
+import {useTheme,Layout as Lay, Text,Divider, MenuGroup,MenuItem,Menu, Icon} from '@ui-kitten/components'
 import * as Linking from 'expo-linking'
 import {openBrowserAsync} from 'expo-web-browser'
 import {useLinkTo} from '@react-navigation/native'
@@ -12,7 +12,7 @@ import Layout from '@pn/components/global/Layout'
 import Avatar from '@pn/components/global/Avatar'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import {menu as getMenu} from '../constants/menu'
-import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
+import Header,{useHeader,headerHeight,TopAction} from '@pn/components/navigation/Header'
 import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
 import RNFS from 'react-native-fs'
@@ -105,7 +105,7 @@ export default function({navigation}){
         <>
         <Layout navigation={navigation} >
             <Animated.View style={{position:'absolute',backgroundColor: theme['color-basic-100'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopNavigationAction icon={SettingIcon} onPress={()=>navigation.navigate("Setting")} />}>
+				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopAction icon={SettingIcon} onPress={()=>navigation.navigate("Setting")} />}>
                     <Lay level="1" style={{height:100,paddingVertical:10,paddingHorizontal:15,alignItems:'center',flexDirection:'row'}}>
                         <Lay level="1" style={{marginRight:20}}><Avatar size={60} {...(user !== false ? {src:`${user?.picture}&watermark=no`} : {avatar:true})} /></Lay>
                         <Lay level="1" style={{marginRight:20}}>

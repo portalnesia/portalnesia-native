@@ -1,6 +1,6 @@
 import React from 'react'
-import {Dimensions,View,Pressable,ImageProps, TextProps, Animated,LayoutAnimation,UIManager,Alert} from 'react-native'
-import {useTheme,Layout as Lay, Text,Input,Divider,Icon,ListItem,Menu,MenuItem} from '@ui-kitten/components'
+import {Dimensions,View,ImageProps, TextProps, Animated,LayoutAnimation,UIManager,Alert} from 'react-native'
+import {useTheme,Layout as Lay, Text,Input,Divider,Icon,Menu,MenuItem} from '@ui-kitten/components'
 import {openBrowserAsync} from 'expo-web-browser'
 import {useLinkTo} from '@react-navigation/native'
 import {gql} from 'graphql-request'
@@ -9,6 +9,8 @@ import {AxiosRequestConfig} from 'axios'
 import {Modalize} from 'react-native-modalize'
 import {Portal} from '@gorhom/portal'
 
+import ListItem from './ListItem'
+import Pressable from '@pn/components/global/Pressable';
 import Backdrop from '@pn/components/global/Backdrop';
 import useClipboard,{copyTextType} from '@pn/utils/clipboard'
 import {URL} from '@env'
@@ -453,9 +455,11 @@ export function Comments(props: CommentsProps){
             )
         } else if(!reachEnd) {
             return (
-                <View style={{alignItems:'center',justifyContent:'center',marginBottom:10}}>
-                    <Button text disabled={loading !== null} onPress={()=>getComment(data[data.length-1].id)}>Load more</Button>
-                </View>
+                <Pressable style={{padding:5}} disabled={loading !== null} onPress={()=>getComment(data[data.length-1].id)}>
+                    <View style={{alignItems:'center',justifyContent:'center'}}>
+                        <Text style={{fontSize:12,color:theme['text-hint-color']}}>{i18n.t('load_more')}</Text>
+                    </View>
+                </Pressable>
             )
         }
         return null;
@@ -470,9 +474,11 @@ export function Comments(props: CommentsProps){
             )
         } else if(item?.reply!==null && item?.reply?.length < item?.total_reply) {
             return (
-                <View style={{alignItems:'center',justifyContent:'center',marginBottom:10}}>
-                    <Button text disabled={loading !== null} onPress={()=>getReplies(item?.id,(item?.reply !== null ? item?.reply[item?.reply.length-1].id : 0))}>Load more</Button>
-                </View>
+                <Pressable style={{padding:5}} disabled={loading !== null} onPress={()=>getReplies(item?.id,(item?.reply !== null ? item?.reply[item?.reply.length-1].id : 0))}>
+                    <View style={{alignItems:'center',justifyContent:'center'}}>
+                        <Text style={{fontSize:12,color:theme['text-hint-color']}}>{i18n.t('load_more')}</Text>
+                    </View>
+                </Pressable>
             )
         }
         return null;
@@ -480,8 +486,7 @@ export function Comments(props: CommentsProps){
 
     const renderEmptyChild=()=>(
         <View style={{alignItems:'center',paddingVertical:10}}>
-            <Text style={{fontSize:13}} appearance="hint">There are no comments yet.</Text>
-            <Text style={{fontSize:13}} appearance="hint">Comment now.</Text>
+            <Text style={{fontSize:13}} appearance="hint">{i18n.t('no_reply')}</Text>
         </View>
     )
 
@@ -489,8 +494,7 @@ export function Comments(props: CommentsProps){
         if(loading===null) {
             return (
                 <View style={{alignItems:'center',paddingVertical:10}}>
-                    <Text style={{fontSize:13}} appearance="hint">There are no comments yet.</Text>
-                    <Text style={{fontSize:13}} appearance="hint">Comment now.</Text>
+                    <Text style={{fontSize:13}} appearance="hint">{i18n.t('no_comment')}</Text>
                 </View>
             )
         }
@@ -520,7 +524,7 @@ export function Comments(props: CommentsProps){
                 ListEmptyComponent={renderEmpty}
                 ItemSeparatorComponent={Divider}
                 contentContainerStyle={{paddingBottom:55}}
-                ListFooterComponentStyle={{paddingBottom:55,paddingTop:10}}
+                ListFooterComponentStyle={{paddingBottom:55}}
             />
             <Modalize 
                 ref={modalRef}
@@ -571,9 +575,9 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
 
     return (
         <Lay style={{borderTopLeftRadius:15,borderTopRightRadius:15}}>
-                <Pressable onPress={()=>modalRef?.current?.open("top")}>
+                <Pressable default onPress={()=>modalRef?.current?.open("top")}>
                     <View style={{paddingHorizontal:15,paddingVertical:15,paddingBottom:25,justifyContent:'center',borderTopLeftRadius:15,borderTopRightRadius:15}}>
-                        <Text>Add Comments</Text>
+                        <Text>{i18n.t('add_type',{type:i18n.t('comments')})}</Text>
                     </View>
                 </Pressable>
                 {/*(
@@ -597,7 +601,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
                                     value={unLogin?.name||''}
                                     onChangeText={(val)=>setUnlogin(prev=>({...prev,name:val}))}
                                     returnKeyType="next"
-                                    label="Name"
+                                    label={i18n.t('name')}
                                     disabled={loading!==null}
                                     autoCompleteType="name"
                                     placeholder="John Doe"
@@ -613,7 +617,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
                                     value={unLogin?.email||''}
                                     onChangeText={(val)=>setUnlogin(prev=>({...prev,email:val}))}
                                     returnKeyType="next"
-                                    label="Email"
+                                    label={i18n.t('email')}
                                     disabled={loading!==null}
                                     keyboardType="email-address"
                                     autoCompleteType="email"
@@ -635,7 +639,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
                                 <Input
                                     ref={textRef}
                                     value={value}
-                                    label="Comments"
+                                    label={i18n.t('comments')}
                                     onChangeText={(val)=>setValue(val)}
                                     disabled={loading!==null}
                                     textStyle={{minHeight:100,maxHeight:100}}
@@ -668,7 +672,7 @@ type CommentState = {
 }
 class Comment extends React.PureComponent<CommentType,CommentState>{
     swipeRef = React.createRef<Swipeable>();
-    menu: Array<'reply'|'delete'|'copy'> = ['reply','copy'];
+    menu: Record<string,string>[] = [{type:"reply",title:i18n.t('reply')},{type:'copy',title:i18n.t('copy')}]
     modalRef = React.createRef<Modalize>();
 
     constructor(props: CommentType){
@@ -735,12 +739,12 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
         onReply(rep)
     }
 
-    handleMenu(name: 'reply'|'delete'|'copy'|'report'){
+    handleMenu(name: string){
         const {parentId,data:dt,type,onReply,copyText} = this.props
 
         this.modalRef.current?.close();
         if(name==='copy' && dt?.komentar!==null){
-            copyText(dt.komentar,"Text");
+            copyText(dt.komentar,i18n.t('text'));
         }
         else if(name==='delete' && dt?.delete_token !==null) {
             this.dialogDelete();
@@ -783,7 +787,7 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
     render() {
         const {data:dt,isLoading,type,parentId,onReply,anyReply,onDelete,linkTo,setNotif,theme,PNpost,children,totalReply} = this.props
         const menu = [...this.menu];
-        if(dt?.delete_token !== null) menu.splice(2,0,'delete');
+        if(dt?.delete_token !== null) menu.splice(2,0,{type:'delete',title:i18n.t('delete')});
         return (
             <>
                 <Swipeable
@@ -815,7 +819,7 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
                             )}
                             accessoryRight={()=>(
                                 <View style={{borderRadius:22,overflow:'hidden'}}>
-                                    <Pressable android_ripple={{color:theme['riple-color'],borderless:false}} style={{padding:10}} onPress={()=>this.modalRef.current?.open()}>
+                                    <Pressable style={{padding:10}} onPress={()=>this.modalRef.current?.open()}>
                                         <OptionIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
                                     </Pressable>
                                 </View>
@@ -846,7 +850,7 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
                                 <Menu appearance="noDivider">
                                     {menu.map((it,i)=>{
                                        return (
-                                            <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={ucwords(it)} onPress={()=>this.handleMenu(it)} />
+                                            <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={ucwords(it.title)} onPress={()=>this.handleMenu(it.type)} />
                                         )
                                     })}
                                 </Menu>
@@ -858,10 +862,6 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
             </>
         )
     }
-}
-//expand===`comment-${index}
-interface CommentButtonClassProps extends CommentButtonProps {
-    theme: Record<string,string>
 }
 
 export type CommentButtonProps = {
@@ -880,8 +880,8 @@ export type CommentButtonProps = {
 
 }
 
-class CommentButtonClass extends React.PureComponent<CommentButtonClassProps> {
-    constructor(props: CommentButtonClassProps){
+export default class CommentButton extends React.PureComponent<CommentButtonProps> {
+    constructor(props: CommentButtonProps){
         super(props)
 
         this.open=this.open.bind(this);
@@ -893,20 +893,15 @@ class CommentButtonClass extends React.PureComponent<CommentButtonClassProps> {
     }
 
     render(){
-        const {total,theme} = this.props;
+        const {total} = this.props;
 
         return (
-            <Pressable android_ripple={{color:theme['riple-color'],borderless:false}} onPress={this.open} style={{paddingVertical:10,paddingHorizontal:15}}>
+            <Pressable onPress={this.open} style={{paddingVertical:10,paddingHorizontal:15}}>
                 <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text category="h6">Comments</Text>
+                    <Text category="h6">{i18n.t('comments')}</Text>
                     <Text>{total}</Text>
                 </View>
             </Pressable>
         )
     }
-}
-
-export default function CommentButton(props: CommentButtonProps){
-    const theme = useTheme();
-    return <CommentButtonClass {...props} theme={theme} />
 }

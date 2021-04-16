@@ -1,10 +1,11 @@
 import React from 'react'
 import {useWindowDimensions,View,Share} from 'react-native'
-import {Icon,TopNavigationAction,Layout,Text,useTheme,Menu,MenuItem} from '@ui-kitten/components'
+import {Icon,Layout,Text,useTheme,Menu,MenuItem} from '@ui-kitten/components'
 import {Modalize} from 'react-native-modalize'
 import {openBrowserAsync} from 'expo-web-browser'
 import analytics from '@react-native-firebase/analytics'
 
+import TopNavigationAction from '../navigation/TopAction'
 import {URL} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import useClipboard from '@pn/utils/clipboard'

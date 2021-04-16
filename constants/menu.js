@@ -112,7 +112,9 @@ export const menu=(i18n)=>([
             },
             {
                 title:"Open Source Libraries",
-                to:"OpenSource"
+                to:"OpenSource",
+                //to:"NewsDetail",
+                //params:{source:'liputan6',title:'Patung+Nyi+Roro+Kidul+Muncul+Secara+Misterius+di+Pantai+Nusa+Dua'}
             }
         ]
     },

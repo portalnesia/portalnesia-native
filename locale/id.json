@@ -4,6 +4,8 @@
     "net_online":"Anda telah terhubung ke internet!",
     "net_offline":"Anda tidak terhubung ke internet!",
     "clipboard":"%{type} disalin",
+    "name":"Nama",
+    "email":"Surel",
     "permission_storage":"Maaf, kami membutuhkan izin penyimpanan",
     "download_complete":"Unduhan berhasil!",
     "download_failed":"Unduhan gagal!",
@@ -18,6 +20,7 @@
     "reach_end":"Anda telah mencapai batas akhir halaman",
     "share_type":"Bagikan %{type}",
     "copy_link":"Salin tautan",
+    "copy":"Salin",
     "open_in_browser":"Buka di browser",
     "cancel":"Batal",
     "open":"Buka",
@@ -66,5 +69,12 @@
     "error_no_image":"Tidak dapat menemukan gambar",
     "error_size_image":"Maaf, ukuran file terlalu besar. Ukuran maksimal gambar adalah 5MB",
     "image":"gambar",
-    "select":"Pilih ${type}"
+    "select":"Pilih %{type}",
+    "load_more":"Muat lebih banyak",
+    "comments":"Komentar",
+    "reply":"Balas",
+    "delete":"Hapus",
+    "add_type":"Tambah %{type}",
+    "no_comment":"Belum ada komentar.",
+    "no_reply":"Belum ada balasan."
 }
