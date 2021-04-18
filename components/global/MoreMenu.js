@@ -13,7 +13,7 @@ import i18n from 'i18n-js'
 
 const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
-export const MenuToggle=({onPress})=><TopNavigationAction icon={MoreIcon} onPress={onPress} />
+export const MenuToggle=({onPress})=><TopNavigationAction tooltip={i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />
 
 const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
     const context = React.useContext(AuthContext)

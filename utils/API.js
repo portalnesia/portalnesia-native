@@ -67,20 +67,20 @@ export default function useAPI(){
             .then((response)=>{
                 if(response?.data?.error == 1) {
                     //console.log(response?.status)
-                    setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('error'));
+                    setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'));
                 }
                 res(response?.data);
             })
             .catch((err)=>{
                 //console.log(err?.response)
                 if(err?.response?.data) {
-                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('error'));
+                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('errors.general'));
                 }
                 else if(err?.response?.status===503) {
-                    setNotif("error","Error",i18n.t('server_error'));
+                    setNotif("error","Error",i18n.t('errors.server'));
                     //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
                 } else {
-                    setNotif("error","Error",i18n.t('error'))
+                    setNotif("error","Error",i18n.t('errors.general'))
                 }
                 rej();
             })
@@ -109,10 +109,10 @@ export default function useAPI(){
                     setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
                 }
                 else if(err?.response?.status===503) {
-                    setNotif("error","Error",i18n.t('server_error'));
+                    setNotif("error","Error",i18n.t('errors.server'));
                     //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
                 } else {
-                    setNotif("error","Error",i18n.t('error'))
+                    setNotif("error","Error",i18n.t('errors.general'))
                 }
                 rej();
             })
@@ -132,7 +132,7 @@ export default function useAPI(){
             .then(res=>{
                 return new Promise((resol,reje)=>{
                     const data = res.data;
-                    if(data?.error) resol({message:data?.msg||i18n.t('error'),...data});
+                    if(data?.error) resol({message:data?.msg||i18n.t('errors.general'),...data});
                     else resol(data);
                 })
             })

@@ -6,6 +6,7 @@ import React from 'react';
 import {useNavigationState} from '@react-navigation/native'
 import {Icon,Divider, TopNavigation,Text,useTheme} from '@ui-kitten/components'
 import TopNavigationAction from './TopAction'
+import i18n from 'i18n-js'
 
 const BackIcon=(props)=>(
 	<Icon {...props} name='arrow-back' />
@@ -20,7 +21,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 	const RenderBackBtn=({navigation})=>{
 		if(withClose) {
 			return(
-				<TopNavigationAction icon={CloseIcon} onPress={() => {{
+				<TopNavigationAction tooltip={i18n.t('close')} icon={CloseIcon} onPress={() => {{
 					if(index > 0) {
 						navigation.goBack();
 					} else {
@@ -33,7 +34,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 			)
 		} else if(withBack) {
 			return(
-				<TopNavigationAction icon={BackIcon} onPress={() => {{
+				<TopNavigationAction tooltip={i18n.t('back')} icon={BackIcon} onPress={() => {{
 					if(index > 0) {
 						navigation.goBack();
 					} else {

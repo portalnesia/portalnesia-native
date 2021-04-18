@@ -1,6 +1,7 @@
 import React from 'react'
 import {Spinner,Button as Btn,useTheme} from '@ui-kitten/components'
 import {View,Pressable} from 'react-native'
+import withTooltip from '../HOC/withTooltip'
 
 const LoadingComponent=(props)=>(
     <View style={[props.style,{justifyContent:'center',alignItems:'center'}]}>
@@ -8,7 +9,7 @@ const LoadingComponent=(props)=>(
     </View>
 )
 
-const Button=({size,onPress,disabled,loading,status,appearance,outlined,children,text,accessoryLeft: accessLeft,accessoryRight: accessRight,...others})=>{
+const Button=React.forwardRef(({size,onPress,disabled,loading,status,appearance,outlined,children,text,accessoryLeft: accessLeft,accessoryRight: accessRight,...others},ref)=>{
     const stat = outlined ? "basic" : text ? "basic" : status;
     const appear = outlined ? "outline" : text ? "ghost" : appearance;
     const theme = useTheme();
@@ -42,6 +43,7 @@ const Button=({size,onPress,disabled,loading,status,appearance,outlined,children
                             disabled={disabled}
                             accessoryLeft={accessoryLeft}
                             accessoryRight={accessoryRight}
+                            ref={ref}
                             {...others}
                         >
                             {children}
@@ -60,12 +62,15 @@ const Button=({size,onPress,disabled,loading,status,appearance,outlined,children
             accessoryLeft={accessoryLeft}
             accessoryRight={accessoryRight}
             onPress={onPress}
+            ref={ref}
             {...others}
+            
         >
             {children}
         </Btn>
     )
-}
+})
+
 Button.defaultProps={
     size:'small',
     disabled:false,
@@ -74,4 +79,4 @@ Button.defaultProps={
     appearance:'filled',
     outlined:false
 }
-export default Button
+export default withTooltip(Button)

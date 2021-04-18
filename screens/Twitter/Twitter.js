@@ -69,7 +69,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 	}
 
 	const renderEmpty=()=>{
-		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
 	}
 
@@ -170,7 +170,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 	}
 
 	const renderEmpty=()=>{
-		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
 	}
 

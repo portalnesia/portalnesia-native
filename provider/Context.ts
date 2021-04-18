@@ -16,9 +16,11 @@ export type ContextType = {
     state: StateType,
     dispatch: Dispatch<DispatchArgument>,
     setNotif:(type: boolean | 'error' | 'success' | 'info',title: string,msg?: string,data?: {[key: string]: any})=>void,
-    setTheme:(value: 'light' | 'auto' | 'dark')=>void,
+    setTheme:(value: 'light' | 'auto' | 'dark')=>Promise<void>,
     theme: 'light' | 'dark' | string,
-    userTheme: 'light' | 'auto' | 'dark' | string
+    userTheme: 'light' | 'auto' | 'dark' | string,
+    setLang:(value: 'light' | 'auto' | 'dark')=>Promise<void>,
+    lang: string
 }
 
 const defaultValue = {
@@ -29,9 +31,11 @@ const defaultValue = {
     },
     dispatch:()=>{},
     setNotif:()=>{},
-    setTheme:()=>{},
+    setTheme:async()=>{},
     theme:'light',
-    userTheme:'auto'
+    userTheme:'auto',
+    setLang:async()=>{},
+    lang:'auto'
 }
 
 export const AuthContext = createContext<ContextType>(defaultValue);

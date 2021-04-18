@@ -124,18 +124,18 @@ const NotLogin=({loading,data,error,navigation})=>{
 					<Text category="h1" style={{textAlign:'center'}}>The Future Platform</Text>
 					<Text category="p1">A multi-functional website to accompany you to surf the internet. Sign up to get more features.</Text>
 					<Lay style={{marginTop:20}}>
-						<About title="News" txt={i18n.t('home_news')} screen="News" navigation={navigation} />
-						<About title="Chord" txt={i18n.t('home_chord')} right screen="Chord" navigation={navigation} />
-						<About title="URL Shortener" txt={i18n.t('home_url')} screen="UrlShortener" navigation={navigation} />
-						<About title="Twitter Thread Reader" txt={i18n.t('home_twitter')} right  screen="Twitter" navigation={navigation} />
-						<About title="Twibbon" txt={i18n.t('home_twibbon')}  screen="Twibbon" navigation={navigation} />
-						<About title="Transform Coordinate" txt={i18n.t('home_transform')} right screen="GeodataTransform" navigation={navigation} />
+						<About title="News" txt={i18n.t('home_not_login.news')} screen="News" navigation={navigation} />
+						<About title="Chord" txt={i18n.t('home_not_login.chord')} right screen="Chord" navigation={navigation} />
+						<About title="URL Shortener" txt={i18n.t('home_not_login.url')} screen="UrlShortener" navigation={navigation} />
+						<About title="Twitter Thread Reader" txt={i18n.t('home_not_login.twitter')} right  screen="Twitter" navigation={navigation} />
+						<About title="Twibbon" txt={i18n.t('home_not_login.twibbon')}  screen="Twibbon" navigation={navigation} />
+						<About title="Transform Coordinate" txt={i18n.t('home_not_login.transform')} right screen="GeodataTransform" navigation={navigation} />
 						{/*<About title="Twitter Menfess" txt={`Send a message or just the words you want to convey to "someone" as anonymous without notifying the sender's identity.`} />
 						<About title="Quiz" txt="Create your own quiz and share with friends or answer a few quizzes." right />*/}
-						<About title="Parse HTML" txt={i18n.t('home_html')} screen="ParseHtml" navigation={navigation} />
-						<About title="Blog" txt={i18n.t('home_blog')} right screen="Blog" navigation={navigation} />
-						<About title="Images Checker" txt={i18n.t('home_images_checker')} screen="ImagesChecker" navigation={navigation} />
-						<About title="Others" txt={i18n.t('home_others')} right screen="Menu" navigation={navigation} />
+						<About title="Parse HTML" txt={i18n.t('home_not_login.html')} screen="ParseHtml" navigation={navigation} />
+						<About title="Blog" txt={i18n.t('home_not_login.blog')} right screen="Blog" navigation={navigation} />
+						<About title="Images Checker" txt={i18n.t('home_not_login.images_checker')} screen="ImagesChecker" navigation={navigation} />
+						<About title="Others" txt={i18n.t('home_not_login.others')} right screen="Menu" navigation={navigation} />
 					</Lay>
 				</Lay>
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
@@ -143,7 +143,7 @@ const NotLogin=({loading,data,error,navigation})=>{
 					{loading ? (
 						<Spinner size='giant' />
 					) : error ? (
-						<Text>{i18n.t('error')}</Text>
+						<Text>{i18n.t('errors.general')}</Text>
 					) : (
 						<Carousel
 							data={data?.news}
@@ -157,7 +157,7 @@ const NotLogin=({loading,data,error,navigation})=>{
 					{loading ? (
 						<Spinner size='giant' />
 					) : error ? (
-						<Text>{i18n.t('error')}</Text>
+						<Text>{i18n.t('errors.general')}</Text>
 					) : (
 						<Carousel
 							data={data?.chord}
@@ -171,7 +171,7 @@ const NotLogin=({loading,data,error,navigation})=>{
 					{!data && !error ? (
 						<Spinner size='giant' />
 					) : error || data?.error == 1 ? (
-						<Text>{i18n.t('error')}</Text>
+						<Text>{i18n.t('errors.general')}</Text>
 					) : (
 						<Carousel
 							data={data?.twibbon}
@@ -185,7 +185,7 @@ const NotLogin=({loading,data,error,navigation})=>{
 					{loading || !data ? (
 						<Spinner size='giant' />
 					) : error ? (
-						<Text>{i18n.t('error')}</Text>
+						<Text>{i18n.t('errors.general')}</Text>
 					) : (
 						<Carousel
 							data={data?.thread}

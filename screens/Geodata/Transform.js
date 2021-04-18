@@ -22,7 +22,7 @@ const HeaderModal=React.memo(({search,setSearch,setPage})=>{
     return (
         <Lay style={{padding:5,paddingTop:15,borderTopLeftRadius:15,borderTopRightRadius:15}}>
             <Input
-                placeholder={i18n.t('search_epsg')}
+                placeholder={i18n.t('transform.search_epsg')}
                 value={search}
                 onChangeText={(text)=>{
                     setSearch(text)
@@ -84,7 +84,7 @@ export default function({navigation}){
     )
 
     const onSubmit=()=>{
-        if(input?.match(/\S+/g) === null) return  setNotif("error",i18n.t('form_validation',{type:"Input"}))
+        if(input?.match(/\S+/g) === null) return  setNotif("error",i18n.t('errors.form_validation',{type:"Input"}))
         const post={
             ...switchVal,
             ...sistem,
@@ -116,12 +116,12 @@ export default function({navigation}){
                 >
                     <Lay key={0} style={{paddingTop:10,paddingBottom:40}}>
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text style={{marginBottom:15}}>{i18n.t('transform_desc_1')}</Text>
-                            <Text>{i18n.t('transform_desc_2')}</Text>
+                            <Text style={{marginBottom:15}}>{i18n.t('transform.transform_desc_1')}</Text>
+                            <Text>{i18n.t('transform.transform_desc_2')}</Text>
                         </Lay>
                         <AdsBanner />
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('transform_input_label')}</Text>
+                            <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('transform.transform_input_label')}</Text>
                             <View style={{flexDirection:'row',alignItems:'center'}}>
                                 <Text style={{marginRight:10}}>{`${sistem.insrc}`}</Text>
                                 <Button appearance="ghost" status="basic" onPress={()=>{
@@ -133,7 +133,7 @@ export default function({navigation}){
                             </View>
                             <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}><Toggle checked={switchVal.switch} disabled={loading} onChange={(val)=>setSwitch({...switchVal,switch:val})}>{`Switch X <--> Y`}</Toggle></View>
                             <Input
-                                label={`${i18n.t('transform_input_label_2')}*`}
+                                label={`${i18n.t('transform.transform_input_label_2')}*`}
                                 value={input}
                                 onChangeText={(text)=>setInput(text)}
                                 multiline
@@ -144,7 +144,7 @@ export default function({navigation}){
                             />
                         </Lay>
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('transform_output_label')}</Text>
+                            <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('transform.transform_output_label')}</Text>
                             <View style={{flexDirection:'row',alignItems:'center'}}>
                                 <Text style={{marginRight:10}}>{`${sistem.outsrc}`}</Text>
                                 <Button appearance="ghost" status="basic" onPress={()=>{
@@ -156,7 +156,7 @@ export default function({navigation}){
                             </View>
                             <View style={{flexDirection:'row',alignItems:'center',marginBottom:10}}><Toggle disabled={loading} checked={switchVal.add_input} onChange={(val)=>setSwitch({...switchVal,add_input:val})}>{`Include input coordinates`}</Toggle></View>
                             <Input
-                                label={i18n.t('transform_output_label_2')}
+                                label={i18n.t('transform.transform_output_label_2')}
                                 value={output}
                                 multiline
                                 editable={false}
@@ -170,7 +170,7 @@ export default function({navigation}){
                             />
                         </Lay>
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Text><Text style={{fontFamily:'Inter_Bold'}}>{i18n.t('beware_1')}</Text> <Text>{i18n.t('beware_2')}</Text></Text>
+                            <Text><Text style={{fontFamily:'Inter_Bold'}}>{i18n.t('transform.beware_1')}</Text> <Text>{i18n.t('transform.beware_2')}</Text></Text>
                         </Lay>
                         <AdsBanners />
                         <Lay style={[style.container,{paddingVertical:10}]}>

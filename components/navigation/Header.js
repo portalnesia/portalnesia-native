@@ -5,6 +5,7 @@ import {useNavigationState} from '@react-navigation/native'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import LottieView from 'lottie-react-native'
 import TopNavigationAction from './TopAction'
+import i18n from'i18n-js'
 
 const STATUS_BAR_HEIGHT = StatusBar.currentHeight
 
@@ -128,7 +129,7 @@ const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,m
 	const RenderBackBtn=({navigation})=>{
 		if(withBack) {
 			return(
-				<TopNavigationAction icon={BackIcon} onPress={() => {
+				<TopNavigationAction tooltip={i18n.t('back')} icon={BackIcon} onPress={() => {
 					if(index > 0) {
 						navigation.goBack();
 					} else {

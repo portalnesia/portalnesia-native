@@ -1,6 +1,6 @@
 import React from 'react'
 import {  View,ScrollView,Dimensions } from 'react-native';
-import {Layout as Lay,Text,Divider,useTheme, Icon, TopNavigationAction} from '@ui-kitten/components'
+import {Layout as Lay,Text,Divider,useTheme, Icon} from '@ui-kitten/components'
 import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
 import FastImage from 'react-native-fast-image'
@@ -8,6 +8,7 @@ import Skltn from 'react-native-skeleton-placeholder'
 import RNFS from 'react-native-fs'
 import {Modalize} from 'react-native-modalize'
 
+import TopNavigationAction from '@pn/components/navigation/TopAction'
 import NotFound from '@pn/components/global/NotFound'
 import useSWR from '@pn/utils/swr'
 import Layout from '@pn/components/global/Layout';
@@ -18,6 +19,8 @@ import {CONTENT_URL} from '@env'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
+import i18n from 'i18n-js'
+import { ucwords } from '@pn/utils/Main';
 
 const {width:winWidth,height:winHeight} = Dimensions.get("window");
 const SupportIcon = (props)=> <Icon {...props} name="question-mark-circle-outline" />
@@ -118,7 +121,7 @@ export default function TwibbonDetail({navigation,route}){
 
     const Menu = ()=>(
         <>
-            <TopNavigationAction icon={SupportIcon} onPress={()=>modalRef.current?.open()} />
+            <TopNavigationAction tooltip={i18n.t('usage_guide',{type:"Twibbon"})} icon={SupportIcon} onPress={()=>modalRef.current?.open()} />
             <MenuToggle onPress={()=>setOpen(true)} />
         </>
     )
@@ -160,11 +163,11 @@ export default function TwibbonDetail({navigation,route}){
                             </View>
                             <View style={{margin:15}}>
                                 <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                    <Button disabled={loading} appearance='ghost' status='basic' onPress={openImage}>Select image</Button>
+                                    <Button disabled={loading} appearance='ghost' status='basic' onPress={openImage}>{i18n.t('select',{type:i18n.t('image')})}</Button>
                                     {file !== null && (
                                         <>
-                                            <Button disabled={loading} status='danger' onPress={rotateImage} accessoryLeft={RotateIcon} />
-                                            <Button disabled={loading} loading={loading} onPress={saveImage}>Save</Button>
+                                            <Button tooltip="Rotate" disabled={loading} status='danger' onPress={rotateImage} accessoryLeft={RotateIcon} />
+                                            <Button disabled={loading} loading={loading} onPress={saveImage}>{ucwords(i18n.t('save'))}</Button>
                                         </>
                                     ) }
                                 </View>
@@ -189,29 +192,29 @@ export default function TwibbonDetail({navigation,route}){
                     {Header}
                     <View style={{marginVertical:5}}>
                         <View style={{marginTop:10,paddingHorizontal:15}}>
-                            <Text category="h6">Twibbon Usage Guide</Text>
+                            <Text category="h6">{i18n.t('usage_guide',{type:"Twibbon"})}</Text>
                         </View>
                         <Divider style={{backgroundColor:theme['border-text-color'],marginVertical:5}} />
                         <View style={{marginTop:10,paddingHorizontal:15}}>
                             <View key={0} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
                                 <Text style={{marginRight:5}}>1.</Text>
-                                <Text>Click the <Text style={{fontFamily:'Inter_SemiBold',textDecorationLine:"underline"}} status="info" onPress={()=>(openImage(),modalRef?.current?.close())}>Select Image</Text> button.</Text>
+                                <Text>{i18n.t('twibbon.usage.first')} <Text style={{fontFamily:'Inter_SemiBold',textDecorationLine:"underline"}} status="info" onPress={()=>(openImage(),modalRef?.current?.close())}>{i18n.t('button_type',{type:i18n.t('select',{type:i18n.t('image')})})}</Text>.</Text>
                             </View>
                             <View key={1} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
                                 <Text style={{marginRight:5}}>2.</Text>
-                                <Text>Choose the photo.</Text>
+                                <Text>{i18n.t('twibbon.usage.second')}</Text>
                             </View>
                             <View key={2} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
                                 <Text style={{marginRight:5}}>3.</Text>
-                                <Text>Edit your photo by drag and pinch gesture.</Text>
+                                <Text>{i18n.t('twibbon.usage.third')}</Text>
                             </View>
                             <View key={4} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
                                 <Text style={{marginRight:5}}>4.</Text>
-                                <Text>When you have finished editing, click the <Text style={{fontFamily:'Inter_SemiBold'}}>save</Text> button.</Text>
+                                <Text>{i18n.t('twibbon.usage.fourth')} <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('button_type',{type:i18n.t('save')})}</Text>.</Text>
                             </View>
                             <View key={5} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
                                 <Text style={{marginRight:5}}>5.</Text>
-                                <Text>Done.</Text>
+                                <Text>{i18n.t('twibbon.usage.fifth')}</Text>
                             </View>
                         </View>
                     </View>

@@ -15,15 +15,17 @@ import useLogin from '@pn/utils/Login'
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
 const menuSettingArr=[
-    {name:"Appearance"},
-    {name:"Clear cache"}
+    {key:"appearance"},
+    {key:"lang"},
+    {key:"cache"}
 ]
 const themeArr=['light','dark','auto'];
-
+const langArr=['auto','id','en'];
+const langTitle=['System language','Bahasa Indonesia','English'];
 
 export default function Setting({navigation}){
     const context = React.useContext(AuthContext)
-    const {setTheme,userTheme,setNotif,state} = context;
+    const {setTheme,userTheme,setNotif,state,lang,setLang} = context;
     const {user} = state;
     const [open,setOpen]=React.useState(null)
     const [loading,setLoading] = React.useState(false)
@@ -36,18 +38,26 @@ export default function Setting({navigation}){
         return themeArr.indexOf(userTheme)
     },[userTheme])
 
+    const indexLang = React.useMemo(()=>{
+        return langArr.indexOf(lang)
+    },[lang])
+
     const menuSetting = React.useMemo(()=>{
         if(user !== false) {
             return [...menuSettingArr,
-                {name:"Logout"}
+                {key:"logout",name:"Logout"}
             ]
         } else {
             return menuSettingArr;
         }
     },[user])
 
-    const handleChangeTheme=value=>{
-        setTheme(themeArr[value?.row])
+    const handleChangeTheme=async(value)=>{
+        await setTheme(themeArr[value?.row])
+    }
+
+    const handleChangeLang=async(value)=>{
+        await setLang(langArr[value?.row])
     }
 
     React.useEffect(()=>{
@@ -87,7 +97,7 @@ export default function Setting({navigation}){
             setNotif(false,"Success",i18n.t('deleted',{type:"Caches"}));
             setCacheSize("0 KB")
         })
-        .catch(()=>setNotif(true,"Error",i18n.t('error')))
+        .catch(()=>setNotif(true,"Error",i18n.t('errors.general')))
     }
 
     const handleLogout=()=>{
@@ -111,18 +121,22 @@ export default function Setting({navigation}){
     const renderItem=({item:dt,index:i})=>{
         let desc=undefined,name='';
         let func=()=>dt?.to && navigation.navigate(dt?.to)
-        if(dt?.name==="Clear cache") {
+        if(dt?.key==="cache") {
             name=i18n.t('clear',{type:"cache"});
             desc=cacheSize;
             func = handleCacheDelete
-        } else if(dt?.name==='Appearance') {
+        } else if(dt?.key==='appearance') {
             name=i18n.t('appearance');
             tema_type=`${ucwords(userTheme==='auto' ? i18n.t("device") : i18n.t(userTheme))}`
             desc=i18n.t('theme_type',{type:tema_type});
             func=()=>setOpen("theme");
-        } else if(dt?.name == 'Logout') {
+        } else if(dt?.key == 'logout') {
             name="Logout";
             func=handleLogout
+        } else if(dt?.key==='lang') {
+            name = i18n.t('language');
+            desc = langTitle[indexLang];
+            func = ()=>setOpen("lang");
         }
 
         return (
@@ -132,7 +146,7 @@ export default function Setting({navigation}){
 
     return (
         <>
-            <Layout navigation={navigation} title="Setting" withBack >
+            <Layout navigation={navigation} title={i18n.t('setting')} withBack >
                 <View>
                     <List
                         data={menuSetting}
@@ -142,7 +156,7 @@ export default function Setting({navigation}){
                 </View>
             </Layout>
             <Modal
-                isVisible={open==='theme'}
+                isVisible={open!==null}
                 style={{margin:0,justifyContent:'center',alignItems:'center'}}
                 onBackdropPress={()=>setOpen(null)}
                 animationIn="fadeIn"
@@ -150,15 +164,26 @@ export default function Setting({navigation}){
             >
                 <Lay style={{width:width-50,borderRadius:10,paddingVertical:10}}>
                     <View>
-                        <Menu
-                            selectedIndex={{row:indexTheme}}
-                            onSelect={handleChangeTheme}
-                            contentContainerStyle={{flexGrow:1}}
-                        >
-                            <MenuItem title={i18n.t('theme_type',{type:i18n.t('light')})} style={{paddingHorizontal:13,paddingVertical:12}} />
-                            <MenuItem title={i18n.t('theme_type',{type:i18n.t('dark')})} style={{paddingHorizontal:13,paddingVertical:12}}  />
-                            <MenuItem title={i18n.t('theme_type',{type:i18n.t('device')})} style={{paddingHorizontal:13,paddingVertical:12}} />
-                        </Menu>
+                        {open === 'theme' ? (
+                            <Menu
+                                selectedIndex={{row:indexTheme}}
+                                onSelect={handleChangeTheme}
+                                contentContainerStyle={{flexGrow:1}}
+                            >
+                                {themeArr.map((dt,i)=>{
+                                    const i18 = dt === 'auto' ? 'device' : dt;
+                                    return <MenuItem key={i.toString()} title={i18n.t('theme_type',{type:i18n.t(i18)})} style={{paddingHorizontal:13,paddingVertical:12}} />
+                                })}
+                            </Menu>
+                        ) : open === 'lang' ? (
+                            <Menu
+                                selectedIndex={{row:indexLang}}
+                                onSelect={handleChangeLang}
+                                contentContainerStyle={{flexGrow:1}}
+                            >
+                                {langArr.map((dt,i)=> <MenuItem key={i.toString()} title={langTitle[i]} style={{paddingHorizontal:13,paddingVertical:12}} /> )}
+                            </Menu>
+                        ) : null}
                     </View>
                 </Lay>
             </Modal>

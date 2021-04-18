@@ -109,7 +109,7 @@ export default function ({ navigation,route }) {
 				{isLoadingInitialData ? (
                 	<View style={{height:"100%"}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
             	) : error ? (
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 				) : (
 					<FlatList
 						columnWrapperStyle={{flexWrap:'wrap',flex:1}}

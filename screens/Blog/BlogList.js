@@ -98,13 +98,13 @@ export default function BlogList({navigation,route}){
     return (
 		<Layout navigation={navigation} title={`${ucwords(blogType)} - Blog`} subtitle={ucwords(slug.replace(/\-/g," "))}>
 			{['tags','category'].indexOf(blogType) === -1 ? (
-                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+                <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
             ) : isLoadingInitialData ? (
 				<View style={{height:'100%'}}><Skeleton type="grid" number={4} image /></View>
 			) : (
 				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 					{error ? (
-						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 					) : (
 						<FlatList
 							columnWrapperStyle={{flexWrap:'wrap',flex:1}}

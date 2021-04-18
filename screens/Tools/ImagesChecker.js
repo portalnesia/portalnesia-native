@@ -65,7 +65,7 @@ export default function({navigation}){
 
     const uploadImage=()=>{
         setResult([])
-        if(file===null && url.trim().match(/^https?\:\/\//i) === null) setNotif(true,"Error",i18n.t('error_image'));
+        if(file===null && url.trim().match(/^https?\:\/\//i) === null) setNotif(true,"Error",i18n.t('errors.image'));
         else {
             setLoading(true)
             setProgress(0)
@@ -73,7 +73,7 @@ export default function({navigation}){
             const form=new FormData();
             if(file !== null) {
                 const {name,match} = extractMeta(file)
-                if(!match) return setNotif(true,"Error",i18n.t('error_upload'));
+                if(!match) return setNotif(true,"Error",i18n.t('errors.upload'));
                 form.append('file',{uri:file,name,type:`image/${match[1]}`});
             }
             form.append('url',url);
@@ -115,7 +115,7 @@ export default function({navigation}){
         ImagePicker.requestMediaLibraryPermissionsAsync()
         .then(({status})=>{
             return new Promise((res,rej)=>{
-                if(status !== 'granted') return rej({type:1,message:i18n.t('permission_storage')})
+                if(status !== 'granted') return rej({type:1,message:i18n.t('errors.permission_storage')})
                 return res();
             })
         })
@@ -135,12 +135,12 @@ export default function({navigation}){
         })
         .then((result)=>{
             return new Promise((res,rej)=>{
-                if(!result.exists) return rej({type:1,message:i18n.t('error_no_image')})
+                if(!result.exists) return rej({type:1,message:i18n.t('errors.no_image')})
                 return res(result)
             })
         })
         .then((result)=>{
-            if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('error_size_image'))
+            if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('errors.size_image'))
             setFile(result?.uri)
             setDataFile(result?.uri)
         })

@@ -141,7 +141,7 @@ export default function downloadFile(url,filename,uri="pn://url",saveToAsset=fal
         Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY)
         .then(({status})=>{
             return new Promise((res,rej)=>{
-                if(status!=='granted') return rej({message:i18n.t('permission_storage')})
+                if(status!=='granted') return rej({message:i18n.t('errors.permission_storage')})
                 return res();
             })
         }).then(()=>{
@@ -156,7 +156,7 @@ export const saveBase64=async (data,filename)=>{
     const { status } = await Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY);
     await new Promise((res, rej) => {
         if (status !== 'granted')
-            return rej({ message: i18n.t('permission_storage') });
+            return rej({ message: i18n.t('errors.permission_storage') });
         return res();
     });
     await RNFS.writeFile(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${filename}`, data, 'base64');

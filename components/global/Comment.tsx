@@ -601,7 +601,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
                                     value={unLogin?.name||''}
                                     onChangeText={(val)=>setUnlogin(prev=>({...prev,name:val}))}
                                     returnKeyType="next"
-                                    label={i18n.t('name')}
+                                    label={i18n.t('form.name')}
                                     disabled={loading!==null}
                                     autoCompleteType="name"
                                     placeholder="John Doe"
@@ -617,7 +617,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
                                     value={unLogin?.email||''}
                                     onChangeText={(val)=>setUnlogin(prev=>({...prev,email:val}))}
                                     returnKeyType="next"
-                                    label={i18n.t('email')}
+                                    label={i18n.t('form.email')}
                                     disabled={loading!==null}
                                     keyboardType="email-address"
                                     autoCompleteType="email"

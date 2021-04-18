@@ -23,16 +23,9 @@ import {AuthContext} from './Context'
 import {API} from '@pn/utils/API'
 import {refreshToken} from '@pn/utils/Login'
 import Localization from '@pn/module/Localization'
+import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
-
-i18n.defaultLocale = "en-US"
-i18n.translations = {
-	en:en_locale,
-	id:id_locale
-};
-i18n.locale = Localization.getLocales()[0].languageTag;
-i18n.fallbacks = true;
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -88,8 +81,10 @@ const AuthProvider = (props) => {
 	const [state,dispatch]=useReducer(reducer,initialState)
 	const colorScheme = useColorScheme()
 	const [tema,setTema]=React.useState('auto')
+	const [lang,changeLang]=React.useState("auto");
 	const {linkTo} = useRootNavigation();
 	const lastNotif = Notifications.useLastNotificationResponse()
+	const forceUpdate = useForceUpdate();
 
 	const selectedTheme = React.useMemo(()=>{
 		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
@@ -102,7 +97,18 @@ const AuthProvider = (props) => {
 				await AsyncStorage.setItem("theme",val)
 				setTema(val)
 			} catch(e) {
-				setNotif(true,"Error",i18n.t('error'))
+				setNotif(true,"Error",i18n.t('errors.general'))
+			}
+		}
+	}
+
+	const setLang=async(val)=>{
+		if(['id','auto','en'].indexOf(val) !== -1) {
+			try {
+				await AsyncStorage.setItem("lang",val)
+				changeLang(val)
+			} catch(e) {
+				setNotif(true,"Error",i18n.t('errors.general'))
 			}
 		}
 	}
@@ -121,7 +127,7 @@ const AuthProvider = (props) => {
 		}
 		async function asyncTask(){
 			try {
-				let [user,res] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme")])
+				let [user,res,lang] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
 
 				const token = await refreshToken()
 				console.log(token);
@@ -130,6 +136,7 @@ const AuthProvider = (props) => {
 				}
 				//Set Theme
 				if(res !== null) setTema(res);
+				if(lang !== null) changeLang(lang);
 
 				//Init Notification
 				const {status:existingStatus} = await Notifications.getPermissionsAsync();
@@ -183,13 +190,8 @@ const AuthProvider = (props) => {
 			}
 		})
 
-		function onLocalizationChange(){
-			i18n.locale = Localization.getLocales()[0].languageTag;
-		}
-		
 		asyncTask();
 		setNotificationChannel();
-		Localization.addEventListener('localizationChange',onLocalizationChange)
 
 		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
 		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
@@ -198,9 +200,32 @@ const AuthProvider = (props) => {
 			tokenChangeListener.remove();
 			foregroundListener.remove();
 			netInfoListener();
-			Localization.removeEventListener('localizationChange',onLocalizationChange)
 		}
 	},[])
+
+	React.useEffect(()=>{
+		function onLocalizationChange(){
+			i18n.translations = {
+				en:en_locale,
+				id:id_locale
+			};
+			i18n.fallbacks = true;
+			if(['id','en'].indexOf(lang) !== -1) {
+				const lng = lang === 'id' ? "id-ID" : "en-US";
+				i18n.locale =lng;
+			} else {
+				i18n.locale = Localization.getLocales()[0].languageTag;
+			}
+			forceUpdate();
+		}
+
+		onLocalizationChange();
+		Localization.addEventListener('localizationChange',onLocalizationChange)
+
+		return ()=>{
+			Localization.removeEventListener('localizationChange',onLocalizationChange)
+		}
+	},[lang])
 
 	React.useEffect(()=>{
 		async function checkNotification(){
@@ -232,7 +257,9 @@ const AuthProvider = (props) => {
 				setNotif,
 				setTheme,
 				theme:selectedTheme,
-				userTheme:tema
+				userTheme:tema,
+				lang,
+				setLang
 			}}
 		>
 			<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />

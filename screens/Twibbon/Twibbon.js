@@ -3,6 +3,7 @@ import {  View,FlatList,useWindowDimensions,RefreshControl } from 'react-native'
 import {Layout as Lay,Text,Card} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
+import i18n from 'i18n-js'
 
 import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
@@ -30,12 +31,12 @@ export default function Twibbon({ navigation }) {
 	},[isValidating])
 
 	const Footer=()=>{
-		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
+		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" height={300} number={2} image /></View> 
 		else return null
 	}
 
-	const renderNews=({item,index})=>{
+	const renderTwibbon=({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 20;
 		const cardSize=(width/2)-7
@@ -119,7 +120,7 @@ export default function Twibbon({ navigation }) {
 	}
 
 	const renderEmpty=()=>{
-		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('error')}</Text></Lay>
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
 	}
 
@@ -136,7 +137,7 @@ export default function Twibbon({ navigation }) {
 							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 							ListEmptyComponent={renderEmpty}
 							data={data}
-							renderItem={renderNews}
+							renderItem={renderTwibbon}
 							ListFooterComponent={Footer}
 							numColumns={2}
 							refreshControl={
