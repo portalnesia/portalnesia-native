@@ -45,7 +45,7 @@ import TwibbonDetail from '../screens/Twibbon/TwibbonDetail'
 import OpenSource from '../screens/OpenSource/OpenSource'
 import OpenSourceDetail from '../screens/OpenSource/OpenSourceDetail'
 import Comments from '../screens/Modal/Comments'
-
+import SecondScreen from '../screens/SecondScreen'
 
 import { AuthContext } from '../provider/Context';
 
@@ -152,6 +152,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="TwibbonDetail" component={TwibbonDetail} />
 		<MainStack.Screen name="OpenSource" component={OpenSource} />
 		<MainStack.Screen name="OpenSourceDetail" component={OpenSourceDetail} />
+		<MainStack.Screen name="SecondScreen" component={SecondScreen} />
 	</MainStack.Navigator>
 )
 

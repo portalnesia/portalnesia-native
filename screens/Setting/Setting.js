@@ -1,6 +1,6 @@
 import React from 'react'
-import {View , Alert,useWindowDimensions,ScrollView} from 'react-native'
-import {useTheme,Layout as Lay, Text,Divider,MenuItem,ListItem,List,Menu, Icon} from '@ui-kitten/components'
+import {View , Alert,useWindowDimensions,FlatList} from 'react-native'
+import {useTheme,Layout as Lay, Text,Divider,MenuItem,Menu, Icon} from '@ui-kitten/components'
 import Modal from 'react-native-modal'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
@@ -11,6 +11,7 @@ import Layout from '@pn/components/global/Layout'
 import {AuthContext} from '@pn/provider/Context'
 import { ucwords,number_size } from '@pn/utils/Main';
 import useLogin from '@pn/utils/Login'
+import ListItem from '@pn/components/global/ListItem'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
@@ -147,13 +148,16 @@ export default function Setting({navigation}){
     return (
         <>
             <Layout navigation={navigation} title={i18n.t('setting')} withBack >
-                <View>
-                    <List
+                <Lay>
+                    <FlatList
                         data={menuSetting}
                         renderItem={renderItem}
                         ItemSeparatorComponent={Divider}
+                        contentContainerStyle={{
+                            backgroundColor:theme['background-color-basic-1']
+                        }}
                     />
-                </View>
+                </Lay>
             </Layout>
             <Modal
                 isVisible={open!==null}

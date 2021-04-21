@@ -1,6 +1,6 @@
 import React from 'react';
 import {  View,ScrollView,useWindowDimensions,KeyboardAvoidingView } from 'react-native';
-import {Layout as Lay,Text,Card,Spinner,Input,List,ListItem,Divider,useTheme,Toggle} from '@ui-kitten/components'
+import {Layout as Lay,Text,Card,Spinner,Input,Divider,useTheme,Toggle} from '@ui-kitten/components'
 import useSWR from '@pn/utils/swr'
 import {Modalize} from 'react-native-modalize'
 import i18n from 'i18n-js'
@@ -17,6 +17,7 @@ import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import Recaptcha from '@pn/components/global/Recaptcha'
 import {randomInt} from '@pn/utils/Main'
+import ListItem from '@pn/components/global/ListItem'
 
 const HeaderModal=React.memo(({search,setSearch,setPage})=>{
     return (

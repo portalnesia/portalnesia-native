@@ -2,6 +2,7 @@ import React from 'react';
 import { Animated,RefreshControl,View,useWindowDimensions } from 'react-native';
 import {Layout as Lay,Text,Card,Tab,useTheme} from '@ui-kitten/components'
 import {TabView,TabBar} from 'react-native-tab-view'
+import i18n from 'i18n-js'
 
 import Layout from '@pn/components/global/Layout';
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
@@ -218,8 +219,8 @@ export default function ({ navigation,route }) {
 	const slug = route?.params?.slug
 	const [tabIndex,setTabIndex] = React.useState(typeof slug === 'string' && slug === 'popular' ? 1 : 0);
 	const [routes]=React.useState([
-        {key:'recent',title:"Recent"},
-        {key:'popular',title:"Popular"},
+        {key:'recent',title:i18n.t('recent')},
+        {key:'popular',title:i18n.t('popular')},
     ])
 	const theme = useTheme()
 	const {translateY,...other}=useHeader()

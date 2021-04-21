@@ -106,6 +106,10 @@ export const linking = {
                         path:'twibbon/:slug',
                         exact:true
                     },
+                    SecondScreen:{
+                        path:'second-screen',
+                        exact:true
+                    },
                     NotFound: '*',
                 }
             }

@@ -51,7 +51,7 @@ export default function ListItem(props: ListItemProps){
 
     return (
         <Pressable {...other}>
-            <View style={{paddingVertical:12,paddingHorizontal:8,backgroundColor:theme['background-color-basic-1'],flexDirection:'row',alignItems:'center'}}>
+            <View style={{paddingVertical:12,paddingHorizontal:8,flexDirection:'row',alignItems:'center'}}>
                 {accessoryLeft && accessoryLeft({style: accessoryStyle(theme)})}
                 <View style={{flex:1,flexShrink:1,flexBasis:0}}>
                     {typeof title === 'string' ? (

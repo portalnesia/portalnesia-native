@@ -1,12 +1,19 @@
 import React from 'react';
 import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions'
-import { AuthContext } from '@pn/provider/AuthProvider';
 import RNDownloader from 'react-native-background-downloader'
 import BackgroundService from 'react-native-background-actions'
 import RNFS from 'react-native-fs'
 import * as MediaLibrary from 'expo-media-library'
 import i18n from 'i18n-js'
+
+Notifications.setNotificationHandler({
+    handleNotification: async()=>({
+        shouldShowAlert:true,
+        shouldPlaySound:true,
+        shouldSetBadge:true
+    })
+})
 
 const baseNotificationRequestInput = {
     identifier: '',
@@ -42,7 +49,7 @@ const errorNotification = (identifier,baseNotificationRI,uri) =>({
     identifier:`err${baseNotificationRI.content.title}_${identifier}`,
     content: {
         ...baseNotificationRI.content,
-        body:i18n.t('download_failed'),
+        body:"Download failed",
         sticky:false,
         data:{
             url:uri
@@ -54,7 +61,7 @@ const finnishNotification = (identifier,baseNotificationRI,uri) =>({
     identifier:`fin${baseNotificationRI.content.title}_${identifier}`,
     content: {
         ...baseNotificationRI.content,
-        body:i18n.t('download_complete'),
+        body:"Download completed",
         sticky:false,
         data:{
             url:uri
@@ -68,12 +75,10 @@ export const checkAndCreateAlbum=async(argument)=>{
         const album = await MediaLibrary.getAlbumAsync("Portalnesia")
         if(album == null) {
             await MediaLibrary.createAlbumAsync("Portalnesia",asset,false)
-        } else {
-            await MediaLibrary.addAssetsToAlbumAsync([asset],album,false)
         }
-        return;
-    } else {
-        return;
+        /*else {
+            await MediaLibrary.addAssetsToAlbumAsync([asset],album,false)
+        }*/
     }
 }
 
@@ -81,27 +86,27 @@ const downloadTask = async(argument) =>{
     const identifier = new Date().getTime();
     const baseNotificationRI = initBaseNotificationRequestInput(argument.filename, "Download");
     const errorNot = errorNotification(identifier,baseNotificationRI,argument.uri)
-    const finnishNot = finnishNotification(identifier,baseNotificationRI,argument.uri)
+    const finnishNot = finnishNotification(identifier,baseNotificationRI,argument.completeUri);
 
-    await new Promise((resolve,reject)=>{
+    return new Promise((resolve,reject)=>{
         RNDownloader.download({
             id:`download_${argument?.filename}`,
             url:argument.url,
             destination:`${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${argument?.filename}`
         }).begin(async(expectedBytes)=>{
-            await BackgroundService.updateNotification({progressBar:{max:expectedBytes,value:0,indeterminate:false}})
+            await BackgroundService.updateNotification({progressBar:{max:expectedBytes,value:0,indeterminate:false},taskDesc:"Prepare download..."})
         }).progress(async(_,value,total)=>{
-            await BackgroundService.updateNotification({progressBar:{max:total,value:value,indeterminate:false}})
+            await BackgroundService.updateNotification({progressBar:{max:total,value:value,indeterminate:false},taskDesc:"Downloading..."})
         }).done(async()=>{
-            await checkAndCreateAlbum();
-            await Notifications.scheduleNotificationAsync(finnishNot);
+            Notifications.scheduleNotificationAsync(finnishNot)
+            await BackgroundService.stop()
             resolve()
         }).error(async()=>{
-            await Notifications.scheduleNotificationAsync(errorNot);
+            Notifications.scheduleNotificationAsync(errorNot)
+            await BackgroundService.stop()
             reject()
         })
     })
-    
 }
 
 class PNDownload{
@@ -114,7 +119,7 @@ class PNDownload{
     }
 }
 
-export default function downloadFile(url,filename,uri="pn://url",saveToAsset=false){
+export default function downloadFile(url,filename,uri="pn://news",saveToAsset=false,completeUri=null){
     return new Promise((resolve,reject)=>{
         const options = {
             taskName:`download_${filename}`,
@@ -128,7 +133,8 @@ export default function downloadFile(url,filename,uri="pn://url",saveToAsset=fal
                 url,
                 filename,
                 saveToAsset,
-                uri
+                uri,
+                completeUri: (completeUri !== null ? completeUri : uri)
             },
             linkingURI:uri,
             progressBar:{

@@ -18,11 +18,15 @@ import useAPI from '@pn/utils/API'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 import useLogin from '@pn/utils/Login'
+import Portalnesia from '@pn/module/Portalnesia'
+import downloadFile from '@pn/utils/Download'
+import {startActivityAsync,ACTION_APP_NOTIFICATION_SETTINGS} from 'expo-intent-launcher'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 const SettingIcon=(props)=><Icon {...props} name="settings-outline" />
+const supportedAbi = ['arm64-v8a','armeabi-v7a','x86','x86_64']
 
 export default function({navigation}){
     const auth = React.useContext(AuthContext)
@@ -38,7 +42,33 @@ export default function({navigation}){
     const linkTo = useLinkTo();
     const {login} = useLogin();
 
-    const handleLogin = async()=>{
+    const handleUpdate=React.useCallback(async(url,version)=>{
+        const myAbi = Portalnesia.SUPPORTED_ABIS;
+        let getAbi=null;
+        let i=0;
+
+        while (getAbi===null && i < myAbi.length) {
+            if(supportedAbi.indexOf(myAbi[i]) !== -1) {
+                getAbi = supportedAbi[i];
+            } else i++;
+        }
+        
+        const download_url = getAbi === null ? `${url}/Portalnesia-universal-v${version}.apk` : `${url}/Portalnesia-${getAbi}-v${version}.apk`;
+        
+        try {
+            const download = await downloadFile(download_url,"Portalnesia.apk","pn://login-callback",false,"pn://second-screen?type=update_app");
+        
+            if(download) {
+                setNotif(false,"Download","Start downloading...");
+                download.start();
+            }
+        } catch(err) {
+            setNotif(true,"Error",err?.message||"Something went wrong");
+        }
+
+    },[])
+
+    const handleLogin = React.useCallback(async()=>{
         const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"2.0.0",">=");
         if(isUpdated) {
             if(user !== false) {
@@ -51,9 +81,9 @@ export default function({navigation}){
         } else {
             setNotif(true,"Under Maintenance","This feature is under maintenance");
         }
-    }
+    },[user])
 
-    const checkUpdates=()=>{
+    const checkUpdates=React.useCallback(()=>{
         setLoading(true)
         PNget('/check_update')
         .then((res)=>{
@@ -70,13 +100,7 @@ export default function({navigation}){
                     if(url) {
                         btn = btn.concat({
                             text:"UPDATE",
-                            onPress:()=>{
-                                openBrowserAsync(url,{
-                                    enableDefaultShare:true,
-                                    toolbarColor:'#2f6f4e',
-                                    showTitle:true
-                                })
-                            }
+                            onPress:()=>handleUpdate(url,res?.data?.version)
                         })
                     }
                     Alert.alert(
@@ -99,7 +123,7 @@ export default function({navigation}){
             }
         })
         .finally(()=>setLoading(false))
-    }
+    },[])
 
     return (
         <>

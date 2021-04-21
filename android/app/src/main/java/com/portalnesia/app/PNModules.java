@@ -1,17 +1,22 @@
 package com.portalnesia.app;
 
 //import com.facebook.react.bridge.NativeModule;
+import android.app.DownloadManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.pm.PackageInstaller;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.LocaleList;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-
+import androidx.core.content.FileProvider;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 //import com.facebook.react.bridge.ReactContext;
@@ -23,6 +28,12 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,9 +44,13 @@ import java.util.Map;
 @ReactModule(name=PNModules.REACT_CLASS)
 public class PNModules extends ReactContextBaseJavaModule {
     public static final String REACT_CLASS = "Portalnesia";
+    public static final String ACTION_INSTALL_COMPLETE = "com.portalnesia.app.INSTALL_COMPLETE";
+
+    private ReactApplicationContext reactContext;
 
     PNModules(ReactApplicationContext context) {
         super(context);
+        this.reactContext = context;
     }
 
     @Override
@@ -47,6 +62,7 @@ public class PNModules extends ReactContextBaseJavaModule {
     public Map<String,Object> getConstants(){
         HashMap<String,Object> constants = new HashMap<>();
         constants.put("initialLocalization", getLocalizationConstants());
+        constants.put("SUPPORTED_ABIS",getSupportedAbi());
         return constants;
     }
 
@@ -184,5 +200,134 @@ public class PNModules extends ReactContextBaseJavaModule {
         exported.putArray("locales",locales);
         exported.putString("country",currentRegionCode);
         return exported;
+    }
+
+    public @NonNull WritableArray getSupportedAbi(){
+        WritableArray supportedAbis = Arguments.createArray();
+        String[] textSupportedAbis = Build.SUPPORTED_ABIS;
+
+        for(String abi: textSupportedAbis) {
+            supportedAbis.pushString(abi);
+        }
+        return supportedAbis;
+    }
+
+    private void addApkToInstallSession(File file, PackageInstaller.Session session) throws IOException,FileNotFoundException {
+        try (
+            OutputStream packageInSession = session.openWrite("PNpackage",0,-1);
+            InputStream is = new FileInputStream(file);
+        ) {
+            byte[] buffer = new byte[16384];
+            int n;
+            while((n = is.read(buffer)) >= 0) {
+                packageInSession.write(buffer,0,n);
+            }
+        }
+    }
+
+    private IntentSender createIntentSender(int sessionId){
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(reactContext,sessionId,new Intent(ACTION_INSTALL_COMPLETE),0);
+        return pendingIntent.getIntentSender();
+    }
+
+    @ReactMethod
+    public void installApkSession(String pathname,Promise promise){
+        File file = new File(pathname);
+        PackageInstaller.Session session = null;
+        try {
+            PackageInstaller packageInstaller = reactContext.getPackageManager().getPackageInstaller();
+            PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+            int sessionId = packageInstaller.createSession(params);
+            session = packageInstaller.openSession(sessionId);
+
+            addApkToInstallSession(file,session);
+            session.commit(createIntentSender(sessionId));
+            promise.resolve(true);
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't install package",e);
+        } catch (RuntimeException e) {
+            if(session != null) {
+                session.abandon();
+            }
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void installApkView(String pathname,final Promise promise) {
+        try {
+            //if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            //    uri = FileProvider.getUriForFile(reactContext,reactContext.getPackageName() + ".fileprovider",file);
+            //}
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(getApkUri(pathname),"application/vnd.android.package-archive");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            reactContext.startActivity(intent);
+
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void installApk(String pathname,final Promise promise) {
+        try {
+            //if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            //    uri = FileProvider.getUriForFile(reactContext,reactContext.getPackageName() + ".fileprovider",file);
+            //}
+
+            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+            intent.setData(getApkUri(pathname));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            reactContext.startActivity(intent);
+
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    private Uri getApkUri(String pathname) {
+        File file = new File(pathname);
+        Uri uri = Uri.fromFile(file);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = FileProvider.getUriForFile(reactContext, BuildConfig.APPLICATION_ID + ".fileprovider", file);
+        }
+        return uri;
+    }
+
+    @ReactMethod
+    public void isAppInstalled(String packageName, final Promise promise){
+        Intent appIntent = reactContext.getPackageManager().getLaunchIntentForPackage(packageName);
+        if(appIntent == null) {
+            promise.resolve(false);
+            return;
+        }
+        promise.resolve(true);
+    }
+
+    @ReactMethod
+    public void openDownloadManager() {
+        Intent sendIntent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
+        sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if(sendIntent.resolveActivity(reactContext.getPackageManager()) != null) {
+            reactContext.startActivity(sendIntent);
+        }
+    }
+
+    @ReactMethod
+    public void uriToFileProvider(String pathname,Promise promise){
+        try {
+            File file = new File(pathname);
+            Uri uri = FileProvider.getUriForFile(reactContext, BuildConfig.APPLICATION_ID + ".fileprovider", file);
+            String fileProviderString = uri.toString();
+            promise.resolve(fileProviderString);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
     }
 }

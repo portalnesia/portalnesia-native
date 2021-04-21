@@ -48,6 +48,7 @@
     "expo-file-system": "~9.3.0",
     "expo-font": "~8.4.0",
     "expo-image-picker": "~9.2.0",
+    "expo-intent-launcher": "^9.0.0",
     "expo-linking": "~2.0.1",
     "expo-local-authentication": "~9.5.0",
     "expo-location": "~10.0.0",
@@ -130,7 +131,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }

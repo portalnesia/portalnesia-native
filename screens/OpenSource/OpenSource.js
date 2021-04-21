@@ -44,7 +44,8 @@ const RenderHeader=React.memo(()=>{
     return (
         <Lay level="2" style={{paddingVertical:50,alignItems:'center'}}>
             <Text category="h5">Portalnesia on Android</Text>
-            <Text appearance="hint">{`v${Constants.nativeAppVersion}`}</Text>
+            <Text appearance="hint">{`Native version v${Constants.nativeAppVersion}`}</Text>
+            <Text appearance="hint">{`Bundle version v${Constants.manifest.version}`}</Text>
         </Lay>
     )
 })

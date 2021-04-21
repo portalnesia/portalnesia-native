@@ -7,6 +7,7 @@ import {useNavigationState} from '@react-navigation/native'
 import {Icon,Divider, TopNavigation,Text,useTheme} from '@ui-kitten/components'
 import TopNavigationAction from './TopAction'
 import i18n from 'i18n-js'
+import {useLinkTo} from '@react-navigation/native'
 
 const BackIcon=(props)=>(
 	<Icon {...props} name='arrow-back' />
@@ -18,17 +19,16 @@ const CloseIcon=(props)=>(
 export default function({withBack,title,menu,navigation,align,subtitle,withClose,whiteBg,margin}){
 	const index = useNavigationState(state=>state.index);
 	const theme = useTheme()
-	const RenderBackBtn=({navigation})=>{
+	const linkTo = useLinkTo();
+
+	const RenderBackBtn=({navigation,index})=>{
 		if(withClose) {
 			return(
 				<TopNavigationAction tooltip={i18n.t('close')} icon={CloseIcon} onPress={() => {{
 					if(index > 0) {
 						navigation.goBack();
 					} else {
-						navigation.reset({
-							index:0,
-							routes:[{name:"Main",screen:"MainTabs"}]
-						})
+						linkTo("/")
 					}
 				}}} />
 			)
@@ -38,10 +38,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 					if(index > 0) {
 						navigation.goBack();
 					} else {
-						navigation.reset({
-							index:0,
-							routes:[{name:"Main",screen:"MainTabs"}]
-						})
+						linkTo("/")
 					}
 				}}} />
 			)
@@ -56,7 +53,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 			title={evaProps => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
 			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
 			alignment={align}
-			{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn navigation={navigation} />} : {})}
+			{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn navigation={navigation} index={index} /> } : {})}
 			{...(menu ? {accessoryRight:menu} : {})}
 		/>
 		{withClose && whiteBg ? null : <Divider />}

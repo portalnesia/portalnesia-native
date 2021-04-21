@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Font from 'expo-font';
 import 'moment/locale/id';
 import {StatusBar} from 'expo-status-bar'
+import * as Permissions from 'expo-permissions'
 import {
 	Inter_100Thin,
 	Inter_200ExtraLight,
@@ -26,15 +27,6 @@ LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
 export default function App(props) {
 	const [isLoadingComplete, setLoadingComplete] = useState(false);
-
-	React.useEffect(()=>{
-		RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
-		.then((ada)=>{
-			if(!ada) {
-				RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
-			}
-		})
-	},[])
 
 	if (!isLoadingComplete && !props.skipLoadingScreen) {
 		return (
@@ -63,7 +55,8 @@ export default function App(props) {
 
 async function loadResourcesAsync() {
 	// load all resources such as images, fonts, etc.
-	await Promise.all([
+	const wait = await Promise.all([
+		Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY),
 		Asset.loadAsync([
 			require('./assets/icon.png'),
 			require('./assets/splash.png'),
@@ -85,9 +78,15 @@ async function loadResourcesAsync() {
 			Inter_Bold: Inter_700Bold,
 			Inter_ExtraBold: Inter_800ExtraBold,
 			Inter_900Black,
-		}),
+		})
 	]);
 
+	if(wait[0]?.status === 'granted') {
+		const ada = await RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`);
+		if(!ada) {
+			await RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
+		}
+	}
 }
 
 function handleLoadingError(error) {

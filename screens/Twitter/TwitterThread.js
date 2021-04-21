@@ -3,6 +3,7 @@ import { Animated,RefreshControl,useWindowDimensions,View,Image as IMG } from 'r
 import {Layout as Lay,Text,useTheme,Divider,Icon,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
+import i18n from 'i18n-js'
 
 import Comment from '@pn/components/global/Comment'
 import CountUp from '@pn/components/global/Countup'
@@ -54,9 +55,10 @@ const RenderTwitter=React.memo(({item,index,setMenu})=>{
                     ) : null}
                 </Lay>
                 <Lay key={`layout-option-${index}`}>
-                    <Button appearance="ghost" size="small" status="basic" style={{padding:0}} accessoryLeft={MoreIcon} onPress={()=>setMenu(index)} />
+                    <View style={{borderRadius:20,overflow:'hidden'}}>
+                        <Button appearance="ghost" size="small" status="basic" style={{padding:0}} accessoryLeft={MoreIcon} onPress={()=>setMenu(index)} />
+                    </View>
                 </Lay>
-                
             </Lay>
             <Lay key={`media-${index}`} style={{marginTop:10}}>
                 {item?.media ? 
@@ -218,16 +220,16 @@ export default function({navigation,route}){
                         share={{
                             link:`/twitter/thread/${data?.id}?utm_campaign=news`,
                             title:`${Ktruncate(specialHTML(data?.tweets?.[0]?.tweet),150)} - Portalnesia`,
-                            dialog:"Share Thread"
+                            dialog:i18n.t('share_type',{type:i18n.t('twitter_thread')})
                         }}
                         menu={[{
                             action:"share",
-                            title:"Share",
+                            title:i18n.t('share'),
                         },{
-                            title:"Copy link",
+                            title:i18n.t('copy_link'),
                             action:'copy'
                         },{
-                            title:"Open in browser",
+                            title:i18n.t('open_in_browser'),
                             action:'browser'
                         }]}
                     />
@@ -237,7 +239,7 @@ export default function({navigation,route}){
                         handleClose={()=>setMenu(null)}
                         onClose={()=>setMenu(null)}
                         menu={[{
-                            title:"Copy text",
+                            title:`${i18n.t('copy')} ${i18n.t('text').toLowerCase()}`,
                             onPress:()=>{
                                 copyText(specialHTML(data?.tweets?.[menu]?.tweet),"Text")
                                 setMenu(null)

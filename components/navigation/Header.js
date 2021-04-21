@@ -5,7 +5,8 @@ import {useNavigationState} from '@react-navigation/native'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import LottieView from 'lottie-react-native'
 import TopNavigationAction from './TopAction'
-import i18n from'i18n-js'
+import i18n, { l } from'i18n-js'
+import {useLinkTo} from '@react-navigation/native'
 
 const STATUS_BAR_HEIGHT = StatusBar.currentHeight
 
@@ -125,6 +126,7 @@ export const useHeader=(height=56,refresh=false)=>{
 
 const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,margin})=>{
 	const index = useNavigationState(state=>state.index);
+	const linkTo = useLinkTo();
 
 	const RenderBackBtn=({navigation})=>{
 		if(withBack) {
@@ -133,10 +135,7 @@ const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,m
 					if(index > 0) {
 						navigation.goBack();
 					} else {
-						navigation.reset({
-							index:0,
-							routes:[{name:"Main",screen:"MainTabs"}]
-						})
+						linkTo("/")
 					}
 				}} />
 			)
