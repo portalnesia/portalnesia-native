@@ -75,40 +75,30 @@ const Recent=({headerHeight,navigation,...other})=>{
 	}
 
 	return (
-		<>
-			{isLoadingInitialData ? (
-				<View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-			) : error ? (
-				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
-				</Lay>
-			) : (
-				<Animated.FlatList
-					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-					ListEmptyComponent={renderEmpty}
-					contentContainerStyle={{paddingTop: headerHeight+8}}
-					numColumns={2}
-					data={data}
-					renderItem={_renderItem}
-					//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
-					ListFooterComponent={Footer}
-					//onEndReachedThreshold={0.05}
-					refreshControl={
-						<RefreshControl
-							colors={['white']}
-							progressBackgroundColor="#2f6f4e"
-							progressViewOffset={headerHeight}
-							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-							refreshing={refreshing}
-						/>	
-					}
-					onEndReached={()=>{
-						if(!isLoadingMore) setSize(size+1)
-					}}
-					{...other}
-				/>
-			)}
-		</>
+		<Animated.FlatList
+			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+			ListEmptyComponent={renderEmpty}
+			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			numColumns={2}
+			data={data}
+			renderItem={_renderItem}
+			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
+			ListFooterComponent={Footer}
+			//onEndReachedThreshold={0.05}
+			refreshControl={
+				<RefreshControl
+					colors={['white']}
+					progressBackgroundColor="#2f6f4e"
+					progressViewOffset={headerHeight}
+					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+					refreshing={refreshing}
+				/>	
+			}
+			onEndReached={()=>{
+				if(!isLoadingMore) setSize(size+1)
+			}}
+			{...other}
+		/>
 	)
 }
 
@@ -176,40 +166,30 @@ const Popular=({headerHeight,navigation,...other})=>{
 	}
 
 	return (
-		<>
-			{isLoadingInitialData ? (
-                <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-			) : error ? (
-				<Lay style={{marginBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
-				</Lay>
-			) : (
-				<Animated.FlatList
-					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-					ListEmptyComponent={renderEmpty}
-					contentContainerStyle={{paddingTop: headerHeight+8}}
-					numColumns={2}
-					data={data}
-					renderItem={_renderItem}
-					//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
-					ListFooterComponent={Footer}
-					//onEndReachedThreshold={0.05}
-					refreshControl={
-						<RefreshControl
-							colors={['white']}
-							progressBackgroundColor="#2f6f4e"
-							progressViewOffset={headerHeight}
-							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-							refreshing={refreshing}
-						/>	
-					}
-					onEndReached={()=>{
-						if(!isLoadingMore) setSize(size+1)
-					}}
-					{...other}
-				/>
-			)}
-		</>
+		<Animated.FlatList
+			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+			ListEmptyComponent={renderEmpty}
+			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			numColumns={2}
+			data={data}
+			renderItem={_renderItem}
+			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
+			ListFooterComponent={Footer}
+			//onEndReachedThreshold={0.05}
+			refreshControl={
+				<RefreshControl
+					colors={['white']}
+					progressBackgroundColor="#2f6f4e"
+					progressViewOffset={headerHeight}
+					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+					refreshing={refreshing}
+				/>	
+			}
+			onEndReached={()=>{
+				if(!isLoadingMore) setSize(size+1)
+			}}
+			{...other}
+		/>
 	)
 }
 

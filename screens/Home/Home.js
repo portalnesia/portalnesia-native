@@ -141,7 +141,9 @@ const NotLogin=({loading,data,error,navigation})=>{
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('news')})}</Text>
 					{loading ? (
-						<Spinner size='giant' />
+						<View style={{marginBottom:15}}>
+							<Spinner size='giant' />
+						</View>
 					) : error ? (
 						<Text>{i18n.t('errors.general')}</Text>
 					) : (
@@ -155,7 +157,9 @@ const NotLogin=({loading,data,error,navigation})=>{
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
 					{loading ? (
-						<Spinner size='giant' />
+						<View style={{marginBottom:15}}>
+							<Spinner size='giant' />
+						</View>
 					) : error ? (
 						<Text>{i18n.t('errors.general')}</Text>
 					) : (
@@ -169,7 +173,9 @@ const NotLogin=({loading,data,error,navigation})=>{
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:"Twibbon"})}</Text>
 					{!data && !error ? (
-						<Spinner size='giant' />
+						<View style={{marginBottom:15}}>
+							<Spinner size='giant' />
+						</View>
 					) : error || data?.error == 1 ? (
 						<Text>{i18n.t('errors.general')}</Text>
 					) : (
@@ -183,7 +189,9 @@ const NotLogin=({loading,data,error,navigation})=>{
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
 					{loading || !data ? (
-						<Spinner size='giant' />
+						<View style={{marginBottom:15}}>
+							<Spinner size='giant' />
+						</View>
 					) : error ? (
 						<Text>{i18n.t('errors.general')}</Text>
 					) : (

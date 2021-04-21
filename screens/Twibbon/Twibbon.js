@@ -126,39 +126,32 @@ export default function Twibbon({ navigation }) {
 
 	return (
 		<Layout navigation={navigation} title="Twibbon" withBack>
-			{isLoadingInitialData ? (
-				<View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
-			) : (
-				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					{error ? (
-						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>Something went wrong</Text></Lay>
-					) : (
-						<FlatList
-							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-							ListEmptyComponent={renderEmpty}
-							data={data}
-							renderItem={renderTwibbon}
-							ListFooterComponent={Footer}
-							numColumns={2}
-							refreshControl={
-								<RefreshControl
-									colors={['white']}
-									progressBackgroundColor="#2f6f4e"
-									onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-									refreshing={refreshing}
-								/>
-							}
-							//onEndReachedThreshold={0.05}
-							ref={ref}
-							onEndReached={()=>{
-								if(!isReachingEnd && !isLoadingMore) {
-									setSize(size+1)
-								}
-							}}
-						/>
-					)}
-				</Lay>
-			)}
+			<FlatList
+				columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+				ListEmptyComponent={renderEmpty}
+				contentContainerStyle={{
+					...(error ? {flex:1} : {})
+				}}
+				data={data}
+				renderItem={renderTwibbon}
+				ListFooterComponent={Footer}
+				numColumns={2}
+				refreshControl={
+					<RefreshControl
+						colors={['white']}
+						progressBackgroundColor="#2f6f4e"
+						onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+						refreshing={refreshing}
+					/>
+				}
+				//onEndReachedThreshold={0.05}
+				ref={ref}
+				onEndReached={()=>{
+					if(!isReachingEnd && !isLoadingMore) {
+						setSize(size+1)
+					}
+				}}
+			/>
 		</Layout>
 	);
 }

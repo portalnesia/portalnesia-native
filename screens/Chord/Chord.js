@@ -75,18 +75,10 @@ const Recent=({headerHeight,navigation,...other})=>{
 	}
 
 	return (
-		<>
-			{isLoadingInitialData ? (
-                <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-            ) : error ? (
-				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-				</Lay>
-			) : (
 				<Animated.FlatList
 					ListEmptyComponent={renderEmpty}
 					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-					contentContainerStyle={{paddingTop: headerHeight+8}}
+					contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
 					numColumns={2}
 					data={data}
 					ref={ref}
@@ -111,8 +103,6 @@ const Recent=({headerHeight,navigation,...other})=>{
 					}}
 					{...other}
 				/>
-			)}
-		</>
 	)
 }
 
@@ -181,17 +171,11 @@ const Popular=({headerHeight,navigation,...other})=>{
 
 	return (
 		<>
-			{isLoadingInitialData ? (
-                <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-            ) : error ? (
-				<Lay style={{marginBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-				</Lay>
-			) : (
+			
 				<Animated.FlatList
 					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 					ListEmptyComponent={renderEmpty}
-					contentContainerStyle={{paddingTop: headerHeight+8}}
+					contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
 					numColumns={2}
 					data={data}
 					ref={ref}
@@ -215,7 +199,6 @@ const Popular=({headerHeight,navigation,...other})=>{
 					}}
 					{...other}
 				/>
-			)}
 		</>
 	)
 }

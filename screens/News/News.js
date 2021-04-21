@@ -106,38 +106,33 @@ export default function ({ navigation }) {
 
 	return (
 		<Layout navigation={navigation} title="News" withBack={false}>
-			{isLoadingInitialData ? (
-				<View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
-			) : (
-				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					{error ? (
-						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-					) : (
-						<FlatList
-							ListEmptyComponent={renderEmpty}
-							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-							data={data}
-							renderItem={renderNews}
-							ListFooterComponent={Footer}
-							numColumns={2}
-							refreshControl={
-								<RefreshControl
-									colors={['white']}
-									progressBackgroundColor="#2f6f4e"
-									onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-									refreshing={refreshing}
-								/>
-							}
-							ref={ref}
-							onEndReached={()=>{
-								if(!isReachingEnd && !isLoadingMore) {
-									setSize(size+1)
-								}
-							}}
+			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
+				<FlatList
+					ListEmptyComponent={renderEmpty}
+					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+					contentContainerStyle={{
+						...(error ? {flex:1} : {})
+					}}
+					data={data}
+					renderItem={renderNews}
+					ListFooterComponent={Footer}
+					numColumns={2}
+					refreshControl={
+						<RefreshControl
+							colors={['white']}
+							progressBackgroundColor="#2f6f4e"
+							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+							refreshing={refreshing}
 						/>
-					)}
-				</Lay>
-			)}
+					}
+					ref={ref}
+					onEndReached={()=>{
+						if(!isReachingEnd && !isLoadingMore) {
+							setSize(size+1)
+						}
+					}}
+				/>
+			</Lay>
 		</Layout>
 	);
 }

@@ -28,7 +28,7 @@ LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 export default function App(props) {
 	const [isLoadingComplete, setLoadingComplete] = useState(false);
 
-	if (!isLoadingComplete && !props.skipLoadingScreen) {
+	if (!isLoadingComplete) {
 		return (
 			<>
 			<StatusBar style="light" translucent animated />
@@ -55,8 +55,7 @@ export default function App(props) {
 
 async function loadResourcesAsync() {
 	// load all resources such as images, fonts, etc.
-	const wait = await Promise.all([
-		Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY),
+	await Promise.all([
 		Asset.loadAsync([
 			require('./assets/icon.png'),
 			require('./assets/splash.png'),
@@ -80,19 +79,21 @@ async function loadResourcesAsync() {
 			Inter_900Black,
 		})
 	]);
-
-	if(wait[0]?.status === 'granted') {
+	const wait = await Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY);
+	if(wait?.status === 'granted') {
 		const ada = await RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`);
 		if(!ada) {
 			await RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
 		}
 	}
+	return;
 }
 
 function handleLoadingError(error) {
 	// In this case, you might want to report the error to your error reporting
 	// service, for example Sentry
 	console.warn(error);
+	setLoadingComplete(true);
 }
 
 function handleFinishLoading(setLoadingComplete) {

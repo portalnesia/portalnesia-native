@@ -103,38 +103,41 @@ export default function ({ navigation,route }) {
 		else return null
 	}
 
+	const renderEmpty=()=>{
+		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
+		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
+	}
+
 	return (
 		<Layout navigation={navigation} title={slug ? `Chord By ${artist}` : "Chord Artists"}>
 			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-				{isLoadingInitialData ? (
-                	<View style={{height:"100%"}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-            	) : error ? (
-					<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-				) : (
-					<FlatList
-						columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-						numColumns={2}
-						data={data}
-						renderItem={({item,index})=>{
-							if(slug) return <RenderChord item={item} index={index} width={width} data={data} navigation={navigation} />
-							else return <RenderArtist item={item} index={index} width={width} data={data} navigation={navigation} />
-						}}
-						ListFooterComponent={Footer}
-						refreshControl={
-							<RefreshControl
-								colors={['white']}
-								progressBackgroundColor="#2f6f4e"
-								onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-								refreshing={refreshing}
-							/>
+				<FlatList
+					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+					ListEmptyComponent={renderEmpty}
+					numColumns={2}
+					contentContainerStyle={{
+						...(error ? {flex:1} : {})
+					}}
+					data={data}
+					renderItem={({item,index})=>{
+						if(slug) return <RenderChord item={item} index={index} width={width} data={data} navigation={navigation} />
+						else return <RenderArtist item={item} index={index} width={width} data={data} navigation={navigation} />
+					}}
+					ListFooterComponent={Footer}
+					refreshControl={
+						<RefreshControl
+							colors={['white']}
+							progressBackgroundColor="#2f6f4e"
+							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+							refreshing={refreshing}
+						/>
+					}
+					onEndReached={()=>{
+						if(!isReachingEnd && !isLoadingMore) {
+							setSize(size+1)
 						}
-						onEndReached={()=>{
-							if(!isReachingEnd && !isLoadingMore) {
-								setSize(size+1)
-							}
-						}}
-					/>
-				)}
+					}}
+				/>
 			</Lay>
 		</Layout>
 	);

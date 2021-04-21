@@ -12,7 +12,7 @@ const LoadingBackdrop=({visible,onClose,text,theme,width})=>(
         animationOut="fadeOut"
     >
         <View style={{maxWidth:width-20,flexDirection:'column',justifyContent:'center',alignItems:'center',margin:10,paddingVertical:20,paddingHorizontal:10,backgroundColor:theme['background-basic-color-1'],borderRadius:10}}>
-            <Text style={{marginBottom:10}}>{text}</Text>
+            <Text style={{marginBottom:30}}>{text}</Text>
             <Spinner size="giant" />
         </View>
     </Modal>
@@ -50,7 +50,7 @@ export default function Backdrop({progress,visible,onClose,loading,text="Loading
             animationOut="fadeOut"
         >
             <View style={{width:width-20,flexDirection:'column',justifyContent:'center',alignItems:'center',margin:10,paddingVertical:20,paddingHorizontal:10,backgroundColor:theme['background-basic-color-1'],borderRadius:10}}>
-                <Text style={{marginBottom:10}}>{text}</Text>
+                <Text style={{marginBottom:30}}>{text}</Text>
                 <View style={{flexDirection:'row',height:15,width:'100%',backgroundColor:theme['background-basic-color-3'],borderColor:theme['border-basic-color'],borderWidth:2,borderRadius:15}}>
                     <Animated.View style={[StyleSheet.absoluteFill,{backgroundColor:theme['color-indicator-bar'],width:`${scale}%`,borderRadius:15}]} />
                 </View>
