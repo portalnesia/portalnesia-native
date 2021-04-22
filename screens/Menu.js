@@ -20,7 +20,6 @@ import i18n from 'i18n-js'
 import useLogin from '@pn/utils/Login'
 import Portalnesia from '@pn/module/Portalnesia'
 import downloadFile from '@pn/utils/Download'
-import {startActivityAsync,ACTION_APP_NOTIFICATION_SETTINGS} from 'expo-intent-launcher'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
@@ -56,7 +55,7 @@ export default function({navigation}){
         const download_url = getAbi === null ? `${url}/Portalnesia-universal-v${version}.apk` : `${url}/Portalnesia-${getAbi}-v${version}.apk`;
         
         try {
-            const download = await downloadFile(download_url,"Portalnesia.apk","pn://login-callback",false,"pn://second-screen?type=update_app");
+            const download = await downloadFile(download_url,"Portalnesia.apk","pn://login-callback","pn://second-screen?type=update_app");
         
             if(download) {
                 setNotif(false,"Download","Start downloading...");

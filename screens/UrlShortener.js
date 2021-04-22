@@ -79,21 +79,19 @@ export default function URLshortener({navigation}){
         })
     }
 
-    const handleDownload=(result)=>()=>{
+    const handleDownload=(result)=>async()=>{
         const url = `${CONTENT_URL}/qr/url/${result.custom}`
         const filename = `[portalnesia.com]_${result.custom}.png`;
-        downloadFile(url,filename,"pn://url",true)
-        .then((res)=>{
-            return new Promise((resolve,reject)=>{
+        
+        try {
+            const down = await downloadFile(url,filename,"pn://url")
+            if(down) {
                 setNotif(false,"Download","Start downloading...");
-                res.start()
-                .then(()=>resolve)
-                .catch(()=>reject)
-            })
-        })
-        .catch(err=>{
+                await down.start();
+            }
+        } catch(err) {
             setNotif(true,"Error",err?.message||"Something went wrong");
-        })
+        }
     }
 
     return (
