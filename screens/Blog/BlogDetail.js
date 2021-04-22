@@ -18,6 +18,7 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import {CONTENT_URL} from '@env'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import i18n from 'i18n-js'
+import usePost from '@pn/utils/API'
 //const ShareIcon=(props)=><Icon {...props} name="ios-share" pack="material" />
 
 export default function({navigation,route}){
@@ -30,19 +31,25 @@ export default function({navigation,route}){
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
     const linkTo = useLinkTo()
+    const {PNget} = usePost();
 
     React.useEffect(()=>{
-        if(data && !data?.error && !ready) {
-            (async function(){
-                await analytics().logSelectContent({
-                    content_type:'blog',
-                    item_id:String(data?.blog?.id)
-                })
-                setReady(true)
-            })()
+        let timeout = null;
+        async function check() {
+            await analytics().logSelectContent({
+                content_type:'blog',
+                item_id:String(data?.blog?.id)
+            })
+            await PNget(`/blog/${slug}/update`);
+            setReady(true)
+        }
+
+        if(data && !data?.error && !ready && !__DEV__) {
+            timeout = setTimeout(check,5000);
         }
         return ()=>{
             if(ready) setReady(false)
+            if(timeout !== null) clearTimeout(timeout);
         }
     },[data,ready,slug])
 
@@ -103,7 +110,7 @@ export default function({navigation,route}){
                 </Animated.ScrollView>
             ) : null}
         </Layout>
-        {data && data?.error==0 && ready && (
+        {data && data?.error==0 && (
             <MenuContainer
                visible={open}
                handleOpen={()=>setOpen(true)}

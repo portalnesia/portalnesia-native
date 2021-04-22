@@ -18,6 +18,7 @@ import Chord from '@pn/components/global/Chord'
 import Button from '@pn/components/global/Button'
 import {ucwords} from '@pn/utils/Main'
 import i18n from 'i18n-js'
+import usePost from '@pn/utils/API'
 
 const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
@@ -38,6 +39,7 @@ export default function({navigation,route}){
     const [tools,setTools]=React.useState({fontSize:4,transpose:0,autoScroll:0})
     const [showMenu,setShowMenu]=React.useState(null)
     const linkTo = useLinkTo()
+    const {PNget} = usePost();
 
     const transpose = React.useMemo(()=>{
         const angka = tools.transpose
@@ -111,17 +113,22 @@ export default function({navigation,route}){
     },[])
 
     React.useEffect(()=>{
-        if(data && !data?.error && !ready) {
-            (async function(){
-                await analytics().logSelectContent({
-                    content_type:'chord',
-                    item_id:String(data?.chord?.id)
-                })
-                setReady(true)
-            })()
+        let timeout = null;
+        async function check() {
+            await analytics().logSelectContent({
+                content_type:'chord',
+                item_id:String(data?.chord?.id)
+            })
+            await PNget(`/chord/${slug}/update`);
+            setReady(true)
+        }
+
+        if(data && !data?.error && !ready && !__DEV__) {
+            timeout = setTimeout(check,5000);
         }
         return ()=>{
             if(ready) setReady(false)
+            if(timeout !== null) clearTimeout(timeout);
         }
     },[data,ready,route])
 
@@ -235,7 +242,7 @@ export default function({navigation,route}){
                 </Animated.ScrollView>
             ) : null}
         </Layout>
-        {data && ready && (
+        {data && !data?.error && (
                 <MenuContainer
                     visible={open}
                     handleOpen={()=>setOpen(true)}

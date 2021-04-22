@@ -4,6 +4,7 @@ import {Layout as Lay, Text,Divider,useTheme,Spinner} from '@ui-kitten/component
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
+import usePost from '@pn/utils/API'
 
 import Layout from '@pn/components/global/Layout';
 //import Image from '@pn/components/global/Image';
@@ -27,19 +28,26 @@ export default function({navigation,route}){
     const heightt = {...headerHeight,sub:0}	
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
+    const {PNget} = usePost();
 
     React.useEffect(()=>{
-        if(data && !data?.error && !ready) {
-            (async function(){
-                await analytics().logSelectContent({
-                    content_type:'user',
-                    item_id:String(data?.users?.id)
-                })
-                setReady(true)
-            })()
+        let timeout = null;
+        async function check() {
+            await analytics().logSelectContent({
+                content_type:'user',
+                item_id:String(data?.users?.id)
+            })
+            await PNget(`/pages/${slug}/update`);
+            setReady(true)
         }
+
+        if(data && !data?.error && !ready && !__DEV__) {
+            timeout = setTimeout(check,5000);
+        }
+        
         return ()=>{
             if(ready) setReady(false)
+            if(timeout !== null) clearTimeout(timeout);
         }
     },[data,ready,route])
 

@@ -17,6 +17,7 @@ import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {ucwords,openBrowser} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import Comment from '@pn/components/global/Comment'
+import usePost from '@pn/utils/API'
 //import {CONTENT_URL} from '@env'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
@@ -30,19 +31,25 @@ export default function({navigation,route}){
     const heightt = {...headerHeight,sub:0}	
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
+    const {PNget} = usePost();
 
     React.useEffect(()=>{
-        if(data && !data?.error && !ready) {
-            (async function(){
-                await analytics().logSelectContent({
-                    content_type:'news',
-                    item_id:String(data?.id)
-                })
-                setReady(true)
-            })()
+        let timeout = null;
+        async function check() {
+            await analytics().logSelectContent({
+                content_type:'news',
+                item_id:String(data?.id)
+            })
+            await PNget(`/news/${source}/${title}/update`);
+            setReady(true)
+        }
+
+        if(data && !data?.error && !ready && !__DEV__) {
+            timeout = setTimeout(check,5000);
         }
         return ()=>{
             if(ready) setReady(false)
+            if(timeout !== null) clearTimeout(timeout);
         }
     },[data,ready,title])
 
@@ -93,7 +100,7 @@ export default function({navigation,route}){
                 </Animated.ScrollView>
             ) : null}
         </Layout>
-        {data && ready && (
+        {data && !data?.error && (
             <MenuContainer
                 visible={open}
                 handleOpen={()=>setOpen(true)}

@@ -22,6 +22,7 @@ import { AuthContext } from '@pn/provider/AuthProvider';
 import Button from '@pn/components/global/Button'
 import {specialHTML,listToMatrix,openBrowser,Ktruncate} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'
+import usePost from '@pn/utils/API'
 
 const MoreIcon=(props)=><Icon {...props} style={{...props?.style,marginHorizontal:0}} name="more-vertical" />
 
@@ -130,19 +131,25 @@ export default function({navigation,route}){
     const {width} = useWindowDimensions()
     const [menu,setMenu]=React.useState(null)
     const {copyText} = useClipboard()
+    const {PNget} = usePost();
 
     React.useEffect(()=>{
-        if(data && !data?.error && !ready) {
-            (async function(){
-                await analytics().logSelectContent({
-                    content_type:'twitter_thread',
-                    item_id:String(data?.id)
-                })
-                setReady(true)
-            })()
+        let timeout = null;
+        async function check() {
+            await analytics().logSelectContent({
+                content_type:'twitter_thread',
+                item_id:String(data?.id)
+            })
+            await PNget(`/twitter/${slug}/update`);
+            setReady(true)
+        }
+
+        if(data && !data?.error && !ready && !__DEV__) {
+            timeout = setTimeout(check,5000);
         }
         return ()=>{
             if(ready) setReady(false)
+            if(timeout !== null) clearTimeout(timeout);
         }
     },[data,ready,route])
 
@@ -207,7 +214,7 @@ export default function({navigation,route}){
                 />
             ) : null }
         </Layout>
-        {data && ready && (
+        {data && !data?.error && (
                 <>
                     <MenuContainer
                         key="menu-1"
