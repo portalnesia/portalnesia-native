@@ -6,7 +6,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Font from 'expo-font';
 import 'moment/locale/id';
 import {StatusBar} from 'expo-status-bar'
-import * as Permissions from 'expo-permissions'
 import {
 	Inter_100Thin,
 	Inter_200ExtraLight,
@@ -21,7 +20,6 @@ import {
 import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './provider/AuthProvider';
 import {AppearanceProvider} from 'react-native-appearance'
-import RNFS from 'react-native-fs'
 
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
@@ -79,14 +77,6 @@ async function loadResourcesAsync() {
 			Inter_900Black,
 		})
 	]);
-	const wait = await Permissions.askAsync(Permissions.MEDIA_LIBRARY_WRITE_ONLY);
-	if(wait?.status === 'granted') {
-		const ada = await RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`);
-		if(!ada) {
-			await RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
-		}
-	}
-	return;
 }
 
 function handleLoadingError(error) {

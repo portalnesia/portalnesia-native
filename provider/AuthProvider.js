@@ -9,10 +9,11 @@ import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
 import useRootNavigation from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
-import {useColorScheme} from 'react-native'
+import {useColorScheme,PermissionsAndroid} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
+import RNFS from 'react-native-fs'
 
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
@@ -180,6 +181,16 @@ const AuthProvider = (props) => {
 			])
 		}
 
+		async function createFolder() {
+			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
+			if(granted === PermissionsAndroid.RESULTS.GRANTED) {
+				const ada = await RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`);
+				if(!ada) {
+					await RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
+				}
+			}
+		}
+
 		const netInfoListener = NetInfo.addEventListener(state=>{
 			if(state.isInternetReachable && !currentInternet.current) {
 				setNotif(false,i18n.t('net_online'));
@@ -192,6 +203,7 @@ const AuthProvider = (props) => {
 
 		asyncTask();
 		setNotificationChannel();
+		createFolder();
 
 		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
 		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
