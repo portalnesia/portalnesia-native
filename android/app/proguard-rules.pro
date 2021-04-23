@@ -8,6 +8,7 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+-keep class expo.modules.** { *; }
 -keep class com.google.android.gms.common.GooglePlayServicesUtil {*;}
 -keep class com.google.android.gms.ads.** { public *; }
 -keep class com.google.ads.** { public *; }
