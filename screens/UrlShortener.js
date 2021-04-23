@@ -84,10 +84,10 @@ export default function URLshortener({navigation}){
         const filename = `[portalnesia.com]_${result.custom}.png`;
         
         try {
-            const down = await downloadFile(url,filename,"pn://url")
+            const down = await downloadFile(url,filename,"pn://twitter/thread",`pn://second-screen?type=open_file&file=${encodeURIComponent(filename)}&mime=${encodeURIComponent('image/png')}`)
             if(down) {
                 setNotif(false,"Download","Start downloading...");
-                await down.start();
+                await down.start()
             }
         } catch(err) {
             setNotif(true,"Error",err?.message||"Something went wrong");

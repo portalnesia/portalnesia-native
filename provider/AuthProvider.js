@@ -246,11 +246,11 @@ const AuthProvider = (props) => {
 				const res = await AsyncStorage.getItem("last_notification")
 				if(res !== id) {
 					const urls = lastNotif?.notification?.request?.content?.data?.url
-					if(urls?.match(/portalnesia\.com+/) !== null) {
+					if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
 						const url = urls.split("//portalnesia.com")
 						linkTo(url[1]);
 					}
-					if(urls?.match(/pn\:\/\/+/) !== null) {
+					if(urls?.match(/^pn\:\/\/+/) !== null) {
 						const url = urls.split("pn:/")
 						linkTo(url[1]);
 					}
@@ -260,6 +260,21 @@ const AuthProvider = (props) => {
 		}
 		setTimeout(checkNotification,500)
 	},[lastNotif])
+
+	const onTap=(dt)=>{
+		const urls = dt?.payload?.url
+		if(urls) {
+			if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
+				const url = urls.split("//portalnesia.com")
+				linkTo(url[1]);
+			}
+			if(urls?.match(/^pn\:\/\/+/) !== null) {
+				const url = urls.split("pn:/")
+				linkTo(url[1]);
+			}
+		}
+		
+	}
 
 	return (
 		<AuthContext.Provider
@@ -284,7 +299,7 @@ const AuthProvider = (props) => {
 					activeStatusBarStyle='light-content'
 					inactiveStatusBarStyle={selectedTheme==='light' ? "dark-content" : "light-content"}
 					inactiveStatusBarBackgroundColor={selectedTheme==='light' ? "#FFFFFF" : "#222B45"}
-					onTap={(data)=>console.log(data)}
+					onTap={onTap}
 					renderImage={()=>null}
 					ref={dropdownRef} />
 			</ApplicationProvider>

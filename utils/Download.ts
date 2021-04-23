@@ -1,7 +1,6 @@
 import React from 'react';
 import {PermissionsAndroid} from 'react-native'
 import * as Notifications from 'expo-notifications'
-import RNDownloader from 'react-native-background-downloader'
 import BackgroundService,{BackgroundTaskOptions} from 'react-native-background-actions'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
@@ -37,7 +36,7 @@ function initBaseNotificationRequestInput(filename: string, channelId: string) {
         },
         trigger: {
             channelId,
-            seconds: 5,
+            seconds: 1,
             repeats: false
         }
     };
@@ -81,41 +80,41 @@ export interface TaskOptions extends BackgroundTaskOptions {
     parameters: ArgumentType
 }
 
-const downloadTask = async(argument?: ArgumentType) =>{
-    if(typeof argument !== 'undefined') {
-        const identifier = new Date().getTime().toString();
-        const baseNotificationRI = initBaseNotificationRequestInput(argument.filename, "Download");
-        const errorNot = errorNotification(identifier,baseNotificationRI,argument.uri)
-        const finnishNot = finnishNotification(identifier,baseNotificationRI,argument.completeUri);
-
-        await new Promise<void>((resolve,reject)=>{
-            RNDownloader.download({
-                id:`download_${argument?.filename}`,
-                url:argument.url,
-                destination:`${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${argument?.filename}`
-            }).begin(async(expectedBytes)=>{
-                await BackgroundService.updateNotification({progressBar:{max:expectedBytes,value:0,indeterminate:false},taskDesc:"Prepare download..."})
-            }).progress(async(_,value,total)=>{
-                await BackgroundService.updateNotification({progressBar:{max:total,value:value,indeterminate:false},taskDesc:"Downloading..."})
-            }).done(async()=>{
-                await Promise.all([
-                    Notifications.scheduleNotificationAsync(finnishNot),
-                    //BackgroundService.stop()
-                ])
-                resolve()
-            }).error(async()=>{
-                await Promise.all([
-                    Notifications.scheduleNotificationAsync(errorNot),
-                    //BackgroundService.stop()
-                ])
-                reject()
+const downloadTask = (argument?: ArgumentType) =>{
+    return new Promise<void>((resolve)=>{
+        if(typeof argument !== 'undefined') {
+            const identifier = new Date().getTime().toString();
+            const baseNotificationRI = initBaseNotificationRequestInput(argument.filename, "Download");
+            const errorNot = errorNotification(identifier,baseNotificationRI,argument.uri)
+            const finnishNot = finnishNotification(identifier,baseNotificationRI,argument.completeUri);
+    
+            RNFS.downloadFile({
+                fromUrl:argument.url,
+                toFile: `${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${argument?.filename}`,
+                begin:async(res: RNFS.DownloadBeginCallbackResult)=>{
+                    await BackgroundService.updateNotification({progressBar:{max:res.contentLength,value:0,indeterminate:false},taskDesc:"Prepare download...",taskTitle:argument?.filename})
+                },
+                progress:async(res:RNFS.DownloadProgressCallbackResult)=>{
+                    await BackgroundService.updateNotification({progressBar:{max:res.contentLength,value:res.bytesWritten,indeterminate:false},taskDesc:"Downloading...",taskTitle:argument?.filename})
+                }
+            }).promise
+            .then((res)=>{
+                return new Promise(resolve=>{
+                    if(res.statusCode == 200) {
+                        Notifications.scheduleNotificationAsync(finnishNot).then(resolve)
+                    } else {
+                        Notifications.scheduleNotificationAsync(errorNot).then(resolve)
+                    }
+                })
             })
-        })
-        return;
-    } else {
-        //await BackgroundService.stop()
-        return;
-    }
+            .then(()=>{
+              resolve();  
+            })
+            .catch(()=>resolve());
+        } else {
+            resolve();
+        }
+    })
 }
 
 class PNDownload{
@@ -127,14 +126,18 @@ class PNDownload{
         this.option = option
     }
 
-    async start(){
-        return await BackgroundService.start<ArgumentType>(this.task,this.option)
+    start(){
+        return BackgroundService.start<ArgumentType>(this.task,this.option)
+    }
+    stop(){
+        return BackgroundService.stop();
     }
 }
 
 export default async function downloadFile(url: string,filename: string,uri: string="pn://news",completeUri: string|null=null){
+    const identifier = new Date().getTime().toString();    
     const options: TaskOptions = {
-        taskName:`download_${filename}`,
+        taskName:`download_${filename}_${identifier}`,
         taskTitle:`Task`,
         taskDesc:`Background Task`,
         taskIcon:{

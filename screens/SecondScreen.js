@@ -4,13 +4,13 @@ import RNFS from 'react-native-fs'
 import {useNavigationState} from '@react-navigation/native'
 import {useTheme} from '@ui-kitten/components'
 import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
+import * as IntentLauncher from 'expo-intent-launcher'
 
 import Loading from './utils/Loading'
 import Portalnesia from '@pn/module/Portalnesia'
 import {AuthContext} from '@pn/provider/Context'
 
 export default function ({ navigation,route }) {
-	const type = route?.params?.type
 	const index = useNavigationState(state=>state.index);
 	const auth = React.useContext(AuthContext);
 	const {theme:selectedTheme} = auth;
@@ -27,6 +27,8 @@ export default function ({ navigation,route }) {
 	},[])
 
 	React.useEffect(()=>{
+		const type = route?.params?.type
+
 		function goBack(){
 			if(index > 0) {
 				navigation.goBack();
@@ -54,10 +56,28 @@ export default function ({ navigation,route }) {
             } else goBack();
         }
 
+		async function openFile() {
+			try {
+				const file = decodeURIComponent(route?.params?.file);
+				const mime = decodeURIComponent(route?.params?.mime);
+				const fileUri = await Portalnesia.uriToFileProvider(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${file}`);
+				await IntentLauncher.startActivityAsync("android.intent.action.VIEW",{
+					type:mime,
+					data: fileUri,
+					flags:1
+				})
+				goBack();
+			} catch(e) {
+				console.log(e)
+				goBack();
+			}
+		}
+
         if(type==='update_app') checkIsUpdate();
+		else if(type==='open_file') openFile();
 		else goBack();
 
-    },[type])
+    },[route])
 
 	return (
 		<Layout navigation={navigation} title="Portalnesia" withBack>
