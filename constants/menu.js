@@ -4,7 +4,7 @@ export const menu=(i18n)=>([
         menu:[
             {
                 title:"Twitter Thread Reader",
-                to:"Twitter",
+                to:"/twitter/thread",
                 icon:['twitter','font_awesome']
             },
             {
@@ -13,7 +13,7 @@ export const menu=(i18n)=>([
                 menu:[
                     {
                         title:"Transform Coordinate",
-                        to:"GeodataTransform"
+                        to:"/geodata/transform"
                     }
                 ]
             },
@@ -23,15 +23,15 @@ export const menu=(i18n)=>([
                 menu:[
                     {
                         title:"QR Code Generator",
-                        to:"QrGenerator"
+                        to:"/qr-code"
                     },
                     {
                         title:"Random Number Generator",
-                        to:"NumberGenerator"
+                        to:"/random-number"
                     },
                     {
                         title:"Parse HTML",
-                        to:"ParseHtml"
+                        to:"/parse-html"
                     },
                     /*{
                         title:"Downloader",
@@ -39,7 +39,7 @@ export const menu=(i18n)=>([
                     },*/
                     {
                         title:"Images Checker",
-                        to:"ImagesChecker"
+                        to:"/images-checker"
                     },
                     /*{
                         title:"Twitter Menfess",
@@ -59,18 +59,18 @@ export const menu=(i18n)=>([
             },*/
             {
                 title:"URL Shortener",
-                to:"UrlShortener",
+                to:"/url",
                 //link:"pn://pages/terms-of-service",
                 icon:['link','font_awesome'],
             },
             {
                 title:"Blog",
-                to:"Blog",
+                to:"/blog",
                 icon:['article','material'],
             },
             {
                 title:"Twibbon",
-                to:"Twibbon",
+                to:"/twibbon",
                 icon:['ios-image','ionicons'],
             },
         ]
@@ -80,7 +80,7 @@ export const menu=(i18n)=>([
         menu:[
             {
                 title:i18n.t("contact"),
-                to:"Contact",
+                to:"/contact",
                 //icon:['contact-support','material'],
             },
             {
@@ -90,7 +90,7 @@ export const menu=(i18n)=>([
             },
             {
                 title:i18n.t("terms_of_service"),
-                to:"Pages",
+                to:"/pages/terms-of-service?navbar=Terms of Service",
                 params:{
                     navbar:"Terms of Service",
                     slug:"terms-of-service"
@@ -98,7 +98,7 @@ export const menu=(i18n)=>([
             },
             {
                 title:i18n.t("privacy_policy"),
-                to:"Pages",
+                to:"/pages/privacy-policy?navbar=Privacy Policy",
                 params:{
                     slug:"privacy-policy",
                     navbar:"Privacy Policy"
@@ -112,7 +112,7 @@ export const menu=(i18n)=>([
             },
             {
                 title:"Open Source Libraries",
-                to:"OpenSource",
+                to:"/opensource",
                 //to:"NewsDetail",
                 //params:{source:'liputan6',title:'Patung+Nyi+Roro+Kidul+Muncul+Secara+Misterius+di+Pantai+Nusa+Dua'}
             }

@@ -5,6 +5,7 @@ import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
 import {CONTENT_URL,API_URL} from '@env'
 import i18n from 'i18n-js'
+import {useLinkTo} from '@react-navigation/native'
 
 import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
@@ -17,8 +18,9 @@ import {specialHTML} from '@pn/utils/Main'
 //const CONTENT_URL='https://content.portalnesia.com',API_URL='https://api.portalnesia.com'
 
 const RenderNews = React.memo(({item:dt, index:i,navigation}) => {
+	const linkTo = useLinkTo();
 	return (
-		<Card key={i} onPress={()=>navigation.navigate("NewsDetail",{source:dt?.source,title:encodeURIComponent(dt.title)})}>
+		<Card key={i} onPress={()=>linkTo(`/news/${dt?.source}/${encodeURIComponent(dt.title)}`)}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"

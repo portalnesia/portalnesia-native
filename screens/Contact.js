@@ -51,7 +51,7 @@ const dataContact=[
 ]
 
 export default function Contact({navigation,route}){
-    const {subject} = route.params
+    const subject = route.params?.subject
     const {PNpost} = useAPI(false)
     const context = React.useContext(AuthContext)
     const {setNotif} = context

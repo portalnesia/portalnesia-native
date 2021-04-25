@@ -128,7 +128,7 @@ export default function({navigation}){
         <>
         <Layout navigation={navigation} >
             <Animated.View style={{position:'absolute',backgroundColor: theme['color-basic-100'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopAction tooltip={i18n.t('setting')} icon={SettingIcon} onPress={()=>navigation.navigate("Setting")} />}>
+				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopAction tooltip={i18n.t('setting')} icon={SettingIcon} onPress={()=>linkTo("/setting")} />}>
                     <Lay level="1" style={{height:100,paddingVertical:10,paddingHorizontal:15,alignItems:'center',flexDirection:'row'}}>
                         <Lay level="1" style={{marginRight:20}}><Avatar size={60} {...(user !== false ? {src:`${user?.picture}&watermark=no`} : {avatar:true})} /></Lay>
                         <Lay level="1" style={{marginRight:20}}>
@@ -168,6 +168,7 @@ export default function({navigation}){
 }
 
 const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
+    const linkTo = useLinkTo();
     return (
         <Menu>
             {dt.map((it,ii)=>{
@@ -202,7 +203,7 @@ const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
                     }
                     const onPress=()=>{
                         if(it?.to === "CheckUpdate") checkUpdates();
-                        else if(it.to) navigation.navigate(it.to,it?.params||{})
+                        else if(it.to) linkTo(it.to)
                         else if(it.link) {
                             if(!it.link?.match(/https?\:\/\/+/)) {
                                 Linking.openURL(it.link)

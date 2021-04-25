@@ -30,6 +30,15 @@ export const linking = {
                             },
                         }
                     },
+                    SettingStack:{
+                        path:'setting',
+                        exact:true,
+                        screens:{
+                            Setting:{
+                                path:''
+                            }
+                        }
+                    },
                     NewsDetail:{
                         path:'news/:source/:title',
                         exact:true
@@ -108,6 +117,10 @@ export const linking = {
                     },
                     SecondScreen:{
                         path:'second-screen',
+                        exact:true
+                    },
+                    OpenSource:{
+                        path:'opensource',
                         exact:true
                     },
                     NotFound: '*',

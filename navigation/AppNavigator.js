@@ -99,6 +99,12 @@ const BottomTabBar = ({navigation,state})=>{
 		</BottomNavigation>
 	)
 }
+/* CREATE BOTTOM NAVIGATOR */
+
+
+const MainStack = createStackNavigator();
+const RootStack = createStackNavigator();
+const SettingStack = createStackNavigator();
 
 const MainTabs=()=>(
 	<Tabs.Navigator initialRouteName="Home" tabBar={props=><BottomTabBar {...props} />}>
@@ -109,11 +115,22 @@ const MainTabs=()=>(
 		<Tabs.Screen name="Menu" component={Menu} />
 	</Tabs.Navigator>
 )
-/* CREATE BOTTOM NAVIGATOR */
 
 
-const MainStack = createStackNavigator();
-const RootStack = createStackNavigator();
+const SettingStackScreen=()=>(
+	<SettingStack.Navigator
+		screenOptions={{
+			headerShown: false,
+			gestureEnabled:true,
+			gestureDirection:'horizontal',
+			cardStyle:{backgroundColor:'transparent'},
+			...TransitionPresets.SlideFromRightIOS
+		}}
+		initialRouteName="Setting"
+	>
+		<SettingStack.Screen name="Setting" component={Setting} />
+	</SettingStack.Navigator>
+)
 
 const MainStackScreen=()=>(
 	<MainStack.Navigator
@@ -144,7 +161,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="QrGenerator" component={QrGenerator} />
 		<MainStack.Screen name="UrlShortener" component={UrlShortener} />
 		<MainStack.Screen name="Contact" component={Contact} />
-		<MainStack.Screen name="Setting" component={Setting} />
+		<MainStack.Screen name="SettingStack" component={SettingStackScreen} />
 		<MainStack.Screen name="BlogList" component={BlogList} />
 		<MainStack.Screen name="User" component={User} />
 		<MainStack.Screen name="SearchFilter" component={SearchFilter} />
