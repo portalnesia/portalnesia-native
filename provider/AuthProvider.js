@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
 import RNFS from 'react-native-fs'
+import {openBrowserAsync} from 'expo-web-browser'
 
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
@@ -246,6 +247,14 @@ const AuthProvider = (props) => {
 				const res = await AsyncStorage.getItem("last_notification")
 				if(res !== id) {
 					const urls = lastNotif?.notification?.request?.content?.data?.url
+					if(urls?.match(/\/corona+/)) {
+						const url = urls?.replace(/^pn\:\/\//,"https://portalnesia.com/");
+						return openBrowserAsync(url,{
+							enableDefaultShare:true,
+							toolbarColor:'#2f6f4e',
+							showTitle:true
+						})
+					}
 					if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
 						const url = urls.split("//portalnesia.com")
 						linkTo(url[1]);
@@ -264,6 +273,14 @@ const AuthProvider = (props) => {
 	const onTap=(dt)=>{
 		const urls = dt?.payload?.url
 		if(urls) {
+			if(urls?.match(/\/corona+/)) {
+				const url = urls?.replace("pn://","https://portalnesia.com/");
+				return openBrowserAsync(url,{
+					enableDefaultShare:true,
+					toolbarColor:'#2f6f4e',
+					showTitle:true
+				})
+			}
 			if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
 				const url = urls.split("//portalnesia.com")
 				linkTo(url[1]);

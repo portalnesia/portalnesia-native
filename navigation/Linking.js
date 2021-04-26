@@ -1,5 +1,6 @@
 import {createURL,getInitialURL as expoGetInitialURL,addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener} from 'expo-linking'
 import {addNotificationResponseReceivedListener} from 'expo-notifications'
+import {openBrowserAsync} from 'expo-web-browser'
 
 export const linking = {
     prefixes:[createURL('/'),'https://portalnesia.com'],
@@ -129,11 +130,13 @@ export const linking = {
     },
     async getInitialURL(){
         const url = await expoGetInitialURL()
-        if(url !== null) return url
+        const notCorona = url!==null && url?.match(/\/corona+/) ===null;
+        if(notCorona) return url
     },
     subcribe(listener){
         const onReceiveURL = ({url})=>{
-            return listener(url)
+            const notCorona = typeof url === 'string' && url?.match(/\/corona+/) === null;
+            if(notCorona) return listener(url)
         }
         const notificationFunction = (data) =>{
             if(data?.notification?.request?.content?.data?.url) {

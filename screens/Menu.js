@@ -186,7 +186,7 @@ const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
                     return (
                         <MenuGroup key={`${i}-${ii}`} title={Title} style={{paddingHorizontal:15,paddingVertical:14}}>
                             {it.menu.map((itt,iii)=>(
-                                <MenuItem key={`${i}-${ii}-${iii}`} title={()=><Text style={{marginLeft:15}}>{itt.title}</Text>} onPress={()=>itt.to ? navigation.navigate(itt.to,itt?.params||{}) : itt.link ? Linking.openURL(itt.link) : undefined} />
+                                <MenuItem key={`${i}-${ii}-${iii}`} title={()=><Text style={{marginLeft:15}}>{itt.title}</Text>} onPress={()=>itt.to ? linkTo(itt.to) : itt.link ? Linking.openURL(itt.link) : undefined} />
                             ))}
                         </MenuGroup>
                     )
