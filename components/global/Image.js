@@ -8,7 +8,7 @@ import Img from 'react-native-fast-image'
 
 import { AuthContext } from '@pn/provider/AuthProvider';
 
-export const ImageFull=React.memo(({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFancybox,thumbnail,zoomable,animated=true,...other})=>{
+export const ImageFull=React.memo(({source,style,alt,contentWidth,fancybox,dataSrc,forceFancybox,thumbnail,zoomable,animated=true,...other})=>{
     const {width: screenWidth} = useWindowDimensions()
     const context = React.useContext(AuthContext)
     const {theme:selectedTheme} = context

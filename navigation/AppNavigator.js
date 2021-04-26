@@ -46,6 +46,7 @@ import OpenSource from '../screens/OpenSource/OpenSource'
 import OpenSourceDetail from '../screens/OpenSource/OpenSourceDetail'
 import Comments from '../screens/Modal/Comments'
 import SecondScreen from '../screens/SecondScreen'
+import NotificationEvent from '../screens/Notification/NotificationEvent'
 
 import { AuthContext } from '../provider/Context';
 
@@ -104,7 +105,6 @@ const BottomTabBar = ({navigation,state})=>{
 
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
-const SettingStack = createStackNavigator();
 
 const MainTabs=()=>(
 	<Tabs.Navigator initialRouteName="Home" tabBar={props=><BottomTabBar {...props} />}>
@@ -114,22 +114,6 @@ const MainTabs=()=>(
 		<Tabs.Screen name="Chord" component={Chord} />
 		<Tabs.Screen name="Menu" component={Menu} />
 	</Tabs.Navigator>
-)
-
-
-const SettingStackScreen=()=>(
-	<SettingStack.Navigator
-		screenOptions={{
-			headerShown: false,
-			gestureEnabled:true,
-			gestureDirection:'horizontal',
-			cardStyle:{backgroundColor:'transparent'},
-			...TransitionPresets.SlideFromRightIOS
-		}}
-		initialRouteName="Setting"
-	>
-		<SettingStack.Screen name="Setting" component={Setting} />
-	</SettingStack.Navigator>
 )
 
 const MainStackScreen=()=>(
@@ -161,7 +145,6 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="QrGenerator" component={QrGenerator} />
 		<MainStack.Screen name="UrlShortener" component={UrlShortener} />
 		<MainStack.Screen name="Contact" component={Contact} />
-		<MainStack.Screen name="SettingStack" component={SettingStackScreen} />
 		<MainStack.Screen name="BlogList" component={BlogList} />
 		<MainStack.Screen name="User" component={User} />
 		<MainStack.Screen name="SearchFilter" component={SearchFilter} />
@@ -170,6 +153,8 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="OpenSource" component={OpenSource} />
 		<MainStack.Screen name="OpenSourceDetail" component={OpenSourceDetail} />
 		<MainStack.Screen name="SecondScreen" component={SecondScreen} />
+		<MainStack.Screen name="Setting" component={Setting} />
+		<MainStack.Screen name="NotificationEvent" component={NotificationEvent} />
 	</MainStack.Navigator>
 )
 

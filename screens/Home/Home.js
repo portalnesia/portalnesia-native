@@ -5,7 +5,7 @@ import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
 import {CONTENT_URL,API_URL} from '@env'
 import i18n from 'i18n-js'
-import {useLinkTo} from '@react-navigation/native'
+import {useLinkTo,useNavigationState} from '@react-navigation/native'
 
 import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
@@ -216,6 +216,7 @@ export default function HomeScreen({ navigation }) {
 	const [data,setData]=React.useState()
 	const [error,setError] = React.useState(false)
 	const {PNget} = useAPI();
+	const state = useNavigationState(state=>({index:state.index,routes:state.routes}));
 	
 	React.useEffect(()=>{
 		setTimeout(()=>{

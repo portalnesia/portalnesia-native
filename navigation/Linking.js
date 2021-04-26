@@ -30,14 +30,9 @@ export const linking = {
                             },
                         }
                     },
-                    SettingStack:{
+                    Setting:{
                         path:'setting',
                         exact:true,
-                        screens:{
-                            Setting:{
-                                path:''
-                            }
-                        }
                     },
                     NewsDetail:{
                         path:'news/:source/:title',
@@ -121,6 +116,10 @@ export const linking = {
                     },
                     OpenSource:{
                         path:'opensource',
+                        exact:true
+                    },
+                    NotificationEvent:{
+                        path:'notification/events/:slug',
                         exact:true
                     },
                     NotFound: '*',
