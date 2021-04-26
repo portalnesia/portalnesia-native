@@ -38,7 +38,7 @@ export default function useAPI(){
     const {setNotif,state} = context
     const {user,session,token}=state
     
-    const PNpost=(url,data,formdata)=>{
+    const PNpost=(url,data,formdata,catchError=true)=>{
         return new Promise((res,rej)=>{
             const baseURL =  user === false || user === null ?  `/native${url}` :  `/native_secure${url}`
             const qs=require('qs');
@@ -65,29 +65,31 @@ export default function useAPI(){
             }
             API.post(baseURL,dt,opt)
             .then((response)=>{
-                if(response?.data?.error == 1) {
+                if(response?.data?.error == 1 && catchError) {
                     //console.log(response?.status)
                     setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'));
                 }
                 res(response?.data);
             })
             .catch((err)=>{
-                //console.log(err?.response)
-                if(err?.response?.data) {
-                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('errors.general'));
+                if(catchError) {
+                    if(err?.response?.data) {
+                        setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('errors.general'));
+                    }
+                    else if(err?.response?.status===503) {
+                        setNotif("error","Error",i18n.t('errors.server'));
+                        //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
+                    } else {
+                        setNotif("error","Error",i18n.t('errors.general'))
+                    }
                 }
-                else if(err?.response?.status===503) {
-                    setNotif("error","Error",i18n.t('errors.server'));
-                    //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
-                } else {
-                    setNotif("error","Error",i18n.t('errors.general'))
-                }
+                
                 rej();
             })
         })
     }
 
-    const PNget=(url)=>{
+    const PNget=(url,catchError=true)=>{
         return new Promise((res,rej)=>{
             const baseURL =  user === false || user === null ?  `/native${url}` :  `/native_secure${url}`
             const opt={
@@ -98,21 +100,23 @@ export default function useAPI(){
             }
             API.get(baseURL,opt)
             .then((response)=>{
-                if(response?.data?.error == 1) {
+                if(response?.data?.error == 1 && catchError) {
                     setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
                 }
                 res(response?.data);
             })
             .catch((err)=>{
                 //console.log(`PNGET: ${url}`,err?.response?.data,opt)
-                if(err?.response?.data) {
-                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
-                }
-                else if(err?.response?.status===503) {
-                    setNotif("error","Error",i18n.t('errors.server'));
-                    //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
-                } else {
-                    setNotif("error","Error",i18n.t('errors.general'))
+                if(catchError) {
+                    if(err?.response?.data) {
+                        setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
+                    }
+                    else if(err?.response?.status===503) {
+                        setNotif("error","Error",i18n.t('errors.server'));
+                        //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
+                    } else {
+                        setNotif("error","Error",i18n.t('errors.general'))
+                    }
                 }
                 rej();
             })

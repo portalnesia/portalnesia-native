@@ -10,6 +10,7 @@ import {URL} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import useClipboard from '@pn/utils/clipboard'
 import i18n from 'i18n-js'
+import useAPI from '@pn/utils/API'
 
 const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
@@ -19,6 +20,7 @@ const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const {copyText} = useClipboard()
+    const {PNpost} = useAPI();
     //const {width}=useWindowDimensions()
     const theme=useTheme()
     const ref = React.useRef(null)
@@ -41,12 +43,18 @@ const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
         },{
             dialogTitle:dialog||i18n.t('share')
         })
-        if(type && item_id) {
-            await analytics().logShare({
-                content_type:type,
-                item_id:String(item_id),
-                method:"share_button"
-            })
+        if(type && item_id && !__DEV__) {
+            try {
+                const a = await Promise.all([
+                    analytics().logShare({
+                        content_type:type,
+                        item_id:String(item_id),
+                        method:"share_button"
+                    }),
+                    PNpost(`/backend/shared?native=true`,{type,posid:item_id})
+                ])
+                console.log(a[1]);
+            } catch(e) {}
         }
     },[type,item_id])
 
