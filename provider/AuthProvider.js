@@ -249,19 +249,20 @@ const AuthProvider = (props) => {
 					const urls = lastNotif?.notification?.request?.content?.data?.url
 					if(urls?.match(/\/corona+/)) {
 						const url = urls?.replace(/^pn\:\/\//,"https://portalnesia.com/");
-						return openBrowserAsync(url,{
+						openBrowserAsync(url,{
 							enableDefaultShare:true,
 							toolbarColor:'#2f6f4e',
 							showTitle:true
 						})
-					}
-					if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
-						const url = urls.split("//portalnesia.com")
-						linkTo(url[1]);
-					}
-					if(urls?.match(/^pn\:\/\/+/) !== null) {
-						const url = urls.split("pn:/")
-						linkTo(url[1]);
+					} else {
+						if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
+							const url = urls.split("//portalnesia.com")
+							linkTo(url[1]);
+						}
+						if(urls?.match(/^pn\:\/\/+/) !== null) {
+							const url = urls.split("pn:/")
+							linkTo(url[1]);
+						}
 					}
 					await AsyncStorage.setItem("last_notification",id);
 				}
