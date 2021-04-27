@@ -233,6 +233,12 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
+    "expo-intent-launcher@9.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
     "expo-linking@2.0.1": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
@@ -376,7 +382,7 @@
         "licenseUrl": "https://github.com/ljharb/qs/raw/master/LICENSE.md",
         "parents": "portal-native"
     },
-    "react-dom@16.13.1": {
+    "react-dom@17.0.2": {
         "licenses": "MIT",
         "repository": "https://github.com/facebook/react",
         "licenseUrl": "https://github.com/facebook/react/raw/master/LICENSE",
@@ -410,6 +416,10 @@
         "licenses": "Apache-2.0",
         "repository": "https://github.com/EkoLabs/react-native-background-downloader",
         "licenseUrl": "https://github.com/EkoLabs/react-native-background-downloader/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-chart-kit@6.11.0": {
+        "licenses": "UNKNOWN",
         "parents": "portal-native"
     },
     "react-native-dotenv@2.5.3": {
@@ -464,6 +474,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/drophive/react-native-pkce-challenge",
         "licenseUrl": "https://github.com/drophive/react-native-pkce-challenge/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-print@0.7.0": {
+        "licenses": "MIT",
+        "repository": "github:christopherdro/react-native-print",
+        "licenseUrl": "github:christopherdro/react-native-print",
         "parents": "portal-native"
     },
     "react-native-reanimated@1.13.2": {
@@ -592,7 +608,7 @@
         "licenseUrl": "https://github.com/conorhastings/react-syntax-highlighter/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react@16.13.1": {
+    "react@17.0.2": {
         "licenses": "MIT",
         "repository": "https://github.com/facebook/react",
         "licenseUrl": "https://github.com/facebook/react/raw/master/LICENSE",
