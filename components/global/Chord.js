@@ -1,6 +1,7 @@
 import React from 'react'
 import {View,Platform} from 'react-native'
 import {Text} from '@ui-kitten/components'
+import {URL,CONTENT_URL} from '@env'
 
 import {replaceAt,splice,specialHTML} from '@pn/utils/Main'
 
@@ -289,3 +290,204 @@ export default React.memo(function({template,transpose=0,fontSize}){
         </View>
     )
 })
+
+const Kchord=function(template, transpose=0,margin,func) {
+    if( typeof transpose == 0 ) {
+        transpose = false;
+    }
+    const chordregex= /\[([^\]]*)\]/;
+    const inword    = /[a-z]$/;
+    const buffer    = [];
+    const chords    = [];
+    let last_was_lyric = false;
+    let chord;
+    
+    if (!template || template.length===0) {
+        if(typeof func==='function') return func("");
+        return "";
+    }
+
+    template.split("\n").forEach(function(line, linenum) {
+        /* Comment, ignore */
+        if (line.match(/^#/)) {
+            return "";
+        }
+        /* Chord line */
+        if (line.match(chordregex)) {
+            if( !buffer.length ) {
+                buffer.push('<div class="lyric_block">');
+                last_was_lyric = true;
+            } else if( !last_was_lyric ) {
+                buffer.push('</div><div class="lyric_block">');
+                last_was_lyric = true;
+            }
+            let chords = "";
+            let lyrics = "";
+            let chordlen = 0;
+            line.split(chordregex).forEach(function(word, pos) {
+                var dash = 0;
+                /* Lyrics */
+                if ((pos % 2) == 0) {
+                    lyrics = lyrics + word.replace(' ', "&nbsp;");
+                  /*
+                   * Whether or not to add a dash (within a word)
+                   */
+                    if (word.match(inword)) {
+                        dash = 1;
+                    }
+                  /*
+                   * Apply padding.  We never want two chords directly adjacent,
+                   * so unconditionally add an extra space.
+                   */
+                    if (word && word.length < chordlen) {
+                        chords = chords + "&nbsp;";
+                        lyrics = (dash == 1) ? lyrics + "&nbsp;" : lyrics + "&nbsp&nbsp;";
+                        for (var i = chordlen - word.length - dash; i != 0; i--) {
+                            lyrics = lyrics + "&nbsp;";
+                        }
+                    } else if (word && word.length == chordlen) {
+                        chords = chords + "&nbsp;";
+                        lyrics = (dash == 1) ? lyrics + " " : lyrics + "&nbsp;";
+                    } else if (word && word.length > chordlen) {
+                        for (var i = word.length - chordlen; i != 0; i--) {
+                            chords = chords + "&nbsp;";
+                        }
+                    }
+                } else {
+                    /* Chords */
+                    chord = word.replace(/[[]]/, "");
+                    if(transpose !== false) {
+                        chord = transpose_chord(chord, transpose);
+                    }
+                    chordlen = chord.length;
+                    chords = chords + '<span class="chord" data-original-val="' + chord + '">' + chord + '</span>';
+                }
+            }, this);
+            var cek=lyrics.match(/(?!nbsp\b)\b\w+/); //Cek ada lirik *null= tidak ada
+            if( cek === null){
+                buffer.push('<span class="line">' + chords + "</span><br/>");
+            } else {
+                buffer.push('<span class="line">' + chords + "<br/>\n" + lyrics + "</span><br/>");
+            }
+            return;
+        }
+        /* Commands, ignored for now */
+        if (line.match(/^{.*}/)) {
+            if( !buffer.length ) {
+                buffer.push('<div class="command_block">');
+                last_was_lyric = false;
+            } else if( last_was_lyric ) {
+                buffer.push('</div><div class="command_block">');
+                last_was_lyric = false;
+            }
+            //ADD COMMAND PARSING HERE
+            //reference: http://tenbyten.com/software/songsgen/help/HtmlHelp/files_reference.htm
+            // implement basic formatted text commands
+            var matches = line.match(/^{(title|t|subtitle|st|comment|c|#):\s*(.*)}/, "i");
+            if( matches.length >= 3 ) {
+                var command = matches[1];
+                var text = matches[2];
+                var wrap="";
+                //add more non-wrapping commands with this switch
+                switch( command ) {
+                    case "title":
+                    case "t":
+                        command = "";
+                        wrap = "h1";
+                        break;
+                    case "subtitle":
+                    case "st":
+                        command = "";
+                        wrap = "h4";
+                        break;
+                    case "comment":
+                    case "c":
+                        command = `comment${margin ? ` margin` : ''}`;
+                        wrap    = "em";
+                        break;
+                    case "#":
+                        command = '';
+                        wrap = 'h6';
+                        text="#"+text;
+                        break;
+                }
+                if( wrap ) {
+                    if(wrap==='em') {
+                        buffer.push('<' + wrap + ' class="' + command + '">[' + text + ']</' + wrap + '>' );
+                    } else {
+                        buffer.push('<' + wrap + ' class="' + command + '">' + text + '</' + wrap + '>' );
+                    }
+                }
+            }
+            // work from here to add wrapping commands
+            return;
+        }
+        /* Anything else */
+        buffer.push(line + "<br/>");
+    }, this);
+    if(typeof func==='function') {
+        return func(buffer.join("\n"));
+    }
+    return buffer.join("\n");
+};
+
+export function chord_html(chord,transpose){
+    const data = Kchord(chord?.text,transpose);
+    let html='';
+    try {
+        html=`
+            <style>
+                @page {
+                    size: A4;
+                    margin: 15mm 5mm 15mm 5mm;
+                }
+                .wrapper{
+                    white-space:no-wrap;
+                    font-family:'monospace';
+                    line-height:1.5;
+                    margin-top:2rem;
+                    column-count: 2;
+                    p,span{
+                        font-size:14px;
+                    }
+                }
+                .command_block{
+                    margin:.5px
+                }
+                .comment{
+                    display:block;
+                }
+                .margin{
+                    marginBottom:5;
+                }
+                .line{
+                    -webkit-column-break-inside:avoid;
+                    page-break-inside':avoid;
+                    break-inside':avoid-column;
+                }
+                .chord{
+                    font-weight:700;
+                    color: #1591f9;
+                }
+            </style>
+            <table style="margin-bottom:1rem">
+                <tr>
+                    <td rowspan="3"><img style="width:70px;" src="${CONTENT_URL}/icon/android-chrome-512x512.png"/></td>
+                    <td style="padding-left:1rem">Chord ${chord?.title}</td>
+                </tr>
+                <tr>
+                    <td style="padding-left:1rem">By ${chord?.artist}</td>
+                </tr>
+                <tr>
+                    <td style="padding-left:1rem"><strong><em>${URL}/chord/${encodeURIComponent(chord?.slug?.toLowerCase())}</em></strong></td>
+                </tr>
+            </table>
+            <div class="wrapper">
+                ${data}
+            </div>
+        `
+    } catch(e) {
+        console.log(e);
+    }
+    return html;
+}

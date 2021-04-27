@@ -106,7 +106,7 @@ export default function Contact({navigation,route}){
     }
 
     React.useEffect(()=>{
-        if(subject) setInput({...input,subject:subject})
+        if(subject) setInput({...input,subject:decodeURIComponent(subject)})
     },[])
 
     return (

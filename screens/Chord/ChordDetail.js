@@ -5,7 +5,11 @@ import {useLinkTo} from '@react-navigation/native'
 import Skeleton from '@pn/components/global/Skeleton'
 import Modal from 'react-native-modal'
 import analytics from '@react-native-firebase/analytics'
+import RNPrint from 'react-native-print'
+import compareVersion from 'compare-versions'
+import {Constants} from 'react-native-unimodules'
 
+import {URL} from '@env'
 import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -14,7 +18,7 @@ import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
-import Chord from '@pn/components/global/Chord'
+import Chord,{chord_html} from '@pn/components/global/Chord'
 import Button from '@pn/components/global/Button'
 import {ucwords} from '@pn/utils/Main'
 import i18n from 'i18n-js'
@@ -24,15 +28,16 @@ const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
 const XIcon=(props)=><Icon {...props} name="close" />
 
-const fontArray = [10,11,12,13,14,15,16,17,18]
+const fontArray = [9,10,11,12,13,14,15,16,17]
+const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.3.0",">=");
 
-export default function({navigation,route}){
+function ChordDetailScreen({navigation,route}){
     const {slug} = route.params
     const theme=useTheme()
     const {data,error,mutate,isValidating}=useSWR(`/chord/${slug}`,{},false)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
-    const heightt = {...headerHeight,sub:40}	
+    const heightt = {...headerHeight,sub:40}
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
     const {width} = useWindowDimensions()
@@ -112,6 +117,21 @@ export default function({navigation,route}){
         }
     },[])
 
+    const handlePrint=React.useCallback(async()=>{
+        if(data?.chord) {
+            try {
+                const b = chord_html(data?.chord,transpose);
+                
+                await RNPrint.print({
+                    html:b,
+                    jobName:"Chord"
+                })
+            } catch(e) {
+                consoloe.log(e)
+            }
+        }
+    },[data,transpose])
+
     React.useEffect(()=>{
         let timeout = null;
         async function check() {
@@ -143,11 +163,17 @@ export default function({navigation,route}){
 				<Header title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : ``} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
                     <Lay style={{height:heightt?.sub,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly'}}>
                         <Lay>
-                            <Button size="small" status="basic" appearance="ghost" onPress={()=>{setShowMenu('transpose')}}>Transpose</Button>
+                            <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('transpose')}}>Transpose</Button>
                         </Lay>
                         <Lay>
-                            <Button size="small" status="basic" appearance="ghost" onPress={()=>{setShowMenu('font size')}}>Font Size</Button>
+                            <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('font size')}}>Font Size</Button>
                         </Lay>
+                        {isUpdated && (
+                            <Lay>
+                                <Button size="small" status="basic" appearance="ghost" onPress={handlePrint}>Print</Button>
+                            </Lay>
+                        )}
+                        
                     </Lay>
                 </Header>
 
@@ -231,6 +257,10 @@ export default function({navigation,route}){
                             </Lay>
                         </ScrollView>
                     </Lay>
+                    <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                    <Lay style={[style.container]}>
+                        <Text>Your chord aren't here? <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/contact?subject=${encodeURIComponent("Request Chord")}`)}>request your chord</Text>.</Text>
+                    </Lay>
                     {data && data?.chord?.id ? (
                         <>
                             <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
@@ -270,3 +300,5 @@ export default function({navigation,route}){
         </>
     )
 }
+
+export default React.memo(ChordDetailScreen)
