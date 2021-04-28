@@ -15,7 +15,9 @@ import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
 import RNFS from 'react-native-fs'
 import {openBrowserAsync} from 'expo-web-browser'
+import {AdsConsent, AdsConsentStatus} from '@react-native-firebase/admob'
 
+import {URL,ADS_PUBLISHER_ID} from '@env'
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
@@ -155,6 +157,18 @@ const AuthProvider = (props) => {
 						console.log(err.message);
 					}
 				}
+
+				const consentInfo = await AdsConsent.requestInfoUpdate([ADS_PUBLISHER_ID])
+				if(consentInfo.isRequestLocationInEeaOrUnknown && consentInfo.status == AdsConsentStatus.UNKNOWN) {
+					const formResult = await AdsConsent.showForm({
+						privacyPolicy:`${URL}/pages/privacy-policy`,
+						withAdFree:false,
+						withPersonalizedAds:true,
+						withNonPersonalizedAds:true
+					})
+					await AsyncStorage.setItem('ads',formResult.status);
+				}
+
 				//Dispatch reducer
 				if(token !== null) {
 					dispatch({ type:"MANUAL",payload:{user:user,token:token,session:user?.session_id}})

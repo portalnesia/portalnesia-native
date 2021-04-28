@@ -25,6 +25,7 @@ export default function({navigation}){
     const {height,width}=useWindowDimensions()
     const theme = useTheme()
     const captcha = React.useRef(null)
+    const {showAds} = showInterstisial()
 
     const onReceiveToken=(token)=>{
         setRecaptcha(token)
@@ -38,7 +39,7 @@ export default function({navigation}){
         PNpost(`/parse_html`,{html:input,recaptcha})
         .then((res)=>{
             if(!res?.error) {
-                if(randomInt(3) == 0) showInterstisial();
+                if(randomInt(3) == 0) showAds();
                 setInput(res.encode);
             }
         })
@@ -77,7 +78,7 @@ export default function({navigation}){
                         </Lay>
                         </KeyboardAvoidingView>
                         <Lay style={{marginVertical:10}}>
-                            <AdsBanners />
+                            <AdsBanners size="MEDIUM_RECTANGLE" />
                         </Lay>
                         <Lay style={{flex:1,justifyContent:'flex-end',flexDirection:'column'}}>
                             <Lay style={[style.container,{paddingVertical:5}]}>

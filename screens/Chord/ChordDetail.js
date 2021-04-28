@@ -23,6 +23,7 @@ import Button from '@pn/components/global/Button'
 import {ucwords} from '@pn/utils/Main'
 import i18n from 'i18n-js'
 import usePost from '@pn/utils/API'
+import {AdsBanner, AdsBanners} from '@pn/components/global/Ads'
 
 const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
@@ -243,9 +244,9 @@ function ChordDetailScreen({navigation,route}){
                             </View>
                         </Card>
                     </Modal>
-
                     <Lay key={1} style={{paddingBottom:20}}>
                         <Divider style={{marginVertical:10,height:2,backgroundColor:theme['border-text-color']}} />
+                        <Lay style={{marginVertical:10,marginBottom:20}}><AdsBanner /></Lay>
                         <ScrollView
                             horizontal
                             contentContainerStyle={{
@@ -260,6 +261,7 @@ function ChordDetailScreen({navigation,route}){
                     <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
                     <Lay style={[style.container]}>
                         <Text>Your chord aren't here? <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/contact?subject=${encodeURIComponent("Request Chord")}`)}>request your chord</Text>.</Text>
+                        <Lay style={{marginTop:20}}><AdsBanners size="MEDIUM_RECTANGLE" /></Lay>
                     </Lay>
                     {data && data?.chord?.id ? (
                         <>

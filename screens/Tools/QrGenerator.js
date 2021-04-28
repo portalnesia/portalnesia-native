@@ -502,6 +502,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight,recaptch
     const [input,setInput]=React.useState({});
     const [loading,setLoading]=React.useState(false);
     const {PNpost} = useAPI(false)
+    const {showAds} = showInterstisial()
 
     React.useEffect(()=>{
         const sl=route?.key||'url'
@@ -531,7 +532,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight,recaptch
         .then(()=>{
             return PNpost(`/qrcode`,{...input,recaptcha}).then((res)=>{
                 if(!res.error) {
-                    if(randomInt(2) == 0) showInterstisial();
+                    if(randomInt(2) == 0) showAds();
                     const sl=route?.key||'url'
                     setInput(getDefaultValue(sl))
                     onProcess && onProcess(res.data)
@@ -581,7 +582,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight,recaptch
                     <Text style={{marginBottom:5}}>- Information you provide will not be stored on our server.</Text>
                 </Lay>
             </Lay>
-            <AdsBanners />
+            <AdsBanners size="MEDIUM_RECTANGLE" />
             <Lay style={{padding:15}}>
                 <Button onPress={handleSubmit} disabled={loading} loading={loading}>Send</Button>
             </Lay>

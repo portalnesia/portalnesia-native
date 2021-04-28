@@ -168,6 +168,7 @@ export default () => {
 	const {user,session} = state
 	const theme=useTheme()
 	const [ready,setReady]=React.useState(false);
+	const {showAds} = showInterstisial();
 
 	function onReady(){
 		setReady(true);
@@ -186,7 +187,7 @@ export default () => {
 		if(screenChange === 7) {
 			const random = Math.floor(Math.random() * 2);
 			screenChange = 0;
-			if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) await showInterstisial();
+			if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) showAds();
 		} else {
 			screenChange += 1;
 		}

@@ -38,6 +38,7 @@ export default function({navigation}){
     const [yOffset,setYOffset] = React.useState(null)
     const scrollRef=React.useRef(null)
     const captcha = React.useRef(null)
+    const {showAds} = showInterstisial()
 
     const onReceiveToken=(token)=>{
         setRecaptcha(token)
@@ -91,7 +92,7 @@ export default function({navigation}){
             .then((res)=>{
                 setNotif(Boolean(res.error),res.msg)
                 if(!res.error) {
-                    if(randomInt(3) == 0) showInterstisial();
+                    if(randomInt(3) == 0) showAds();
                     setResult(res.result)
                     setTimeout(()=>{
                         if(yOffset !== null) {
@@ -183,7 +184,7 @@ export default function({navigation}){
                             />
                         </Lay>
                         <Lay style={{marginVertical:10}}>
-                            <AdsBanner />
+                            <AdsBanner size="MEDIUM_RECTANGLE" />
                         </Lay>
                         <Lay onLayout={onLayout} style={{...(result.length > 0 ? {paddingVertical:10} : {})}}>
                             {result.length > 0 && (

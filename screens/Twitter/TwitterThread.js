@@ -37,12 +37,12 @@ const RenderTwitter=React.memo(({item,index,setMenu})=>{
         <Lay key={`thread-${index}`} >
             {ads === 1 ? (
                 <View key={`ads-1-${index}`} style={{marginTop:20}}>
-                    <AdsBanner key={`ads-ads-1-${index}`} />
+                    <AdsBanner key={`ads-ads-1-${index}`} size="MEDIUM_RECTANGLE" />
                     <Divider key={`ads-banner-1-${index}`} style={{marginTop:20,backgroundColor:theme['border-text-color']}} />
                 </View>
             ) : ads === 11 ? (
                 <View key={`ads-2-${index}`} style={{marginTop:20}}>
-                    <AdsBanners key={`ads-ads-2-${index}`} />
+                    <AdsBanners key={`ads-ads-2-${index}`} size="MEDIUM_RECTANGLE" />
                     <Divider key={`ads-banner-2-${index}`} style={{marginTop:20,backgroundColor:theme['border-text-color']}} />
                 </View>
             ) : null}

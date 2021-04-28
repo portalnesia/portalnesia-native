@@ -153,7 +153,7 @@ const DivRender=(attribs,children,style,props)=>{
         if(attribs?.['data-portalnesia-action']=='ads') {
             const type=attribs?.['data-ads'];
             if(type=='300') return <AdsBanner key={`ads-1-${props?.key}`} />
-            else if(type=='468' || type=='728') return <AdsBanners key={`ads-2-${props?.key}`} />
+            else if(type=='468' || type=='728') return <AdsBanners key={`ads-2-${props?.key}`} size="MEDIUM_RECTANGLE" />
             return null
         }
         return null

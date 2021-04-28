@@ -57,6 +57,7 @@ export default function({navigation}){
     const [switchVal,setSwitch]=React.useState({switch:false,add_input:false})
     const captcha = React.useRef(null)
     const modalRef = React.useRef(null)
+    const {showAds} = showInterstisial()
 
     const onReceiveToken=(token)=>{
         setRecaptcha(token)
@@ -97,7 +98,7 @@ export default function({navigation}){
         .then((res)=>{
             if(res?.msg !== null) setNotif(!(Boolean(res.error)),"Info",res.msg)
             if(!res?.error) {
-                if(randomInt(2) == 0) showInterstisial();
+                if(randomInt(2) == 0) showAds();
                 if(res?.output?.length) setOutput(res.output);
             }
         })
@@ -173,9 +174,9 @@ export default function({navigation}){
                         <Lay style={[style.container,{paddingVertical:10}]}>
                             <Text><Text style={{fontFamily:'Inter_Bold'}}>{i18n.t('transform.beware_1')}</Text> <Text>{i18n.t('transform.beware_2')}</Text></Text>
                         </Lay>
-                        <AdsBanners />
+                        <AdsBanners size="MEDIUM_RECTANGLE" />
                         <Lay style={[style.container,{paddingVertical:10}]}>
-                            <Button size="medium" onPress={onSubmit} loading={loading} disabled={loading}>Transform</Button>
+                            <Button onPress={onSubmit} loading={loading} disabled={loading}>Transform</Button>
                         </Lay>
                     </Lay>
                 </ScrollView>

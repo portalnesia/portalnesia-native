@@ -147,7 +147,7 @@ export default function URLshortener({navigation}){
                                 )}
                             </Lay>
                             <Lay style={{marginVertical:10}}>
-                                <AdsBanners />
+                                <AdsBanners size="MEDIUM_RECTANGLE" />
                             </Lay>
                             <Lay style={{justifyContent:'flex-end'}}>
                                 <Lay style={[style.container,{paddingVertical:5}]}>
