@@ -140,15 +140,15 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3
-        versionName "1.3.0"
+        versionName "2.1.0"
     }
     splits {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk true  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-            //include "arm64-v8a"
+            universalApk false  // If true, also generate a universal APK
+            //include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+            include "arm64-v8a"
         }
     }
     signingConfigs {
@@ -213,7 +213,7 @@ dependencies {
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.flipper'
     }
-    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-background-fetch','expo-error-recovery','expo-image-manipulator','expo-task-manager','unimodules-barcode-scanner-interface','unimodules-camera-interface','unimodules-face-detector-interface','unimodules-sensors-interface','unimodules-task-manager-interface']])
+    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-background-fetch','expo-error-recovery','expo-image-manipulator','expo-task-manager','unimodules-barcode-scanner-interface','unimodules-camera-interface','unimodules-face-detector-interface','unimodules-sensors-interface','unimodules-task-manager-interface','expo-ads-admob']])
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
