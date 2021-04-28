@@ -140,15 +140,15 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3
-        versionName "2.1.0"
+        versionName "1.3.0"
     }
     splits {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
-            //include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-            include "arm64-v8a"
+            universalApk true  // If true, also generate a universal APK
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+            //include "arm64-v8a"
         }
     }
     signingConfigs {

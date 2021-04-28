@@ -71,13 +71,19 @@
         "licenseUrl": "https://github.com/react-native-community/react-native-slider",
         "parents": "portal-native"
     },
-    "@react-native-firebase/analytics@11.2.0": {
+    "@react-native-firebase/admob@11.3.3": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/admob",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/admob/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-native-firebase/analytics@11.3.3": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/analytics",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/analytics/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/app@11.2.0": {
+    "@react-native-firebase/app@11.3.3": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/app",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/app/raw/master/LICENSE",
@@ -147,12 +153,6 @@
         "licenses": "MIT",
         "repository": "https://github.com/omichelsen/compare-versions",
         "licenseUrl": "https://github.com/omichelsen/compare-versions/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
-    "expo-ads-admob@8.4.0": {
-        "licenses": "MIT",
-        "repository": "https://github.com/expo/expo",
-        "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
     "expo-app-loading@1.0.1": {

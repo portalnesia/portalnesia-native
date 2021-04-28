@@ -4,31 +4,36 @@ import Constants from 'expo-constants';
 import admob,{MaxAdContentRating,BannerAd,BannerAdSize,TestIds, InterstitialAd, AdsConsentStatus, AdEventType} from '@react-native-firebase/admob'
 import {ADS_BANNER,ADS_BANNER_2,ADS_INTERSTISIAL} from '@env'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import compareVersion from 'compare-versions'
 
 const BannerID_1 = Constants.isDevice && !__DEV__ ? ADS_BANNER : TestIds.BANNER;
 const BannerID_2 = Constants.isDevice && !__DEV__ ? ADS_BANNER_2 : TestIds.BANNER;
 const InterID = Constants.isDevice && !__DEV__ ? ADS_INTERSTISIAL : TestIds.INTERSTITIAL;
+
+const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.3.0",">=");
 
 export const AdsBanner=React.memo(({size})=>{
     const [sizeAds,setSize]=React.useState(()=>typeof size==='undefined' ? BannerAdSize.SMART_BANNER : size)
     const [load,setLoad] = React.useState(false)
     const [ads,setAds] = React.useState(false)
     React.useEffect(()=>{
-        admob().setRequestConfiguration({
-            maxAdContentRating:MaxAdContentRating.G,
-            tagForChildDirectedTreatment:true,
-            tagForUnderAgeOfConsent:true
-        })
-        .then(()=>AsyncStorage.getItem('ads'))
-        .then((val)=>{
-            return new Promise(res=>{
-                const personalizedAdsOnly = val === null || val != AdsConsentStatus.NON_PERSONALIZED ? false : true
-                setAds(personalizedAdsOnly);
-                res();
+        if(isUpdated) {
+            admob().setRequestConfiguration({
+                maxAdContentRating:MaxAdContentRating.G,
+                tagForChildDirectedTreatment:true,
+                tagForUnderAgeOfConsent:true
             })
-        })
-        .then(()=>setLoad(true))
-        .catch(()=>{})
+            .then(()=>AsyncStorage.getItem('ads'))
+            .then((val)=>{
+                return new Promise(res=>{
+                    const personalizedAdsOnly = val === null || val != AdsConsentStatus.NON_PERSONALIZED ? false : true
+                    setAds(personalizedAdsOnly);
+                    res();
+                })
+            })
+            .then(()=>setLoad(true))
+            .catch(()=>{})
+        }
     },[])
     React.useEffect(()=>{
         if(size) setSize(size)
@@ -52,21 +57,23 @@ export const AdsBanners=React.memo(({size})=>{
     const [load,setLoad] = React.useState(false)
     const [ads,setAds] = React.useState(false)
     React.useEffect(()=>{
-        admob().setRequestConfiguration({
-            maxAdContentRating:MaxAdContentRating.G,
-            tagForChildDirectedTreatment:true,
-            tagForUnderAgeOfConsent:true
-        })
-        .then(()=>AsyncStorage.getItem('ads'))
-        .then((val)=>{
-            return new Promise(res=>{
-                const personalizedAdsOnly = val === null || val != AdsConsentStatus.NON_PERSONALIZED ? false : true
-                setAds(personalizedAdsOnly);
-                res();
+        if(isUpdated) {
+            admob().setRequestConfiguration({
+                maxAdContentRating:MaxAdContentRating.G,
+                tagForChildDirectedTreatment:true,
+                tagForUnderAgeOfConsent:true
             })
-        })
-        .then(()=>setLoad(true))
-        .catch(()=>{})
+            .then(()=>AsyncStorage.getItem('ads'))
+            .then((val)=>{
+                return new Promise(res=>{
+                    const personalizedAdsOnly = val === null || val != AdsConsentStatus.NON_PERSONALIZED ? false : true
+                    setAds(personalizedAdsOnly);
+                    res();
+                })
+            })
+            .then(()=>setLoad(true))
+            .catch(()=>{})
+        }
     },[])
     React.useEffect(()=>{
         if(size) setSize(size)
