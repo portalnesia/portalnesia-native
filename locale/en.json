@@ -31,6 +31,7 @@
     "news":"News",
     "chord":"Chord",
     "url":"URL",
+    "new_type":"New %{type}",
     "text":"Text",
     "setting":"Setting",
     "appearance":"Appearance",
@@ -64,7 +65,9 @@
         "image":"Please select image first",
         "no_image":"Cannot find image",
         "upload":"Sorry, error while uploading your image",
-        "size_image":"Sorry, your file is too large. Maximum images size is 5 MB"
+        "size_image":"Sorry, your file is too large. Maximum images size is 5 MB",
+        "youtube_service":"You have to install the official youtube apps to be able to watch videos.\n\nClick here to watch in fullscreen mode.",
+        "invalid":"Invalid %{type}"
     },
     "form":{
         "name":"Name",

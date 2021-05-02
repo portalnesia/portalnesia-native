@@ -31,6 +31,7 @@
     "news":"Berita",
     "chord":"Kord",
     "url":"Tautan",
+    "new_type":"%{type} Baru",
     "text":"Teks",
     "setting":"Pengaturan",
     "appearance":"Tampilan",
@@ -64,7 +65,9 @@
         "image":"Pilih gambar terlebih dahulu",
         "no_image":"Tidak dapat menemukan gambar",
         "upload":"Kesalahan ketika mengunggah gambar Anda",
-        "size_image":"Maaf, ukuran file terlalu besar. Ukuran maksimal gambar adalah 5MB"
+        "size_image":"Maaf, ukuran file terlalu besar. Ukuran maksimal gambar adalah 5MB",
+        "youtube_service":"Anda harus menginstal aplikasi youtube resmi untuk dapat menonton video.\n\nKlik di sini untuk menonton dalam mode layar penuh.",
+        "invalid":"%{type} tidak valid"
     },
     "form":{
         "name":"Nama",
