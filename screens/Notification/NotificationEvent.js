@@ -14,7 +14,7 @@ export default function NotificationEvent({navigation,route}){
     const {slug,token} = route?.params;
     if(!slug || !token) return <NotFound status={404} />
     const theme = useTheme();
-    const {data,error} = useSWR(`/backend/notification_event/${slug}?token=${token}`);
+    const {data,error} = useSWR(`/backend/notification_event/${slug}?token=${token}`,{revalidateOnMount:true});
 
     return (
         <Layout navigation={navigation} title="Notification" subtitle={data?.title||""} whiteBg>

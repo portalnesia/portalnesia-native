@@ -1,15 +1,110 @@
 import React from 'react';
-import { Animated,RefreshControl,View,useWindowDimensions } from 'react-native';
-import {Layout as Lay,Text,Card,Tab,useTheme} from '@ui-kitten/components'
+import { Animated,RefreshControl,View,Dimensions,ToastAndroid } from 'react-native';
+import {Layout as Lay,Text,Card,Tab,useTheme,Input,Icon,Divider} from '@ui-kitten/components'
 import {TabView,TabBar} from 'react-native-tab-view'
 import i18n from 'i18n-js'
+import Modal from 'react-native-modal'
 
+import TopAction from '@pn/components/navigation/TopAction'
 import Layout from '@pn/components/global/Layout';
+import Button from '@pn/components/global/Button'
+import Pressable from '@pn/components/global/Pressable'
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {specialHTML} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
+import useAPI from '@pn/utils/API'
+import Recaptcha from '@pn/components/global/Recaptcha'
+import {useLinkTo} from '@react-navigation/native'
+
+const {width} = Dimensions.get('window')
+const InputIcon = (props)=><Icon {...props} name="plus-circle-outline" />
+
+const RenderInput=React.memo(({onClose})=>{
+	const [input,setInput]=React.useState("")
+    const [loading,setLoading]=React.useState(false);
+    const [result,setResult]=React.useState(null)
+	const [recaptcha,setRecaptcha]=React.useState("");
+	const theme = useTheme();
+	const {PNpost} = useAPI();
+	const captcha = React.useRef(null)
+	const linkTo = useLinkTo();
+
+	const onReceiveToken=React.useCallback((token)=>{
+        setRecaptcha(token)
+    },[])
+
+	const handleSubmit=()=>{
+		if(input.trim().match(/twitter\.com/)) {
+			setLoading(true)
+			PNpost(`/twitter/thread`,{url:input,recaptcha:recaptcha},undefined,false)
+			.then((res)=>{
+				if(res?.error) ToastAndroid.show(res?.msg,ToastAndroid.LONG)
+				else {
+					setInput("");
+					setResult(res?.data);
+				}
+			})
+			.catch((err)=>{
+				if(err?.response?.data) {
+					ToastAndroid.show(typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : i18n.t('errors.general'),ToastAndroid.LONG);
+				}
+				else if(err?.response?.status===503) {
+					ToastAndroid.show(i18n.t('errors.server'),ToastAndroid.LONG);
+				} else {
+					ToastAndroid.show(i18n.t('errors.general'),ToastAndroid.LONG)
+				}
+			})
+			.finally(()=>{
+				setLoading(false)
+				captcha?.current?.refreshToken()
+			})
+		} else {
+			ToastAndroid.show(i18n.t("errors.invalid",{type:i18n.t('url')}),ToastAndroid.LONG)
+		}
+	}
+
+	const handleTo = ()=>{
+		onClose && onClose();
+		linkTo(`/twitter/thread/${result?.id}`)
+	}
+
+	return (
+		<Lay style={{padding:10,width:width-20,borderRadius:10}}>
+			<View style={{marginBottom:15,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+				<Text>{i18n.t("new_type",{type:i18n.t('twitter_thread')})}</Text>
+				<View style={{borderRadius:22,overflow:'hidden'}}>
+					<Pressable style={{padding:10}} onPress={()=> onClose && onClose()}>
+						<Icon style={{width:24,height:24,tintColor:theme['text-hint-color']}} name="close-outline" />
+					</Pressable>
+				</View>
+			</View>
+			<Input
+				placeholder="https://twitter.com/...."
+                value={input}
+				label="Twitter Thread URL"
+                onChangeText={setInput}
+				returnKeyType="send"
+				disabled={loading}
+				autoCapitalize="none"
+				onSubmitEditing={handleSubmit}
+			/>
+			<View style={{marginTop:10}}>
+				<Button disabled={loading} loading={loading} onPress={handleSubmit}>Submit</Button>
+			</View>
+			{result !== null && (
+				<View>
+					<Divider style={{marginVertical:15,backgroundColor:theme['border-text-color']}} />
+					<Card onPress={handleTo}>
+						<Text category="p1">{specialHTML(result?.tweet)}</Text>
+					</Card>
+				</View>
+			)}
+			<Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
+		</Lay>
+	)
+})
 
 const Recent=({headerHeight,navigation,...other})=>{
 	const {
@@ -21,7 +116,6 @@ const Recent=({headerHeight,navigation,...other})=>{
 		isReachingEnd,
 		mutate,isValidating,isLoadingInitialData
 	} = usePagination("/twitter?type=recent","data",20,false,false)
-	const {width}=useWindowDimensions()
 
 	const [refreshing,setRefreshing]=React.useState(false)
 
@@ -112,7 +206,6 @@ const Popular=({headerHeight,navigation,...other})=>{
 		isReachingEnd,
 		mutate,isValidating,isLoadingInitialData
 	} = usePagination("/twitter?type=popular","data",20,false,false)
-	const {width}=useWindowDimensions()
 
 	const [refreshing,setRefreshing]=React.useState(false)
 
@@ -204,15 +297,15 @@ export default function ({ navigation,route }) {
     ])
 	const theme = useTheme()
 	const {translateY,...other}=useHeader()
-	const {width}=useWindowDimensions()
 	const headerHeight={...headerHeightt,sub:46}
 	const heightHeader = headerHeight?.main + headerHeight?.sub
+	const [open,setOpen]=React.useState(false);
 
 	const renderTabBar=(props)=>{
 		
 		return (
 			<Animated.View style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
-				<Header title="Twitter Thread Reader" navigation={navigation} height={56} withBack>
+				<Header title="Twitter Thread Reader" navigation={navigation} height={56} withBack menu={()=><TopAction icon={InputIcon} tooltip={i18n.t("new_type",{type:i18n.t('twitter_thread')})} onPress={()=>setOpen(true)} />} >
 					<TabBar
 						{...props}
 						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
@@ -250,6 +343,14 @@ export default function ({ navigation,route }) {
 	return (
 		<Layout navigation={navigation}>
 			{renderTabView()}
+			<Modal
+                isVisible={open}
+                style={{margin:0,justifyContent:'center',alignItems:'center'}}
+                animationIn="fadeIn"
+                animationOut="fadeOut"
+            >
+				<RenderInput onClose={()=>setOpen(false)} />
+			</Modal>
 		</Layout>
 	);
 }

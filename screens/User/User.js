@@ -310,6 +310,9 @@ export default function UserScreen({navigation,route}){
                 setReady(true)
             })()
         }
+        if(!data) {
+            mutate();
+        }
 
         return ()=>{
             if(ready) setReady(false)

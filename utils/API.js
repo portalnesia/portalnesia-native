@@ -19,7 +19,22 @@ export const API = axios.create({
 
 //let tokens=null;
 
-//export const fetcher=(url) => fetch(url, {...(tokens!==null ? {headers:{Authorization:`Bearer ${tokens}`},'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId,credentials: 'include'} : {headers:{'X-Application-Version': Constants.nativeAppVersion,'X-Device-Id': Application.androidId}})}).then(res=>res.json());
+export const fetcher=(path,option) => {
+    return new Promise((resolve,reject)=>{
+        API.get(path,option)
+        .then(res=>{
+            return new Promise((resol,reje)=>{
+                const data = res.data;
+                if(data?.error) reje({message:data?.msg||i18n.t('errors.general'),...data});
+                else resol(data);
+            })
+        })
+        .then(resolve)
+        .catch(err=>{
+            reject(err)
+        });
+    })
+}
 
 /*export const setToken=token=>{
     tokens=token
@@ -84,7 +99,7 @@ export default function useAPI(){
                     }
                 }
                 
-                rej();
+                rej(err);
             })
         })
     }

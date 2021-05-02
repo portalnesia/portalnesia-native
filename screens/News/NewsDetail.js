@@ -47,6 +47,9 @@ export default function({navigation,route}){
         if(data && !data?.error && !ready && !__DEV__) {
             timeout = setTimeout(check,5000);
         }
+        if(!data) {
+            mutate();
+        }
         return ()=>{
             if(ready) setReady(false)
             if(timeout !== null) clearTimeout(timeout);

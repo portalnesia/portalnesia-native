@@ -11,4 +11,5 @@ declare module '@env' {
     export const ADS_BANNER_2: string;
     export const ADS_INTERSTISIAL: string;
     export const ADS_PUBLISHER_ID: string;
+    export const YOUTUBE_KEY: string;
 }

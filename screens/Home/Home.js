@@ -5,7 +5,7 @@ import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
 import {CONTENT_URL,API_URL} from '@env'
 import i18n from 'i18n-js'
-import {useLinkTo,useNavigationState} from '@react-navigation/native'
+import {useLinkTo} from '@react-navigation/native'
 
 import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
@@ -17,7 +17,7 @@ import {specialHTML} from '@pn/utils/Main'
 
 //const CONTENT_URL='https://content.portalnesia.com',API_URL='https://api.portalnesia.com'
 
-const RenderNews = React.memo(({item:dt, index:i,navigation}) => {
+const RenderNews = React.memo(({item:dt, index:i}) => {
 	const linkTo = useLinkTo();
 	return (
 		<Card key={i} onPress={()=>linkTo(`/news/${dt?.source}/${encodeURIComponent(dt.title)}`)}>
@@ -106,7 +106,7 @@ const Dashboard=({loading,data,error,navigation})=>{
 	)
 }
 
-const NotLogin=({loading,data,error,navigation})=>{
+const NotLogin=React.memo(({loading,data,error,navigation})=>{
 
 	return (
 		<Layout navigation={navigation}>
@@ -207,7 +207,7 @@ const NotLogin=({loading,data,error,navigation})=>{
 			</ScrollView>
 		</Layout>
 	)
-}
+})
 
 export default function HomeScreen({ navigation }) {
 	const context = React.useContext(AuthContext);
@@ -216,7 +216,7 @@ export default function HomeScreen({ navigation }) {
 	const [data,setData]=React.useState()
 	const [error,setError] = React.useState(false)
 	const {PNget} = useAPI();
-	const state = useNavigationState(state=>({index:state.index,routes:state.routes}));
+	//const state = useNavigationState(state=>({index:state.index,routes:state.routes}));
 	
 	React.useEffect(()=>{
 		setTimeout(()=>{

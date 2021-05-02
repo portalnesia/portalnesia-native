@@ -55,11 +55,12 @@ export default function OpenSourceScreen({navigation}){
     const licenses=React.useMemo(()=>{
         return Object.keys(licenseArr).map((it)=>{
             const version = it.match(/\d+(\.\d+)*/);
-            const title = it.replace(/(?:@)/gi,'').replace(version ? version[0] : '','');
+            const title = it.replace(version ? version[0] : '','').replace(/(?:@$)/gi,'');
+            const url = title.match(/native\-firebase\/+/) ? licenseArr[it]?.licenseUrl.replace(/raw\/master\//,'').replace(/tree/,'raw') : licenseArr[it]?.licenseUrl;
             return {
                 title,
                 version: version ? version[0] : '',
-                url: licenseArr[it]?.licenseUrl,
+                url,
                 license: licenseArr[it]?.licenses
             }
         })

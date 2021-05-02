@@ -10,4 +10,6 @@ export interface APIResponseTypes {
 
 export const API: AxiosInstance;
 
+export function fetcher<R = any>(url: string,option?: AxiosRequestConfig): Promise<R>
+
 export default function useAPI(): APIResponseTypes

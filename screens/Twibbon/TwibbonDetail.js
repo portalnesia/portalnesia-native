@@ -51,7 +51,7 @@ export default function TwibbonDetail({navigation,route}){
     const context = React.useContext(AuthContext)
     const {setNotif} = context;
     const theme = useTheme();
-    const {data,error} = useSWR(slug ? `/twibbon/${slug}` : null)
+    const {data,error} = useSWR(slug ? `/twibbon/${slug}` : null,{revalidateOnMount:true})
     const [file,setFile] = React.useState(null);
     const captureRef = React.useRef(null)
     const modalRef = React.useRef(null)

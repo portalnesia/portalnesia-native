@@ -20,7 +20,12 @@ export default function usePagination(path,data_name,limit,news,user=false){
             if(previous && previous?.page) return `${path}${ppath}${news ? previous?.page : previous?.page+1}`
             return `${path}${ppath}${news ? index : index + 1}` 
         },
-        fetcher
+        {
+            fetcher,
+            revalidateOnFocus:false,
+            revalidateOnMount:true,
+            revalidateOnReconnect:true,
+        }
     )
 
     const posts=useMemo(()=>{

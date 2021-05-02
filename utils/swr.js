@@ -9,5 +9,11 @@ export default function useSWR(path,config={},user=false){
     const {state}=context
     const {user:stateUser,session}=state;
     const {fetcher}=useAPI();
-    return useSWRR(stateUser===null || session === null ? null : path,fetcher,config)
+    return useSWRR(stateUser===null || session === null ? null : path,{
+        fetcher,
+        revalidateOnFocus:false,
+        revalidateOnMount:false,
+        revalidateOnReconnect:true,
+        ...config
+    })
 }

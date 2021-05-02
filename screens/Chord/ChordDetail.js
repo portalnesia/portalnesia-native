@@ -9,7 +9,6 @@ import RNPrint from 'react-native-print'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 
-import {URL} from '@env'
 import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -24,6 +23,7 @@ import {ucwords} from '@pn/utils/Main'
 import i18n from 'i18n-js'
 import usePost from '@pn/utils/API'
 import {AdsBanner, AdsBanners} from '@pn/components/global/Ads'
+import Player from '@pn/components/global/VideoPlayer'
 
 const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
@@ -89,7 +89,7 @@ function ChordDetailScreen({navigation,route}){
         return angka
     },[tools.fontSize])
 
-    const AS = React.useMemo(()=>{
+    /*const AS = React.useMemo(()=>{
         const angka = tools.autoScroll
         if(angka < 0 || angka > 5) {
             if(angka < 0) return 0;
@@ -106,17 +106,7 @@ function ChordDetailScreen({navigation,route}){
         } else {
             setTools({...tools,autoScroll:0})
         }
-    }
-
-    const togglePlaying=React.useCallback(()=>{
-        setPlaying(prev=>!prev)
-    },[])
-
-    const onStateChange=React.useCallback((state)=>{
-        if(state==='ended') {
-            setPlaying(false)
-        }
-    },[])
+    }*/
 
     const handlePrint=React.useCallback(async()=>{
         if(data?.chord) {
@@ -146,6 +136,9 @@ function ChordDetailScreen({navigation,route}){
 
         if(data && !data?.error && !ready && !__DEV__) {
             timeout = setTimeout(check,5000);
+        }
+        if(!data) {
+            mutate();
         }
         return ()=>{
             if(ready) setReady(false)
@@ -246,6 +239,11 @@ function ChordDetailScreen({navigation,route}){
                     </Modal>
                     <Lay key={1} style={{paddingBottom:20}}>
                         <Divider style={{marginVertical:10,height:2,backgroundColor:theme['border-text-color']}} />
+                        {typeof data?.chord?.youtube_id === 'string' ? (
+                            <View style={{marginTop:10}}>
+                                <Player youtube={data?.chord?.youtube_id} />
+                            </View>
+                        ) : null}
                         <Lay style={{marginVertical:10,marginBottom:20}}><AdsBanner /></Lay>
                         <ScrollView
                             horizontal
