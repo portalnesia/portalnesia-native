@@ -10,8 +10,8 @@
 # Add any project specific keep options here:
 -keep class expo.modules.** { *; }
 -keep class com.google.android.gms.common.GooglePlayServicesUtil {*;}
--keep class com.google.android.gms.ads.** { public *; }
--keep class com.google.ads.** { public *; }
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.ads.** { *; }
 -keep public class com.horcrux.svg.** { *; }
 -keep class com.facebook.hermes.unicode.** { *; }
 -keep class com.facebook.jni.** { *; }
@@ -24,3 +24,5 @@
     **[] $VALUES;
     public *;
 }
+-keep class io.invertase.firebase.** { *; }
+-dontwarn io.invertase.firebase.**

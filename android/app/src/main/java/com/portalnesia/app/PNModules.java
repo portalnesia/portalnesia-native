@@ -295,7 +295,7 @@ public class PNModules extends ReactContextBaseJavaModule {
         File file = new File(pathname);
         Uri uri = Uri.fromFile(file);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            uri = FileProvider.getUriForFile(reactContext, BuildConfig.APPLICATION_ID + ".fileprovider", file);
+            uri = FileProvider.getUriForFile(reactContext, reactContext.getPackageName() + ".fileprovider", file);
         }
         return uri;
     }
@@ -323,7 +323,7 @@ public class PNModules extends ReactContextBaseJavaModule {
     public void uriToFileProvider(String pathname,Promise promise){
         try {
             File file = new File(pathname);
-            Uri uri = FileProvider.getUriForFile(reactContext, BuildConfig.APPLICATION_ID + ".fileprovider", file);
+            Uri uri = FileProvider.getUriForFile(reactContext, reactContext.getPackageName() + ".fileprovider", file);
             String fileProviderString = uri.toString();
             promise.resolve(fileProviderString);
         } catch (Exception e) {

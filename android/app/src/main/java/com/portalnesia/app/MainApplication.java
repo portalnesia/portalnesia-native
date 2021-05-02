@@ -3,6 +3,7 @@ package com.portalnesia.app;
 import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
+import android.webkit.WebView;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -85,8 +86,9 @@ public class MainApplication extends Application implements ReactApplication {
 
     if (!BuildConfig.DEBUG) {
       UpdatesController.initialize(this);
+    } else {
+      WebView.setWebContentsDebuggingEnabled(true);
     }
-
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
 
