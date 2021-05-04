@@ -57,6 +57,8 @@
     "button":"tombol",
     "button_type":"tombol %{type}",
     "save":"simpan",
+    "show_type":"Tampilkan %{type}",
+    "hide_type":"Sembunyikan %{type}",
     "errors":{
         "general":"Kesalahan",
         "server":"Kesalahan internal server",
@@ -105,5 +107,9 @@
             "fourth":"Saat Anda telah selesai melakukan editing, klik",
             "fifth":"Selesai."
         }
+    },
+    "media":{
+        "video_player":"pemutar video",
+        "music_player":"pemutar musik"
     }
 }

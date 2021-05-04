@@ -24,7 +24,9 @@ import i18n from 'i18n-js'
 import usePost from '@pn/utils/API'
 import {AdsBanner, AdsBanners} from '@pn/components/global/Ads'
 import Player from '@pn/components/global/VideoPlayer'
+import Backdrop from '@pn/components/global/Backdrop';
 
+const AnimLay = Animated.createAnimatedComponent(Lay)
 const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
 const XIcon=(props)=><Icon {...props} name="close" />
@@ -39,13 +41,19 @@ function ChordDetailScreen({navigation,route}){
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:40}
-    const {translateY,...other} = useHeader()
-	const heightHeader = heightt?.main + heightt?.sub
     const {width} = useWindowDimensions()
     const [tools,setTools]=React.useState({fontSize:4,transpose:0,autoScroll:0})
     const [showMenu,setShowMenu]=React.useState(null)
     const linkTo = useLinkTo()
     const {PNget} = usePost();
+    const [backdrop,setBackdrop] = React.useState(false);
+    const [viewVideo,setViewVideo] = React.useState(false)
+
+    const heightHeader = React.useMemo(()=>{
+        return heightt?.main + heightt?.sub;
+    },[])
+
+    const {translateY,onScroll,...other} = useHeader(56)
 
     const transpose = React.useMemo(()=>{
         const angka = tools.transpose
@@ -110,6 +118,7 @@ function ChordDetailScreen({navigation,route}){
 
     const handlePrint=React.useCallback(async()=>{
         if(data?.chord) {
+            setBackdrop(true)
             try {
                 const b = chord_html(data?.chord,transpose);
                 
@@ -119,6 +128,8 @@ function ChordDetailScreen({navigation,route}){
                 })
             } catch(e) {
                 consoloe.log(e)
+            } finally {
+                setBackdrop(false)
             }
         }
     },[data,transpose])
@@ -152,9 +163,9 @@ function ChordDetailScreen({navigation,route}){
 
     return (
         <>
-        <Layout navigation={navigation} custom={
-            <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : ``} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
+        <Layout navigation={navigation}>
+            <AnimLay style={{left: 0,right: 0,width: '100%',zIndex: 1,...(!viewVideo ? {position:'absolute',transform: [{translateY}]} : {})}}>
+                <Header title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : ``} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
                     <Lay style={{height:heightt?.sub,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly'}}>
                         <Lay>
                             <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('transpose')}}>Transpose</Button>
@@ -167,13 +178,14 @@ function ChordDetailScreen({navigation,route}){
                                 <Button size="small" status="basic" appearance="ghost" onPress={handlePrint}>Print</Button>
                             </Lay>
                         )}
-                        
                     </Lay>
+                    {typeof data?.chord?.youtube_id === 'string' && viewVideo ? (
+                        <Lay>
+                            <Player youtube={data?.chord?.youtube_id} />
+                        </Lay>
+                    ) : null}
                 </Header>
-
-            </Animated.View>
-        }>
-            
+            </AnimLay>
             {!data && !error ? (
                 <View style={{height:'100%',paddingTop:heightHeader+8}}>
                     <Skeleton type="article" />
@@ -184,10 +196,11 @@ function ChordDetailScreen({navigation,route}){
                 <Animated.ScrollView
                     contentContainerStyle={{
                         flexGrow: 1,
-                        paddingTop:heightHeader+8
+                        ...(!viewVideo ? {paddingTop:heightHeader+8} : {})
                     }}
+                    onScroll={onScroll}
                     {...other}
-                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
+                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" refreshing={isValidating} onRefresh={()=>mutate()} {...(!viewVideo ? {progressViewOffset:heightHeader} : {})} /> } : {})}
                 >
                     <Lay key={0} style={[style.container,{paddingTop:10}]}>
                         <Text category="h3">{data?.chord?.title}</Text>
@@ -206,6 +219,39 @@ function ChordDetailScreen({navigation,route}){
                         </Lay>
                     </Lay>
 
+                    <Lay><Divider style={{marginVertical:10,height:2,backgroundColor:theme['border-text-color']}} /></Lay>
+                    
+                    
+                    <Lay key={1} style={{paddingBottom:20}}>
+                        <Lay style={{marginVertical:10,marginBottom:20}}><AdsBanner /></Lay>
+                        <ScrollView
+                            horizontal
+                            contentContainerStyle={{
+                                flexGrow: 1,
+                            }}
+                        >
+                            <Lay key={2} style={style.container}>
+                                <Chord template={data?.chord?.text} transpose={transpose} fontSize={fontArray[fSize]} />
+                            </Lay>
+                        </ScrollView>
+                    </Lay>
+
+                    <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                    
+                    <Lay style={[style.container]}>
+                        <Text>Your chord aren't here? <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/contact?subject=${encodeURIComponent("Request Chord")}`)}>request your chord</Text>.</Text>
+                        <Lay style={{marginTop:20}}><AdsBanners size="MEDIUM_RECTANGLE" /></Lay>
+                    </Lay>
+                    
+                    {data && data?.chord?.id ? (
+                        <>
+                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                            <Lay style={{paddingBottom:50}}>
+                                <Comment navigation={navigation} total={data?.chord?.comment_count} type="chord" posId={data?.chord?.id} posUrl={`chord/${data?.chord?.slug}`} />
+                            </Lay>
+                        </>
+                    ): null}
+                    
                     <Modal
                         isVisible={showMenu!==null}
                         style={{margin:0,justifyContent:'center',alignItems:'center'}}
@@ -237,41 +283,10 @@ function ChordDetailScreen({navigation,route}){
                             </View>
                         </Card>
                     </Modal>
-                    <Lay key={1} style={{paddingBottom:20}}>
-                        <Divider style={{marginVertical:10,height:2,backgroundColor:theme['border-text-color']}} />
-                        {typeof data?.chord?.youtube_id === 'string' ? (
-                            <View style={{marginTop:10}}>
-                                <Player youtube={data?.chord?.youtube_id} />
-                            </View>
-                        ) : null}
-                        <Lay style={{marginVertical:10,marginBottom:20}}><AdsBanner /></Lay>
-                        <ScrollView
-                            horizontal
-                            contentContainerStyle={{
-                                flexGrow: 1,
-                            }}
-                        >
-                            <Lay key={2} style={style.container}>
-                                <Chord template={data?.chord?.text} transpose={transpose} fontSize={fontArray[fSize]} />
-                            </Lay>
-                        </ScrollView>
-                    </Lay>
-                    <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                    <Lay style={[style.container]}>
-                        <Text>Your chord aren't here? <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/contact?subject=${encodeURIComponent("Request Chord")}`)}>request your chord</Text>.</Text>
-                        <Lay style={{marginTop:20}}><AdsBanners size="MEDIUM_RECTANGLE" /></Lay>
-                    </Lay>
-                    {data && data?.chord?.id ? (
-                        <>
-                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                            <Lay style={{paddingBottom:50}}>
-                                <Comment navigation={navigation} total={data?.chord?.comment_count} type="chord" posId={data?.chord?.id} posUrl={`chord/${data?.chord?.slug}`} />
-                            </Lay>
-                        </>
-                    ): null}
                 </Animated.ScrollView>
             ) : null}
         </Layout>
+        <Backdrop loading visible={backdrop} />
         {data && !data?.error && (
                 <MenuContainer
                     visible={open}
@@ -286,6 +301,11 @@ function ChordDetailScreen({navigation,route}){
                         dialog:i18n.t('share_type',{type:i18n.t('chord')})
                     }}
                     menu={[{
+                        title:viewVideo ? i18n.t('hide_type',{type:i18n.t('media.video_player')}) : i18n.t('show_type',{type:i18n.t('media.video_player')}),
+                        onPress:()=>{
+                            setViewVideo(p=>!p);
+                        }
+                    },{
                         action:"share",
                         title:i18n.t('share'),
                     },{

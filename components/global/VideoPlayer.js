@@ -10,10 +10,11 @@ import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 import Pressable from './Pressable'
 
-const {width} = Dimensions.get('window')
+const {width:winWidth} = Dimensions.get('window')
 const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.4.0",">=");
 
-const NativePlayer=React.memo(({src,poster,height})=>{
+const NativePlayer=React.memo(({src,poster,height,width: vidWidth})=>{
+    const width = vidWidth||winWidth;
     const [ratio,setRatio] = React.useState(null)
     const [full,setFull] = React.useState(false)
     const [videoRef,setVideoRef]=React.useState(null)
@@ -22,7 +23,7 @@ const NativePlayer=React.memo(({src,poster,height})=>{
         if(height) return height
         const rat = ratio !== null ? ratio : (3 / 4)
         return width * rat
-    },[ratio,height])
+    },[ratio,height,width])
 
     React.useEffect(()=>{
         if(!height) {
@@ -68,11 +69,13 @@ const NativePlayer=React.memo(({src,poster,height})=>{
     )
 })
 
-const YoutubePlayer=React.memo(({youtube})=>{
+const YoutubePlayer=React.memo(({youtube,width: vidWidth,style})=>{
+    const width = vidWidth||winWidth
     const theme = useTheme();
     const [ytError,setYtError]=React.useState(false)
     const handleError=React.useCallback((e)=>{
-        if(['SERVICE_INVALID','SERVICE_MISSING','SERVICE_DISABLED'].indexOf(e?.error) !== null) {
+        console.log("Player error",e);
+        if(['SERVICE_INVALID','SERVICE_MISSING','SERVICE_DISABLED'].indexOf(e?.error) !== -1) {
             setYtError(true);
         }
     },[]);
@@ -107,20 +110,21 @@ const YoutubePlayer=React.memo(({youtube})=>{
             <Youtube
                 apiKey={YOUTUBE_KEY}
                 videoId={youtube}
-                style={{width,height:(9*width/16)}}
+                style={{...style,width,height:(9*width/16)}}
                 onError={handleError}
                 controls={1}
+                
             />
         )
     }
     return null;
 })
 
-export default React.memo(({iframe,youtube,...other})=>{
+export default React.memo(({iframe,youtube,width,style,...other})=>{
     if(iframe) return null
     if(youtube) {
-        if(isUpdated) return <YoutubePlayer youtube={youtube} />
+        if(isUpdated) return <YoutubePlayer youtube={youtube} width={width} style={style} />
         else return null;
     }
-    return <NativePlayer {...other} />
+    return <NativePlayer {...other} width={width} style={style} />
 })

@@ -57,6 +57,8 @@
     "button":"button",
     "button_type":"%{type} button",
     "save":"save",
+    "show_type":"Show %{type}",
+    "hide_type":"Hide %{type}",
     "errors":{
         "general":"Something went wrong",
         "server":"Internal server error",
@@ -104,5 +106,9 @@
             "fourth":"When you have finished editing, click the",
             "fifth":"Done."
         }
+    },
+    "media":{
+        "video_player":"video player",
+        "music_player":"music_player"
     }
 }

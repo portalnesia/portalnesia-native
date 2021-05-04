@@ -7,7 +7,7 @@ import LottieView from 'lottie-react-native'
 import TopNavigationAction from './TopAction'
 import i18n from'i18n-js'
 
-const STATUS_BAR_HEIGHT = StatusBar.currentHeight
+//const STATUS_BAR_HEIGHT = StatusBar.currentHeight
 
 const {diffClamp} = Animated;
 export const headerHeight = {
@@ -29,7 +29,7 @@ export const Lottie=({style={},...other})=>{
 	return <LottieView style={{height:RefreshingHeight,position:'absolute',top:5,left:0,right:0,...style}} autoPlay source={theme==='dark' ? require('@pn/assets/animation/loading-dark.json') : require('@pn/assets/animation/loading-dark.json')} {...other} />
 }
 
-export const useHeader=(height=56,refresh=false)=>{
+export const useHeader=(height=56,onScrollProps)=>{
 	const index = useNavigationState(state=>state.index);
 	const clampedScrollValue = React.useRef(0)
 	const offsetValue = React.useRef(0)
@@ -92,6 +92,9 @@ export const useHeader=(height=56,refresh=false)=>{
 		],
 		{
 			useNativeDriver: true,
+			listener:(event)=>{
+				if(typeof onScrollProps === 'function') onScrollProps(event);
+			}
 		},
 	)
 
