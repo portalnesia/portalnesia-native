@@ -2,11 +2,14 @@ import React from 'react'
 import {View,Dimensions, Animated, RefreshControl} from 'react-native'
 import {Layout as Lay,Text,useTheme,Icon,Divider} from '@ui-kitten/components'
 import Skltn from 'react-native-skeleton-placeholder'
+import {openBrowserAsync} from 'expo-web-browser'
 
+import Pressable from '@pn/components/global/Pressable'
 import RenderPrivate,{RenderSuspend} from './PrivateUser'
 import Button from '@pn/components/global/Button'
 import {Markdown} from '@pn/components/global/Parser'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
+import { ucwords } from '@pn/utils/Main'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 
@@ -36,7 +39,28 @@ const SkeletonAbout=()=>{
     )
 }
 
+const IconSocial = React.memo(({style,name}) => <Icon style={style} name={name} pack="font_awesome" />)
+
+const SocialWrapper = React.memo(({name,onPress})=>{
+    const theme = useTheme();
+    return (
+        <View style={{borderRadius:22,overflow:'hidden'}}>
+            <Pressable style={{padding:8}} onPress={onPress} tooltip={ucwords(name)}>
+                <View style={{width:26,height:26,justifyContent:'center',alignItems:'center'}}>
+                <IconSocial style={{height:24,tintColor:theme['text-hint-color']}} name={name} /></View>
+            </Pressable>
+        </View>
+    )
+})
+
 function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}){
+    const socialClick=React.useCallback((url)=>{
+        openBrowserAsync(url,{
+            enableDefaultShare:true,
+            toolbarColor:'#2f6f4e',
+            showTitle:true
+        })
+    },[])
     return (
         <Animated.ScrollView
             scrollToOverflowEnabled
@@ -80,19 +104,19 @@ function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumSc
                 <Lay style={{paddingVertical:15}}>
                     <View style={{paddingHorizontal:15,flexDirection:'row',justifyContent:'space-evenly',alignItems:'center'}}>
                         {data?.users?.instagram && (
-                            <Button appearance="ghost" status="basic" size="medium" accessoryLeft={IgIcon} />
+                            <SocialWrapper name="instagram" onPress={()=>socialClick(data?.users?.instagram)} />
                         )}
                         {data?.users?.twitter && (
-                            <Button appearance="ghost" status="basic" size="medium" accessoryLeft={TwIcon} />
+                            <SocialWrapper name="twitter" onPress={()=>socialClick(data?.users?.twitter)} />
                         )}
                         {data?.users?.facebook && (
-                            <Button appearance="ghost" status="basic" size="medium" accessoryLeft={FbIcon} />
+                            <SocialWrapper name="facebook" onPress={()=>socialClick(data?.users?.facebook)} />
                         )}
                         {data?.users?.line && (
-                            <Button appearance="ghost" status="basic" size="medium" accessoryLeft={LnIcon} />
+                            <SocialWrapper name="line" onPress={()=>socialClick(data?.users?.line)} />
                         )}
                         {data?.users?.telegram && (
-                            <Button appearance="ghost" status="basic" size="medium" accessoryLeft={TgIcon} />
+                            <SocialWrapper name="telegram" onPress={()=>socialClick(data?.users?.telegram)} />
                         )}
                     </View>
                     {(data?.users?.biodata && data?.users?.biodata?.match(/\S/) !== null) ? (

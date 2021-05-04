@@ -75,6 +75,7 @@ const RenderThread = React.memo(({item:dt, index:i,navigation}) => {
 })
 
 const About=React.memo(({title,txt,right,last,screen,navigation})=>{
+	const context = React.useContext(AuthContext)
 	if(last) {
 		return (
 			<Lay style={{marginTop:5,marginBottom:5,padding:10,...(last ? {marginBottom:50} : {}) }}>
@@ -92,7 +93,7 @@ const About=React.memo(({title,txt,right,last,screen,navigation})=>{
 })
 
 const Dashboard=({loading,data,error,navigation})=>{
-
+	const context = React.useContext(AuthContext)
 	return (
 		<Layout navigation={navigation}>
 			<ScrollView
@@ -107,7 +108,7 @@ const Dashboard=({loading,data,error,navigation})=>{
 }
 
 const NotLogin=React.memo(({loading,data,error,navigation})=>{
-
+	const context = React.useContext(AuthContext)
 	return (
 		<Layout navigation={navigation}>
 			<ScrollView
