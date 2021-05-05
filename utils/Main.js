@@ -246,24 +246,33 @@ export const extractMeta=(file)=>{
     return {name:fileName,match}
 }
 
-export const openBrowser=(url)=>{
-    Alert.alert(
-        i18n.t('title_external_link'),
-        i18n.t('desc_external_link'),
-        [{
-            text:i18n.t('cancel'),
-            onPress:()=>{}
-        },{
-            text:i18n.t("open"),
-            onPress:()=>{
-                    openBrowserAsync(url,{
-                    enableDefaultShare:true,
-                    toolbarColor:'#2f6f4e',
-                    showTitle:true
-                })
-            }
-        }]
-    )
+export const openBrowser=(url,alert=true)=>{
+    if(alert) {
+        Alert.alert(
+            i18n.t('title_external_link'),
+            i18n.t('desc_external_link'),
+            [{
+                text:i18n.t('cancel'),
+                onPress:()=>{}
+            },{
+                text:i18n.t("open"),
+                onPress:()=>{
+                        openBrowserAsync(url,{
+                        enableDefaultShare:true,
+                        toolbarColor:'#2f6f4e',
+                        showTitle:true
+                    })
+                }
+            }]
+        )
+    } else {
+        openBrowserAsync(url,{
+            enableDefaultShare:true,
+            toolbarColor:'#2f6f4e',
+            showTitle:true
+        })
+    }
+    
 }
 
 export const randomInt=(total=2)=>Math.floor(Math.random() * total);

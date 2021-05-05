@@ -47,12 +47,14 @@ const onLinkPress=(e,href)=>{
         url = `${URL}/link?u=${Buffer.from(encodeURIComponent(href)).toString('base64')}`
         openBrowser(url)
     } else {
-        if(href?.match(/^mailto\:/)) {
+        if(href?.match(/^https\:\/\/portalnesia.com/)) {
+            url = href?.replace(/^https\:\/\/portalnesia.com/,'');
+            linkTo(`/${url}`);
+        } else if(href?.match(/^mailto\:/)) {
             openURL(href);
-            return;
+        } else {
+            openBrowser(href,false);
         }
-        url = href?.replace(/^https\:\/\/portalnesia.com/,'');
-        linkTo(`/${url}`);
     }
     
 }
