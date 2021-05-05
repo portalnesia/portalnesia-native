@@ -44,6 +44,11 @@ export const escapeHTML=(text,withQuote)=>{
     }
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
   }
+
+export const stripHTML=(text='')=>{
+    if(typeof text!=='string' || text.match(/\S/) === null) return '';
+    return text.replace(/<[^>]*>?/gm,'').replace(/\&\#xA0\;/gm,' ');
+}
   
 export const specialHTML=(text)=>{
     if(typeof text!=='string' || text.match(/\S/) === null) return '';

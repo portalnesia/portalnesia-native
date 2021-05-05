@@ -1,5 +1,5 @@
 import React from 'react'
-import {useWindowDimensions,Alert,TouchableOpacity,View,Platform} from 'react-native'
+import {useWindowDimensions,View,Platform, Pressable} from 'react-native'
 import {Text,useTheme,Divider} from '@ui-kitten/components'
 import WebView from 'react-native-webview'
 import HTML,{IGNORED_TAGS,domNodeToHTMLString,getClosestNodeParentByTag} from 'react-native-render-html'
@@ -9,13 +9,17 @@ import {Buffer} from 'buffer'
 import TableRenderer,{IGNORED_TAGS as TABLE_IGNORED_TAGS} from '@native-html/table-plugin'
 import Syntax from 'react-native-syntax-highlighter'
 import {androidstudio} from 'react-syntax-highlighter/styles/hljs'
+import {openURL} from 'expo-linking'
 
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import global_style from '@pn/components/global/style'
 import AutoHeightWebView from 'react-native-autoheight-webview'
-import {openBrowser} from '@pn/utils/Main'
+import {jsStyles, openBrowser, stripHTML} from '@pn/utils/Main'
 
 import { AuthContext } from '@pn/provider/AuthProvider';
+import useRootNavigation from '../../navigation/useRootNavigation'
+
+let Hid = [];
 
 const Url = require('url-parse')
 
@@ -23,17 +27,34 @@ const GlobalImageRender=({src,dataSrc,thumbnail})=>{
     return <Image source={{uri:src}} fullSize fancybox dataSrc={{uri:dataSrc}} {...(thumbnail ? {thumbnail:{uri:thumbnail}} : {})} />
 }
 
+export const onLinkPagePress=(id,yLayout=0,scrollRef)=>{
+    const filter = Hid.filter(i=>i.id == id);
+    if(scrollRef?.current?.scrollTo && filter?.length > 0) {
+        const y = filter?.[0]?.y + yLayout - 65;
+        scrollRef?.current?.scrollTo({x:0,y})
+    }
+}
+
 const onLinkPress=(e,href)=>{
+    if(href?.match(/^javascript\:/)) return;
+    const {linkTo} = useRootNavigation();
     let url = href;
     if(
         !href?.match(/^mailto\:/)
         && !href?.match(/portalnesia\.com+/)
-        && !href?.match(/^javascript\:/)
         && !href?.match(/^\/+/)
     ) {
         url = `${URL}/link?u=${Buffer.from(encodeURIComponent(href)).toString('base64')}`
+        openBrowser(url)
+    } else {
+        if(href?.match(/^mailto\:/)) {
+            openURL(href);
+            return;
+        }
+        url = href?.replace(/^https\:\/\/portalnesia.com/,'');
+        linkTo(`/${url}`);
     }
-    openBrowser(url)
+    
 }
 
 const TextRender=(attribs,children,style,props)=>{
@@ -50,31 +71,40 @@ const TextViewRender=(attribs,children,style,props)=>{
 
 const ARender=(attribs,children,style,props)=>{
     const {href}=attribs
-    if(href?.match(/^#+/)
+    if( attribs?.['data-fancybox']
         || href?.match(/^javascript\:/)
         || href?.match(/^\/+/)
     ) {
         return children
     }
-    if(attribs?.['data-fancybox']){
-        return children
-    } else {
-        const onPress = (evt) =>
-            props.onLinkPress && attribs && attribs.href
-            ? props.onLinkPress(evt, attribs.href, attribs)
-            : undefined;
-            return (
-              <Text
-                selectable={props?.selectable||false}
-                onPress={onPress}
-                key={props?.key}
-                style={[global_style.container,style,{lineHeight:23,textDecorationLine:"underline"}]}
-                status="info"
-              >
-                {props?.domNode?.children?.[0]?.data || props?.domNode?.data || props.data}
-              </Text>
-            );
+    if(href?.match(/^#+/)){
+        const scrollRef=props?.renderersProps?.scrollRef;
+        const yLayout=props?.renderersProps?.yLayout;
+        const onPress=()=>{
+            onLinkPagePress(attribs?.href?.substring(1),yLayout,scrollRef)
+        }
+        return (
+            <Pressable key={props?.key} onPress={onPress}>
+                {children}
+            </Pressable>
+        );
     }
+    
+    const onPress = (evt) =>
+        props.onLinkPress && attribs && attribs.href
+        ? props.onLinkPress(evt, attribs.href, attribs)
+        : undefined;
+        return (
+            <Text
+            selectable={props?.selectable||false}
+            onPress={onPress}
+            key={props?.key}
+            style={[global_style.container,style,{lineHeight:23,textDecorationLine:"underline"}]}
+            status="info"
+            >
+            {props?.domNode?.children?.[0]?.data || props?.domNode?.data || props.data}
+            </Text>
+        );
 }
 
 const PictureRender=(attribs,children,style,props)=>{
@@ -119,12 +149,12 @@ const ImageRender=(attribs,children,style,props)=>{
     const {src}=node?.attribs;
     const withPng = node?.attribs?.['data-png'] == "true";
     const srrrc=node?.attribs?.['data-src']||src;
-    const dtSrc = aa !== null && aa?.attribs?.['data-src'] ? `${aa?.attribs?.['data-src']}${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
+    const dtSrc = aa !== null && aa?.attribs?.['data-src'] ? `${aa?.attribs?.['data-src']}${withPng ? '&output=png' : '&output=webp'}` : `${srrrc}${withPng ? '&output=png' : '&output=webp'}`;
     const dtCaption = aa !== null && aa?.attribs?.['data-caption'] ? aa?.attribs?.['data-caption'] : "";
-    const srrc=!srrrc?.match(/portalnesia\.com\/+/) || !srrrc?.match(/^\/+/) ? `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=400${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
+    const srrc=!srrrc?.match(/portalnesia\.com\/+/) ? `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=400${withPng ? '&output=png' : '&output=webp'}` : `${srrrc}${withPng ? '&output=png' : '&output=webp'}`;
     let thumb;
-    //if(!withPng) {
-        if(!srrrc?.match(/portalnesia\.com\/+/) || !srrrc?.match(/^\/+/)) thumb = `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=50`;
+    if(!withPng) {
+        if(!srrrc?.match(/portalnesia\.com\/+/)) thumb = `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=50`;
         else {
             const UrlParse = new Url(srrrc,true);
             const imgWid = UrlParse?.query?.size;
@@ -132,15 +162,46 @@ const ImageRender=(attribs,children,style,props)=>{
             ssrc = imgWid ? srrrc.replace(`?size=${imgWid}`,'?') : srrrc;
             thumb = `${ssrc}&size=50`
         }
-    //} else thumb=undefined
+    } else thumb=undefined
     //console.log(thumb);
     return <View key={props?.key} style={{marginTop:10,justifyContent:'center',alignItems:'center'}}><GlobalImageRender src={srrc} dataSrc={dtSrc} thumbnail={thumb} caption={dtCaption} /></View>
 }
 
 const HRender=(type)=>(attribs,children,style,props)=>{
+    const scrollRef=props?.renderersProps?.scrollRef;
+    const yLayout=props?.renderersProps?.yLayout;
+    const onReceiveId=props?.renderersProps?.onReceiveId;
     const heading = type=='h1' ? 'h3' : type == 'h3' ? 'h5' : 'h4';
+    let id;
+    const name = stripHTML(domNodeToHTMLString(props?.domNode))?.replace(/\n/g,'')
+    const block = getClosestNodeParentByTag(props?.domNode,"blockquote");
+    
+    if(attribs?.id) {
+        id = attribs?.id;
+    } else {
+        id = name.split(' ').slice(0,3).join(' ');
+        id = jsStyles(id);
+    }
+    const withTableClass = props?.domNode?.attribs?.class?.match(/no-table-content/);
+    const withTable = withTableClass === undefined || withTableClass === null;
+    const withUnderlineClass = props?.domNode?.attribs?.class?.match(/no-underline/);
+    const withUnderline = withUnderlineClass === undefined || withUnderlineClass === null;
+    const onLayout=(e)=>{
+        if(e?.nativeEvent?.layout?.y && typeof block === 'undefined' && withTable && name?.match(/\S/) !==null) {
+            const index = Hid.findIndex(i=>i.id == id);
+            if(index == -1) {
+                Hid = Hid.concat({id,tag:heading,y:e?.nativeEvent?.layout?.y,name})
+            } else {
+                Hid[index]={id,tag:heading,y:e?.nativeEvent?.layout?.y,name}
+            }
+            if(onReceiveId) onReceiveId(Hid);
+        }
+    }
+
     return (
-        <Text selectable={props?.selectable||false} key={props?.key} category={heading} style={[global_style.container,{marginTop:20,paddingBottom:5,borderBottomColor:props?.renderersProps?.theme['border-text-color'],borderBottomWidth:2}]}>{children||props?.data}</Text>
+        <View key={props?.key} onLayout={onLayout} >
+            <Text onPress={()=>typeof block === 'undefined' && withTable && onLinkPagePress(id,yLayout,scrollRef)} selectable={props?.selectable||false} category={heading} style={[global_style.container,{marginTop:20,...(withUnderline ? {paddingBottom:5,borderBottomColor:props?.renderersProps?.theme['border-text-color'],borderBottomWidth:2} : {})}]}>{children||props?.data}</Text>
+        </View>
     )
 }
 
@@ -282,7 +343,7 @@ const BlockRender=(attribs,children,style,props)=>{
 
 const FigureRender=(attribs,children,style,props)=>children
 
-export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
+export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yLayout=0,onReceiveId})=>{
     const {width: screenWidth} = useWindowDimensions()
     const theme = useTheme()
     const context = React.useContext(AuthContext);
@@ -337,7 +398,10 @@ export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
         theme,
         iklan,
         screenWidth,
-        selectedTheme
+        selectedTheme,
+        scrollRef,
+        yLayout,
+        onReceiveId
     }
 
     const alterData=(node)=>{
@@ -360,6 +424,12 @@ export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
         defaultWebViewProps:{style:{opacity:0.99,overflow:'hidden'}},
         onParsed:onParsed
     }
+
+    React.useEffect(()=>{
+        return ()=>{
+            Hid = [];
+        }
+    },[source])
 
     return (
         <HTML
@@ -394,7 +464,7 @@ export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
                             marginRight: 10,
                             width: 15 / 2.8,
                             height: 15 / 2.8,
-                            marginTop: 15 / 2,
+                            marginTop: 15 / 1.5,
                             borderRadius: 15 / 2.8,
                             backgroundColor: theme['text-basic-color'],
                         }}
@@ -402,7 +472,7 @@ export const Parser=React.memo(({source,selectable=false,iklan=true})=>{
                 ),
                 ol:(a,b,c,props)=>(
                     <Text
-                        style={{ marginRight: 5, fontSize:15 }}
+                        style={{ marginRight: 5, fontSize:15,marginTop:1 }}
                     >
                         {props?.index + 1})
                     </Text>

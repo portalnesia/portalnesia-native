@@ -59,6 +59,7 @@
     "save":"save",
     "show_type":"Show %{type}",
     "hide_type":"Hide %{type}",
+    "table_of_content":"Table of Contents",
     "errors":{
         "general":"Something went wrong",
         "server":"Internal server error",

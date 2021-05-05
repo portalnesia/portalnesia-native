@@ -59,6 +59,7 @@
     "save":"simpan",
     "show_type":"Tampilkan %{type}",
     "hide_type":"Sembunyikan %{type}",
+    "table_of_content":"Daftar Isi",
     "errors":{
         "general":"Kesalahan",
         "server":"Kesalahan internal server",

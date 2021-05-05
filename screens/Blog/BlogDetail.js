@@ -19,7 +19,7 @@ import {CONTENT_URL} from '@env'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import i18n from 'i18n-js'
 import usePost from '@pn/utils/API'
-//const ShareIcon=(props)=><Icon {...props} name="ios-share" pack="material" />
+import TableContent from '@pn/components/global/TableContent'
 
 export default function({navigation,route}){
     const {slug} = route.params
@@ -28,10 +28,20 @@ export default function({navigation,route}){
     const theme = useTheme()
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:0}	
-    const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
     const linkTo = useLinkTo()
     const {PNget} = usePost();
+
+    const scrollRef = React.useRef(null)
+    const [yLayout,setYLayout]=React.useState(0);
+    const [content,setContent] = React.useState([]);
+    const [tableShow,setTableShow] = React.useState(false)
+
+    const scrollAnim = new Animated.Value(0);
+    const onScroll = (e)=>{
+        scrollAnim.setValue(e?.nativeEvent?.contentOffset?.y);
+    }
+    const {translateY,...other} = useHeader(56,onScroll)
 
     React.useEffect(()=>{
         let timeout = null;
@@ -56,13 +66,30 @@ export default function({navigation,route}){
         }
     },[data,ready,slug])
 
+    const onLayout=React.useCallback((e)=>{
+        setYLayout(e?.nativeEvent?.layout?.y)
+    },[])
+
+    const onReceiveId=React.useCallback((id)=>{
+        setContent(id)
+    },[])
+
+    const onShowContent=React.useCallback(()=>{
+        setTableShow(true)
+    },[])
+
+    const onHideContent=React.useCallback(()=>{
+        setTableShow(false)
+    },[])
+
     return (
         <>
         <Layout navigation={navigation} custom={
-            <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
+            <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 2,transform: [{translateY}]}}>
 				<Header title='Blog' subtitle={data?.blog?.title||""} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />} />
 			</Animated.View>
         }>
+            {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
             {!data && !error ? (
                 <View style={{height:'100%',paddingTop:heightHeader+8}}>
                     <Skeleton type="article" />
@@ -71,6 +98,7 @@ export default function({navigation,route}){
                 <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
             ) : data?.blog?.text ? (
                 <Animated.ScrollView
+                ref={scrollRef}
                     contentContainerStyle={{
                         flexGrow: 1,
                         paddingTop:heightHeader+8
@@ -88,8 +116,16 @@ export default function({navigation,route}){
                             <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.blog?.users?.username}`)}>{data?.blog?.users?.name||"Portalnesia"}</Text>
                         </Text>
                     </Lay>
+                    {content?.length > 0 && (
+                        <>
+                            <Divider style={{backgroundColor:theme['border-text-color']}} />
+                            <TableContent.Text onPress={onShowContent} />
+                        </>
+                    )}
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
-                    <Lay style={{paddingBottom:20}}><Parser source={data?.blog?.text} selectable /></Lay>
+                    <Lay style={{paddingBottom:20}} onLayout={onLayout}>
+                        <Parser source={data?.blog?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                    </Lay>
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
                     <Lay style={[style.container,{paddingBottom:20,paddingTop:20}]}>
                         <Text>Category: <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/category/${PNslug(data?.blog?.category)}`)} >{ucwords(data?.blog?.category)}</Text></Text>
@@ -138,6 +174,7 @@ export default function({navigation,route}){
                 }]}
            />
        )}
+       {content?.length > 0 && <TableContent.Modal scrollRef={scrollRef} yLayout={yLayout} open={tableShow} onClose={onHideContent} content={content} />}
         </>
     )
 }

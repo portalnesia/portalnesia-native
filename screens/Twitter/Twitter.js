@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated,RefreshControl,View,Dimensions,ToastAndroid } from 'react-native';
+import { Animated,RefreshControl,View,Dimensions } from 'react-native';
 import {Layout as Lay,Text,Card,Tab,useTheme,Input,Icon,Divider} from '@ui-kitten/components'
 import {TabView,TabBar} from 'react-native-tab-view'
 import i18n from 'i18n-js'
@@ -17,6 +17,7 @@ import Skeleton from '@pn/components/global/Skeleton'
 import useAPI from '@pn/utils/API'
 import Recaptcha from '@pn/components/global/Recaptcha'
 import {useLinkTo} from '@react-navigation/native'
+import { AuthContext } from '@pn/provider/Context';
 
 const {width} = Dimensions.get('window')
 const InputIcon = (props)=><Icon {...props} name="plus-circle-outline" />
@@ -27,6 +28,8 @@ const RenderInput=React.memo(({onClose})=>{
     const [result,setResult]=React.useState(null)
 	const [recaptcha,setRecaptcha]=React.useState("");
 	const theme = useTheme();
+	const context = React.useContext(AuthContext)
+	const {setNotif} = context;
 	const {PNpost} = useAPI();
 	const captcha = React.useRef(null)
 	const linkTo = useLinkTo();
@@ -40,7 +43,7 @@ const RenderInput=React.memo(({onClose})=>{
 			setLoading(true)
 			PNpost(`/twitter/thread`,{url:input,recaptcha:recaptcha},undefined,false)
 			.then((res)=>{
-				if(res?.error) ToastAndroid.show(res?.msg,ToastAndroid.LONG)
+				if(res?.error) setNotif(true,"Error",res?.msg);
 				else {
 					setInput("");
 					setResult(res?.data);
@@ -48,12 +51,12 @@ const RenderInput=React.memo(({onClose})=>{
 			})
 			.catch((err)=>{
 				if(err?.response?.data) {
-					ToastAndroid.show(typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : i18n.t('errors.general'),ToastAndroid.LONG);
+					setNotif(true,"Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : i18n.t('errors.general'));
 				}
 				else if(err?.response?.status===503) {
-					ToastAndroid.show(i18n.t('errors.server'),ToastAndroid.LONG);
+					setNotif(true,"Error",i18n.t('errors.server'))
 				} else {
-					ToastAndroid.show(i18n.t('errors.general'),ToastAndroid.LONG)
+					setNotif(true,"Error",i18n.t('errors.general'))
 				}
 			})
 			.finally(()=>{
@@ -61,7 +64,7 @@ const RenderInput=React.memo(({onClose})=>{
 				captcha?.current?.refreshToken()
 			})
 		} else {
-			ToastAndroid.show(i18n.t("errors.invalid",{type:i18n.t('url')}),ToastAndroid.LONG)
+			setNotif(true,"Error",i18n.t("errors.invalid",{type:i18n.t('url')}));
 		}
 	}
 
@@ -348,6 +351,7 @@ export default function ({ navigation,route }) {
                 style={{margin:0,justifyContent:'center',alignItems:'center'}}
                 animationIn="fadeIn"
                 animationOut="fadeOut"
+				coverScreen={false}
             >
 				<RenderInput onClose={()=>setOpen(false)} />
 			</Modal>

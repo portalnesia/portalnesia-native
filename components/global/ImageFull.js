@@ -253,7 +253,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
   __cachedPhysicalDimensionsFromProps;
   mounted = false;
 
-  thumbnailAnimated = new Animated.Value(0)
+  thumbnailAnimated = new Animated.Value(1)
   imageAnimated = new Animated.Value(0)
   scaleZoom = new Animated.Value(1)
 
@@ -272,7 +272,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
       ...state,
       imageBoxDimensions: this.computeImageBoxDimensions(props, state),
     };
-
+    this.renderImage = this.renderImage.bind(this)
   }
 
   static defaultProps = {
@@ -426,16 +426,16 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
     return false;
   }
 
-  thumbnailLoaded=()=>{
+  /*thumbnailLoaded=()=>{
     Animated.timing(this.thumbnailAnimated,{
       toValue:1,
       useNativeDriver:true
     }).start()
-  }
+  }*/
 
   imageLoaded=()=>{
     const {imageBoxDimensions} = this.state
-    if(imageBoxDimensions !== null) {
+    //if(imageBoxDimensions !== null) {
       Animated.timing(this.thumbnailAnimated,{
         toValue:0,
         useNativeDriver:true
@@ -445,7 +445,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
           useNativeDriver:true
         }).start()
       })
-    }
+    //}
   }
 
   onPinchEvent = Animated.event(
@@ -477,10 +477,10 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
         <>
           <Animated.Image
             source={thumbnail}
-            style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:contentWidth}),opacity:animated ? this.thumbnailAnimated : 1}]}
+            style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4}),opacity:animated ? this.thumbnailAnimated : 1,maxHeight:4*contentWidth/3}]}
             testID="image-layout-thumbnail"
             blurRadius={5}
-            onLoadStart={animated ? this.thumbnailLoaded : undefined}
+            //onLoadStart={animated ? this.thumbnailLoaded : undefined}
           />
           {zoomable ? (
               <PinchGestureHandler
@@ -490,7 +490,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
                 <AnimImage
                   source={source}
                   onError={() => this.setState({ error: true })}
-                  style={[styles.imageOverlay,defaultImageStyle, imageBoxDimensions, imageStyles,{opacity:this.imageAnimated,transform:[{scale:this.scaleZoom}]}]}
+                  style={[styles.imageOverlay,defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4}),opacity:this.imageAnimated,maxHeight:4*contentWidth/3,transform:[{scale:this.scaleZoom}]}]}
                   testID="image-layout"
                   onLoadEnd={()=>animated && this.imageLoaded()}
                   onLoad={(e)=>this.onFastImageLoad(e)}
@@ -500,7 +500,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
               <AnimImage
                 source={source}
                 onError={() => this.setState({ error: true })}
-                style={[styles.imageOverlay,defaultImageStyle, imageBoxDimensions, imageStyles,{opacity:animated ? this.imageAnimated : 1}]}
+                style={[styles.imageOverlay,defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4}),opacity:animated ? this.imageAnimated : 1,maxHeight:4*contentWidth/3}]}
                 testID="image-layout"
                 onLoadEnd={()=>animated && this.imageLoaded()}
                 onLoad={(e)=>this.onFastImageLoad(e)}
@@ -514,7 +514,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
             <AnimImage
               source={source}
               onError={() => this.setState({ error: true })}
-              style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:contentWidth,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1}]}
+              style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1,maxHeight:4*contentWidth/3}]}
               testID="image-layout"
               onLoadEnd={()=>animated && this.imageLoaded()}
               onLoad={(e)=>this.onFastImageLoad(e)}
@@ -525,7 +525,7 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
           <AnimImage
             source={source}
             onError={() => this.setState({ error: true })}
-            style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:contentWidth,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1}]}
+            style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1,maxHeight:4*contentWidth/3}]}
             testID="image-layout"
             onLoadEnd={()=>animated && this.imageLoaded()}
             onLoad={(e)=>this.onFastImageLoad(e)}

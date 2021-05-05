@@ -32,9 +32,11 @@ export default function OpenSourceDetailScreen({navigation,route}){
         if(!data) mutate();
     },[data])
 
-    React.useEffect(()=>{
-        if(error) console.log(error)
-    },[error])
+    /*React.useEffect(()=>{
+        if(error) {
+            console.log(route?.params?.url,error)
+        }
+    },[error])*/
 
     const onPress=()=>{
         openBrowserAsync(route?.params?.url,{

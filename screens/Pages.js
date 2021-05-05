@@ -16,6 +16,7 @@ import {ucwords} from '@pn/utils/Main'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import {CONTENT_URL} from '@env'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
+import TableContent from '@pn/components/global/TableContent'
 
 //const ShareIcon=(props)=><Icon {...props} name="ios-share" pack="material" />
 
@@ -26,9 +27,18 @@ export default function({navigation,route}){
     const theme = useTheme()
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:0}	
-    const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
     const {PNget} = usePost();
+    const scrollRef = React.useRef(null)
+    const [yLayout,setYLayout]=React.useState(0);
+    const [content,setContent] = React.useState([]);
+    const [tableShow,setTableShow] = React.useState(false)
+
+    const scrollAnim = new Animated.Value(0);
+    const onScroll = (e)=>{
+        scrollAnim.setValue(e?.nativeEvent?.contentOffset?.y);
+    }
+    const {translateY,...other} = useHeader(56,onScroll)
 
     React.useEffect(()=>{
         let timeout = null;
@@ -55,14 +65,30 @@ export default function({navigation,route}){
         }
     },[data,ready,route])
 
+    const onLayout=React.useCallback((e)=>{
+        setYLayout(e?.nativeEvent?.layout?.y)
+    },[])
+
+    const onReceiveId=React.useCallback((id)=>{
+        setContent(id)
+    },[])
+
+    const onShowContent=React.useCallback(()=>{
+        setTableShow(true)
+    },[])
+
+    const onHideContent=React.useCallback(()=>{
+        setTableShow(false)
+    },[])
+
     return (
         <>
             <Layout navigation={navigation} custom={
-                <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
+                <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 2,transform: [{translateY}]}}>
                     <Header title={navbar||"Pages"} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />} />
                 </Animated.View>
             }>
-                
+                {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
                 {!data && !error ? (
                     <View style={{height:'100%',paddingTop:heightHeader+8}}>
                         <Skeleton type="article" />
@@ -71,6 +97,7 @@ export default function({navigation,route}){
                     <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
                 ) : data?.pages?.text ? (
                     <Animated.ScrollView
+                        ref={scrollRef}
                         contentContainerStyle={{
                             flexGrow: 1,
                             paddingTop:heightHeader+8
@@ -88,12 +115,20 @@ export default function({navigation,route}){
                             <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}}>{"Portalnesia"}</Text>
                         </Lay>
                     </Lay>
+                    {content?.length > 0 && (
+                        <>
+                            <Divider style={{backgroundColor:theme['border-text-color']}} />
+                            <TableContent.Text onPress={onShowContent} />
+                        </>
+                    )}
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
-                    <Lay style={{paddingBottom:50}}><Parser source={data?.pages?.text} selectable /></Lay>
+                    <Lay style={{paddingBottom:50}} onLayout={onLayout}>
+                        <Parser source={data?.pages?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                    </Lay>
                     </Animated.ScrollView>
                 ) : null}
             </Layout>
-            {data && data?.error==0 && ready && (
+            {data && data?.error==0 && (
                  <MenuContainer
                     visible={open}
                     handleOpen={()=>setOpen(true)}
@@ -117,6 +152,7 @@ export default function({navigation,route}){
                     }]}
                 />
             )}
+            {content?.length > 0 && <TableContent.Modal scrollRef={scrollRef} yLayout={yLayout} open={tableShow} onClose={onHideContent} content={content} />}
         </>
     )
 }
