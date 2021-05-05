@@ -1,57 +1,79 @@
 import React from 'react'
-import {Animated,Dimensions,View} from 'react-native'
+import {Animated,Dimensions,View,ScrollView,StyleProp,ViewStyle} from 'react-native'
 import {Layout as Lay, Text,Divider,useTheme,Icon, List} from '@ui-kitten/components'
 import Pressable from './Pressable'
 import {Portal} from '@gorhom/portal'
 import Modal from 'react-native-modal';
 import i18n from 'i18n-js'
 import {onLinkPagePress} from '@pn/components/global/Parser'
-import ListItem from './ListItem'
+import ListItem,{PropsType} from './ListItem'
 
 const {width,height}=Dimensions.get('window')
 
-const TableContentText=React.memo(({style,sticky,scrollAnim,translateY,onPress})=>{
+export interface TableContentTextProps {
+    style?: StyleProp<ViewStyle>;
+    sticky?:boolean;
+    scrollAnim?: Animated.Value;
+    translateY?: Animated.AnimatedInterpolation;
+    onPress: ()=>void
+}
+
+const TableContentText=React.memo(({style={},sticky,scrollAnim,translateY,onPress}: TableContentTextProps)=>{
     const theme = useTheme();
-    if(sticky) {
+    if(sticky && typeof scrollAnim !== 'undefined' && typeof translateY !== 'undefined') {
         const translateScroll = Animated.add(
             scrollAnim.interpolate({
                 inputRange:[0,120,220],
-                outputRange:[-56,0,56],
+                outputRange:[-58,0,58],
                 extrapolate:'clamp'
             }),
             translateY
         )
         return (
             <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY:translateScroll}]}}>
-                <Pressable onPress={()=>onPress && onPress()} style={{paddingVertical:10,paddingHorizontal:15,...style}}>
-                    <Text>Table of Contents</Text>
+                <Pressable onPress={()=>onPress && onPress()} style={[{paddingVertical:10,paddingHorizontal:15},style]}>
+                    <Text>{i18n.t("table_of_content")}</Text>
                 </Pressable>
-                <Divider style={{backgroundColor:theme['border-text-color']}} />
+                <Divider />
             </Animated.View>
         )
     }
     return (
-        <Pressable onPress={()=>onPress && onPress()} style={{paddingVertical:10,paddingHorizontal:15,...style}}>
-            <Text>Table of Contents</Text>
+        <Pressable onPress={()=>onPress && onPress()} style={[{paddingVertical:10,paddingHorizontal:15},style]}>
+            <Text>{i18n.t("table_of_content")}</Text>
         </Pressable>
     )
 })
 
-const RenderList = React.memo(({item,index,onPress})=>{
+export interface TableContentDataTypes {
+    id: string;
+    name: string;
+    tag: string;
+    y: number;
+}
+
+interface RenderListProps {
+    item: TableContentDataTypes;
+    index: number;
+    onPress:(id: string)=>void;
+}
+
+const RenderList = React.memo(({item,index,onPress}: RenderListProps)=>{
     const theme=useTheme()
-    const margin = item?.tag == 'h3' ? 0 : item?.tag == 'h4' ? 10 : 20;
-    const renderTitle = (props)=>(
+    const margin = item?.tag == 'h3' ? 0 : item?.tag == 'h4' ? 15 : 30;
+    const fontSize = item?.tag == 'h3' ? 15 : item?.tag == 'h4' ? 14 : 13;
+    const renderTitle = (props?: PropsType)=>(
         <View style={{alignItems:'flex-start',flexDirection:'row',justifyContent:'flex-start',marginLeft:margin}}>
             <View
                 style={{
-                    width: 13 / 2.8,
-                    height: 13 / 2.8,
-                    marginTop: 13 / 1.5,
-                    borderRadius: 13 / 2.8,
+                    width: fontSize / 2.8,
+                    height: fontSize / 2.8,
+                    marginTop: fontSize / 1.5,
+                    borderRadius: fontSize / 2.8,
                     backgroundColor: theme['text-basic-color'],
                 }}
             />
-            <Text {...props}>{item?.name}</Text>
+            <Text {...props} style={[props?.style,{fontSize}]}>{item?.name}</Text>
         </View>
     )
 
@@ -66,10 +88,18 @@ const RenderList = React.memo(({item,index,onPress})=>{
     )
 })
 
-const TableContentModal = React.memo(({open=false,content=[],onClose,yLayout,scrollRef})=>{
+export interface TableContentModalProps {
+    open: boolean;
+    content: TableContentDataTypes[];
+    onClose:()=>void;
+    yLayout: number;
+    scrollRef: React.MutableRefObject<ScrollView>
+}
+
+const TableContentModal = React.memo(({open=false,content=[],onClose,yLayout,scrollRef}: TableContentModalProps)=>{
     const theme = useTheme();
 
-    const onPress=React.useCallback((id)=>{
+    const onPress=React.useCallback((id: string)=>{
         onClose();
         onLinkPagePress(id,yLayout,scrollRef)
     },[yLayout,scrollRef,onClose])
@@ -89,7 +119,7 @@ const TableContentModal = React.memo(({open=false,content=[],onClose,yLayout,scr
             >
                 <Lay style={{padding:10,width:width-20,borderRadius:10}}>
                     <Lay style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                        <Text>{i18n.t("table_of_content")}</Text>
+                        <Text category='h5'>{i18n.t("table_of_content")}</Text>
                         <Lay style={{borderRadius:22,overflow:'hidden'}}>
                             <Pressable style={{padding:10}} onPress={()=> onClose && onClose()}>
                                 <Icon style={{width:24,height:24,tintColor:theme['text-hint-color']}} name="close-outline" />
@@ -103,6 +133,7 @@ const TableContentModal = React.memo(({open=false,content=[],onClose,yLayout,scr
                             renderItem={(props)=><RenderList {...props} onPress={onPress} />}
                             keyExtractor={(item,index)=>item.id}
                             ItemSeparatorComponent={Divider}
+                            showsVerticalScrollIndicator={false}
                         />
                     </Lay>
                 </Lay>

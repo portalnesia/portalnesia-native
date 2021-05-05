@@ -247,7 +247,7 @@ function computeImageBoxDimensions(params) {
   return null;
 }
 
-const HTMLImageElement = class HTMLImageElement extends React.Component {
+const HTMLImageElement = class HTMLImageElement extends React.PureComponent {
   __cachedFlattenStyles;
   __cachedRequirements;
   __cachedPhysicalDimensionsFromProps;
@@ -417,14 +417,14 @@ const HTMLImageElement = class HTMLImageElement extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps,nextState) {
+  /*shouldComponentUpdate(nextProps,nextState) {
     if(nextProps.source !== this.props.source) return true;
     if(nextState.imageBoxDimensions !== this.state.imageBoxDimensions
       || nextState.imagePhysicalWidth !== this.state.imagePhysicalWidth
       || nextState.imagePhysicalHeight !== this.state.imagePhysicalHeight
       || nextState.error !== this.state.error) return true;
     return false;
-  }
+  }*/
 
   /*thumbnailLoaded=()=>{
     Animated.timing(this.thumbnailAnimated,{

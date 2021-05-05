@@ -151,9 +151,9 @@ const ImageRender=(attribs,children,style,props)=>{
     const {src}=node?.attribs;
     const withPng = node?.attribs?.['data-png'] == "true";
     const srrrc=node?.attribs?.['data-src']||src;
-    const dtSrc = aa !== null && aa?.attribs?.['data-src'] ? `${aa?.attribs?.['data-src']}${withPng ? '&output=png' : '&output=webp'}` : `${srrrc}${withPng ? '&output=png' : '&output=webp'}`;
+    const dtSrc = aa !== null && aa?.attribs?.['data-src'] ? `${aa?.attribs?.['data-src']}${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
     const dtCaption = aa !== null && aa?.attribs?.['data-caption'] ? aa?.attribs?.['data-caption'] : "";
-    const srrc=!srrrc?.match(/portalnesia\.com\/+/) ? `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=400${withPng ? '&output=png' : '&output=webp'}` : `${srrrc}${withPng ? '&output=png' : '&output=webp'}`;
+    const srrc=!srrrc?.match(/portalnesia\.com\/+/) ? `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=400${withPng ? '&output=png' : '&output=webp'}` : `${srrrc}${withPng ? '&output=png' : ''}`;
     let thumb;
     if(!withPng) {
         if(!srrrc?.match(/portalnesia\.com\/+/)) thumb = `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=50`;

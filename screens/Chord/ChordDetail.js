@@ -53,7 +53,7 @@ function ChordDetailScreen({navigation,route}){
         return heightt?.main + heightt?.sub;
     },[])
 
-    const {translateY,onScroll,...other} = useHeader(56)
+    const {translateY,onScroll,...other} = useHeader()
 
     const transpose = React.useMemo(()=>{
         const angka = tools.transpose

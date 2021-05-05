@@ -90,7 +90,7 @@ interface Props {
   onMove?: (position: OnMove) => void;
   responderRelease?: (vx?: number, scale?: number) => void;
   willClose?: () => void;
-  onClose: () => void;
+  onClose?: () => void;
   renderContent?:React.ReactNode;
 }
 export default class ImageDetail extends React.Component<Props> {
@@ -99,6 +99,7 @@ export default class ImageDetail extends React.Component<Props> {
   private _animatedPositionY = new Animated.Value(0);
   private _animatedFrame = new Animated.Value(0);
   private _animatedOpacity = new Animated.Value(Dimensions.get('window').height);
+  private _opacityAnimated = new Animated.Value(0);
   private _imagePanResponder?: PanResponderInstance = undefined;
 
   private _lastPositionX: null | number = null;
@@ -495,12 +496,9 @@ export default class ImageDetail extends React.Component<Props> {
         useNativeDriver: false,
       }).start();
     }
-
-    Animated.timing(this._animatedOpacity, {
-      toValue: 0,
-      duration: 100,
-      useNativeDriver: false,
-    }).start();
+    Animated.parallel([
+      Animated.timing(this._animatedOpacity, {toValue: 0,duration: 100,useNativeDriver: true})
+    ]).start();
 
     this._horizontalWholeOuterCounter = 0;
     this._swipeDownOffset = 0;
@@ -524,10 +522,11 @@ export default class ImageDetail extends React.Component<Props> {
         Animated.timing(this._animatedScale, { toValue: 1, useNativeDriver: false }),
         Animated.timing(this._animatedPositionX, { toValue: 0, useNativeDriver: false }),
         Animated.timing(this._animatedPositionY, { toValue: 0, useNativeDriver: false }),
-        Animated.timing(this._animatedOpacity, { toValue: windowHeight, useNativeDriver: false }),
+        Animated.timing(this._animatedOpacity, { toValue: windowHeight, useNativeDriver: true }),
         Animated.spring(this._animatedFrame, { toValue: 0, useNativeDriver: false }),
       ]).start(() => {
-        onClose();
+        if(onClose) onClose();
+        Animated.timing(this._opacityAnimated, { toValue: 0, useNativeDriver: false }).start();
         this._isAnimated = true;
       });
     });
@@ -537,7 +536,9 @@ export default class ImageDetail extends React.Component<Props> {
     if (
       nextProps.isOpen !== this.props.isOpen ||
       nextProps.origin.x !== this.props.origin.x ||
-      nextProps.origin.y !== this.props.origin.y
+      nextProps.origin.y !== this.props.origin.y ||
+      nextProps.source !== this.props.source || 
+      nextProps?.renderContent !== this.props?.renderContent
     ) {
       return true;
     }
@@ -545,7 +546,7 @@ export default class ImageDetail extends React.Component<Props> {
   }
 
   componentDidUpdate(): void {
-    const { isOpen, didOpen,source } = this.props;
+    const { isOpen, didOpen } = this.props;
     if (isOpen) {
       this._lastPositionX = null;
       this._lastPositionY = null;
@@ -570,7 +571,8 @@ export default class ImageDetail extends React.Component<Props> {
       this._isAnimated = true;
 
       Animated.parallel([
-        Animated.timing(this._animatedOpacity, { toValue: 0, useNativeDriver: false }),
+        Animated.timing(this._animatedOpacity, { toValue: 0, useNativeDriver: true }),
+        Animated.timing(this._opacityAnimated, { toValue: 1, useNativeDriver: false }),
         Animated.spring(this._animatedFrame, { toValue: 1, useNativeDriver: false }),
       ]).start(() => {
         this._isAnimated = false;
@@ -625,6 +627,10 @@ export default class ImageDetail extends React.Component<Props> {
         inputRange: [0, 1],
         outputRange: [origin.height, windowHeight],
       }),
+      opacity:this._opacityAnimated.interpolate({
+        inputRange:[0,1],
+        outputRange:[0,1]
+      })
     };
 
     const background = (

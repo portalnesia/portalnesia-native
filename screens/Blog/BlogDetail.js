@@ -41,7 +41,7 @@ export default function({navigation,route}){
     const onScroll = (e)=>{
         scrollAnim.setValue(e?.nativeEvent?.contentOffset?.y);
     }
-    const {translateY,...other} = useHeader(56,onScroll)
+    const {translateY,...other} = useHeader(58,onScroll)
 
     React.useEffect(()=>{
         let timeout = null;

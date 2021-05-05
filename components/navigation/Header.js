@@ -29,7 +29,7 @@ export const Lottie=({style={},...other})=>{
 	return <LottieView style={{height:RefreshingHeight,position:'absolute',top:5,left:0,right:0,...style}} autoPlay source={theme==='dark' ? require('@pn/assets/animation/loading-dark.json') : require('@pn/assets/animation/loading-dark.json')} {...other} />
 }
 
-export const useHeader=(height=56,onScrollProps)=>{
+export const useHeader=(height=58,onScrollProps)=>{
 	const index = useNavigationState(state=>state.index);
 	const clampedScrollValue = React.useRef(0)
 	const offsetValue = React.useRef(0)

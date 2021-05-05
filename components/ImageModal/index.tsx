@@ -43,7 +43,7 @@ interface Props extends FastImageProps {
   children:React.ReactNode;
   renderContent?:React.ReactNode;
 }
-export default class ImageModal extends React.Component<Props, State> {
+export default class ImageModal extends React.PureComponent<Props, State> {
   private _root: View | null = null;
   private _originImageOpacity = new Animated.Value(1);
 
@@ -108,15 +108,21 @@ export default class ImageModal extends React.Component<Props, State> {
         isOpen: true,
       });
     });
-
-    this._root && this._originImageOpacity.setValue(0);
+    if(this._root) {
+      Animated.timing(this._originImageOpacity,{
+        toValue:0,
+        useNativeDriver:true
+      }).start();
+    }
   };
 
   private _onClose = (): void => {
     const { onClose } = this.props;
-    this._originImageOpacity.setValue(1);
-
-    setTimeout(() => {
+    Animated.timing(this._originImageOpacity,{
+      toValue:1,
+      duration:100,
+      useNativeDriver:true
+    }).start(()=>{
       this.setState({
         isOpen: false,
       });

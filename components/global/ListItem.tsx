@@ -5,7 +5,7 @@ import {useTheme,Text} from '@ui-kitten/components'
 import Pressable,{PressableProps} from './Pressable'
 
 type StyleType = Record<string,any>
-type PropsType = {
+export type PropsType = {
     style: StyleType
 }
 
@@ -38,8 +38,8 @@ const accessoryStyle=(theme: Record<string,string>): Record<string,any> =>({
 })
 
 export interface ListItemProps extends PressableProps {
-    accessoryLeft:(props?: {style:Record<string,any>})=>JSX.Element;
-    accessoryRight:(props?: {style:Record<string,any>})=>JSX.Element;
+    accessoryLeft?:(props?: {style:Record<string,any>})=>JSX.Element;
+    accessoryRight?:(props?: {style:Record<string,any>})=>JSX.Element;
     style?:ViewStyle;
     title: string | ((props?: PropsType)=>JSX.Element);
     description?: string | ((props?: PropsType)=>JSX.Element);

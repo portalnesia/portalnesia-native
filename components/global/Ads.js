@@ -100,6 +100,9 @@ export function showInterstisial(){
             if(type == AdEventType.LOADED) {
                 setLoaded(true)
             }
+            if(type == AdEventType.ERROR) {
+                console.log("Ads Error")
+            }
         })
         interstisial.load();
         return ()=>{
