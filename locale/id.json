@@ -60,6 +60,10 @@
     "show_type":"Tampilkan %{type}",
     "hide_type":"Sembunyikan %{type}",
     "table_of_content":"Daftar Isi",
+    "post":"Pos",
+    "others_type":"%{type} Lainnya",
+    "recommended":"Rekomendasi",
+    "recommended_type":"%{type} Rekomendasi",
     "errors":{
         "general":"Kesalahan",
         "server":"Kesalahan internal server",

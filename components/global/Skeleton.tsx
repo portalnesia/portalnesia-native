@@ -4,7 +4,7 @@ import {useWindowDimensions,View} from 'react-native'
 import {useTheme} from '@ui-kitten/components'
 
 export type SkeletonProps={
-    type:'paragraph'|'rect'|'text'|'grid'|'article'|'list'
+    type:'paragraph'|'rect'|'text'|'grid'|'article'|'list'|'caraousel'
     number:number,
     width?:number,
     textProps?: SkeletonPlaceholderItem
@@ -187,6 +187,43 @@ export const ArticleSkeleton=({height}:{height:number})=>{
     )
 }
 
+export const CaraouselSkeleton=({image,gridStyle={},height}:{height:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
+    
+    const {width} = useWindowDimensions();
+    const theme=useTheme();
+    const textWidth = width-30
+    const cardSize=(width/2)-7
+    const renderItemWithImage=()=>{
+        return(
+            <Skltn.Item width={textWidth}>
+                <Skltn.Item flexDirection="row" justifyContent="center" alignItems="center">
+                    <Skltn.Item height={cardSize} alignItems="center" width={cardSize} borderRadius={4} marginBottom={10} />
+                </Skltn.Item>
+                <Skltn.Item height={27} width={textWidth} borderRadius={4} marginBottom={5} />
+                <Skltn.Item height={15} width={textWidth/2} borderRadius={4} marginBottom={2} />
+                <Skltn.Item height={15} width={textWidth/3} borderRadius={4} />
+            </Skltn.Item>
+        )
+    }
+
+    const renderItemNoImage=()=>{
+        return(
+            <Skltn.Item width={textWidth}>
+                <Skltn.Item height={27} width={textWidth} borderRadius={4} marginBottom={5} />
+                <Skltn.Item height={15} width={textWidth/2} borderRadius={4} marginBottom={2} />
+            </Skltn.Item>
+        )
+    }
+
+    return (
+        <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
+            <Skltn.Item>
+                {image ? renderItemWithImage() : renderItemNoImage()}
+            </Skltn.Item>
+        </Skltn>
+    )
+}
+
 export default function Skeleton({type,number=3,width,textProps,image,gridStyle,height}: SkeletonProps): JSX.Element|null {
     const {height:winHeight}=useWindowDimensions()
     height=height||winHeight
@@ -196,5 +233,6 @@ export default function Skeleton({type,number=3,width,textProps,image,gridStyle,
     else if(type==='grid') return <GridSkeleton number={number} image={image} gridStyle={gridStyle} height={height} />
     else if(type==='article') return <ArticleSkeleton height={height} />
     else if(type==='list') return <ListSkeleton height={height} number={number} image={image} />
+    else if(type=='caraousel') return <CaraouselSkeleton image={image} gridStyle={gridStyle} height={height} />
     return null;
 }

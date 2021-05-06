@@ -898,7 +898,7 @@ export default class CommentButton extends React.PureComponent<CommentButtonProp
         return (
             <Pressable onPress={this.open} style={{paddingVertical:10,paddingHorizontal:15}}>
                 <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text category="h6">{i18n.t('comments')}</Text>
+                    <Text category="h5" style={{fontWeight:"600"}}>{i18n.t('comments')}</Text>
                     <Text>{total}</Text>
                 </View>
             </Pressable>

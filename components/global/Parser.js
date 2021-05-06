@@ -257,7 +257,7 @@ const CodeRender=(attribs,children,style,props)=>{
             const lang = attribs?.class?.match(/language\-(\w+)/)
             return (
                 <View key={props?.key} style={[global_style.container,{width:props?.renderersProps?.screenWidth}]}>
-                    <Syntax language={(lang[0] === 'js' ? 'javascript' : lang[0])} fontSize={14} style={androidstudio} customStyle={{borderRadius:5,padding:0}} codeTagProps={{style:{padding:8}}}>{data}</Syntax>
+                    <Syntax language={(lang[1] === 'js' ? 'javascript' : lang[1])} fontSize={14} style={androidstudio} customStyle={{borderRadius:5,padding:0}} codeTagProps={{style:{padding:8}}}>{data}</Syntax>
                 </View>
             )
         }
@@ -486,7 +486,7 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
     )
 })
 
-export const Markdown=({source,skipHtml,selectable=false,iklan=true})=>{
+export const Markdown=({source,skipHtml,...other})=>{
     const marked=require('marked');
     const sanitizeHtml = require('sanitize-html')
     const html = React.useMemo(()=>{
@@ -507,5 +507,5 @@ export const Markdown=({source,skipHtml,selectable=false,iklan=true})=>{
         //return DOMpurify.sanitize(hhtm, {FORBID_TAGS: forb,USE_PROFILES: {html: true}})
     },[source,skipHtml])
 
-    return <Parser source={html} selectable={selectable} iklan={iklan} />
+    return <Parser source={html} {...other} />
 }

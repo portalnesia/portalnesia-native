@@ -71,6 +71,12 @@ export default class ImageModal extends React.PureComponent<Props, State> {
     });
   }
 
+  componentDidUpdate(prev: Props){
+    if(prev.children !== this.props.children) {
+      this._setOrigin();
+    }
+  }
+
   private _setOrigin = (): void => {
     if (this._root) {
       this._root.measureInWindow((x: number, y: number, width: number, height: number) => {
@@ -168,7 +174,7 @@ export default class ImageModal extends React.PureComponent<Props, State> {
         onLayout={() => {}}
         style={[{ alignSelf: 'baseline', backgroundColor: imageBackgroundColor }]}>
         <Animated.View
-          renderToHardwareTextureAndroid={renderToHardwareTextureAndroid === false ? false : true}
+          renderToHardwareTextureAndroid={false}
           style={{ opacity: this._originImageOpacity }}>
           <TouchableOpacity
             activeOpacity={0.7}

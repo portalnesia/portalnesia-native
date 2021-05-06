@@ -1,17 +1,18 @@
 import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
-import {Layout as Lay, Text,Spinner,Divider,useTheme} from '@ui-kitten/components'
+import {Layout as Lay, Text,Spinner,Divider,useTheme,Card} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import {useLinkTo} from '@react-navigation/native'
 import analytics from '@react-native-firebase/analytics'
+import Carousel from '@pn/components/global/Carousel';
 
+import Image from '@pn/components/global/Image'
 import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
-//import Image from '@pn/components/global/Image';
 import NotFound from '@pn/components/global/NotFound'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
-import {Parser} from '@pn/components/global/Parser'
+import {Parser,Markdown} from '@pn/components/global/Parser'
 import CountUp from '@pn/components/global/Countup'
 import {ucwords,PNslug} from '@pn/utils/Main'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
@@ -124,7 +125,11 @@ export default function({navigation,route}){
                     )}
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
                     <Lay style={{paddingBottom:20}} onLayout={onLayout}>
-                        <Parser source={data?.blog?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                        {data?.blog?.format === 'html' ? (
+                            <Parser source={data?.blog?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                        ) : (
+                            <Markdown source={data?.blog?.text} skipHtml={false} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                        )}
                     </Lay>
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
                     <Lay style={[style.container,{paddingBottom:20,paddingTop:20}]}>
@@ -138,13 +143,20 @@ export default function({navigation,route}){
                             ))}
                         </Text>
                     </Lay>
+                    <Lay style={{paddingVertical:5}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                    {data && data?.others?.length > 0 ? (
+                        <Lay style={{paddingVertical:10,paddingBottom:20}}>
+                            <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('others_type',{type:i18n.t('post')})}</Text>
+                            <Carousel
+                                data={data?.others}
+                                renderItem={(props)=><RenderCaraousel {...props} />}
+                            />
+                        </Lay>
+                    ): null}
                     {data && data?.blog?.id ? (
-                        <>
-                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                            <Lay style={{paddingBottom:50}}>
-                                <Comment navigation={navigation} total={data?.blog?.comment_count} type="chord" posId={data?.blog?.id} posUrl={`chord/${data?.blog?.slug}`} />
-                            </Lay>
-                        </>
+                        <Lay style={{paddingBottom:50}}>
+                            <Comment navigation={navigation} total={data?.blog?.comment_count} type="chord" posId={data?.blog?.id} posUrl={`chord/${data?.blog?.slug}`} />
+                        </Lay>
                     ): null}
                 </Animated.ScrollView>
             ) : null}
@@ -178,3 +190,24 @@ export default function({navigation,route}){
         </>
     )
 }
+
+const RenderCaraousel = React.memo(({item, index:i}) => {
+	const linkTo = useLinkTo();
+	return (
+		<Card key={i} onPress={()=>linkTo(`/blog/${item?.slug}`)}>
+			<View style={{alignItems:'center'}}>
+				<Image
+					resizeMode="center"
+					style={{
+						height: 200,
+						width: 200,
+					}}
+					source={{uri:`${CONTENT_URL}/img/url?size=500&export=twibbon&watermark=no&image=${encodeURIComponent(item.image)}`}}
+				/>
+			</View>
+			<Text category="p1" style={{marginTop:10,fontWeight:"600"}}>{item.title}</Text>
+            <Text category="label" appearance="hint" style={{marginTop:10}}>{item.users?.name}</Text>
+            <Text category="label" appearance="hint" style={{fontSize:10}}>{item.date}</Text>
+		</Card>
+	);
+})

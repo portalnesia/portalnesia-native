@@ -1,9 +1,11 @@
 import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
-import {Layout as Lay, Text,useTheme,Divider,Spinner} from '@ui-kitten/components'
+import {Layout as Lay, Text,useTheme,Divider,Card} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
+import {useLinkTo} from '@react-navigation/native'
 
+import Carousel from '@pn/components/global/Carousel';
 import CountUp from '@pn/components/global/Countup'
 import Button from '@pn/components/global/Button';
 import Layout from '@pn/components/global/Layout';
@@ -26,6 +28,7 @@ export default function({navigation,route}){
     const {source,title} = route.params
     const theme=useTheme()
     const {data,error,mutate,isValidating}=useSWR(`/news/${source}/${title}`,{},false)
+    const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id ? `/news/others/${data.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:0}	
@@ -36,16 +39,19 @@ export default function({navigation,route}){
     React.useEffect(()=>{
         let timeout = null;
         async function check() {
-            await analytics().logSelectContent({
-                content_type:'news',
-                item_id:String(data?.id)
-            })
-            await PNget(`/news/${source}/${title}/update`);
+            if(!__DEV__) {
+                await analytics().logSelectContent({
+                    content_type:'news',
+                    item_id:String(data?.id)
+                })
+                await PNget(`/news/${source}/${title}/update`);
+            }
             setReady(true)
         }
 
-        if(data && !data?.error && !ready && !__DEV__) {
+        if(data && !data?.error && !ready) {
             timeout = setTimeout(check,5000);
+            mutateOthers();
         }
         if(!data) {
             mutate();
@@ -92,10 +98,25 @@ export default function({navigation,route}){
                             <Button onPress={()=>openBrowser(data?.url)} text>Artikel Asli</Button>
                         </Lay>
                     </Lay>
+                    <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
                     {data && data?.id ? (
                         <>
-                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                            <Lay style={{paddingBottom:50}}>
+                             <Lay style={{paddingBottom:20}}>
+                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>
+                                {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' image height={300} /></Lay>
+                                : errorOthers || dataOthers?.error==1 ? (
+                                    <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                                ) : dataOthers?.data?.length > 0 ? (
+                                    <Carousel
+                                        data={dataOthers?.data}
+                                        renderItem={(props)=><RenderCaraousel {...props} />}
+                                    />
+                                ) : (
+                                    <Text style={{paddingHorizontal:15}}>No posts</Text>
+                                )}
+                            </Lay>
+                            <Divider style={{backgroundColor:theme['border-text-color']}} />
+                            <Lay style={{paddingBottom:50,paddingTop:10}}>
                                 <Comment navigation={navigation} total={data?.comment_count} type="news" posId={data?.id} posUrl={`news/${source}/${title}`} />
                             </Lay>
                         </>
@@ -132,10 +153,23 @@ export default function({navigation,route}){
     )
 }
 
-/*
-{data?.image?.length > 0 && (
-                                <View style={{marginBottom:10}}>
-                                    <Image fullSize source={{uri:`${CONTENT_URL}/img/url?image=${encodeURIComponent(data?.image)}&size=400`}} />
-                                </View>
-                            )}
-*/
+const RenderCaraousel = React.memo(({item, index:i}) => {
+	const linkTo = useLinkTo();
+	return (
+		<Card key={i} onPress={()=>linkTo(`/news/${item?.source}/${encodeURIComponent(item?.title)}`)}>
+			<View style={{alignItems:'center'}}>
+				<Image
+					resizeMode="center"
+					style={{
+						height: 200,
+						width: 200,
+					}}
+					source={{uri:item?.image}}
+				/>
+			</View>
+			<Text category="p1" style={{marginTop:10,fontWeight:"600"}}>{item.title}</Text>
+            <Text category="label" appearance="hint" style={{marginTop:10}}>{item.source}</Text>
+            <Text category="label" appearance="hint" style={{fontSize:10}}>{item.date_string}</Text>
+		</Card>
+	);
+})

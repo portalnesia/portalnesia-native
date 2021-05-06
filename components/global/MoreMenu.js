@@ -2,13 +2,13 @@ import React from 'react'
 import {useWindowDimensions,View,Share} from 'react-native'
 import {Icon,Layout,Text,useTheme,Menu,MenuItem} from '@ui-kitten/components'
 import {Modalize} from 'react-native-modalize'
-import {openBrowserAsync} from 'expo-web-browser'
 import analytics from '@react-native-firebase/analytics'
 
 import TopNavigationAction from '../navigation/TopAction'
 import {URL} from '@env'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import useClipboard from '@pn/utils/clipboard'
+import {openBrowser} from '@pn/utils/Main'
 import i18n from 'i18n-js'
 import useAPI from '@pn/utils/API'
 
@@ -66,11 +66,7 @@ const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
             } else if(dt?.action === "copy") {
                 copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`,i18n.t('url'));
             } else if(dt?.action === 'browser') {
-                openBrowserAsync(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,{
-                    enableDefaultShare:true,
-                    toolbarColor:'#2f6f4e',
-                    showTitle:true
-                });
+                openBrowser(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
             }
         }
         ref?.current?.close();

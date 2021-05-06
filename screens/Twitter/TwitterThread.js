@@ -1,9 +1,11 @@
 import React from 'react';
-import { Animated,RefreshControl,useWindowDimensions,View,Image as IMG } from 'react-native';
-import {Layout as Lay,Text,useTheme,Divider,Icon,Spinner} from '@ui-kitten/components'
+import { Animated,RefreshControl,useWindowDimensions,View } from 'react-native';
+import {Layout as Lay,Text,useTheme,Divider,Icon,Card} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
+import {useLinkTo} from '@react-navigation/native'
+import Carousel from '@pn/components/global/Carousel';
 
 import Comment from '@pn/components/global/Comment'
 import CountUp from '@pn/components/global/Countup'
@@ -119,10 +121,11 @@ const RenderTwitter=React.memo(({item,index,setMenu})=>{
 
 export default function({navigation,route}){
     const {slug} = route.params
-    const context = React.useContext(AuthContext);
-    const {theme:contextTheme} = context
+    //const context = React.useContext(AuthContext);
+    //const {state} = context
     const theme=useTheme()
     const {data,error,mutate,isValidating}=useSWR(`/twitter/${slug}`,{},false)
+    const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id ? `/twitter/others/${data?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:0}	
@@ -136,16 +139,19 @@ export default function({navigation,route}){
     React.useEffect(()=>{
         let timeout = null;
         async function check() {
-            await analytics().logSelectContent({
-                content_type:'twitter_thread',
-                item_id:String(data?.id)
-            })
-            await PNget(`/twitter/${slug}/update`);
+            if(!__DEV__) {
+                await analytics().logSelectContent({
+                    content_type:'twitter_thread',
+                    item_id:String(data?.id)
+                })
+                await PNget(`/twitter/${slug}/update`);
+            }
             setReady(true)
         }
 
-        if(data && !data?.error && !ready && !__DEV__) {
+        if(data && !data?.error && !ready) {
             timeout = setTimeout(check,5000);
+            mutateOthers();
         }
         if(!data) {
             mutate();
@@ -177,7 +183,22 @@ export default function({navigation,route}){
         if(data && data?.id){
             return (
                 <>
-                    <Lay style={{paddingBottom:50,paddingTop:20}}>
+                    <Lay style={{paddingTop:20,paddingBottom:20}}>
+                        <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>
+                        {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                        : errorOthers || dataOthers?.error==1 ? (
+                            <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                        ) : dataOthers?.data?.popular?.length > 0 ? (
+                            <Carousel
+                                data={dataOthers?.data?.popular}
+                                renderItem={(props)=><RenderCaraousel {...props} />}
+                            />
+                        ) : (
+                            <Text style={{paddingHorizontal:15}}>No thread</Text>
+                        )}
+                    </Lay>
+                    <Divider style={{backgroundColor:theme['border-text-color']}} />
+                    <Lay style={{paddingBottom:50,paddingTop:10}}>
                         <Comment navigation={navigation} total={data?.comment_count} type="news" posId={data?.id} posUrl={`twitter/thread/${data?.id}`} />
                     </Lay>
                 </>
@@ -228,7 +249,7 @@ export default function({navigation,route}){
                         type="twitter_thread"
                         item_id={data?.id}
                         share={{
-                            link:`/twitter/thread/${data?.id}?utm_campaign=news`,
+                            link:`/twitter/thread/${data?.id}?utm_campaign=twitter_thread`,
                             title:`${Ktruncate(specialHTML(data?.tweets?.[0]?.tweet),150)} - Portalnesia`,
                             dialog:i18n.t('share_type',{type:i18n.t('twitter_thread')})
                         }}
@@ -261,3 +282,13 @@ export default function({navigation,route}){
         </>
     )
 }
+
+const RenderCaraousel = React.memo(({item, index:i}) => {
+	const linkTo = useLinkTo();
+	return (
+		<Card key={i} onPress={()=>linkTo(`/twitter/thread/${item?.id}`)}>
+			<Text category="p1">{specialHTML(item?.title)}</Text>
+            <Text appearance="hint" category="label" style={{marginTop:10}}>{`Thread by @${item?.screen_name}`}</Text>
+		</Card>
+	);
+})

@@ -11,7 +11,7 @@ import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
-import {Parser} from '@pn/components/global/Parser'
+import {Parser,Markdown} from '@pn/components/global/Parser'
 import {ucwords} from '@pn/utils/Main'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import {CONTENT_URL} from '@env'
@@ -123,7 +123,12 @@ export default function({navigation,route}){
                     )}
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
                     <Lay style={{paddingBottom:50}} onLayout={onLayout}>
-                        <Parser source={data?.pages?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                        {data?.pages?.format === 'html' ? (
+                            <Parser source={data?.pages?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                        ) : (
+                            <Markdown source={data?.pages?.text} skipHtml={false} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                        )}
+                        
                     </Lay>
                     </Animated.ScrollView>
                 ) : null}
