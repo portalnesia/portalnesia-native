@@ -50,7 +50,7 @@ export const fetcher=(path,option) => {
 
 export default function useAPI(){
     const context = React.useContext(AuthContext)
-    const {setNotif,state} = context
+    const {setNotif,state,sendReport} = context
     const {user,session,token}=state
     
     const PNpost=(url,data,formdata,catchError=true)=>{
@@ -91,9 +91,8 @@ export default function useAPI(){
                     if(err?.response?.data) {
                         setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('errors.general'));
                     }
-                    else if(err?.response?.status===503) {
-                        setNotif("error","Error",i18n.t('errors.server'));
-                        //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
+                    else if(err?.response?.status===503||err?.response?.status===500) {
+                        sendReport('url',{force:false,endpoint:baseURL})
                     } else {
                         setNotif("error","Error",i18n.t('errors.general'))
                     }
@@ -128,7 +127,6 @@ export default function useAPI(){
                     }
                     else if(err?.response?.status===503) {
                         setNotif("error","Error",i18n.t('errors.server'));
-                        //dispatch({type:'REPORT',payload:{type:'url',urlreported:window?.location?.href,endpoint:url}})
                     } else {
                         setNotif("error","Error",i18n.t('errors.general'))
                     }

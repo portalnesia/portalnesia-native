@@ -47,6 +47,8 @@ import OpenSourceDetail from '../screens/OpenSource/OpenSourceDetail'
 import Comments from '../screens/Modal/Comments'
 import SecondScreen from '../screens/SecondScreen'
 import NotificationEvent from '../screens/Notification/NotificationEvent'
+import ReportScreen from '../screens/ReportScreen'
+import ReportModal from '../screens/Modal/ReportModal'
 
 import { AuthContext } from '../provider/Context';
 
@@ -128,6 +130,16 @@ const MainStackScreen=()=>(
 		initialRouteName="MainTabs"
 		
 	>
+		<MainStack.Screen name="Comments" component={Comments} options={{
+			headerShown: false,
+			gestureEnabled:true,
+			gestureDirection:'vertical',
+			...TransitionPresets.ModalSlideFromBottomIOS
+		}} />
+		<MainStack.Screen name="ReportModal" component={ReportModal} options={{
+			headerShown: false,
+			...TransitionPresets.ModalSlideFromBottomIOS
+		}} />
 		<MainStack.Screen name="NotFound" component={NotFound} />
 		<MainStack.Screen name="MainTabs" component={MainTabs} />
 		<MainStack.Screen name="NewsDetail" component={NewsDetail} />
@@ -155,6 +167,7 @@ const MainStackScreen=()=>(
 		<MainStack.Screen name="SecondScreen" component={SecondScreen} />
 		<MainStack.Screen name="Setting" component={Setting} />
 		<MainStack.Screen name="NotificationEvent" component={NotificationEvent} />
+		<MainStack.Screen name="ReportScreen" component={ReportScreen} />
 	</MainStack.Navigator>
 )
 
@@ -203,21 +216,62 @@ export default () => {
 					onStateChange={onStateChange}
 					linking={linking}
 				>
-					<RootStack.Navigator mode="modal" initialRouteName="Main" screenOptions={{headerShown:false}}>
-						<RootStack.Screen name="Main" component={MainStackScreen} />
-						<RootStack.Screen name="ImageModal" component={ImageModal} options={{
+					<MainStack.Navigator
+						screenOptions={{
+							headerShown: false,
+							gestureEnabled:true,
+							gestureDirection:'horizontal',
+							cardStyle:{backgroundColor:'transparent'},
+							...TransitionPresets.SlideFromRightIOS
+						}}
+						initialRouteName="MainTabs"
+						
+					>
+						<MainStack.Screen name="ImageModal" component={ImageModal} options={{
 							headerShown: false,
 							gestureEnabled:true,
 							gestureDirection:'vertical',
 							...TransitionPresets.ModalSlideFromBottomIOS
 						}} />
-						<RootStack.Screen name="Comments" component={Comments} options={{
+						<MainStack.Screen name="Comments" component={Comments} options={{
 							headerShown: false,
 							gestureEnabled:true,
 							gestureDirection:'vertical',
 							...TransitionPresets.ModalSlideFromBottomIOS
 						}} />
-					</RootStack.Navigator>
+						<MainStack.Screen name="ReportModal" component={ReportModal} options={{
+							headerShown: false,
+							...TransitionPresets.ModalSlideFromBottomIOS
+						}} />
+						<MainStack.Screen name="NotFound" component={NotFound} />
+						<MainStack.Screen name="MainTabs" component={MainTabs} />
+						<MainStack.Screen name="NewsDetail" component={NewsDetail} />
+						<MainStack.Screen name="ChordDetail" component={ChordDetail} />
+						<MainStack.Screen name="ChordList" component={ChordList} />
+						<MainStack.Screen name="Pages" component={Pages} />
+						<MainStack.Screen name="Blog" component={Blog} />
+						<MainStack.Screen name="BlogDetail" component={BlogDetail} />
+						<MainStack.Screen name="Twitter" component={Twitter} />
+						<MainStack.Screen name="TwitterThread" component={TwitterThread} />
+						<MainStack.Screen name="GeodataTransform" component={GeodataTransform} />
+						<MainStack.Screen name="NumberGenerator" component={NumberGenerator} />
+						<MainStack.Screen name="ParseHtml" component={ParseHtml} />
+						<MainStack.Screen name="ImagesChecker" component={ImagesChecker} />
+						<MainStack.Screen name="QrGenerator" component={QrGenerator} />
+						<MainStack.Screen name="UrlShortener" component={UrlShortener} />
+						<MainStack.Screen name="Contact" component={Contact} />
+						<MainStack.Screen name="BlogList" component={BlogList} />
+						<MainStack.Screen name="User" component={User} />
+						<MainStack.Screen name="SearchFilter" component={SearchFilter} />
+						<MainStack.Screen name="Twibbon" component={Twibbon} />
+						<MainStack.Screen name="TwibbonDetail" component={TwibbonDetail} />
+						<MainStack.Screen name="OpenSource" component={OpenSource} />
+						<MainStack.Screen name="OpenSourceDetail" component={OpenSourceDetail} />
+						<MainStack.Screen name="SecondScreen" component={SecondScreen} />
+						<MainStack.Screen name="Setting" component={Setting} />
+						<MainStack.Screen name="NotificationEvent" component={NotificationEvent} />
+						<MainStack.Screen name="ReportScreen" component={ReportScreen} />
+					</MainStack.Navigator>
 				</NavigationContainer>
 			)}
 		</>

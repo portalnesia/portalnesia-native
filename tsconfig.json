@@ -20,7 +20,8 @@
         "@pn/provider/*":["provider/*"],
         "@pn/module/*":["module/*"],
         "@pn/locale/*":["locale/*"],
-        "@pn/types/*":["types/*"]
+        "@pn/types/*":["types/*"],
+        "@pn/navigation/*":["navigation/*"]
       }
     },
     "exclude": ["node_modules","android","babel.config.js","metro.config.js","jest.config.js"],

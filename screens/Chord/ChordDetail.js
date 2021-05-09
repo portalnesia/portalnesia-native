@@ -1,6 +1,6 @@
 import React from 'react';
 import { Animated,RefreshControl,ScrollView,useWindowDimensions,View } from 'react-native';
-import {Layout as Lay,Text,useTheme,Divider,Card,ButtonGroup,Icon,Spinner} from '@ui-kitten/components'
+import {Layout as Lay,Text,useTheme,Divider,Card,ButtonGroup,Icon} from '@ui-kitten/components'
 import {useLinkTo} from '@react-navigation/native'
 import Skeleton from '@pn/components/global/Skeleton'
 import Modal from 'react-native-modal'
@@ -9,6 +9,7 @@ import RNPrint from 'react-native-print'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 
+import Carousel from '@pn/components/global/Carousel';
 import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -38,6 +39,7 @@ function ChordDetailScreen({navigation,route}){
     const {slug} = route.params
     const theme=useTheme()
     const {data,error,mutate,isValidating}=useSWR(`/chord/${slug}`,{},false)
+    const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.chord?.id ? `/chord/others/${data?.chord?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:40}
@@ -137,16 +139,20 @@ function ChordDetailScreen({navigation,route}){
     React.useEffect(()=>{
         let timeout = null;
         async function check() {
-            await analytics().logSelectContent({
-                content_type:'chord',
-                item_id:String(data?.chord?.id)
-            })
-            await PNget(`/chord/${slug}/update`);
+            if(!__DEV__) {
+                await analytics().logSelectContent({
+                    content_type:'chord',
+                    item_id:String(data?.chord?.id)
+                })
+                await PNget(`/chord/${slug}/update`);
+            }
+            
             setReady(true)
         }
 
-        if(data && !data?.error && !ready && !__DEV__) {
+        if(data && !data?.error && !ready) {
             timeout = setTimeout(check,5000);
+            mutateOthers();
         }
         if(!data) {
             mutate();
@@ -242,11 +248,56 @@ function ChordDetailScreen({navigation,route}){
                         <Text>Your chord aren't here? <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/contact?subject=${encodeURIComponent("Request Chord")}`)}>request your chord</Text>.</Text>
                         <Lay style={{marginTop:20}}><AdsBanners size="MEDIUM_RECTANGLE" /></Lay>
                     </Lay>
-                    
+                    <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
                     {data && data?.chord?.id ? (
                         <>
-                            <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                            <Lay style={{paddingBottom:50}}>
+                            <Lay style={{paddingBottom:20}}>
+                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended_type',{type:i18n.t('chord')})}</Text>
+                                {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                                : errorOthers || dataOthers?.error==1 ? (
+                                    <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                                ) : dataOthers?.relateds?.length > 0 ? (
+                                    <Carousel
+                                        data={dataOthers?.relateds}
+                                        renderItem={(props)=><RenderCaraousel {...props} />}
+                                        autoplay
+                                    />
+                                ) : (
+                                    <Text style={{paddingHorizontal:15}}>No posts</Text>
+                                )}
+                            </Lay>
+                            <Lay style={{paddingBottom:20}}>
+                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('popular_type',{type:i18n.t('chord')})}</Text>
+                                {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                                : errorOthers || dataOthers?.error==1 ? (
+                                    <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                                ) : dataOthers?.populars?.length > 0 ? (
+                                    <Carousel
+                                        data={dataOthers?.populars}
+                                        renderItem={(props)=><RenderCaraousel {...props} />}
+                                        autoplay
+                                    />
+                                ) : (
+                                    <Text style={{paddingHorizontal:15}}>No posts</Text>
+                                )}
+                            </Lay>
+                            <Lay style={{paddingBottom:20}}>
+                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
+                                {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                                : errorOthers || dataOthers?.error==1 ? (
+                                    <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                                ) : dataOthers?.recents?.length > 0 ? (
+                                    <Carousel
+                                        data={dataOthers?.recents}
+                                        renderItem={(props)=><RenderCaraousel {...props} />}
+                                        autoplay
+                                    />
+                                ) : (
+                                    <Text style={{paddingHorizontal:15}}>No posts</Text>
+                                )}
+                            </Lay>
+                            <Divider style={{backgroundColor:theme['border-text-color']}} />
+                            <Lay style={{paddingBottom:50,paddingTop:10}}>
                                 <Comment navigation={navigation} total={data?.chord?.comment_count} type="chord" posId={data?.chord?.id} posUrl={`chord/${data?.chord?.slug}`} />
                             </Lay>
                         </>
@@ -314,11 +365,25 @@ function ChordDetailScreen({navigation,route}){
                     },{
                         title:i18n.t('open_in_browser'),
                         action:'browser'
+                    },{
+                        title:i18n.t('report'),
+                        action:'report',
+                        beforeAction:()=>setViewVideo(false)
                     }]}
                 />
             )}
         </>
     )
 }
+
+const RenderCaraousel = React.memo(({item, index:i}) => {
+	const linkTo = useLinkTo();
+	return (
+		<Card key={i} onPress={()=>linkTo(`/chord/${item?.slug}`)}>
+			<Text category="p1" style={{fontWeight:"600"}}>{`${item?.artist} - ${item?.title}`}</Text>
+            <Text category="label" style={{marginTop:10}}>{item?.original}</Text>
+		</Card>
+	);
+})
 
 export default React.memo(ChordDetailScreen)

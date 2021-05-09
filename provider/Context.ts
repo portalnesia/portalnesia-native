@@ -12,6 +12,18 @@ export type DispatchArgument = {
     payload?: string|{[key: string]: any}
 }
 
+export interface ParamsReportType {
+    endpoint?: string|null|number,
+    urlreported?: string,
+    force?: boolean,
+    contentTitle?: string,
+    contentId?: string|number,
+    contentType?: string
+    [key: string]: any
+}
+
+export type SendReportType = 'komentar'|'url'|'konten'|'feedback'
+
 export type ContextType = {
     state: StateType,
     dispatch: Dispatch<DispatchArgument>,
@@ -20,7 +32,8 @@ export type ContextType = {
     theme: 'light' | 'dark' | string,
     userTheme: 'light' | 'auto' | 'dark' | string,
     setLang:(value: 'light' | 'auto' | 'dark')=>Promise<void>,
-    lang: string
+    lang: string,
+    sendReport:(type: SendReportType,params?: ParamsReportType)=>void
 }
 
 const defaultValue = {
@@ -35,7 +48,8 @@ const defaultValue = {
     theme:'light',
     userTheme:'auto',
     setLang:async()=>{},
-    lang:'auto'
+    lang:'auto',
+    sendReport:()=>{}
 }
 
 export const AuthContext = createContext<ContextType>(defaultValue);

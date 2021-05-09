@@ -1,10 +1,4 @@
 {
-    "@benjeau/react-native-draw@0.3.3": {
-        "licenses": "MIT",
-        "repository": "https://github.com/BenJeau/react-native-draw",
-        "licenseUrl": "https://github.com/BenJeau/react-native-draw/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "@eva-design/eva@2.0.0": {
         "licenses": "MIT",
         "repository": "https://github.com/eva-design/eva",
@@ -12,12 +6,6 @@
         "parents": "portal-native"
     },
     "@expo-google-fonts/inter@0.1.0": {
-        "licenses": "MIT",
-        "repository": "https://github.com/expo/google-fonts",
-        "licenseUrl": "https://github.com/expo/google-fonts",
-        "parents": "portal-native"
-    },
-    "@expo-google-fonts/ubuntu@0.1.0": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/google-fonts",
         "licenseUrl": "https://github.com/expo/google-fonts",
@@ -89,6 +77,24 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/app/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@react-native-firebase/crashlytics@11.3.3": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/crashlytics",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/crashlytics/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-native-firebase/in-app-messaging@11.3.3": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/in-app-messaging",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/in-app-messaging/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-native-firebase/remote-config@11.3.3": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@react-navigation/bottom-tabs@5.11.8": {
         "licenses": "MIT",
         "repository": "https://github.com/react-navigation/react-navigation",
@@ -111,6 +117,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/react-navigation/react-navigation",
         "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@terrylinla/react-native-sketch-canvas@0.8.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/terrylinla/react-native-sketch-canvas",
+        "licenseUrl": "https://github.com/terrylinla/react-native-sketch-canvas/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "@types/i18n-js@3.8.0": {
@@ -180,6 +192,12 @@
         "parents": "portal-native"
     },
     "expo-av@8.7.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-cellular@3.1.0": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -412,12 +430,6 @@
         "licenseUrl": "https://github.com/Rapsssito/react-native-background-actions/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react-native-background-downloader@2.3.4": {
-        "licenses": "Apache-2.0",
-        "repository": "https://github.com/EkoLabs/react-native-background-downloader",
-        "licenseUrl": "https://github.com/EkoLabs/react-native-background-downloader/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "react-native-chart-kit@6.11.0": {
         "licenses": "UNKNOWN",
         "parents": "portal-native"
@@ -470,12 +482,6 @@
         "licenseUrl": "https://github.com/callstack/react-native-pager-view/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react-native-pkce-challenge@3.0.0": {
-        "licenses": "MIT",
-        "repository": "https://github.com/drophive/react-native-pkce-challenge",
-        "licenseUrl": "https://github.com/drophive/react-native-pkce-challenge/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "react-native-print@0.7.0": {
         "licenses": "MIT",
         "repository": "github:christopherdro/react-native-print",
@@ -524,18 +530,6 @@
         "licenseUrl": "github.com/archriss/react-native-snap-carousel/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react-native-sticky-parallax-header@0.4.0": {
-        "licenses": "MIT",
-        "repository": "https://github.com/netguru/sticky-parallax-header",
-        "licenseUrl": "https://github.com/netguru/sticky-parallax-header/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
-    "react-native-super-grid@4.1.1": {
-        "licenses": "MIT",
-        "repository": "https://github.com/saleel97/react-native-super-grid",
-        "licenseUrl": "https://github.com/saleel97/react-native-super-grid/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "react-native-svg@12.1.0": {
         "licenses": "MIT",
         "repository": "https://github.com/react-native-community/react-native-svg",
@@ -566,12 +560,6 @@
         "licenseUrl": "https://github.com/expo/expo/raw/master/LICENSE.md",
         "parents": "portal-native"
     },
-    "react-native-video@5.1.1": {
-        "licenses": "MIT",
-        "repository": "https://github.com/react-native-community/react-native-video",
-        "licenseUrl": "https://github.com/react-native-community/react-native-video/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "react-native-view-shot@3.1.2": {
         "licenses": "MIT",
         "repository": "https://github.com/gre/react-native-view-shot",
@@ -584,16 +572,16 @@
         "licenseUrl": "https://github.com/necolas/react-native-web",
         "parents": "portal-native"
     },
-    "react-native-webview@11.0.0": {
+    "react-native-webview@11.4.3": {
         "licenses": "MIT",
-        "repository": "https://github.com/react-native-community/react-native-webview",
-        "licenseUrl": "https://github.com/react-native-community/react-native-webview/raw/master/LICENSE",
+        "repository": "https://github.com/react-native-webview/react-native-webview",
+        "licenseUrl": "https://github.com/react-native-webview/react-native-webview/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react-native-youtube-iframe@1.4.1": {
+    "react-native-youtube@2.0.1": {
         "licenses": "MIT",
-        "repository": "https://github.com/LonelyCpp/react-native-youtube-iframe",
-        "licenseUrl": "https://github.com/LonelyCpp/react-native-youtube-iframe/raw/master/LICENSE",
+        "repository": "https://github.com/inProgress-team/react-native-youtube",
+        "licenseUrl": "https://github.com/inProgress-team/react-native-youtube/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native@0.63.4": {
@@ -620,7 +608,7 @@
         "licenseUrl": "https://github.com/apostrophecms/sanitize-html/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "swr@0.4.2": {
+    "swr@0.5.5": {
         "licenses": "MIT",
         "repository": "https://github.com/vercel/swr",
         "licenseUrl": "https://github.com/vercel/swr/raw/master/LICENSE",

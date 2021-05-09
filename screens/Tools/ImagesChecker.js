@@ -224,13 +224,16 @@ export default function({navigation}){
                 }}
                 menu={[{
                     action:"share",
-                    title:"Share",
+                    title:i18n.t('share'),
                 },{
-                    title:"Copy link",
+                    title:i18n.t('copy_link'),
                     action:'copy'
                 },{
-                    title:"Open in browser",
+                    title:i18n.t('open_in_browser'),
                     action:'browser'
+                },{
+                    title:i18n.t('report'),
+                    action:'report'
                 }]}
             />
             <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />

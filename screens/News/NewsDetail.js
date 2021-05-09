@@ -20,6 +20,7 @@ import {ucwords,openBrowser} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import Comment from '@pn/components/global/Comment'
 import usePost from '@pn/utils/API'
+import {linkTo} from '@pn/navigation/useRootNavigation'
 //import {CONTENT_URL} from '@env'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
@@ -110,6 +111,7 @@ export default function({navigation,route}){
                                     <Carousel
                                         data={dataOthers?.data}
                                         renderItem={(props)=><RenderCaraousel {...props} />}
+                                        autoplay
                                     />
                                 ) : (
                                     <Text style={{paddingHorizontal:15}}>No posts</Text>
@@ -146,6 +148,9 @@ export default function({navigation,route}){
                 },{
                     title:i18n.t('open_in_browser'),
                     action:'browser'
+                },{
+                    title:i18n.t('report'),
+                    action:'report'
                 }]}
             />
         )}
@@ -154,9 +159,8 @@ export default function({navigation,route}){
 }
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
-	const linkTo = useLinkTo();
 	return (
-		<Card key={i} onPress={()=>linkTo(`/news/${item?.source}/${encodeURIComponent(item?.title)}`)}>
+		<Card key={i} onPress={()=>linkTo(item?.url?.substring(23))}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"

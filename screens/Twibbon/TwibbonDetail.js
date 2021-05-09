@@ -226,19 +226,24 @@ export default function TwibbonDetail({navigation,route}){
                     handleOpen={()=>setOpen(true)}
                     handleClose={()=>setOpen(false)}
                     onClose={()=>setOpen(false)}
+                    type="twibbon"
+                    item_id={data?.twibbon?.id}
                     share={{
                         link:`/twibbon/${data?.twibbon?.slug}?utm_campaign=tools`,
                         title:`${data?.twibbon?.title} - Portalnesia Twibbon`
                     }}
                     menu={[{
                         action:"share",
-                        title:"Share",
+                        title:i18n.t('share'),
                     },{
-                        title:"Copy link",
+                        title:i18n.t('copy_link'),
                         action:'copy'
                     },{
-                        title:"Open in browser",
+                        title:i18n.t('open_in_browser'),
                         action:'browser'
+                    },{
+                        title:i18n.t('report'),
+                        action:'report'
                     }]}
                 />
             ) : null}

@@ -154,6 +154,9 @@ export default function({navigation,route}){
                     },{
                         title:i18n.t('open_in_browser'),
                         action:'browser'
+                    },{
+                        title:i18n.t('report'),
+                        action:'report'
                     }]}
                 />
             )}

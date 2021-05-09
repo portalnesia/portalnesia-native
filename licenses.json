@@ -1,10 +1,4 @@
 {
-    "@benjeau/react-native-draw@0.3.3": {
-        "licenses": "MIT",
-        "repository": "https://github.com/BenJeau/react-native-draw",
-        "licenseUrl": "https://github.com/BenJeau/react-native-draw/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "@eva-design/eva@2.0.0": {
         "licenses": "MIT",
         "repository": "https://github.com/eva-design/eva",
@@ -125,6 +119,12 @@
         "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@terrylinla/react-native-sketch-canvas@0.8.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/terrylinla/react-native-sketch-canvas",
+        "licenseUrl": "https://github.com/terrylinla/react-native-sketch-canvas/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@types/i18n-js@3.8.0": {
         "licenses": "MIT",
         "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
@@ -192,6 +192,12 @@
         "parents": "portal-native"
     },
     "expo-av@8.7.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-cellular@3.1.0": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -552,12 +558,6 @@
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo/raw/master/LICENSE.md",
-        "parents": "portal-native"
-    },
-    "react-native-video@5.1.1": {
-        "licenses": "MIT",
-        "repository": "https://github.com/react-native-community/react-native-video",
-        "licenseUrl": "https://github.com/react-native-community/react-native-video/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-view-shot@3.1.2": {

@@ -49,7 +49,7 @@ export default function OpenSourceDetailScreen({navigation,route}){
     return (
         <Layout navigation={navigation} withBack title="Open Source Libraries" subtitle={route?.params?.title} {...(data !== null && data !== undefined && !error ? {whiteBg:true} : {})}>
             {!data && !error ? (
-                <Skeleton type="article" />
+                <View style={{paddingTop:10}}><Skeleton type="article" /></View>
             ) : error  ? (
                 <Error status={503}>
                     <Text>Something went wrong.</Text>

@@ -192,6 +192,7 @@ export default function({navigation,route}){
                             <Carousel
                                 data={dataOthers?.data?.popular}
                                 renderItem={(props)=><RenderCaraousel {...props} />}
+                                autoplay
                             />
                         ) : (
                             <Text style={{paddingHorizontal:15}}>No thread</Text>
@@ -262,6 +263,9 @@ export default function({navigation,route}){
                         },{
                             title:i18n.t('open_in_browser'),
                             action:'browser'
+                        },{
+                            title:i18n.t('report'),
+                            action:'report'
                         }]}
                     />
                     <MenuContainer
@@ -287,7 +291,7 @@ const RenderCaraousel = React.memo(({item, index:i}) => {
 	const linkTo = useLinkTo();
 	return (
 		<Card key={i} onPress={()=>linkTo(`/twitter/thread/${item?.id}`)}>
-			<Text category="p1">{specialHTML(item?.title)}</Text>
+			<Text category="p1" style={{fontWeight:"600"}}>{specialHTML(item?.title)}</Text>
             <Text appearance="hint" category="label" style={{marginTop:10}}>{`Thread by @${item?.screen_name}`}</Text>
 		</Card>
 	);

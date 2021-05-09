@@ -64,6 +64,10 @@
     "others_type":"%{type} Lainnya",
     "recommended":"Rekomendasi",
     "recommended_type":"%{type} Rekomendasi",
+    "report":"Lapor",
+    "feedback":"umpan balik",
+    "send_type":"Kirim %{type}",
+    "send":"Kirim",
     "errors":{
         "general":"Kesalahan",
         "server":"Kesalahan internal server",
@@ -75,6 +79,10 @@
         "size_image":"Maaf, ukuran file terlalu besar. Ukuran maksimal gambar adalah 5MB",
         "youtube_service":"Anda harus menginstal aplikasi youtube resmi untuk dapat menonton video.\n\nKlik di sini untuk menonton dalam mode layar penuh.",
         "invalid":"%{type} tidak valid"
+    },
+    "report_placeholder":{
+        "placeholder_url":"Mohon maaf atas ketidaknyamanannya, sepertinya ada masalah dengan layanan server internal kami. Bisakah Anda memberi tahu kami bagaimana ini bisa terjadi?",
+        "placeholder":"Punya feedback/umpan balik? Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungkan di Kontak kami."
     },
     "form":{
         "name":"Nama",

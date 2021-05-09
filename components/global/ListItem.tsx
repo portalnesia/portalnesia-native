@@ -46,7 +46,7 @@ export interface ListItemProps extends PressableProps {
 }
 
 export default function ListItem(props: ListItemProps){
-    const {accessoryLeft,accessoryRight,style,title,description,...other} = props
+    const {accessoryLeft,accessoryRight,title,description,...other} = props
     const theme=useTheme();
 
     return (

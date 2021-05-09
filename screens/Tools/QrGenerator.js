@@ -4,6 +4,7 @@ import {Layout as Lay,Text,Card,Input,List,ListItem,Divider,useTheme,Radio,Radio
 import {TabView,TabBar} from 'react-native-tab-view'
 import Modal from 'react-native-modal'
 import RNFS from 'react-native-fs'
+import i18n from 'i18n-js'
 
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
@@ -696,13 +697,16 @@ export default function QrCodeGenerator({navigation,route}){
                 }}
                 menu={[{
                     action:"share",
-                    title:"Share",
+                    title:i18n.t('share'),
                 },{
-                    title:"Copy link",
+                    title:i18n.t('copy_link'),
                     action:'copy'
                 },{
-                    title:"Open in browser",
+                    title:i18n.t('open_in_browser'),
                     action:'browser'
+                },{
+                    title:i18n.t('report'),
+                    action:'report'
                 }]}
             />
             <Modal

@@ -57,24 +57,20 @@ async function loadResourcesAsync() {
 		Asset.loadAsync([
 			require('./assets/icon.png'),
 			require('./assets/splash.png'),
-			require('./assets/login.png'),
-			require('./assets/register.png'),
-			require('./assets/forget.png'),
-			require('./assets/404.png'),
 			require('./assets/avatar.png'),
 			require('./assets/landing.png'),
 			require('./assets/transparent.png'),
 		]),
 		Font.loadAsync({
-			Inter_100Thin,
-			Inter_200ExtraLight,
-			Inter_300Light,
+			//Inter_100Thin,
+			//Inter_200ExtraLight,
+			//Inter_300Light,
 			Inter_Regular: Inter_400Regular,
 			Inter_Medium:Inter_500Medium,
 			Inter_SemiBold: Inter_600SemiBold,
 			Inter_Bold: Inter_700Bold,
-			Inter_ExtraBold: Inter_800ExtraBold,
-			Inter_900Black,
+			//Inter_ExtraBold: Inter_800ExtraBold,
+			//Inter_900Black,
 		})
 	]);
 }

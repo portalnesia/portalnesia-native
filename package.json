@@ -8,7 +8,6 @@
     "postinstall": "npm-license-crawler -onlyDirectDependencies -json licenses.json"
   },
   "dependencies": {
-    "@benjeau/react-native-draw": "^0.3.3",
     "@eva-design/eva": "^2.0.0",
     "@expo-google-fonts/inter": "^0.1.0",
     "@expo/vector-icons": "^12.0.0",
@@ -29,6 +28,7 @@
     "@react-navigation/drawer": "^5.12.4",
     "@react-navigation/native": "^5.7.6",
     "@react-navigation/stack": "^5.9.3",
+    "@terrylinla/react-native-sketch-canvas": "^0.8.0",
     "@types/i18n-js": "^3.8.0",
     "@ui-kitten/components": "^5.0.0",
     "@ui-kitten/eva-icons": "^5.0.0",
@@ -42,6 +42,7 @@
     "expo-asset": "~8.2.1",
     "expo-auth-session": "~3.0.0",
     "expo-av": "~8.7.0",
+    "expo-cellular": "^3.1.0",
     "expo-clipboard": "~1.0.1",
     "expo-constants": "~9.3.3",
     "expo-crypto": "~8.4.0",
@@ -130,7 +131,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "1.4.6",
+  "version": "1.5.0",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }

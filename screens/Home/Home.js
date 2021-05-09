@@ -187,7 +187,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 							renderItem={(props)=><RenderTwibbon {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Main",{screen:"Twibbon"})}>{i18n.t('see_more')}</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Twibbon")}>{i18n.t('see_more')}</Button>
 				</Lay>
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
@@ -203,7 +203,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 							renderItem={(props)=><RenderThread {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Main",{screen:"Twitter"})}>{i18n.t('see_more')}</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Twitter")}>{i18n.t('see_more')}</Button>
 				</Lay>
 			</ScrollView>
 		</Layout>

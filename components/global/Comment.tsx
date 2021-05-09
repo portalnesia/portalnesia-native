@@ -18,7 +18,7 @@ import Button from '@pn/components/global/Button'
 import Avatar from '@pn/components/global/Avatar'
 import useAPI from '@pn/utils/API'
 import i18n from 'i18n-js'
-import { AuthContext } from '@pn/provider/Context'
+import { AuthContext,ParamsReportType,SendReportType } from '@pn/provider/Context'
 import {Ktruncate, ucwords} from '@pn/utils/Main'
 import { FlatList } from 'react-native-gesture-handler'
 import {ListSkeleton as Skeleton} from './Skeleton'
@@ -97,6 +97,9 @@ interface PostSuccess<T> {
     data: T;
 }
 type CommentType={
+    posUrl: string,
+    commentType: CommentsType,
+    posId: number,
     recaptcha: string,
     data: DataResult|ReplyResult,
     parentId?: number,
@@ -113,6 +116,7 @@ type CommentType={
     PNpost:<R = any>(url: string, data?: {[key: string]: any;} | undefined, formData?: AxiosRequestConfig | undefined) => Promise<R>,
     linkTo:(path: string)=>void,
     totalReply?: number,
+    sendReport:(type: SendReportType,params?:ParamsReportType)=>void,
     setNotif:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: { [key: string]: any;} | undefined) => void
 }
 export interface CommentsProps {
@@ -134,7 +138,7 @@ export function Comments(props: CommentsProps){
     const {type,posId,comment_id,posUrl} = props
     const {PNgraph,PNpost} = useAPI();
     const context = React.useContext(AuthContext);
-    const {setNotif,state} = context;
+    const {setNotif,sendReport,state} = context;
     const linkTo = useLinkTo();
     const theme = useTheme();
     const {copyText} = useClipboard();
@@ -410,6 +414,10 @@ export function Comments(props: CommentsProps){
                 setNotif={setNotif}
                 recaptcha={recaptcha}
                 copyText={copyText}
+                sendReport={sendReport}
+                posUrl={posUrl}
+                posId={posId}
+                commentType={type}
             />
         )
     }
@@ -433,6 +441,10 @@ export function Comments(props: CommentsProps){
                 recaptcha={recaptcha}
                 copyText={copyText}
                 totalReply={item.total_reply}
+                sendReport={sendReport}
+                posUrl={posUrl}
+                posId={posId}
+                commentType={type}
             >
                 <FlatList
                     data={item.reply === null ? [] : item.reply}
@@ -666,22 +678,23 @@ const MemoAvatar=React.memo(({item,type}: {item: DataResult|ReplyResult,type: 'c
 
 //{data:dt,children,isLoading,type,isExpanded,parentId,onExpand,onReply,anyReply,onDelete,linkTo,setNotif,theme,PNpost}
 type CommentState = {
-    open: string|number|null,
+    //open: string|number|null,
     loading: boolean,
-    expand: boolean
+    expand: boolean,
+    selectedMenu: string|null
 }
 class Comment extends React.PureComponent<CommentType,CommentState>{
     swipeRef = React.createRef<Swipeable>();
-    menu: Record<string,string>[] = [{type:"reply",title:i18n.t('reply')},{type:'copy',title:i18n.t('copy')}]
+    menu: Record<string,string>[] = [{type:"reply",title:i18n.t('reply')},{type:'copy',title:i18n.t('copy')},{type:'report',title:i18n.t('report')}]
     modalRef = React.createRef<Modalize>();
 
     constructor(props: CommentType){
         super(props);
         
         this.state={
-            open:null,
             loading:false,
-            expand:false
+            expand:false,
+            selectedMenu:null
         }
     }
 
@@ -690,7 +703,25 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
     }
 
     onClose(){
-        this.setState({open:null})
+        const {parentId,data:dt,type,onReply,copyText,sendReport,posUrl,commentType,posId} = this.props
+        const {selectedMenu:name}=this.state;
+
+        if(name==='copy' && dt?.komentar!==null){
+            copyText(dt.komentar,i18n.t('text'));
+        }
+        else if(name==='delete' && dt?.delete_token !==null) {
+            this.dialogDelete();
+        } 
+        else if(name==='reply') {
+            if(type==='reply' && typeof parentId==='undefined') return;
+            const rep: ReplyValueType={id:dt?.id,username:dt?.nama,message:dt?.komentar}
+            if(type==='reply') rep.parent=parentId
+            onReply(rep)
+        }
+        else if(name==='report') {
+            sendReport('komentar',{endpoint:dt.id,urlreported:posUrl,contentId:dt.id,contentType:commentType})
+        }
+        this.setState({selectedMenu:null})
     }
 
     dialogDelete(){
@@ -740,24 +771,7 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
     }
 
     handleMenu(name: string){
-        const {parentId,data:dt,type,onReply,copyText} = this.props
-
-        this.modalRef.current?.close();
-        if(name==='copy' && dt?.komentar!==null){
-            copyText(dt.komentar,i18n.t('text'));
-        }
-        else if(name==='delete' && dt?.delete_token !==null) {
-            this.dialogDelete();
-        } 
-        else if(name==='reply') {
-            if(type==='reply' && typeof parentId==='undefined') return;
-            const rep: ReplyValueType={id:dt?.id,username:dt?.nama,message:dt?.komentar}
-            if(type==='reply') rep.parent=parentId
-            onReply(rep)
-        }
-        /*else if(name==='report') {
-            
-        }*/
+        this.setState({selectedMenu:name},()=>this.modalRef.current?.close())
     }
 
     leftSwipe(){
@@ -843,6 +857,7 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
                             backgroundColor:theme['background-basic-color-1'],
                         }}
                         adjustToContentHeight
+                        onClosed={()=>this.onClose()}
                     >
                         <Lay style={{borderTopLeftRadius:20,borderTopRightRadius:20}}>
                             {this.renderHeader()}

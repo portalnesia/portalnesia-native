@@ -3,7 +3,7 @@
 		"name": "Portalnesia",
 		"slug": "portalnesia",
 		"scheme": "pn",
-		"version": "1.4.6",
+		"version": "1.5.0",
 		"sdkVersion": "40.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
@@ -34,8 +34,6 @@
 			"favicon": "./assets/favicon.png"
 		},
 		"android":{
-			"package":"com.portalnesia.app",
-			"versionCode":1,
 			"config": {
 				"googleMobileAdsAppId": "ca-app-pub-5345145600516995~7540046866"
 			},

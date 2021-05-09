@@ -7,6 +7,7 @@ import {Modalize} from 'react-native-modalize'
 import Skltn from 'react-native-skeleton-placeholder'
 import Modal from 'react-native-modal'
 import analytics from '@react-native-firebase/analytics'
+import i18n from 'i18n-js'
 
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -376,13 +377,16 @@ export default function UserScreen({navigation,route}){
                     }}
                     menu={[{
                         action:"share",
-                        title:"Share",
+                        title:i18n.t('share'),
                     },{
-                        title:"Copy link",
+                        title:i18n.t('copy_link'),
                         action:'copy'
                     },{
-                        title:"Open in browser",
+                        title:i18n.t('open_in_browser'),
                         action:'browser'
+                    },{
+                        title:i18n.t('report'),
+                        action:'report'
                     }]}
                 />
             )}

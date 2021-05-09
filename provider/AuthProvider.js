@@ -7,7 +7,7 @@ import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
-import useRootNavigation from '../navigation/useRootNavigation'
+import useRootNavigation,{getPath} from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme,PermissionsAndroid} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -16,6 +16,7 @@ import {PortalProvider} from'@gorhom/portal'
 import RNFS from 'react-native-fs'
 import {openBrowserAsync} from 'expo-web-browser'
 import {AdsConsent, AdsConsentStatus} from '@react-native-firebase/admob'
+import {captureScreen} from 'react-native-view-shot'
 
 import {URL,ADS_PUBLISHER_ID} from '@env'
 import * as Notifications from 'expo-notifications'
@@ -86,9 +87,9 @@ const AuthProvider = (props) => {
 	const colorScheme = useColorScheme()
 	const [tema,setTema]=React.useState('auto')
 	const [lang,changeLang]=React.useState("auto");
-	const {linkTo} = useRootNavigation();
 	const lastNotif = Notifications.useLastNotificationResponse()
 	const forceUpdate = useForceUpdate();
+	const {linkTo,navigationRef} = useRootNavigation()
 
 	const selectedTheme = React.useMemo(()=>{
 		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
@@ -123,6 +124,23 @@ const AuthProvider = (props) => {
 			tipe = type===true ? 'error' : 'success'
 		}
 		dropdownRef.current.alertWithType(tipe||'success',title||"Title",msg,{type:'alert',...data});
+	}
+
+	const sendReport=(type,params={})=>{
+		const title = ['konten','komentar','url'].indexOf(type) !== -1 ? "Send Report" : "Send Feedback";
+		const path = getPath();
+		const {urlreported:urlreport,...other}=params;
+		const urlreported=urlreport||path
+		captureScreen({format:'png',quality:0.9})
+		.then(
+			uri=>{
+				navigationRef?.current?.navigate("ReportScreen",{title,uri,type,urlreported,...other})
+			},
+			error=>{
+				console.log("capture error",error)
+				setNotif(true,"Error","Something went wrong");
+			}
+		)
 	}
 
 	useEffect(()=>{
@@ -318,7 +336,8 @@ const AuthProvider = (props) => {
 				theme:selectedTheme,
 				userTheme:tema,
 				lang,
-				setLang
+				setLang,
+				sendReport
 			}}
 		>
 			<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />

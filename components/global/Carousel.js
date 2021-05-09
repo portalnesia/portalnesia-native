@@ -1,6 +1,6 @@
 import React from 'react'
 import {Dimensions} from 'react-native'
-import Carousel from 'react-native-snap-carousel';
+import Carousell from 'react-native-snap-carousel';
 
 const { width: viewportWidth } = Dimensions.get('window');
 
@@ -16,14 +16,20 @@ const itemHorizontalMargin = wp(3);
 export const sliderWidth = viewportWidth;
 export const itemWidth = slideWidth - itemHorizontalMargin;
 
-export default React.forwardRef(function({data,renderItem},ref){
+const Carousel = React.forwardRef(function({data,renderItem,loop,autoplay,...other},ref){
+    const loops = autoplay ? true : loop;
     return (
-        <Carousel
+        <Carousell
             ref={ref}
+            {...other}
             data={data}
             renderItem={renderItem}
             sliderWidth={sliderWidth}
             itemWidth={itemWidth}
+            autoplay={autoplay}
+            loop={loops}
         />
     )
 })
+
+export default Carousel

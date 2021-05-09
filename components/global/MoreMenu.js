@@ -16,11 +16,12 @@ const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
 export const MenuToggle=({onPress})=><TopNavigationAction tooltip={i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />
 
-const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
+const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
     const context = React.useContext(AuthContext)
-    const {setNotif} = context
+    const {setNotif,sendReport} = context
     const {copyText} = useClipboard()
     const {PNpost} = useAPI();
+    const [selectedMenu,setSelectedMenu]=React.useState(null)
     //const {width}=useWindowDimensions()
     const theme=useTheme()
     const ref = React.useRef(null)
@@ -59,28 +60,45 @@ const MenuCont=({menu,visible,onClose,share,type,item_id,...props})=>{
     },[type,item_id])
 
     const handleOnPress=(dt)=>{
-        if(dt?.onPress) dt?.onPress();
-        else if(share) {
-            if(dt?.action === "share") {
-                handleShare(share?.title,`${URL}${share?.link}&utm_source=android&utm_medium=share`,share?.dialog);
-            } else if(dt?.action === "copy") {
-                copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`,i18n.t('url'));
-            } else if(dt?.action === 'browser') {
-                openBrowser(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
-            }
+        setSelectedMenu(dt);
+    }
+
+    React.useEffect(()=>{
+        if(selectedMenu !== null) {
+            ref?.current?.close();
         }
-        ref?.current?.close();
+    },[selectedMenu])
+
+    const onModalClosed=()=>{
+        if(selectedMenu !== null) {
+            if(selectedMenu?.beforeAction) selectedMenu?.beforeAction();
+            if(selectedMenu?.onPress) selectedMenu?.onPress();
+            else if(share) {
+                if(selectedMenu?.action === "share") {
+                    handleShare(share?.title,`${URL}${share?.link}&utm_source=android&utm_medium=share`,share?.dialog);
+                } else if(selectedMenu?.action === "copy") {
+                    copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`,i18n.t('url'));
+                } else if(selectedMenu?.action === 'browser') {
+                    openBrowser(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
+                } else if(selectedMenu?.action === 'report') {
+                    setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,urlreported:`${URL}${share?.link}`}))
+                }
+            }
+            setSelectedMenu(null)
+        }
+        if(onClosed) onClosed();
     }
 
     return (
         <Modalize
             ref={ref}
             withHandle={false}
-            onClose={onClose}
             modalStyle={{
                 backgroundColor:theme['background-basic-color-1'],
             }}
+            onClose={onClose}
             adjustToContentHeight
+            onClosed={onModalClosed}
         >
             <Layout style={{borderTopLeftRadius:20,
                 borderTopRightRadius:20}}>

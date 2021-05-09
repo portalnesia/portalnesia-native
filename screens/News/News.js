@@ -59,7 +59,7 @@ export default function ({ navigation }) {
 						</View>
 					) : null}
 					<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("Main",{screen:"NewsDetail",params:{source:item?.source,title:encodeURIComponent(item?.title)}})} header={(props)=>(
+						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("NewsDetail",{source:item?.source,title:encodeURIComponent(item?.title)})} header={(props)=>(
 							<View {...props} style={{...props?.style,padding:0}}>
 								<Image
 									style={{
@@ -75,7 +75,7 @@ export default function ({ navigation }) {
 							<Text category="label" appearance="hint" style={{fontSize:10}}>{item.date_string}</Text>
 						</Card>
 						{data?.[index+1]?.id && (
-							<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>navigation.navigate("Main",{screen:"NewsDetail",params:{source:data?.[index+1]?.source,title:encodeURIComponent(data?.[index+1]?.title)}})} header={(props)=>(
+							<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>navigation.navigate("NewsDetail",{source:data?.[index+1]?.source,title:encodeURIComponent(data?.[index+1]?.title)})} header={(props)=>(
 								<View {...props} style={{...props?.style,padding:0}}>
 									<Image
 										style={{

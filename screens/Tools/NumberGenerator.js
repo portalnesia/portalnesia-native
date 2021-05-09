@@ -1,7 +1,7 @@
 import React from 'react';
 import {  View,ScrollView,useWindowDimensions } from 'react-native';
 import {Layout as Lay,Text,Spinner,Input,useTheme} from '@ui-kitten/components'
-
+import i18n from 'i18n-js'
 
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -194,13 +194,16 @@ export default function({navigation}){
                 }}
                 menu={[{
                     action:"share",
-                    title:"Share",
+                    title:i18n.t('share'),
                 },{
-                    title:"Copy link",
+                    title:i18n.t('copy_link'),
                     action:'copy'
                 },{
-                    title:"Open in browser",
+                    title:i18n.t('open_in_browser'),
                     action:'browser'
+                },{
+                    title:i18n.t('report'),
+                    action:'report'
                 }]}
             />
         </>
