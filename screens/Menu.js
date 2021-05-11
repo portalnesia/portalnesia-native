@@ -3,8 +3,9 @@ import {Animated,Image,View,LogBox,Alert} from 'react-native'
 import {useTheme,Layout as Lay, Text,Divider, MenuGroup,MenuItem,Menu, Icon} from '@ui-kitten/components'
 import * as Linking from 'expo-linking'
 import {openBrowserAsync} from 'expo-web-browser'
-import {useLinkTo} from '@react-navigation/native'
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import compareVersion from 'compare-versions'
+import {useScrollToTop} from '@react-navigation/native'
 
 import Button from '@pn/components/global/Button'
 import Backdrop from '@pn/components/global/Backdrop';
@@ -38,8 +39,9 @@ export default function({navigation}){
 	const heightHeader = heightt?.main + heightt?.sub + 20
     const [loading,setLoading] = React.useState(false)
     const menu = getMenu(i18n)
-    const linkTo = useLinkTo();
     const {login} = useLogin();
+    const ref=React.useRef(null);
+    useScrollToTop(ref)
 
     const handleUpdate=React.useCallback(async(url,version)=>{
         const myAbi = Portalnesia.SUPPORTED_ABIS;
@@ -136,7 +138,7 @@ export default function({navigation}){
                             <Text style={{fontSize:12}}>{user !==false ? `@${user?.username}` : `© ${new Date().getFullYear()}`}</Text>
                         </Lay>
                         <Lay level="1" style={{flex:1}}>
-                            <View style={{alignItems:'flex-end'}}><Button onPress={handleLogin}>{user === false ? "Login" : "Profile"}</Button></View>
+                            <View style={{alignItems:'flex-end'}}><Button onPress={handleLogin}>{user === false ? "Login / Register" : "Profile"}</Button></View>
                         </Lay>
                     </Lay>
 				</Header>
@@ -146,6 +148,7 @@ export default function({navigation}){
 					flexGrow: 1,
                     paddingTop:heightHeader
 				}}
+                ref={ref}
                 {...other}
 			>
                 {menu.map((dt,i)=>(
@@ -168,7 +171,6 @@ export default function({navigation}){
 }
 
 const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
-    const linkTo = useLinkTo();
     return (
         <Menu>
             {dt.map((it,ii)=>{

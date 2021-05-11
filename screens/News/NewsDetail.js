@@ -3,7 +3,6 @@ import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,useTheme,Divider,Card} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
-import {useLinkTo} from '@react-navigation/native'
 
 import Carousel from '@pn/components/global/Carousel';
 import CountUp from '@pn/components/global/Countup'
@@ -20,7 +19,7 @@ import {ucwords,openBrowser} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import Comment from '@pn/components/global/Comment'
 import usePost from '@pn/utils/API'
-import {linkTo} from '@pn/navigation/useRootNavigation'
+import {pushTo} from '@pn/navigation/useRootNavigation'
 //import {CONTENT_URL} from '@env'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
@@ -160,7 +159,7 @@ export default function({navigation,route}){
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
 	return (
-		<Card key={i} onPress={()=>linkTo(item?.url?.substring(23))}>
+		<Card key={i} onPress={()=>pushTo(item?.url?.substring(23))}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"

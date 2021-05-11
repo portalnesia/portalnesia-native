@@ -4,6 +4,7 @@ import {Layout as Lay,Text,Card,Tab,useTheme,Input,Icon,Divider} from '@ui-kitte
 import {TabView,TabBar} from 'react-native-tab-view'
 import i18n from 'i18n-js'
 import Modal from 'react-native-modal'
+import {linkTo} from '@pn/navigation/useRootNavigation'
 
 import TopAction from '@pn/components/navigation/TopAction'
 import Layout from '@pn/components/global/Layout';
@@ -16,7 +17,6 @@ import {specialHTML} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import useAPI from '@pn/utils/API'
 import Recaptcha from '@pn/components/global/Recaptcha'
-import {useLinkTo} from '@react-navigation/native'
 import { AuthContext } from '@pn/provider/Context';
 
 const {width} = Dimensions.get('window')
@@ -32,7 +32,6 @@ const RenderInput=React.memo(({onClose})=>{
 	const {setNotif} = context;
 	const {PNpost} = useAPI();
 	const captcha = React.useRef(null)
-	const linkTo = useLinkTo();
 
 	const onReceiveToken=React.useCallback((token)=>{
         setRecaptcha(token)

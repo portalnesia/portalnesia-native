@@ -13,12 +13,6 @@ import { ucwords } from '@pn/utils/Main'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 
-const IgIcon=(props)=><Icon {...props} name="instagram" pack="font_awesome" />
-const TwIcon=(props)=><Icon {...props} name="twitter" pack="font_awesome" />
-const FbIcon=(props)=><Icon {...props} name="facebook" pack="font_awesome" />
-const LnIcon=(props)=><Icon {...props} name="line" pack="font_awesome" />
-const TgIcon=(props)=><Icon {...props} name="telegram" pack="font_awesome" />
-
 const SkeletonAbout=()=>{
     const theme=useTheme()
     return (

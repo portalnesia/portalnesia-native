@@ -3,7 +3,7 @@ import { View,Dimensions,FlatList, Pressable } from 'react-native';
 import {Layout as Lay,Text,Card,useTheme,Input, Icon,Divider,Autocomplete,AutocompleteItem} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
-import {useLinkTo} from '@react-navigation/native'
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import analytics from '@react-native-firebase/analytics'
 
@@ -183,7 +183,6 @@ export default function Search({navigation,route}){
     const context = React.useContext(AuthContext)
     const {setNotif}=context;
     const {PNget}=useAPI();
-    const linkTo=useLinkTo()
     const theme = useTheme();
     const [search,setSearch] = React.useState(q ? decodeURIComponent(q) : "");
     const [data,setData]=React.useState([]);

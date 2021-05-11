@@ -14,14 +14,14 @@ export const ImageFull=React.memo(({source,style,alt,contentWidth,fancybox,dataS
     const {theme:selectedTheme} = context
     const theme = useTheme()
 
-    const onOpen=()=>{
+    const onOpen=React.useCallback(()=>{
         setStatusBarStyle("light")
-        setStatusBarBackgroundColor("#000")
-    }
-    const onClose=()=>{
+        setStatusBarBackgroundColor("#000",true)
+    },[])
+    const onClose=React.useCallback(()=>{
         setStatusBarStyle(selectedTheme==='light' ? 'dark' : 'light')
-        setStatusBarBackgroundColor(theme['background-basic-color-1'])
-    };
+        setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
+    },[theme,selectedTheme]);
 
     const ImageComponent=()=>(
         <ImageFullComp
@@ -47,7 +47,7 @@ export const ImageFull=React.memo(({source,style,alt,contentWidth,fancybox,dataS
     //navigator={dataSrc?.uri ? dataSrc?.uri : forceFancybox && source?.uri ? source?.uri : undefined}
     if(fancybox) {
         return (
-            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid>
+            <ImageModal onOpen={onOpen} willClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid isTranslucent >
                 <ImageComponent />
             </ImageModal>
         )
@@ -60,14 +60,14 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
     const {theme:selectedTheme} = context
     const theme = useTheme()
 
-    const onOpen=()=>{
+    const onOpen=React.useCallback(()=>{
         setStatusBarStyle("light")
-        setStatusBarBackgroundColor("#000")
-    }
-    const onClose=()=>{
+        setStatusBarBackgroundColor("#000",true)
+    },[])
+    const onClose=React.useCallback(()=>{
         setStatusBarStyle(selectedTheme==='light' ? 'dark' : 'light')
-        setStatusBarBackgroundColor(theme['background-basic-color-1'])
-    };
+        setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
+    },[theme,selectedTheme]);
 
     const RenderDataSrc=React.useMemo(()=>{
         return (
@@ -118,7 +118,7 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
     
     if(fancybox) {
         return (
-            <ImageModal onOpen={onOpen} onClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid>
+            <ImageModal onOpen={onOpen} willClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid>
                 <ImageComponent />
             </ImageModal>
         )

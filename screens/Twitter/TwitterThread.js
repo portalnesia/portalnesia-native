@@ -1,10 +1,10 @@
 import React from 'react';
-import { Animated,RefreshControl,useWindowDimensions,View } from 'react-native';
+import { Animated,RefreshControl,useWindowDimensions,View,LogBox } from 'react-native';
 import {Layout as Lay,Text,useTheme,Divider,Icon,Card} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
-import {useLinkTo} from '@react-navigation/native'
+import {pushTo} from '@pn/navigation/useRootNavigation'
 import Carousel from '@pn/components/global/Carousel';
 
 import Comment from '@pn/components/global/Comment'
@@ -25,6 +25,8 @@ import Button from '@pn/components/global/Button'
 import {specialHTML,listToMatrix,openBrowser,Ktruncate} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'
 import usePost from '@pn/utils/API'
+
+LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
 
 const MoreIcon=(props)=><Icon {...props} style={{...props?.style,marginHorizontal:0}} name="more-vertical" />
 
@@ -119,12 +121,16 @@ const RenderTwitter=React.memo(({item,index,setMenu})=>{
     )
 })
 
-export default function({navigation,route}){
+export default function TwitterThread({navigation,route}){
     const {slug} = route.params
+    if (slug === 'popular') {
+        navigation.replace("Twitter",{slug:'popular'})
+        return null;
+    }
     //const context = React.useContext(AuthContext);
     //const {state} = context
     const theme=useTheme()
-    const {data,error,mutate,isValidating}=useSWR(`/twitter/${slug}`,{},false)
+    const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/twitter/${slug}` : null,{},false)
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id ? `/twitter/others/${data?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
@@ -161,10 +167,6 @@ export default function({navigation,route}){
             if(timeout !== null) clearTimeout(timeout);
         }
     },[data,ready,route])
-
-    React.useEffect(()=>{
-        if (slug === 'popular') return navigation.replace("Twitter",{slug:'popular'})
-    },[route])
 
     const HeaderComp = ()=>(
         <Lay style={{flex:1}}>
@@ -288,9 +290,8 @@ export default function({navigation,route}){
 }
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
-	const linkTo = useLinkTo();
 	return (
-		<Card key={i} onPress={()=>linkTo(`/twitter/thread/${item?.id}`)}>
+		<Card key={i} onPress={()=>pushTo(`/twitter/thread/${item?.id}`)}>
 			<Text category="p1" style={{fontWeight:"600"}}>{specialHTML(item?.title)}</Text>
             <Text appearance="hint" category="label" style={{marginTop:10}}>{`Thread by @${item?.screen_name}`}</Text>
 		</Card>

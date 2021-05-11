@@ -3,6 +3,7 @@ import {  View,FlatList,useWindowDimensions,RefreshControl,Image } from 'react-n
 import {Layout as Lay,Text,Button,Card,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 
+import {linkTo} from '@pn/navigation/useRootNavigation'
 //import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
@@ -55,7 +56,7 @@ export default function BlogList({navigation,route}){
 						</View>
 					) : null}
 					<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-						<Card key={`card-0-${index}`} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("BlogDetail",{slug:item?.slug})} header={(props)=>(
+						<Card key={`card-0-${index}`} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.push("BlogDetail",{slug:item?.slug})} header={(props)=>(
 							<View {...props} {...props} style={{...props?.style,padding:0}}>
 								<Image
 									style={{
@@ -71,7 +72,7 @@ export default function BlogList({navigation,route}){
 							<Text category="label" appearance="hint" style={{fontSize:10}}>{item.date}</Text>
 						</Card>
 						{data?.[index+1]?.id && (
-							<Card key={`card-1-${index}`} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>navigation.navigate("BlogDetail",{slug:data[index+1].slug})} header={(props)=>(
+							<Card key={`card-1-${index}`} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>navigation.push("BlogDetail",{slug:data[index+1]?.slug})} header={(props)=>(
 								<View {...props} {...props} style={{...props?.style,padding:0}}>
 									<Image
 										style={{

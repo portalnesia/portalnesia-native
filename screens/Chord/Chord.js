@@ -4,6 +4,7 @@ import {Layout as Lay,Text,Card,Tab,useTheme} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import {TabView,TabBar} from 'react-native-tab-view'
 
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import Layout from '@pn/components/global/Layout';
 import Header,{useHeader,headerHeight as headerHeightt,Lottie} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
@@ -48,11 +49,11 @@ const Recent=({headerHeight,navigation,...other})=>{
 						</View>
 					) : null}
 					<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("ChordDetail",{slug:item.slug})}>
+						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>linkTo(`/chord/${item?.slug}`)}>
 							<Text category="p1">{`${item.artist} - ${item.title}`}</Text>
 						</Card>
 						{data?.[index+1]?.id && (
-							<Card key={1} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("ChordDetail",{slug:data[index+1].slug})}>
+							<Card key={1} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>linkTo(`/chord/${data[index+1]?.slug}`)}>
 								<Text category="p1">{`${data[index+1].artist} - ${data[index+1].title}`}</Text>
 							</Card>
 						)}
@@ -143,11 +144,11 @@ const Popular=({headerHeight,navigation,...other})=>{
 						</View>
 					) : null}
 					<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("ChordDetail",{slug:item.slug})}>
+						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>linkTo(`/chord/${item?.slug}`)}>
 							<Text category="p1">{`${item.artist} - ${item.title}`}</Text>
 						</Card>
 						{data?.[index+1]?.id && (
-							<Card key={1} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("ChordDetail",{slug:data[index+1].slug})}>
+							<Card key={1} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>linkTo(`/chord/${data[index+1]?.slug}`)}>
 								<Text category="p1">{`${data[index+1].artist} - ${data[index+1].title}`}</Text>
 							</Card>
 						)}

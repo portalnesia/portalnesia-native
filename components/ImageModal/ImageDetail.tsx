@@ -93,7 +93,7 @@ interface Props {
   onClose?: () => void;
   renderContent?:React.ReactNode;
 }
-export default class ImageDetail extends React.Component<Props> {
+export default class ImageDetail extends React.PureComponent<Props> {
   private _animatedScale = new Animated.Value(1);
   private _animatedPositionX = new Animated.Value(0);
   private _animatedPositionY = new Animated.Value(0);
@@ -532,7 +532,7 @@ export default class ImageDetail extends React.Component<Props> {
     });
   };
 
-  shouldComponentUpdate(nextProps: Props): boolean {
+  /*shouldComponentUpdate(nextProps: Props): boolean {
     if (
       nextProps.isOpen !== this.props.isOpen ||
       nextProps.origin.x !== this.props.origin.x ||
@@ -543,7 +543,7 @@ export default class ImageDetail extends React.Component<Props> {
       return true;
     }
     return false;
-  }
+  }*/
 
   componentDidUpdate(): void {
     const { isOpen, didOpen } = this.props;

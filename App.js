@@ -7,15 +7,11 @@ import * as Font from 'expo-font';
 import 'moment/locale/id';
 import {StatusBar} from 'expo-status-bar'
 import {
-	Inter_100Thin,
-	Inter_200ExtraLight,
 	Inter_300Light,
 	Inter_400Regular,
 	Inter_500Medium,
 	Inter_600SemiBold,
 	Inter_700Bold,
-	Inter_800ExtraBold,
-	Inter_900Black
 } from '@expo-google-fonts/inter';
 import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './provider/AuthProvider';
@@ -23,7 +19,7 @@ import {AppearanceProvider} from 'react-native-appearance'
 
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
-export default function App(props) {
+export default function App() {
 	const [isLoadingComplete, setLoadingComplete] = useState(false);
 
 	if (!isLoadingComplete) {
@@ -32,7 +28,7 @@ export default function App(props) {
 			<StatusBar style="light" translucent animated />
 			<AppLoading
 				startAsync={loadResourcesAsync}
-				onError={handleLoadingError}
+				onError={(err)=>handleLoadingError(err,setLoadingComplete)}
 				onFinish={() => handleFinishLoading(setLoadingComplete)}
 			/>
 			</>
@@ -62,20 +58,16 @@ async function loadResourcesAsync() {
 			require('./assets/transparent.png'),
 		]),
 		Font.loadAsync({
-			//Inter_100Thin,
-			//Inter_200ExtraLight,
-			//Inter_300Light,
+			Inter_300Light,
 			Inter_Regular: Inter_400Regular,
 			Inter_Medium:Inter_500Medium,
 			Inter_SemiBold: Inter_600SemiBold,
 			Inter_Bold: Inter_700Bold,
-			//Inter_ExtraBold: Inter_800ExtraBold,
-			//Inter_900Black,
 		})
 	]);
 }
 
-function handleLoadingError(error) {
+function handleLoadingError(error,setLoadingComplete) {
 	// In this case, you might want to report the error to your error reporting
 	// service, for example Sentry
 	console.warn(error);

@@ -6,6 +6,7 @@ import {AuthContext} from '@pn/provider/AuthProvider'
 import LottieView from 'lottie-react-native'
 import TopNavigationAction from './TopAction'
 import i18n from'i18n-js'
+import {resetRoot} from '@pn/navigation/useRootNavigation'
 
 //const STATUS_BAR_HEIGHT = StatusBar.currentHeight
 
@@ -136,7 +137,7 @@ const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,m
 					if(index > 0) {
 						navigation.goBack();
 					} else {
-						navigation.replace("MainTabs",{screens:"Home"})
+						resetRoot()
 					}
 				}} />
 			)

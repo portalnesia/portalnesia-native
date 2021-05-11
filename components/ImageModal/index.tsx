@@ -1,5 +1,6 @@
 import React, { LegacyRef } from 'react';
-import { Animated, View, TouchableOpacity, StatusBar, Platform, Dimensions } from 'react-native';
+import { Animated, View, TouchableOpacity, Platform, Dimensions } from 'react-native';
+//import * as StatusBar from 'expo-status-bar'
 //import FastImage from 'react-native-fast-image';
 import type { ResizeMode } from 'react-native-fast-image';
 import type { ImageStyle, FastImageProps } from 'react-native-fast-image';
@@ -51,7 +52,7 @@ export default class ImageModal extends React.PureComponent<Props, State> {
     super(props);
     const { isTranslucent } = props;
     if (Platform.OS === 'android' && isTranslucent) {
-      StatusBar.setTranslucent(isTranslucent);
+      //StatusBar.setTranslucent(isTranslucent);
     }
 
     this.state = {
@@ -71,23 +72,15 @@ export default class ImageModal extends React.PureComponent<Props, State> {
     });
   }
 
-  componentDidUpdate(prev: Props){
-    if(prev.children !== this.props.children) {
-      this._setOrigin();
-    }
-  }
-
   private _setOrigin = (): void => {
     if (this._root) {
       this._root.measureInWindow((x: number, y: number, width: number, height: number) => {
-        const { isTranslucent, onOpen, isRTL } = this.props;
+        const { isTranslucent,isRTL } = this.props;
         let newY: number = y;
-        if (typeof onOpen === 'function') {
-          onOpen();
-        }
         if (isTranslucent) {
-          newY += StatusBar.currentHeight ? StatusBar.currentHeight : 0;
-          StatusBar.setHidden(true);
+          //StatusBar.setStatusBarStyle('light');
+          //StatusBar.setStatusBarBackgroundColor('#000',true)
+
         }
         let newX: number = x;
         if (isRTL) {
@@ -109,6 +102,9 @@ export default class ImageModal extends React.PureComponent<Props, State> {
     if (this.props.disabled) return;
 
     this._setOrigin();
+    if (typeof this.props.onOpen === 'function') {
+      this.props.onOpen();
+    }
     setTimeout(() => {
       this.setState({
         isOpen: true,
@@ -179,7 +175,7 @@ export default class ImageModal extends React.PureComponent<Props, State> {
           <TouchableOpacity
             activeOpacity={0.7}
             style={{ alignSelf: 'baseline' }}
-            onPress={this._open}
+            onPress={this._open.bind(this)}
             onLongPress={onLongPressOriginImage}>
             {children}
           </TouchableOpacity>
@@ -205,7 +201,7 @@ export default class ImageModal extends React.PureComponent<Props, State> {
           onMove={onMove}
           responderRelease={responderRelease}
           willClose={willClose}
-          onClose={this._onClose}
+          onClose={this._onClose.bind(this)}
           renderContent={renderContent}
         />
       </View>

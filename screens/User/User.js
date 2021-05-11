@@ -1,13 +1,14 @@
 import React from 'react'
 import {View,Dimensions,Animated,RefreshControl,Alert} from 'react-native'
 import {Layout as Lay,Text,useTheme,TopNavigation,TopNavigationAction,Icon,Divider,Menu,MenuItem} from '@ui-kitten/components'
-import {TabView,TabBar,SceneMap} from 'react-native-tab-view'
+import {TabView,TabBar} from 'react-native-tab-view'
 import {useNavigationState} from '@react-navigation/native'
 import {Modalize} from 'react-native-modalize'
 import Skltn from 'react-native-skeleton-placeholder'
 import Modal from 'react-native-modal'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
+import {resetRoot} from '@pn/navigation/useRootNavigation'
 
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -19,7 +20,6 @@ import {TabBarHeight,HeaderHeight} from './utils'
 import RenderFollow from './Follow'
 import RenderAbout from './About'
 import RenderMedia from './Media'
-import { ForceTouchGestureHandler } from 'react-native-gesture-handler'
 
 const user=false;
 
@@ -43,10 +43,7 @@ const RenderBackButton=React.memo(({navigation})=>{
             if(index > 0) {
                 navigation.goBack();
             } else {
-                navigation.reset({
-                    index:0,
-                    routes:[{name:"Main",screen:"MainTabs"}]
-                })
+                resetRoot();
             }
         }}} />
     )

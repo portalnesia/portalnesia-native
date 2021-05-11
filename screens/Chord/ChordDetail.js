@@ -1,7 +1,6 @@
 import React from 'react';
-import { Animated,RefreshControl,ScrollView,useWindowDimensions,View } from 'react-native';
+import { Animated,RefreshControl,ScrollView,useWindowDimensions,View,LogBox } from 'react-native';
 import {Layout as Lay,Text,useTheme,Divider,Card,ButtonGroup,Icon} from '@ui-kitten/components'
-import {useLinkTo} from '@react-navigation/native'
 import Skeleton from '@pn/components/global/Skeleton'
 import Modal from 'react-native-modal'
 import analytics from '@react-native-firebase/analytics'
@@ -9,6 +8,7 @@ import RNPrint from 'react-native-print'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 
+import {linkTo,pushTo} from '@pn/navigation/useRootNavigation'
 import Carousel from '@pn/components/global/Carousel';
 import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
@@ -27,6 +27,8 @@ import {AdsBanner, AdsBanners} from '@pn/components/global/Ads'
 import Player from '@pn/components/global/VideoPlayer'
 import Backdrop from '@pn/components/global/Backdrop';
 
+LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
+
 const AnimLay = Animated.createAnimatedComponent(Lay)
 const MinusIcon=(props)=><Icon {...props} name="minus" />
 const PlusIcon=(props)=><Icon {...props} name="plus" />
@@ -37,8 +39,12 @@ const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.3.0",">="
 
 function ChordDetailScreen({navigation,route}){
     const {slug} = route.params
+    if (slug === 'popular') {
+        navigation.replace("Chord",{slug:'popular'})
+        return null;
+    }
     const theme=useTheme()
-    const {data,error,mutate,isValidating}=useSWR(`/chord/${slug}`,{},false)
+    const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/chord/${slug}` : null,{},false)
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.chord?.id ? `/chord/others/${data?.chord?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
@@ -46,7 +52,6 @@ function ChordDetailScreen({navigation,route}){
     const {width} = useWindowDimensions()
     const [tools,setTools]=React.useState({fontSize:4,transpose:0,autoScroll:0})
     const [showMenu,setShowMenu]=React.useState(null)
-    const linkTo = useLinkTo()
     const {PNget} = usePost();
     const [backdrop,setBackdrop] = React.useState(false);
     const [viewVideo,setViewVideo] = React.useState(false)
@@ -163,9 +168,9 @@ function ChordDetailScreen({navigation,route}){
         }
     },[data,ready,route])
 
-    React.useEffect(()=>{
-        if (slug === 'popular') return navigation.replace("MainTabs",{screen:"Chord",params:{slug:'popular'}})
-    },[route])
+    /*React.useEffect(()=>{
+        if (slug === 'popular') return navigation.replace("Chord",{slug:'popular'})
+    },[route])*/
 
     return (
         <>
@@ -377,9 +382,8 @@ function ChordDetailScreen({navigation,route}){
 }
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
-	const linkTo = useLinkTo();
 	return (
-		<Card key={i} onPress={()=>linkTo(`/chord/${item?.slug}`)}>
+		<Card key={i} onPress={()=>pushTo(`/chord/${item?.slug}`)}>
 			<Text category="p1" style={{fontWeight:"600"}}>{`${item?.artist} - ${item?.title}`}</Text>
             <Text category="label" style={{marginTop:10}}>{item?.original}</Text>
 		</Card>

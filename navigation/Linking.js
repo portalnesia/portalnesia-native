@@ -2,142 +2,167 @@ import {createURL,getInitialURL as expoGetInitialURL,addEventListener as ExpoAdd
 import {addNotificationResponseReceivedListener} from 'expo-notifications'
 import {openBrowserAsync} from 'expo-web-browser'
 
+export const getLink=(link,a=true)=>{
+    let url = link.replace("https://portalnesia.com/","");
+    url = url.replace("pn://","");
+    const uri = url.split("?")[0];
+    const split = uri.split("/")[0];
+    let firstPath='';
+    if(split === 'news') firstPath='NewsStack';
+    else if(split==='chord') firstPath='ChordStack';
+    else if(split==='search') firstPath='SearchPath';
+    else if(['pages','setting','contact','url','blog','twibbon','login-callback','twitter'].indexOf(split) !== -1) firstPath='MenuStack';
+    else firstPath="HomeStack";
+    const finalPath = a ? `https://portalnesia.com/${firstPath}/${url}` : `/${firstPath}/${url}`
+    return finalPath;
+}
+
+const getScreen={
+    Setting:{
+        path:'setting',
+    },
+    NewsDetail:{
+        path:'news/:source/:title',
+    },
+    ChordList:{
+        path:'chord/artist/:slug?',
+    },
+    ChordDetail:{
+        path:'chord/:slug',
+    },
+    Blog:{
+        path:'blog',
+    },
+    BlogDetail:{
+        path:'blog/:slug',
+    },
+    BlogList:{
+        path:'blog/:blogType/:slug',
+    },
+    Pages:{
+        path:'pages/:slug',
+    },
+    Twitter:{
+        path:'twitter/thread',
+    },
+    TwitterThread:{
+        path:'twitter/thread/:slug',
+    },
+    GeodataTransform:{
+        path:'geodata/transform',
+    },
+    NumberGenerator:{
+        path:'random-number',
+    },
+    ParseHtml:{
+        path:'parse-html',
+    },
+    ImagesChecker:{
+        path:'images-checker',
+    },
+    QrGenerator:{
+        path:'qr-code/:slug?',
+    },
+    UrlShortener:{
+        path:'url',
+    },
+    Contact:{
+        path:'contact',
+    },
+    User:{
+        path:'user/:username/:slug?',
+    },
+    Twibbon:{
+        path:'twibbon',
+    },
+    TwibbonDetail:{
+        path:'twibbon/:slug',
+    },
+    SecondScreen:{
+        path:'second-screen',
+    },
+    OpenSource:{
+        path:'opensource',
+    },
+    NotificationEvent:{
+        path:'notification/events/:slug',
+    },
+    NotFound: '*',
+}
+
 export const linking = {
     prefixes:[createURL('/'),'https://portalnesia.com'],
     config:{
         screens:{
-            MainTabs:{
+            HomeStack:{
+                path:'HomeStack',
                 screens:{
                     Home:{
-                        path:''
+                        path:'',
                     },
-                    News:{
-                        path:'news',
-                        exact:true
-                    },
-                    Chord:{
-                        path:'chord',
-                        exact:true
-                    },
-                    Search:{
-                        path:'search',
-                        exact:true
-                    },
-                    Menu:{
-                        path:'login-callback',
-                        exact:true
-                    },
+                    ...getScreen
                 }
             },
-            Setting:{
-                path:'setting',
-                exact:true,
+            NewsStack:{
+                path:'NewsStack',
+                screens:{
+                    News:{
+                        path:'news',
+                    },
+                    ...getScreen
+                }
             },
-            NewsDetail:{
-                path:'news/:source/:title',
-                exact:true
+            ChordStack:{
+                path:'ChordStack',
+                screens:{
+                    Chord:{
+                        path:'chord',
+                    },
+                    ...getScreen
+                }
             },
-            ChordList:{
-                path:'chord/artist/:slug?',
-                exact:true
+            SearchStack:{
+                path:'SearchStack',
+                screens:{
+                    Search:{
+                        path:'search',
+                    },
+                    ...getScreen
+                }
             },
-            ChordDetail:{
-                path:'chord/:slug',
-                exact:true
+            MenuStack:{
+                path:'MenuStack',
+                screens:{
+                    Menu:{
+                        path:'login-callback',
+                    },
+                    ...getScreen
+                }
             },
-            Blog:{
-                path:'blog',
-                exact:true
-            },
-            BlogDetail:{
-                path:'blog/:slug',
-                exact:true
-            },
-            BlogList:{
-                path:'blog/:blogType/:slug',
-                exact:true
-            },
-            Pages:{
-                path:'pages/:slug',
-                exact:true
-            },
-            Twitter:{
-                path:'twitter/thread',
-                exact:true
-            },
-            TwitterThread:{
-                path:'twitter/thread/:slug',
-                exact:true
-            },
-            GeodataTransform:{
-                path:'geodata/transform',
-                exact:true
-            },
-            NumberGenerator:{
-                path:'random-number',
-                exact:true
-            },
-            ParseHtml:{
-                path:'parse-html',
-                exact:true
-            },
-            ImagesChecker:{
-                path:'images-checker',
-                exact:true
-            },
-            QrGenerator:{
-                path:'qr-code/:slug?',
-                exact:true
-            },
-            UrlShortener:{
-                path:'url',
-                exact:true
-            },
-            Contact:{
-                path:'contact',
-                exact:true
-            },
-            User:{
-                path:'user/:username/:slug?',
-                exact:true
-            },
-            Twibbon:{
-                path:'twibbon',
-                exact:true
-            },
-            TwibbonDetail:{
-                path:'twibbon/:slug',
-                exact:true
-            },
-            SecondScreen:{
-                path:'second-screen',
-                exact:true
-            },
-            OpenSource:{
-                path:'opensource',
-                exact:true
-            },
-            NotificationEvent:{
-                path:'notification/events/:slug',
-                exact:true
-            },
-            NotFound: '*',
         }
     },
     async getInitialURL(){
         const url = await expoGetInitialURL()
         const notCorona = url!==null && url?.match(/\/corona+/) ===null;
-        if(notCorona) return url
+        if(notCorona) {
+            return getLink(url)
+        }
     },
-    subcribe(listener){
+    /*subcribe(listener){
         const onReceiveURL = ({url})=>{
+            console.log(url)
             const notCorona = typeof url === 'string' && url?.match(/\/corona+/) === null;
-            if(notCorona) return listener(url)
+            
+            if(notCorona) {
+                const link = getLink(url)
+                return listener(link)
+            }
         }
         const notificationFunction = (data) =>{
             if(data?.notification?.request?.content?.data?.url) {
                 const url = data?.notification?.request?.content?.data?.url
-                return listener(url);
+                const link = getLink(url)
+                return listener(link)
             }
         }
 
@@ -148,5 +173,5 @@ export const linking = {
             ExpoRemoveListener('url',onReceiveURL);
             notificationListener.remove();
         }
-    }
+    }*/
 }

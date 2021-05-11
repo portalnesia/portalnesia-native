@@ -1,16 +1,18 @@
 import React from 'react';
-import {  View,FlatList,useWindowDimensions,RefreshControl } from 'react-native';
+import {  View,FlatList,useWindowDimensions,RefreshControl,Dimensions } from 'react-native';
 import {Layout as Lay,Text,Card} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
 import i18n from 'i18n-js'
 
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
 
+const {width} = Dimensions.get('window')
 
 const renderRecommend=()=>{
 
@@ -26,7 +28,6 @@ export default function ({ navigation }) {
 		isReachingEnd,
 		mutate,isValidating,isLoadingInitialData,response
 	} = usePagination("/news","data",24,true,false)
-	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
 
@@ -59,7 +60,7 @@ export default function ({ navigation }) {
 						</View>
 					) : null}
 					<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("NewsDetail",{source:item?.source,title:encodeURIComponent(item?.title)})} header={(props)=>(
+						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>linkTo(`/news/${item?.source}/${encodeURIComponent(item?.title)}`)} header={(props)=>(
 							<View {...props} style={{...props?.style,padding:0}}>
 								<Image
 									style={{
@@ -75,7 +76,7 @@ export default function ({ navigation }) {
 							<Text category="label" appearance="hint" style={{fontSize:10}}>{item.date_string}</Text>
 						</Card>
 						{data?.[index+1]?.id && (
-							<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>navigation.navigate("NewsDetail",{source:data?.[index+1]?.source,title:encodeURIComponent(data?.[index+1]?.title)})} header={(props)=>(
+							<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>linkTo(`/news/${data?.[index+1]?.source}/${encodeURIComponent(data?.[index+1]?.title)}`)} header={(props)=>(
 								<View {...props} style={{...props?.style,padding:0}}>
 									<Image
 										style={{

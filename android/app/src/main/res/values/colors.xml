@@ -3,4 +3,5 @@
   <color name="iconBackground">#2f6f4e</color>
   <color name="splashscreen_background">#2F6F4E</color>
   <color name="colorPrimary">#2f6f4e</color>
+  <color name="backgroundColor">#ffffff</color>
 </resources>

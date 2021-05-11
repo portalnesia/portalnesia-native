@@ -17,7 +17,7 @@ import AutoHeightWebView from 'react-native-autoheight-webview'
 import {jsStyles, openBrowser, stripHTML} from '@pn/utils/Main'
 
 import { AuthContext } from '@pn/provider/AuthProvider';
-import useRootNavigation from '../../navigation/useRootNavigation'
+import {pushTo} from '../../navigation/useRootNavigation'
 
 let Hid = [];
 
@@ -37,7 +37,6 @@ export const onLinkPagePress=(id,yLayout=0,scrollRef)=>{
 
 const onLinkPress=(e,href)=>{
     if(href?.match(/^javascript\:/)) return;
-    const {linkTo} = useRootNavigation();
     let url = href;
     if(
         !href?.match(/^mailto\:/)
@@ -49,7 +48,7 @@ const onLinkPress=(e,href)=>{
     } else {
         if(href?.match(/^https\:\/\/portalnesia.com/)) {
             url = href?.replace(/^https\:\/\/portalnesia.com/,'');
-            linkTo(`/${url}`);
+            pushTo(`/${url}`);
         } else if(href?.match(/^mailto\:/)) {
             openURL(href);
         } else {

@@ -2,13 +2,13 @@ import React from 'react'
 import {Dimensions,View,ImageProps, TextProps, Animated,LayoutAnimation,UIManager,Alert} from 'react-native'
 import {useTheme,Layout as Lay, Text,Input,Divider,Icon,Menu,MenuItem} from '@ui-kitten/components'
 import {openBrowserAsync} from 'expo-web-browser'
-import {useLinkTo} from '@react-navigation/native'
 import {gql} from 'graphql-request'
 import Swipeable from 'react-native-gesture-handler/Swipeable'
 import {AxiosRequestConfig} from 'axios'
 import {Modalize} from 'react-native-modalize'
 import {Portal} from '@gorhom/portal'
 
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import ListItem from './ListItem'
 import Pressable from '@pn/components/global/Pressable';
 import Backdrop from '@pn/components/global/Backdrop';
@@ -114,7 +114,6 @@ type CommentType={
     onDelete: (params: OnDeleteType)=>void,
     theme: Record<string,string>,
     PNpost:<R = any>(url: string, data?: {[key: string]: any;} | undefined, formData?: AxiosRequestConfig | undefined) => Promise<R>,
-    linkTo:(path: string)=>void,
     totalReply?: number,
     sendReport:(type: SendReportType,params?:ParamsReportType)=>void,
     setNotif:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: { [key: string]: any;} | undefined) => void
@@ -139,7 +138,6 @@ export function Comments(props: CommentsProps){
     const {PNgraph,PNpost} = useAPI();
     const context = React.useContext(AuthContext);
     const {setNotif,sendReport,state} = context;
-    const linkTo = useLinkTo();
     const theme = useTheme();
     const {copyText} = useClipboard();
     const com_id=comment_id||0;
@@ -148,7 +146,7 @@ export function Comments(props: CommentsProps){
     const [loading,setLoading]=React.useState<string|number|null>('global')
     const [data,setData]=React.useState<Array<DataResult>>([]);
     const [loadingCom,setLoadingCom]=React.useState<string|number|null>(null)
-    const [expand,setExpand]=React.useState<string|number|null>(null)
+    //const [expand,setExpand]=React.useState<string|number|null>(null)
     const [recaptcha,setRecaptcha] = React.useState<string>("")
     const textRef=React.useRef<Input>(null)
     const textNameRef=React.useRef<Input>(null)
@@ -408,7 +406,6 @@ export function Comments(props: CommentsProps){
                 onReply={handleReply}
                 anyReply={false}
                 onDelete={handleDelete}
-                linkTo={linkTo}
                 theme={theme}
                 PNpost={PNpost}
                 setNotif={setNotif}
@@ -434,7 +431,6 @@ export function Comments(props: CommentsProps){
                 onReply={handleReply}
                 anyReply={item?.reply!==null}
                 onDelete={handleDelete}
-                linkTo={linkTo}
                 theme={theme}
                 PNpost={PNpost}
                 setNotif={setNotif}
@@ -799,7 +795,7 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
     }
 
     render() {
-        const {data:dt,isLoading,type,parentId,onReply,anyReply,onDelete,linkTo,setNotif,theme,PNpost,children,totalReply} = this.props
+        const {data:dt,isLoading,type,parentId,onReply,anyReply,onDelete,setNotif,theme,PNpost,children,totalReply} = this.props
         const menu = [...this.menu];
         if(dt?.delete_token !== null) menu.splice(2,0,{type:'delete',title:i18n.t('delete')});
         return (
@@ -904,7 +900,7 @@ export default class CommentButton extends React.PureComponent<CommentButtonProp
 
     open(){
         const {navigation,type,posId,posUrl,comment_id} = this.props
-        navigation.navigate("Comments",{type,posId,posUrl:`${URL}/${posUrl}`,comment_id})
+        navigation?.navigate("Comments",{type,posId,posUrl:`${URL}/${posUrl}`,comment_id})
     }
 
     render(){

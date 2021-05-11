@@ -141,7 +141,7 @@ export default function Setting({navigation}){
         }
 
         return (
-            <ListItem title={name} description={desc} style={{paddingHorizontal:15,paddingVertical:14}} key={`menu${i}`} accessoryRight={ForwardIcon} onPress={func} />
+            <ListItem title={name} description={desc} key={`menu${i}`} accessoryRight={ForwardIcon} onPress={func} />
         )
     }
 

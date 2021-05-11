@@ -1,7 +1,6 @@
 import React from 'react';
 import {  View,FlatList,useWindowDimensions,RefreshControl } from 'react-native';
 import {Layout as Lay,Text,Card} from '@ui-kitten/components'
-import {useScrollToTop} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
 import i18n from 'i18n-js'
 
@@ -21,8 +20,6 @@ export default function Twibbon({ navigation }) {
 		mutate,isValidating,isLoadingInitialData
 	} = usePagination("/twibbon","twibbon",12)
 	const {width}=useWindowDimensions()
-	const ref = React.useRef(null)
-	useScrollToTop(ref)
 
 	const [refreshing,setRefreshing]=React.useState(false)
 
@@ -53,7 +50,7 @@ export default function Twibbon({ navigation }) {
 						</View>
 					) : null}
 					<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("Main",{screen:"TwibbonDetail",params:{slug:item?.slug}})} header={(props)=>(
+						<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("TwibbonDetail",{slug:item?.slug})} header={(props)=>(
 							<View {...props} style={{...props?.style,padding:0,height:cardSize,width:cardSize}}>
                                 <Image
 									style={{
@@ -82,7 +79,7 @@ export default function Twibbon({ navigation }) {
 							<Text category="label" appearance="hint" style={{fontSize:10}}>{item?.date}</Text>
 						</Card>
 						{data?.[index+1]?.id && (
-							<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>navigation.navigate("Main",{screen:"TwibbonDetail",params:{slug:data?.[index+1]?.slug}})} header={(props)=>(
+							<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={()=>navigation.navigate("TwibbonDetail",{slug:data?.[index+1]?.slug})} header={(props)=>(
 								<View {...props} style={{...props?.style,padding:0,height:cardSize,width:cardSize}}>
 									<Image
                                         style={{
@@ -144,8 +141,6 @@ export default function Twibbon({ navigation }) {
 						refreshing={refreshing}
 					/>
 				}
-				//onEndReachedThreshold={0.05}
-				ref={ref}
 				onEndReached={()=>{
 					if(!isReachingEnd && !isLoadingMore) {
 						setSize(size+1)

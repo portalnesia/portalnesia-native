@@ -3,6 +3,7 @@ import { View,useWindowDimensions,FlatList,RefreshControl } from 'react-native';
 import {Layout as Lay,Text,Card,Spinner,useTheme} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import Layout from '@pn/components/global/Layout';
 //import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
@@ -27,11 +28,11 @@ const RenderChord=React.memo(({item,index,width,data,navigation})=>{
 					</View>
 				) : null}
 				<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-					<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("ChordDetail",{slug:item.slug})}>
+					<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.push("ChordDetail",{slug:item.slug})}>
 						<Text category="p1">{`${item.artist} - ${item.title}`}</Text>
 					</Card>
 					{data?.[index+1]?.id && (
-						<Card key={1} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.navigate("ChordDetail",{slug:data[index+1].slug})}>
+						<Card key={1} style={{width:cardSize,margin:5,marginRight:2}} onPress={()=>navigation.push("ChordDetail",{slug:data[index+1].slug})}>
 							<Text category="p1">{`${data[index+1].artist} - ${data[index+1].title}`}</Text>
 						</Card>
 					)}
@@ -75,7 +76,6 @@ const RenderArtist=React.memo(({item,index,width,data,navigation})=>{
 export default function ({ navigation,route }) {
 	const {slug} = route.params
 	const artist = React.useMemo(()=>{
-		console.log(slug)
 		if(slug) {
 			return ucwords(slug.replace(/\-/g," "))
 		}

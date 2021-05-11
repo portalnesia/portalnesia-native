@@ -1,8 +1,5 @@
 import React from 'react';
-//import { View, TouchableOpacity } from 'react-native';
-//import Text from '../utils/UbuntuFont';
-//import Colors from '../../constants/colors';
-//import { Ionicons } from '@expo/vector-icons';
+import {resetRoot} from '@pn/navigation/useRootNavigation'
 import {useNavigationState} from '@react-navigation/native'
 import {Icon,Divider, TopNavigation,Text,useTheme} from '@ui-kitten/components'
 import TopNavigationAction from './TopAction'
@@ -26,7 +23,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 					if(index > 0) {
 						navigation.goBack();
 					} else {
-						navigation.replace("MainTabs",{screens:"Home"})
+						resetRoot();
 					}
 				}}} />
 			)
@@ -36,7 +33,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 					if(index > 0) {
 						navigation.goBack();
 					} else {
-						navigation.replace("MainTabs",{screens:"Home"})
+						resetRoot();
 					}
 				}}} />
 			)

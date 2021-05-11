@@ -2,10 +2,10 @@ import React from 'react'
 import {ScrollView,RefreshControl,View,Animated} from 'react-native'
 import {Layout as Lay, Text,Spinner,Divider,useTheme,Card} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
-import {useLinkTo} from '@react-navigation/native'
 import analytics from '@react-native-firebase/analytics'
 import Carousel from '@pn/components/global/Carousel';
 
+import {linkTo,pushTo} from '@pn/navigation/useRootNavigation'
 import Image from '@pn/components/global/Image'
 import Comment from '@pn/components/global/Comment'
 import Layout from '@pn/components/global/Layout';
@@ -30,7 +30,6 @@ export default function({navigation,route}){
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:0}	
 	const heightHeader = heightt?.main + heightt?.sub
-    const linkTo = useLinkTo()
     const {PNget} = usePost();
 
     const scrollRef = React.useRef(null)
@@ -196,9 +195,8 @@ export default function({navigation,route}){
 }
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
-	const linkTo = useLinkTo();
 	return (
-		<Card key={i} onPress={()=>linkTo(`/blog/${item?.slug}`)}>
+		<Card key={i} onPress={()=>pushTo(`/blog/${item?.slug}`)}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"

@@ -3,8 +3,8 @@ import { View,Dimensions,FlatList, Pressable } from 'react-native';
 import {Layout as Lay,Text,Card,useTheme,Input, Icon,Divider,Autocomplete,AutocompleteItem} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
-import {useLinkTo} from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import {linkTo} from '@pn/navigation/useRootNavigation'
 
 import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
@@ -16,7 +16,6 @@ import {RenderNoImage,RenderWithImage} from './Search'
 
 export default function SearchFilter({navigation,route}){
     const {filter,q} = route?.params
-    const linkTo = useLinkTo();
     const theme = useTheme();
     const {
 		data,

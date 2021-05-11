@@ -5,8 +5,9 @@ import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
 import {CONTENT_URL,API_URL} from '@env'
 import i18n from 'i18n-js'
-import {useLinkTo} from '@react-navigation/native'
+import {useScrollToTop} from '@react-navigation/native'
 
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
 import Image from '@pn/components/global/Image'
@@ -18,9 +19,9 @@ import {specialHTML} from '@pn/utils/Main'
 //const CONTENT_URL='https://content.portalnesia.com',API_URL='https://api.portalnesia.com'
 
 const RenderNews = React.memo(({item:dt, index:i}) => {
-	const linkTo = useLinkTo();
+	
 	return (
-		<Card key={i} onPress={()=>linkTo(`/news/${dt?.source}/${encodeURIComponent(dt.title)}`)}>
+		<Card key={i} onPress={()=>linkTo(`/${dt?.link}`)}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"
@@ -37,18 +38,20 @@ const RenderNews = React.memo(({item:dt, index:i}) => {
 	);
 })
 
-const RenderChord = React.memo(({item:dt, index:i,navigation}) => {
+const RenderChord = React.memo(({item:dt, index:i}) => {
+	
 	return (
-		<Card style={{borderWidth:2}} key={i} onPress={()=>navigation.navigate("ChordDetail",{slug:dt?.slug})}>
+		<Card style={{borderWidth:2}} key={i} onPress={()=>linkTo(`/chord/${dt?.slug}`)}>
 			<Text category="p1" style={{fontWeight:"700"}}>{`${dt.title} - ${dt.artist}`}</Text>
 			<Text category="label" style={{marginTop:5}}>{dt.original}</Text>
 		</Card>
 	);
 })
 
-const RenderTwibbon = React.memo(({item:dt, index:i,navigation}) => {
+const RenderTwibbon = React.memo(({item:dt, index:i,naviation}) => {
+	
 	return (
-		<Card key={i} onPress={()=>navigation.navigate("TwibbonDetail",{slug:dt?.slug})}>
+		<Card key={i} onPress={()=>linkTo(`/twibbon/${dt?.slug}`)}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"
@@ -66,16 +69,18 @@ const RenderTwibbon = React.memo(({item:dt, index:i,navigation}) => {
 })
 
 const RenderThread = React.memo(({item:dt, index:i,navigation}) => {
+	
 	return (
-		<Card style={{borderWidth:2}} key={i} onPress={()=>navigation.navigate("TwitterThread",{slug:dt?.tweet_id})}>
+		<Card style={{borderWidth:2}} key={i} onPress={()=>linkTo(`/twitter/thread/${dt?.tweet_id}`)}>
 			<Text category="p1" style={{fontWeight:"700"}}>{`Thread by @${dt.screen_name}`}</Text>
 			<Text category="label" style={{marginTop:5}}>{specialHTML(dt.tweet)}</Text>
 		</Card>
 	);
 })
 
-const About=React.memo(({title,txt,right,last,screen,navigation})=>{
+const About=React.memo(({title,txt,right,last,screen})=>{
 	const context = React.useContext(AuthContext)
+	
 	if(last) {
 		return (
 			<Lay style={{marginTop:5,marginBottom:5,padding:10,...(last ? {marginBottom:50} : {}) }}>
@@ -85,7 +90,7 @@ const About=React.memo(({title,txt,right,last,screen,navigation})=>{
 		)
 	}
 	return (
-		<Card appearance="filled" onPress={()=>screen && navigation.navigate(screen)} style={{marginTop:5,marginBottom:5,padding:10,...(last ? {marginBottom:50} : {}) }}>
+		<Card appearance="filled" onPress={()=>screen && linkTo(screen)} style={{marginTop:5,marginBottom:5,padding:10,...(last ? {marginBottom:50} : {}) }}>
 			<Text category="h6" {...(right ? {style:{textAlign:'right'}} : {})}>{title}</Text>
 			<Text category="s2" {...(right ? {style:{textAlign:'right'}} : {})}>{txt}</Text>
 		</Card>
@@ -94,6 +99,7 @@ const About=React.memo(({title,txt,right,last,screen,navigation})=>{
 
 const Dashboard=({loading,data,error,navigation})=>{
 	const context = React.useContext(AuthContext)
+	
 	return (
 		<Layout navigation={navigation}>
 			<ScrollView
@@ -109,12 +115,15 @@ const Dashboard=({loading,data,error,navigation})=>{
 
 const NotLogin=React.memo(({loading,data,error,navigation})=>{
 	const context = React.useContext(AuthContext)
+	const ref=React.useRef(null)
+	useScrollToTop(ref)
 	return (
 		<Layout navigation={navigation}>
 			<ScrollView
 				contentContainerStyle={{
 					flexGrow: 1,
 				}}
+				ref={ref}
 			>
 				<Lay style={style.container}>
 					<View>
@@ -127,18 +136,18 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					<Text category="h1" style={{textAlign:'center'}}>The Future Platform</Text>
 					<Text category="p1">A multi-functional website to accompany you to surf the internet. Sign up to get more features.</Text>
 					<Lay style={{marginTop:20}}>
-						<About title="News" txt={i18n.t('home_not_login.news')} screen="News" navigation={navigation} />
-						<About title="Chord" txt={i18n.t('home_not_login.chord')} right screen="Chord" navigation={navigation} />
-						<About title="URL Shortener" txt={i18n.t('home_not_login.url')} screen="UrlShortener" navigation={navigation} />
-						<About title="Twitter Thread Reader" txt={i18n.t('home_not_login.twitter')} right  screen="Twitter" navigation={navigation} />
-						<About title="Twibbon" txt={i18n.t('home_not_login.twibbon')}  screen="Twibbon" navigation={navigation} />
-						<About title="Transform Coordinate" txt={i18n.t('home_not_login.transform')} right screen="GeodataTransform" navigation={navigation} />
+						<About title="News" txt={i18n.t('home_not_login.news')} screen="/news" navigation={navigation} />
+						<About title="Chord" txt={i18n.t('home_not_login.chord')} right screen="/chord" navigation={navigation} />
+						<About title="URL Shortener" txt={i18n.t('home_not_login.url')} screen="/url" navigation={navigation} />
+						<About title="Twitter Thread Reader" txt={i18n.t('home_not_login.twitter')} right  screen="/twitter/thread" navigation={navigation} />
+						<About title="Twibbon" txt={i18n.t('home_not_login.twibbon')}  screen="/twibbon" navigation={navigation} />
+						<About title="Transform Coordinate" txt={i18n.t('home_not_login.transform')} right screen="/geodata/transform" navigation={navigation} />
 						{/*<About title="Twitter Menfess" txt={`Send a message or just the words you want to convey to "someone" as anonymous without notifying the sender's identity.`} />
 						<About title="Quiz" txt="Create your own quiz and share with friends or answer a few quizzes." right />*/}
-						<About title="Parse HTML" txt={i18n.t('home_not_login.html')} screen="ParseHtml" navigation={navigation} />
-						<About title="Blog" txt={i18n.t('home_not_login.blog')} right screen="Blog" navigation={navigation} />
-						<About title="Images Checker" txt={i18n.t('home_not_login.images_checker')} screen="ImagesChecker" navigation={navigation} />
-						<About title="Others" txt={i18n.t('home_not_login.others')} right screen="Menu" navigation={navigation} />
+						<About title="Parse HTML" txt={i18n.t('home_not_login.html')} screen="/parse-html" navigation={navigation} />
+						<About title="Blog" txt={i18n.t('home_not_login.blog')} right screen="/blog" navigation={navigation} />
+						<About title="Images Checker" txt={i18n.t('home_not_login.images_checker')} screen="/images-checker" navigation={navigation} />
+						<About title="Others" txt={i18n.t('home_not_login.others')} right screen="/login-callback" navigation={navigation} />
 					</Lay>
 				</Lay>
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
@@ -155,7 +164,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 							renderItem={(props)=><RenderNews {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} onPress={()=>navigation.navigate("News")}>{i18n.t('see_more')}</Button>
+					<Button style={{marginTop:10,marginBottom:40}} onPress={()=>linkTo("/news")}>{i18n.t('see_more')}</Button>
 				</Lay>
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
@@ -171,7 +180,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 							renderItem={(props)=><RenderChord {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Chord")}>{i18n.t('see_more')}</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>linkTo("/chord")}>{i18n.t('see_more')}</Button>
 				</Lay>
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:"Twibbon"})}</Text>
@@ -187,7 +196,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 							renderItem={(props)=><RenderTwibbon {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Twibbon")}>{i18n.t('see_more')}</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>linkTo("/twibbon")}>{i18n.t('see_more')}</Button>
 				</Lay>
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
@@ -203,7 +212,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 							renderItem={(props)=><RenderThread {...props} navigation={navigation} />}
 						/>
 					)}
-					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>navigation.navigate("Twitter")}>{i18n.t('see_more')}</Button>
+					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>linkTo("/twitter/thread")}>{i18n.t('see_more')}</Button>
 				</Lay>
 			</ScrollView>
 		</Layout>

@@ -17,6 +17,9 @@ import RNFS from 'react-native-fs'
 import {openBrowserAsync} from 'expo-web-browser'
 import {AdsConsent, AdsConsentStatus} from '@react-native-firebase/admob'
 import {captureScreen} from 'react-native-view-shot'
+import compareVersion from 'compare-versions'
+import {Constants} from 'react-native-unimodules'
+import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener} from 'expo-linking'
 
 import {URL,ADS_PUBLISHER_ID} from '@env'
 import * as Notifications from 'expo-notifications'
@@ -31,6 +34,7 @@ import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
+import {getLink} from '@pn/navigation/Linking'
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -127,20 +131,25 @@ const AuthProvider = (props) => {
 	}
 
 	const sendReport=(type,params={})=>{
-		const title = ['konten','komentar','url'].indexOf(type) !== -1 ? "Send Report" : "Send Feedback";
-		const path = getPath();
-		const {urlreported:urlreport,...other}=params;
-		const urlreported=urlreport||path
-		captureScreen({format:'png',quality:0.9})
-		.then(
-			uri=>{
-				navigationRef?.current?.navigate("ReportScreen",{title,uri,type,urlreported,...other})
-			},
-			error=>{
-				console.log("capture error",error)
-				setNotif(true,"Error","Something went wrong");
-			}
-		)
+		const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.5.0",">=");
+		if(isUpdated) {
+			const title = ['konten','komentar','url'].indexOf(type) !== -1 ? "Send Report" : "Send Feedback";
+			const path = getPath();
+			const {urlreported:urlreport,...other}=params;
+			const urlreported=urlreport||path
+			captureScreen({format:'png',quality:0.9})
+			.then(
+				uri=>{
+					navigationRef?.current?.navigate("ReportScreen",{title,uri,type,urlreported,...other})
+				},
+				error=>{
+					console.log("capture error",error)
+					setNotif(true,"Error","Something went wrong");
+				}
+			)
+		} else {
+			setNotif(true,"Error","Please update your apps to the latest version");
+		}
 	}
 
 	useEffect(()=>{
@@ -223,6 +232,12 @@ const AuthProvider = (props) => {
 				}
 			}
 		}
+		function handleURL({url}){
+			if(url !== null) {
+				const link = getLink(url,false);
+				linkTo(link,false)
+			}
+		}
 
 		const netInfoListener = NetInfo.addEventListener(state=>{
 			if(state.isInternetReachable && !currentInternet.current) {
@@ -237,6 +252,7 @@ const AuthProvider = (props) => {
 		asyncTask();
 		setNotificationChannel();
 		createFolder();
+		ExpoAddListener('url',handleURL)
 
 		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
 		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
@@ -245,6 +261,7 @@ const AuthProvider = (props) => {
 			tokenChangeListener.remove();
 			foregroundListener.remove();
 			netInfoListener();
+			ExpoRemoveListener('url',handleURL)
 		}
 	},[])
 
@@ -287,14 +304,8 @@ const AuthProvider = (props) => {
 							showTitle:true
 						})
 					} else {
-						if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
-							const url = urls.split("//portalnesia.com")
-							linkTo(url[1]);
-						}
-						if(urls?.match(/^pn\:\/\/+/) !== null) {
-							const url = urls.split("pn:/")
-							linkTo(url[1]);
-						}
+						const url = getLink(urls,false);
+						linkTo(url,false);
 					}
 					await AsyncStorage.setItem("last_notification",id);
 				}
@@ -314,14 +325,8 @@ const AuthProvider = (props) => {
 					showTitle:true
 				})
 			}
-			if(urls?.match(/^https\:\/\/portalnesia\.com+/) !== null) {
-				const url = urls.split("//portalnesia.com")
-				linkTo(url[1]);
-			}
-			if(urls?.match(/^pn\:\/\/+/) !== null) {
-				const url = urls.split("pn:/")
-				linkTo(url[1]);
-			}
+			const url = getLink(urls,false);
+			linkTo(url,false);
 		}
 		
 	}
