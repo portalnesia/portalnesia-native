@@ -66,7 +66,6 @@ export default function({navigation}){
         } catch(err) {
             setNotif(true,"Error",err?.message||"Something went wrong");
         }
-
     },[])
 
     const handleLogin = React.useCallback(async()=>{

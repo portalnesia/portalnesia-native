@@ -1,6 +1,5 @@
 package com.portalnesia.app;
 
-//import com.facebook.react.bridge.NativeModule;
 import android.app.DownloadManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -19,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
-//import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
@@ -27,10 +25,14 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.safetynet.SafetyNet;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,6 +55,7 @@ public class PNModules extends ReactContextBaseJavaModule {
         this.reactContext = context;
     }
 
+    @NotNull
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -128,9 +131,6 @@ public class PNModules extends ReactContextBaseJavaModule {
     }
 
     private @NonNull String getScriptCode(@NonNull Locale locale){
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            return "";
-        }
         String script = locale.getScript();
         return TextUtils.isEmpty(script) ? "" : script;
     }
@@ -212,10 +212,10 @@ public class PNModules extends ReactContextBaseJavaModule {
         return supportedAbis;
     }
 
-    private void addApkToInstallSession(File file, PackageInstaller.Session session) throws IOException,FileNotFoundException {
+    private void addApkToInstallSession(File file, PackageInstaller.Session session) throws IOException {
         try (
             OutputStream packageInSession = session.openWrite("PNpackage",0,-1);
-            InputStream is = new FileInputStream(file);
+            InputStream is = new FileInputStream(file)
         ) {
             byte[] buffer = new byte[16384];
             int n;
@@ -329,5 +329,28 @@ public class PNModules extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             promise.reject(e);
         }
+    }
+
+    @ReactMethod
+    public void verifyWithRecaptcha(Promise promise) {
+        String apiKey = reactContext.getString(R.string.recaptcha_apikey);
+        SafetyNet.getClient(reactContext).verifyWithRecaptcha(apiKey)
+        .addOnSuccessListener(
+                response -> {
+                    String token = response.getTokenResult();
+                    promise.resolve(token);
+                }
+        )
+        .addOnFailureListener(
+            e -> {
+                if(e instanceof ApiException) {
+                    ApiException apiException = (ApiException) e;
+                    int statusCode = apiException.getStatusCode();
+                    promise.reject(Integer.toString(statusCode),CommonStatusCodes.getStatusCodeString(statusCode),e);
+                } else {
+                    promise.reject(e);
+                }
+            }
+        );
     }
 }

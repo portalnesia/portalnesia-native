@@ -11,7 +11,6 @@ import * as Cellular from 'expo-cellular'
 import moment from 'moment'
 import RNFS from 'react-native-fs'
 
-import Recaptcha from '@pn/components/global/Recaptcha'
 import Pressable from '@pn/components/global/Pressable'
 import Layout from '@pn/components/global/Layout';
 import usePost from '@pn/utils/API'
@@ -20,6 +19,7 @@ import { jsStyles, ucwords } from '@pn/utils/Main'
 import Localization from '@pn/module/Localization'
 import { AuthContext } from '@pn/provider/Context'
 import Backdrop from '@pn/components/global/Backdrop';
+import verifyRecaptcha from '@pn/module/Recaptcha'
 
 const SendIcon = (props)=><Icon {...props} name="send" pack="material" />
 const {width,height} = Dimensions.get('window')
@@ -37,16 +37,10 @@ export default function ReportScreen({navigation,route}){
     const {setNotif,state:{user}}=context;
     const [input,setInput]=React.useState("");
     const [loading,setLoading]=React.useState(false);
-    const [recaptcha,setRecaptcha]=React.useState("");
     const [check,setCheck]=React.useState(true);
     const theme = useTheme()
     const [modal,setModal]=React.useState(false)
-    const captcha = React.useRef(null)
     const {PNpost} = usePost()
-
-    const onReceiveToken=React.useCallback((token)=>{
-        setRecaptcha(token)
-    },[])
 
     const ContentType = React.useMemo(()=>{
         if(type==='konten') return "Content Report";
@@ -90,6 +84,7 @@ export default function ReportScreen({navigation,route}){
                 accu[val]=array.value;
                 return accu;
             },{})
+            const recaptcha = await verifyRecaptcha(setNotif);
             const data={
                 type,
                 text:input,
@@ -111,7 +106,6 @@ export default function ReportScreen({navigation,route}){
             } 
             finally {
                 setLoading(false);
-                captcha?.current?.refreshToken()
             }
         }
     }
@@ -165,7 +159,6 @@ export default function ReportScreen({navigation,route}){
             >
 				<RenderModal onClose={()=>setModal(false)} theme={theme} systemInfo={SystemInfo} />
 			</Modal>
-            <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
             <Backdrop loading visible={loading} />
         </>
     )

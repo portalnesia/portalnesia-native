@@ -16,7 +16,7 @@ import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {specialHTML} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import useAPI from '@pn/utils/API'
-import Recaptcha from '@pn/components/global/Recaptcha'
+import verifyRecaptcha from '@pn/module/Recaptcha'
 import { AuthContext } from '@pn/provider/Context';
 
 const {width} = Dimensions.get('window')
@@ -26,21 +26,18 @@ const RenderInput=React.memo(({onClose})=>{
 	const [input,setInput]=React.useState("")
     const [loading,setLoading]=React.useState(false);
     const [result,setResult]=React.useState(null)
-	const [recaptcha,setRecaptcha]=React.useState("");
 	const theme = useTheme();
 	const context = React.useContext(AuthContext)
 	const {setNotif} = context;
 	const {PNpost} = useAPI();
-	const captcha = React.useRef(null)
-
-	const onReceiveToken=React.useCallback((token)=>{
-        setRecaptcha(token)
-    },[])
 
 	const handleSubmit=()=>{
 		if(input.trim().match(/twitter\.com/)) {
 			setLoading(true)
-			PNpost(`/twitter/thread`,{url:input,recaptcha:recaptcha},undefined,false)
+			verifyRecaptcha(setNotif)
+			.then(recaptcha=>{
+				return PNpost(`/twitter/thread`,{url:input,recaptcha})
+			})
 			.then((res)=>{
 				if(res?.error) setNotif(true,"Error",res?.msg);
 				else {
@@ -48,19 +45,8 @@ const RenderInput=React.memo(({onClose})=>{
 					setResult(res?.data);
 				}
 			})
-			.catch((err)=>{
-				if(err?.response?.data) {
-					setNotif(true,"Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : i18n.t('errors.general'));
-				}
-				else if(err?.response?.status===503) {
-					setNotif(true,"Error",i18n.t('errors.server'))
-				} else {
-					setNotif(true,"Error",i18n.t('errors.general'))
-				}
-			})
 			.finally(()=>{
 				setLoading(false)
-				captcha?.current?.refreshToken()
 			})
 		} else {
 			setNotif(true,"Error",i18n.t("errors.invalid",{type:i18n.t('url')}));
@@ -103,7 +89,6 @@ const RenderInput=React.memo(({onClose})=>{
 					</Card>
 				</View>
 			)}
-			<Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
 		</Lay>
 	)
 })

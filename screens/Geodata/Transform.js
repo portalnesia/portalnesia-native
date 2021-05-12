@@ -15,9 +15,9 @@ import Button from '@pn/components/global/Button'
 import Pagination from '@pn/components/global/Pagination'
 import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/AuthProvider';
-import Recaptcha from '@pn/components/global/Recaptcha'
 import {randomInt} from '@pn/utils/Main'
 import ListItem from '@pn/components/global/ListItem'
+import verifyRecaptcha from '@pn/module/Recaptcha'
 
 const HeaderModal=React.memo(({search,setSearch,setPage})=>{
     return (
@@ -43,7 +43,6 @@ export default function({navigation}){
     const [input,setInput] = React.useState("")
     const [output,setOutput] = React.useState("")
     const [loading,setLoading] = React.useState(false)
-    const [recaptcha,setRecaptcha]=React.useState("");
     const {copyText} = useClipboard()
     const textRef=React.useRef(null)
     const [page,setPage]=React.useState(1)
@@ -55,14 +54,8 @@ export default function({navigation}){
     const [total,setTotal]=React.useState(1)
     const [sistem,setSistem]=React.useState({insrc:"EPSG:4326",outsrc:"EPSG:4326"})
     const [switchVal,setSwitch]=React.useState({switch:false,add_input:false})
-    const captcha = React.useRef(null)
     const modalRef = React.useRef(null)
     const {showAds} = showInterstisial()
-
-    const onReceiveToken=(token)=>{
-        setRecaptcha(token)
-    }
-
 
     const onModalChange=type=>value=>{
         setSistem({...sistem,[type]:value})
@@ -87,14 +80,16 @@ export default function({navigation}){
 
     const onSubmit=()=>{
         if(input?.match(/\S+/g) === null) return  setNotif("error",i18n.t('errors.form_validation',{type:"Input"}))
-        const post={
-            ...switchVal,
-            ...sistem,
-            recaptcha,
-            input
-        }
         setLoading(true)
-        PNpost(`/geodata/transform`,post)
+        verifyRecaptcha(setNotif)
+        .then(recaptcha=>{
+            return PNpost(`/geodata/transform`,{
+                ...switchVal,
+                ...sistem,
+                recaptcha,
+                input
+            })
+        })
         .then((res)=>{
             if(res?.msg !== null) setNotif(!(Boolean(res.error)),"Info",res.msg)
             if(!res?.error) {
@@ -104,7 +99,6 @@ export default function({navigation}){
         })
         .finally(()=>{
             setLoading(false)
-            captcha?.current?.refreshToken()
         })
     }
 
@@ -229,7 +223,6 @@ export default function({navigation}){
                     action:'report'
                 }]}
             />
-            <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
         </>
     )
 }

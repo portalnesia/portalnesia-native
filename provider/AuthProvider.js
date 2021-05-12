@@ -1,4 +1,4 @@
-import React, { createContext, useRef, useEffect, useReducer,useMemo } from 'react';
+import React, { useRef, useEffect, useReducer } from 'react';
 import * as eva from '@eva-design/eva'
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components'
 import {EvaIconsPack} from '@ui-kitten/eva-icons'
@@ -9,7 +9,7 @@ import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
 import useRootNavigation,{getPath} from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
-import {useColorScheme,PermissionsAndroid} from 'react-native'
+import {useColorScheme,PermissionsAndroid,Alert} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
@@ -29,12 +29,14 @@ import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
 import i18n from 'i18n-js'
 import {AuthContext} from './Context'
 import {API} from '@pn/utils/API'
+import {checkAndUpdateOTA} from '@pn/utils/Updates'
 import {refreshToken} from '@pn/utils/Login'
 import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
 import {getLink} from '@pn/navigation/Linking'
+import {UpdateEventType,addListener as UpdatesAddListener,reloadAsync as UpdatesReloadAsync} from 'expo-updates'
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -161,7 +163,6 @@ const AuthProvider = (props) => {
 				let [user,res,lang] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
 
 				const token = await refreshToken()
-				console.log(token);
 				if(user !== null) {
 					user = JSON.parse(user);
 				}
@@ -202,9 +203,11 @@ const AuthProvider = (props) => {
 				} else {
 					dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
 				}
+				return;
 			} catch(err){
 				console.log("ERR",err);
 				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
+				return;
 			}
 		};
 
@@ -249,7 +252,33 @@ const AuthProvider = (props) => {
 			}
 		})
 
-		asyncTask();
+		async function restartApplication(){
+			try {
+				await UpdatesReloadAsync();
+			} catch(e){
+
+			}
+		}
+
+		const updateListener = UpdatesAddListener((update)=>{
+			if(update.type === UpdateEventType.UPDATE_AVAILABLE && update.manifest?.version !== Constants.manifest.version) {
+				Alert.alert(
+					"New Bundle Version Updates",
+					`A new bundle version has been downloaded.\nRestart the application to apply changes!\nv${update.manifest?.version}`,
+					[{
+						text:"Later",
+						onPress:()=>{}
+					},{
+						text:"Restart",
+						onPress:restartApplication
+					}]
+				)
+			}
+		})
+
+		asyncTask().then(()=>{
+			checkAndUpdateOTA();
+		})
 		setNotificationChannel();
 		createFolder();
 		ExpoAddListener('url',handleURL)
@@ -262,6 +291,7 @@ const AuthProvider = (props) => {
 			foregroundListener.remove();
 			netInfoListener();
 			ExpoRemoveListener('url',handleURL)
+			updateListener.remove()
 		}
 	},[])
 

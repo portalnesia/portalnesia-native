@@ -6,6 +6,7 @@ import Modal from 'react-native-modal'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 
+import verifyRecaptcha from '@pn/module/Recaptcha'
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -16,7 +17,6 @@ import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import { ucwords,extractMeta } from '@pn/utils/Main';
-import Recaptcha from '@pn/components/global/Recaptcha'
 import {saveBase64} from '@pn/utils/Download'
 import {randomInt} from '@pn/utils/Main'
 
@@ -497,7 +497,7 @@ const QRurl=React.memo(({onchange,input,disabled})=>(
     </Lay>
 ))
 
-const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight,recaptcha,captcha})=>{
+const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight})=>{
     const context = React.useContext(AuthContext)
     const {setNotif}=context;
     const [input,setInput]=React.useState({});
@@ -531,18 +531,21 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight,recaptch
             })
         })
         .then(()=>{
-            return PNpost(`/qrcode`,{...input,recaptcha}).then((res)=>{
-                if(!res.error) {
-                    if(randomInt(2) == 0) showAds();
-                    const sl=route?.key||'url'
-                    setInput(getDefaultValue(sl))
-                    onProcess && onProcess(res.data)
-                }
-            })
+            return verifyRecaptcha(setNotif)
+        })
+        .then(recaptcha=>{
+            return PNpost(`/qrcode`,{...input,recaptcha})
+        })
+        .then((res)=>{
+            if(!res.error) {
+                if(randomInt(2) == 0) showAds();
+                const sl=route?.key||'url'
+                setInput(getDefaultValue(sl))
+                onProcess && onProcess(res.data)
+            }
         })
         .finally(()=>{
             setLoading(false)
-            captcha?.current?.refreshToken()
         })
     }
 
@@ -614,10 +617,8 @@ export default function QrCodeGenerator({navigation,route}){
 	const headerHeight={...headerHeightt,sub:46}
 	const heightHeader = headerHeight?.main + headerHeight?.sub
     const [openMenu,setOpenMenu]=React.useState(false)
-    const [recaptcha,setRecaptcha]=React.useState("");
     const [open,setOpen] = React.useState(null)
     const [loading,setLoading]=React.useState(null)
-    const captcha = React.useRef(null)
 
     const renderTabBar=(props)=>{
         return (
@@ -640,7 +641,7 @@ export default function QrCodeGenerator({navigation,route}){
     }
 
     const renderScene=({route})=>{
-        return <RenderScene route={route} onProcess={onProcess} scrollProps={{...other}} headerHeight={heightHeader} recaptcha={recaptcha} captcha={captcha} />;
+        return <RenderScene route={route} onProcess={onProcess} scrollProps={{...other}} headerHeight={heightHeader} />;
     }
 
     const renderTabView=()=>{
@@ -654,10 +655,6 @@ export default function QrCodeGenerator({navigation,route}){
                 lazy
             />
         )
-    }
-
-    const onReceiveToken=(token)=>{
-        setRecaptcha(token)
     }
 
     const onProcess=(dt)=>{
@@ -729,7 +726,6 @@ export default function QrCodeGenerator({navigation,route}){
                     ) : null}
                 </Lay>
             </Modal>
-            <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
         </>
     )
 }

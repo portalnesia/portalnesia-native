@@ -30,7 +30,7 @@
     <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://datas.portalnesia.com/updates/android-index.json" />
     <meta-data android:name="expo.modules.updates.EXPO_SDK_VERSION" android:value="40.0.0" />
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="true"/>
-    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="NEVER"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
     <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-5345145600516995~7540046866"/>
     <meta-data android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" android:value="true"/>

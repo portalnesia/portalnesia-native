@@ -16,7 +16,7 @@ import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
-import Recaptcha from '@pn/components/global/Recaptcha'
+import verifyRecaptcha from '@pn/module/Recaptcha'
 
 const {width:screenWidth} = Dimensions.get("window")
 
@@ -29,7 +29,6 @@ export default function({navigation}){
     //const {height,width}=useWindowDimensions()
     //const theme = useTheme()
     const [url,setUrl]=React.useState("");
-    const [recaptcha,setRecaptcha]=React.useState("");
     const [file,setFile]=React.useState(null);
     const [dataFile,setDataFile]=React.useState(null);
     const [backdrop,setBackdrop]=React.useState(false)
@@ -37,12 +36,7 @@ export default function({navigation}){
     const [result,setResult]=React.useState([])
     const [yOffset,setYOffset] = React.useState(null)
     const scrollRef=React.useRef(null)
-    const captcha = React.useRef(null)
     const {showAds} = showInterstisial()
-
-    const onReceiveToken=(token)=>{
-        setRecaptcha(token)
-    }
 
     const dtFileImg = React.useMemo(()=>dataFile,[dataFile])
 
@@ -71,14 +65,6 @@ export default function({navigation}){
             setLoading(true)
             setProgress(0)
             setBackdrop(true);
-            const form=new FormData();
-            if(file !== null) {
-                const {name,match} = extractMeta(file)
-                if(!match) return setNotif(true,"Error",i18n.t('errors.upload'));
-                form.append('file',{uri:file,name,type:`image/${match[1]}`});
-            }
-            form.append('url',url);
-            form.append('recaptcha',recaptcha);
             const opt={
                 headers:{
                     'Content-Type':'multipart/form-data'
@@ -88,7 +74,23 @@ export default function({navigation}){
                     setProgress(complete);
                 }
             }
-            PNpost(`/backend/nsfw_check`,form,opt)
+            verifyRecaptcha(setNotif)
+            .then(token=>{
+                return new Promise(res=>{
+                    const form=new FormData();
+                    if(file !== null) {
+                        const {name,match} = extractMeta(file)
+                        if(!match) return setNotif(true,"Error",i18n.t('errors.upload'));
+                        form.append('file',{uri:file,name,type:`image/${match[1]}`});
+                    }
+                    form.append('url',url);
+                    form.append('recaptcha',token);
+                    res(form)
+                })
+            })
+            .then((form)=>{
+                return PNpost(`/backend/nsfw_check`,form,opt)
+            })
             .then((res)=>{
                 setNotif(Boolean(res.error),res.msg)
                 if(!res.error) {
@@ -103,7 +105,6 @@ export default function({navigation}){
             }).finally(()=>{
                 setBackdrop(false);
                 setLoading(false)
-                captcha?.current?.refreshToken()
             })
         }
     }
@@ -236,7 +237,6 @@ export default function({navigation}){
                     action:'report'
                 }]}
             />
-            <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
             <Backdrop
                 visible={backdrop}
                 progress={progress}

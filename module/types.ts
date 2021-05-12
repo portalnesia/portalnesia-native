@@ -29,5 +29,6 @@ export interface PortalnesiaInterface {
      * @argument
      * path: filepath without file://
      */
-    uriToFileProvider:(path: string) => Promise<string>
+    uriToFileProvider:(path: string) => Promise<string>;
+    verifyWithRecaptcha:()=>Promise<string>;
 }

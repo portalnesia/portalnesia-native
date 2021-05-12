@@ -140,8 +140,8 @@ android {
         applicationId "com.portalnesia.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 6
-        versionName "1.6.0"
+        versionCode 7
+        versionName "1.7.0"
     }
     splits {
         abi {
@@ -214,6 +214,7 @@ dependencies {
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.flipper'
     }
+    implementation "com.google.android.gms:play-services-safetynet:17.0.0"
     addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-background-fetch','expo-error-recovery','expo-image-manipulator','expo-task-manager','unimodules-barcode-scanner-interface','unimodules-camera-interface','unimodules-face-detector-interface','unimodules-sensors-interface','unimodules-task-manager-interface','expo-ads-admob']])
 
     if (enableHermes) {

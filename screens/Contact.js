@@ -7,7 +7,6 @@ import {openBrowserAsync} from 'expo-web-browser'
 //import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image'
-import Recaptcha from '@pn/components/global/Recaptcha'
 import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
@@ -16,6 +15,7 @@ import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import {CONTENT_URL,URL} from '@env'
 import { ucwords } from '@pn/utils/Main';
+import verifyRecaptcha from '@pn/module/Recaptcha'
 
 const user=null;
 
@@ -56,12 +56,11 @@ export default function Contact({navigation,route}){
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const {copyText} = useClipboard()
-    const [input,setInput] = React.useState({name:user===null ?'':user?.user_nama,email:user===null ? '' : user.user_email,subject:'',message:'',grecaptcha:''})
+    const [input,setInput] = React.useState({name:user===null ?'':user?.user_nama,email:user===null ? '' : user.user_email,subject:'',message:''})
     const [loading,setLoading] = React.useState(false)
     const {height,width}=useWindowDimensions()
     const theme = useTheme()
     const [result,setResult]=React.useState(null)
-    const captcha = React.useRef(null)
     const emailRef=React.useRef(null)
     const subjectRef=React.useRef(null)
     const msgRef=React.useRef(null)
@@ -74,12 +73,15 @@ export default function Contact({navigation,route}){
         const arrInput = Object.keys(input);
         let checkError=[];
         arrInput.map((inp)=>{
-            if(inp !== 'grecaptcha' && input[inp].trim().match(/\S/) === null) checkError.push(`${ucwords(inp)} cannot be empty`)
+            if(input[inp].trim().match(/\S/) === null) checkError.push(`${ucwords(inp)} cannot be empty`)
         })
         if(checkError.length > 0) return setNotif(true,"Error",checkError.join("\n"));
         
         setLoading(true);
-        PNpost('/messages/add',input)
+        verifyRecaptcha(setNotif)
+        .then(grecaptcha=>{
+            return PNpost('/messages/add',{...input,grecaptcha})
+        })
         .then(res=>{
             if(!res.error) {
                 setInput(prev=>({...prev,subject:'',message:''}));
@@ -101,7 +103,6 @@ export default function Contact({navigation,route}){
         })
         .finally(()=>{
             setLoading(false)
-            captcha?.current?.refreshToken()
         })
     }
 
@@ -211,7 +212,6 @@ export default function Contact({navigation,route}){
                     </Lay>
                 </ScrollView>
             </Layout>
-            <Recaptcha ref={captcha} onReceiveToken={handleInputChange('grecaptcha')} />
 
         </>
     )

@@ -9,7 +9,6 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
-import Recaptcha from '@pn/components/global/Recaptcha'
 import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
@@ -18,6 +17,7 @@ import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import {CONTENT_URL} from '@env'
 import downloadFile from '@pn/utils/Download'
+import verifyRecaptcha from '@pn/module/Recaptcha'
 
 export default function URLshortener({navigation}){
     const {PNpost} = useAPI(false)
@@ -25,17 +25,12 @@ export default function URLshortener({navigation}){
     const {setNotif} = context
     const {copyText} = useClipboard()
     const [open,setOpen]=React.useState(false)
-    const [input,setInput] = React.useState({url:'',custom:'',recaptcha:''})
+    const [input,setInput] = React.useState({url:'',custom:''})
     const [loading,setLoading] = React.useState(false)
     const {height,width}=useWindowDimensions()
     const theme = useTheme()
     const [result,setResult]=React.useState(null)
     const customRef=React.useRef(null)
-    const captcha = React.useRef(null)
-
-    const onReceiveToken=(token)=>{
-        setInput({...input,recaptcha:token})
-    }
 
     const handleInputChange=(name)=>val=>{
         if(name==='custom') {
@@ -57,7 +52,10 @@ export default function URLshortener({navigation}){
         if(input.url.match(/\S+/) === null) return setNotif(true,"Error","URL cannot be empty");
         setResult(null);
         setLoading(true);
-        PNpost('/url/short',input)
+        verifyRecaptcha(setNotif)
+        .then(recaptcha=>{
+            return PNpost('/url/short',{...input,recaptcha})
+        })
         .then(res=>{
             if(!res.error) {
                 setInput({url:"",custom:""})
@@ -66,7 +64,6 @@ export default function URLshortener({navigation}){
         })
         .finally(()=>{
             setLoading(false)
-            captcha?.current?.refreshToken()
         })
     }
 
@@ -178,7 +175,6 @@ export default function URLshortener({navigation}){
                     action:'browser'
                 }]}
             />
-            <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
         </>
     )
 }

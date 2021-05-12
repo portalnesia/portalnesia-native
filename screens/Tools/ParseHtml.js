@@ -11,8 +11,8 @@ import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
-import Recaptcha from '@pn/components/global/Recaptcha'
 import {randomInt} from '@pn/utils/Main'
+import verifyRecaptcha from '@pn/module/Recaptcha'
 
 export default function({navigation}){
     const {PNpost} = useAPI(false)
@@ -20,23 +20,20 @@ export default function({navigation}){
     const {setNotif} = context
     const [open,setOpen]=React.useState(false)
     const [input,setInput] = React.useState("")
-    const [recaptcha,setRecaptcha]=React.useState("");
     const [loading,setLoading] = React.useState(false)
     const {height,width}=useWindowDimensions()
     const theme = useTheme()
-    const captcha = React.useRef(null)
     const {showAds} = showInterstisial()
-
-    const onReceiveToken=(token)=>{
-        setRecaptcha(token)
-    }
 
     const handleReset=()=>setInput("")
 
     const handleParse=()=>{
         if(input.match(/\S+/) === null) return setNotif(true,"Error","HTML cannot be empty");
         setLoading(true);
-        PNpost(`/parse_html`,{html:input,recaptcha})
+        verifyRecaptcha(setNotif)
+        .then(recaptcha=>{
+            return PNpost(`/parse_html`,{html:input,recaptcha})
+        })
         .then((res)=>{
             if(!res?.error) {
                 if(randomInt(3) == 0) showAds();
@@ -45,7 +42,6 @@ export default function({navigation}){
         })
         .finally(()=>{
             setLoading(false)
-            captcha?.current?.refreshToken()
         })
     }
 
@@ -116,7 +112,6 @@ export default function({navigation}){
                     action:'report'
                 }]}
             />
-            <Recaptcha ref={captcha} onReceiveToken={onReceiveToken} />
         </>
     )
 }
