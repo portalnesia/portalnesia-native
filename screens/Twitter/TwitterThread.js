@@ -227,7 +227,7 @@ export default function TwitterThread({navigation,route}){
                 <Animated.FlatList
                     ListHeaderComponentStyle={{
                         flexGrow: 1,
-                        paddingTop:heightHeader + 8,
+                        paddingTop:heightHeader + 2,
                     }}
                     {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
                     data={data?.tweets}

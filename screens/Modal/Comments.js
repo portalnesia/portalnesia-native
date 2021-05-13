@@ -7,7 +7,7 @@ import {Comments} from '@pn/components/global/Comment';
 export default function CommentModal({navigation,route}){
     const {type,posId,posUrl,comment_id} = route.params;
     return (
-        <Layout navigation={navigation} withClose whiteBg title={i18n.t('comments')}>
+        <Layout navigation={navigation} withBack whiteBg title={i18n.t('comments')}>
             <Comments posId={posId} posUrl={posUrl} type={type} comment_id={comment_id} />
         </Layout>
     )

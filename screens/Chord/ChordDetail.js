@@ -207,7 +207,7 @@ function ChordDetailScreen({navigation,route}){
                 <Animated.ScrollView
                     contentContainerStyle={{
                         flexGrow: 1,
-                        ...(!viewVideo ? {paddingTop:heightHeader+8} : {})
+                        ...(!viewVideo ? {paddingTop:heightHeader+2} : {})
                     }}
                     onScroll={onScroll}
                     {...other}

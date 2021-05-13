@@ -1,12 +1,12 @@
 import React from 'react'
 import {FlatList} from 'react-native'
 import {useTheme,Layout as Lay, Text,Divider,Icon} from '@ui-kitten/components'
-import {openBrowserAsync} from 'expo-web-browser'
 import {Constants} from 'react-native-unimodules'
 
 import Layout from '@pn/components/global/Layout'
 import {default as licenseArr} from '../../licenses.json';
 import ListItem from '@pn/components/global/ListItem'
+import { openBrowser } from '@pn/utils/Main'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
@@ -48,11 +48,7 @@ const RenderItem=React.memo(({item,index,navigation})=>{
             const url = item?.url?.replace('github.com','raw.githubusercontent.com').replace('raw/','');
             navigation.navigate("OpenSourceDetail",{title:item?.title,url})
         } else {
-            openBrowserAsync(item?.url,{
-                enableDefaultShare:true,
-                toolbarColor:'#2f6f4e',
-                showTitle:true
-            })
+            openBrowser(item?.url,false)
         }
     }
     return (

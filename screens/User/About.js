@@ -2,14 +2,13 @@ import React from 'react'
 import {View,Dimensions, Animated, RefreshControl} from 'react-native'
 import {Layout as Lay,Text,useTheme,Icon,Divider} from '@ui-kitten/components'
 import Skltn from 'react-native-skeleton-placeholder'
-import {openBrowserAsync} from 'expo-web-browser'
 
 import Pressable from '@pn/components/global/Pressable'
 import RenderPrivate,{RenderSuspend} from './PrivateUser'
 import Button from '@pn/components/global/Button'
 import {Markdown} from '@pn/components/global/Parser'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
-import { ucwords } from '@pn/utils/Main'
+import { openBrowser, ucwords } from '@pn/utils/Main'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 
@@ -49,11 +48,7 @@ const SocialWrapper = React.memo(({name,onPress})=>{
 
 function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}){
     const socialClick=React.useCallback((url)=>{
-        openBrowserAsync(url,{
-            enableDefaultShare:true,
-            toolbarColor:'#2f6f4e',
-            showTitle:true
-        })
+        openBrowser(url,false)
     },[])
     return (
         <Animated.ScrollView

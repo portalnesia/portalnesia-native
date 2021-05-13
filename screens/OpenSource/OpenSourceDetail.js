@@ -1,8 +1,6 @@
 import React from 'react'
 import {Dimensions,ScrollView,RefreshControl,View} from 'react-native'
 import {useTheme,Layout as Lay, Text} from '@ui-kitten/components'
-import axios from 'axios';
-import {openBrowserAsync} from 'expo-web-browser'
 
 import Button from '@pn/components/global/Button';
 import Layout from '@pn/components/global/Layout'
@@ -12,6 +10,7 @@ import Error from '@pn/components/global/NotFound'
 import style from '@pn/components/global/style'
 import useSWR from 'swr'
 import {fetcher} from '@pn/utils/API'
+import { openBrowser } from '@pn/utils/Main';
 
 const {width} = Dimensions.get('window');
 
@@ -39,11 +38,7 @@ export default function OpenSourceDetailScreen({navigation,route}){
     },[error])*/
 
     const onPress=()=>{
-        openBrowserAsync(route?.params?.url,{
-            enableDefaultShare:true,
-            toolbarColor:'#2f6f4e',
-            showTitle:true
-        })
+        openBrowser(route?.params?.url,false)
     }
 
     return (

@@ -2,7 +2,6 @@ import React from 'react';
 import {  View,ScrollView,useWindowDimensions,KeyboardAvoidingView,Linking,Alert } from 'react-native';
 import {Layout as Lay,Text,Spinner,Input,useTheme,Icon } from '@ui-kitten/components'
 //import useSWR from '@pn/utils/swr'
-import {openBrowserAsync} from 'expo-web-browser'
 
 //import Carousel from '@pn/components/global/Carousel';
 import Layout from '@pn/components/global/Layout';
@@ -14,7 +13,7 @@ import Button from '@pn/components/global/Button'
 import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import {CONTENT_URL,URL} from '@env'
-import { ucwords } from '@pn/utils/Main';
+import { openBrowser, ucwords } from '@pn/utils/Main';
 import verifyRecaptcha from '@pn/module/Recaptcha'
 
 const user=null;
@@ -133,7 +132,7 @@ export default function Contact({navigation,route}){
                                                 if(dt?.target) {
                                                     return Linking.openURL(dt?.link)
                                                 } else {
-                                                    return openBrowserAsync(URL + dt?.link);
+                                                    return openBrowser(URL + dt?.link,false);
                                                 }
                                             }}>{`${dt?.label}${dt?.bot ? ` (BOT)` : ""}`}</Text>
                                         </View>

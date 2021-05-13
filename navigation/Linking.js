@@ -1,6 +1,4 @@
-import {createURL,getInitialURL as expoGetInitialURL,addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener} from 'expo-linking'
-import {addNotificationResponseReceivedListener} from 'expo-notifications'
-import {openBrowserAsync} from 'expo-web-browser'
+import {createURL,getInitialURL as expoGetInitialURL} from 'expo-linking'
 
 export const getLink=(link,a=true)=>{
     let url = link.replace("https://portalnesia.com/","");
@@ -13,7 +11,7 @@ export const getLink=(link,a=true)=>{
     else if(split==='search') firstPath='SearchPath';
     else if(['pages','setting','contact','url','blog','twibbon','login-callback','twitter'].indexOf(split) !== -1) firstPath='MenuStack';
     else firstPath="HomeStack";
-    const finalPath = a ? `https://portalnesia.com/${firstPath}/${url}` : `/${firstPath}/${url}`
+    const finalPath = a ? `https://portalnesia.com/MainStack/MainTab/${firstPath}/${url}` : `/MainStack/MainTab/${firstPath}/${url}`
     return finalPath;
 }
 
@@ -94,51 +92,64 @@ export const linking = {
     prefixes:[createURL('/'),'https://portalnesia.com'],
     config:{
         screens:{
-            HomeStack:{
-                path:'HomeStack',
+            MainStack:{
+                path:'MainStack',
                 screens:{
-                    Home:{
-                        path:'',
+                    MainTab:{
+                        path:'MainTab',
+                        screens:{
+                            HomeStack:{
+                                path:'HomeStack',
+                                screens:{
+                                    Home:{
+                                        path:'',
+                                    },
+                                    ...getScreen
+                                }
+                            },
+                            NewsStack:{
+                                path:'NewsStack',
+                                screens:{
+                                    News:{
+                                        path:'news',
+                                    },
+                                    ...getScreen
+                                }
+                            },
+                            ChordStack:{
+                                path:'ChordStack',
+                                screens:{
+                                    Chord:{
+                                        path:'chord',
+                                    },
+                                    ...getScreen
+                                }
+                            },
+                            SearchStack:{
+                                path:'SearchStack',
+                                screens:{
+                                    Search:{
+                                        path:'search',
+                                    },
+                                    ...getScreen
+                                }
+                            },
+                            MenuStack:{
+                                path:'MenuStack',
+                                screens:{
+                                    Menu:{
+                                        path:'login-callback',
+                                    },
+                                    ...getScreen
+                                }
+                            },
+                        }
                     },
-                    ...getScreen
+                    ReportScreen:{
+                        path:'ReportScreen'
+                    }
                 }
-            },
-            NewsStack:{
-                path:'NewsStack',
-                screens:{
-                    News:{
-                        path:'news',
-                    },
-                    ...getScreen
-                }
-            },
-            ChordStack:{
-                path:'ChordStack',
-                screens:{
-                    Chord:{
-                        path:'chord',
-                    },
-                    ...getScreen
-                }
-            },
-            SearchStack:{
-                path:'SearchStack',
-                screens:{
-                    Search:{
-                        path:'search',
-                    },
-                    ...getScreen
-                }
-            },
-            MenuStack:{
-                path:'MenuStack',
-                screens:{
-                    Menu:{
-                        path:'login-callback',
-                    },
-                    ...getScreen
-                }
-            },
+            }
         }
     },
     async getInitialURL(){

@@ -3,8 +3,8 @@ import {UserType,TokenType} from '@pn/types/index'
 
 export type StateType = {
     user: UserType | null,
-	token:null,
-	session:null
+	token:string|null,
+	session:string|null
 }
 
 export type DispatchArgument = {

@@ -20,11 +20,19 @@ export const getPath=()=>{
 
 export const resetRoot=()=>{
     const firstPath = getPath();
-    const firstPathSplit = firstPath.split("/")[1];
+    const firstPathSplit = firstPath.split("/")[3];
     const state = navigationRef?.current?.getRootState();
-    const routes=state?.routes?.map((dt)=>{
-        if(dt?.name === firstPathSplit) {
-            delete dt?.state;
+    // PR
+    //console.log(firstPathSplit,state?.routes?.[0]?.state?.routes?.[0]?.state?.routes);
+    const routes=state?.routes?.map((dt,i)=>{
+        if(dt?.state?.routes?.[0]?.name === "MainTab") {
+            dt.state.routes[0].state.index=0;
+            dt.state.routes[0].state.routes = dt?.state?.routes?.[0]?.state?.routes?.map((it,ii)=>{
+                if(it?.name === firstPathSplit) {
+                    delete it.state;
+                }
+                return it;
+            })
         }
         return dt
     })
@@ -37,19 +45,23 @@ export const resetRoot=()=>{
 const getRootPath=()=>{
     const firstPath = getPath();
     const uri = firstPath.split("?")[0];
-    return uri.split("/")[1];
+    return uri.split("/")[3];
 }
 
 export const pushTo=(path,parseLink=true)=>{
     let finalPath;
     if(parseLink) {
-        const index_of=['/','/chord','/news','/login-callback','/search'].indexOf(path);
-        if(index_of !== -1) {
-            const firstScreen=['HomeStack','ChordStack','NewsStack','MenuStack','SearchStack'];
-            finalPath=`/${firstScreen[index_of]}${path}`;
+        if(path?.match(/^(\/messages|\/support)/) !== null) {
+            finalPath=`/MainStack/${path}`;
         } else {
-            const firstPathSplit = getRootPath();
-            finalPath=`/${firstPathSplit}${path}`;
+            const index_of=['/','/chord','/news','/login-callback','/search'].indexOf(path);
+            if(index_of !== -1) {
+                const firstScreen=['HomeStack','ChordStack','NewsStack','MenuStack','SearchStack'];
+                finalPath=`/MainStack/MainTab/${firstScreen[index_of]}${path}`;
+            } else {
+                const firstPathSplit = getRootPath();
+                finalPath=`/MainStack/MainTab/${firstPathSplit}${path}`;
+            }
         }
     } else {
         finalPath=path;
@@ -70,13 +82,17 @@ export const pushTo=(path,parseLink=true)=>{
 export const linkTo=(path,parseLink=true)=>{
     let finalPath;
     if(parseLink) {
-        const index_of=['/','/chord','/news','/login-callback','/search'].indexOf(path);
-        if(index_of !== -1) {
-            const firstScreen=['HomeStack','ChordStack','NewsStack','MenuStack','SearchStack'];
-            finalPath=`/${firstScreen[index_of]}${path}`;
+        if(path?.match(/^(\/messages|\/support)/) !== null) {
+            finalPath=`/MainStack/${path}`;
         } else {
-            const firstPathSplit = getRootPath();
-            finalPath=`/${firstPathSplit}${path}`;
+            const index_of=['/','/chord','/news','/login-callback','/search'].indexOf(path);
+            if(index_of !== -1) {
+                const firstScreen=['HomeStack','ChordStack','NewsStack','MenuStack','SearchStack'];
+                finalPath=`/MainStack/MainTab/${firstScreen[index_of]}${path}`;
+            } else {
+                const firstPathSplit = getRootPath();
+                finalPath=`/MainStack/MainTab/${firstPathSplit}${path}`;
+            }
         }
     } else {
         finalPath=path;

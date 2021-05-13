@@ -2,7 +2,6 @@ import React from 'react'
 import {Animated,Image,View,LogBox,Alert} from 'react-native'
 import {useTheme,Layout as Lay, Text,Divider, MenuGroup,MenuItem,Menu, Icon} from '@ui-kitten/components'
 import * as Linking from 'expo-linking'
-import {openBrowserAsync} from 'expo-web-browser'
 import {linkTo} from '@pn/navigation/useRootNavigation'
 import compareVersion from 'compare-versions'
 import {useScrollToTop} from '@react-navigation/native'
@@ -21,6 +20,7 @@ import i18n from 'i18n-js'
 import useLogin from '@pn/utils/Login'
 import Portalnesia from '@pn/module/Portalnesia'
 import downloadFile from '@pn/utils/Download'
+import { openBrowser } from '@pn/utils/Main'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
@@ -209,11 +209,7 @@ const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
                             if(!it.link?.match(/https?\:\/\/+/)) {
                                 Linking.openURL(it.link)
                             } else {
-                                openBrowserAsync(it.link,{
-                                    enableDefaultShare:true,
-                                    toolbarColor:'#2f6f4e',
-                                    showTitle:true
-                                })
+                                openBrowser(it.link,false)
                             }
                         }
                     }

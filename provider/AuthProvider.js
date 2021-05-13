@@ -14,7 +14,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
 import RNFS from 'react-native-fs'
-import {openBrowserAsync} from 'expo-web-browser'
 import {AdsConsent, AdsConsentStatus} from '@react-native-firebase/admob'
 import {captureScreen} from 'react-native-view-shot'
 import compareVersion from 'compare-versions'
@@ -37,6 +36,7 @@ import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
 import {getLink} from '@pn/navigation/Linking'
 import {UpdateEventType,addListener as UpdatesAddListener,reloadAsync as UpdatesReloadAsync} from 'expo-updates'
+import { openBrowser } from '@pn/utils/Main';
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -328,11 +328,7 @@ const AuthProvider = (props) => {
 					const urls = lastNotif?.notification?.request?.content?.data?.url
 					if(urls?.match(/\/corona+/)) {
 						const url = urls?.replace(/^pn\:\/\//,"https://portalnesia.com/");
-						openBrowserAsync(url,{
-							enableDefaultShare:true,
-							toolbarColor:'#2f6f4e',
-							showTitle:true
-						})
+						openBrowser(url,false)
 					} else {
 						const url = getLink(urls,false);
 						linkTo(url,false);
@@ -349,11 +345,7 @@ const AuthProvider = (props) => {
 		if(urls) {
 			if(urls?.match(/\/corona+/)) {
 				const url = urls?.replace("pn://","https://portalnesia.com/");
-				return openBrowserAsync(url,{
-					enableDefaultShare:true,
-					toolbarColor:'#2f6f4e',
-					showTitle:true
-				})
+				return openBrowser(url,false)
 			}
 			const url = getLink(urls,false);
 			linkTo(url,false);

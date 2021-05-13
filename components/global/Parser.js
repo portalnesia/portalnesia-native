@@ -66,9 +66,6 @@ const TextRender=(attribs,children,style,props)=>{
         <Text selectable={props?.selectable||false} key={props?.key} style={[global_style.container,{marginVertical:10,flexWrap:'wrap',lineHeight:23}]}>{(props?.domNode?.data || props.data || children)}</Text>
     )
 }
-const TextViewRender=(attribs,children,style,props)=>{
-    return <View style={global_style.container}>{children}</View>
-}
 
 const ARender=(attribs,children,style,props)=>{
     const {href}=attribs
@@ -85,9 +82,9 @@ const ARender=(attribs,children,style,props)=>{
             onLinkPagePress(attribs?.href?.substring(1),yLayout,scrollRef)
         }
         return (
-            <Pressable key={props?.key} onPress={onPress}>
+            <Text selectable={props?.selectable||false} key={props?.key} onPress={onPress}>
                 {children}
-            </Pressable>
+            </Text>
         );
     }
     
@@ -201,7 +198,7 @@ const HRender=(type)=>(attribs,children,style,props)=>{
 
     return (
         <View key={props?.key} onLayout={onLayout} >
-            <Text onPress={()=>typeof block === 'undefined' && withTable && onLinkPagePress(id,yLayout,scrollRef)} selectable={props?.selectable||false} category={heading} style={[global_style.container,{marginTop:20,...(withUnderline ? {paddingBottom:5,borderBottomColor:props?.renderersProps?.theme['border-text-color'],borderBottomWidth:2} : {})}]}>{children||props?.data}</Text>
+            <Text onPress={()=>typeof block === 'undefined' && withTable && onLinkPagePress(id,yLayout,scrollRef)} selectable={props?.selectable||false} category={heading} style={[global_style.container,{marginTop:20,marginBottom:10,...(withUnderline ? {paddingBottom:5,borderBottomColor:props?.renderersProps?.theme['border-text-color'],borderBottomWidth:2} : {})}]}>{children||props?.data}</Text>
         </View>
     )
 }
@@ -373,9 +370,9 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
     const renderers={
         table:{renderer:TableRender,wrapper:"Text"},
         p:{renderer:TextRender,wrapper:'View'},
-        //p:{renderer:TextRender,wrapper:'View'},
+        p:{renderer:TextRender,wrapper:'Text'},
         a:{renderer:ARender,wrapper:"View"},
-        //a:{renderer:ARenderView,wrapper:"View"},
+        a:{renderer:ARender,wrapper:"Text"},
         h1:{renderer:HRender('h1'),wrapper:'Text'},
         h2:{renderer:HRender('h2'),wrapper:'Text'},
         h3:{renderer:HRender('h3'),wrapper:'Text'},

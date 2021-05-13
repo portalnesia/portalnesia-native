@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import {useWindowDimensions} from 'react-native'
 //import * as firebase from 'firebase';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
+import { CardStyleInterpolators, createStackNavigator,TransitionPresets } from '@react-navigation/stack';
 //import {createNativeStackNavigator} from 'react-native-screens/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
@@ -164,9 +164,9 @@ const getScreen=()=>{
 		{name:"SecondScreen",component:SecondScreen},
 		{name:"Setting",component:Setting},
 		{name:"NotificationEvent",component:NotificationEvent},
-		{name:"ReportScreen",component:ReportScreen},
-		{name:"Comments",component:Comments,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}},
-		{name:"ReportModal",component:ReportModal,options:{gestureEnabled:false,...TransitionPresets.ModalSlideFromBottomIOS}},
+		//{name:"ReportScreen",component:ReportScreen},
+		{name:"Comments",component:Comments},
+		//{name:"ReportModal",component:ReportModal,options:{gestureEnabled:false,...TransitionPresets.ModalSlideFromBottomIOS}},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }
@@ -181,8 +181,6 @@ const HomeScreenStack = ()=>(
 	<HomeStack.Navigator initialRouteName="Home" screenOptions={{
 		headerShown: false,
 		gestureEnabled:true,
-		gestureDirection:'horizontal',
-		cardStyle:{backgroundColor:'transparent'},
 		...TransitionPresets.SlideFromRightIOS
 	}}>
 		<HomeStack.Screen  name="Home" component={Home} />
@@ -195,8 +193,6 @@ const NewsScreenStack = ()=>(
 	<NewsStack.Navigator initialRouteName="News" screenOptions={{
 		headerShown: false,
 		gestureEnabled:true,
-		gestureDirection:'horizontal',
-		cardStyle:{backgroundColor:'transparent'},
 		...TransitionPresets.SlideFromRightIOS
 	}}>
 		<NewsStack.Screen  name="News" component={News} />
@@ -209,8 +205,6 @@ const ChordScreenStack = ()=>(
 	<ChordStack.Navigator initialRouteName="Chord" screenOptions={{
 		headerShown: false,
 		gestureEnabled:true,
-		gestureDirection:'horizontal',
-		cardStyle:{backgroundColor:'transparent'},
 		...TransitionPresets.SlideFromRightIOS
 	}}>
 		<ChordStack.Screen  name="Chord" component={Chord} />
@@ -223,8 +217,6 @@ const SearchScreenStack = ()=>(
 	<SearchStack.Navigator initialRouteName="Search" screenOptions={{
 		headerShown: false,
 		gestureEnabled:true,
-		gestureDirection:'horizontal',
-		cardStyle:{backgroundColor:'transparent'},
 		...TransitionPresets.SlideFromRightIOS
 	}}>
 		<SearchStack.Screen  name="Search" component={Search} />
@@ -237,8 +229,6 @@ const MenuScreenStack = ()=>(
 	<MenuStack.Navigator initialRouteName="Menu" screenOptions={{
 		headerShown: false,
 		gestureEnabled:true,
-		gestureDirection:'horizontal',
-		cardStyle:{backgroundColor:'transparent'},
 		...TransitionPresets.SlideFromRightIOS
 	}}>
 		<MenuStack.Screen  name="Menu" component={Menu} />
@@ -246,6 +236,45 @@ const MenuScreenStack = ()=>(
 			<MenuStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
 		))}
 	</MenuStack.Navigator>
+)
+
+const MainStack = createStackNavigator();
+const RootStack = createStackNavigator();
+
+const MainTabNavigator=()=>{
+	const theme=useTheme();
+	return (
+		<Tabs.Navigator
+			initialRouteName="HomeStack"
+			//tabBar={props=><BottomTabBar {...props} />}
+			tabBarOptions={{
+				keyboardHidesTabBar:true,
+				tabStyle:{paddingVertical:5},
+				labelStyle:{fontSize:13},
+				style:{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],height:54},
+				inactiveTintColor:theme['text-hint-color'],
+				activeTintColor:theme['color-indicator-bar']
+			}}
+
+		>
+			<Tabs.Screen options={{tabBarLabel:"Home",tabBarIcon:tabBarIcon('home')}} name="HomeStack" component={HomeScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:"News",tabBarIcon:tabBarIcon('news')}} name="NewsStack" component={NewsScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:"Search",tabBarIcon:tabBarIcon('search')}} name="SearchStack" component={SearchScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:"Chord",tabBarIcon:tabBarIcon('chord')}} name="ChordStack" component={ChordScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:"Menu",tabBarIcon:tabBarIcon('menu')}} name="MenuStack" component={MenuScreenStack} />
+		</Tabs.Navigator>
+	)
+}
+
+const MainNavigator=()=>(
+	<MainStack.Navigator initialRouteName="MainTab" screenOptions={{
+		headerShown:false,
+		gestureEnabled:true,
+		...TransitionPresets.SlideFromRightIOS
+	}}>
+		<MainStack.Screen name="MainTab" component={MainTabNavigator} />
+		<MainStack.Screen name="ReportScreen" component={ReportScreen} />
+	</MainStack.Navigator>
 )
 
 export default () => {
@@ -291,25 +320,13 @@ export default () => {
 					onStateChange={onStateChange}
 					linking={linking}
 				>
-					<Tabs.Navigator
-						initialRouteName="HomeStack"
-						//tabBar={props=><BottomTabBar {...props} />}
-						tabBarOptions={{
-							keyboardHidesTabBar:true,
-							tabStyle:{paddingVertical:4},
-							labelStyle:{fontSize:13},
-							style:{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],height:54},
-							inactiveTintColor:theme['text-hint-color'],
-							activeTintColor:theme['color-indicator-bar']
-						}}
-
-					>
-						<Tabs.Screen options={{tabBarLabel:"Home",tabBarIcon:tabBarIcon('home')}} name="HomeStack" component={HomeScreenStack} />
-						<Tabs.Screen options={{tabBarLabel:"News",tabBarIcon:tabBarIcon('news')}} name="NewsStack" component={NewsScreenStack} />
-						<Tabs.Screen options={{tabBarLabel:"Search",tabBarIcon:tabBarIcon('search')}} name="SearchStack" component={SearchScreenStack} />
-						<Tabs.Screen options={{tabBarLabel:"Chord",tabBarIcon:tabBarIcon('chord')}} name="ChordStack" component={ChordScreenStack} />
-						<Tabs.Screen options={{tabBarLabel:"Menu",tabBarIcon:tabBarIcon('menu')}} name="MenuStack" component={MenuScreenStack} />
-					</Tabs.Navigator>
+					<RootStack.Navigator initialRouteName="MainStack" mode="modal" screenOptions={{
+						headerShown:false,
+						...TransitionPresets.ModalSlideFromBottomIOS
+					}}>
+						<RootStack.Screen name="MainStack" component={MainNavigator} />
+						<RootStack.Screen name="ReportModal" component={ReportModal} />
+					</RootStack.Navigator>
 				</NavigationContainer>
 			)}
 		</>

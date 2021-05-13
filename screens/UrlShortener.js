@@ -3,7 +3,6 @@ import {  View,ScrollView,useWindowDimensions,KeyboardAvoidingView,Share } from 
 import {Layout as Lay,Text,Spinner,Input,useTheme} from '@ui-kitten/components'
 //import useSWR from '@pn/utils/swr'
 //import Modal from 'react-native-modal'
-import {openBrowserAsync} from 'expo-web-browser'
 
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -18,6 +17,7 @@ import { AuthContext } from '@pn/provider/AuthProvider';
 import {CONTENT_URL} from '@env'
 import downloadFile from '@pn/utils/Download'
 import verifyRecaptcha from '@pn/module/Recaptcha'
+import { openBrowser } from '@pn/utils/Main';
 
 export default function URLshortener({navigation}){
     const {PNpost} = useAPI(false)
@@ -133,7 +133,7 @@ export default function URLshortener({navigation}){
                                             <Image fancybox source={{uri:`${CONTENT_URL}/qr/url/${result.custom}`}} fullSize contentWidth={200} animated={false} forceFancybox />
                                         </View>
                                         <Text category="h5" style={{marginVertical:10}}>{result.status==0 ? "URL has been successfully shortened." : "URL already been shortened by others."}</Text>
-                                        <Text><Text>Short URL: </Text><Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>openBrowserAsync(result.short_url)}>{result.short_url}</Text></Text>
+                                        <Text><Text>Short URL: </Text><Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>openBrowser(result.short_url,false)}>{result.short_url}</Text></Text>
                                         <Text style={{marginBottom:10}}>{`Long URL: ${result.long_url}`}</Text>
                                         <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                                             <Button status="basic" appearance="ghost" onPress={()=>copyText(result.short_url)}>Copy</Button>

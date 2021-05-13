@@ -72,12 +72,12 @@ export default function ReportScreen({navigation,route}){
                 <Lay style={{flexDirection:'row',justifyContent:'center',alignItems:'center',flexGrow:1,flexShrink:1}}>
                     <View style={{borderRadius:18,overflow:'hidden',marginLeft:10}}>
                         <Pressable style={{padding:2}} tooltip="Highlight" onPress={()=>setSelected('highlight')} >
-                            <View style={{backgroundColor:'rgb(251, 255, 5)',...(selected==='highlight' ? {borderColor:theme['color-primary-500'],borderWidth:2,height:30,width:30,borderRadius:15} : {height:28,width:28,borderRadius:14})}} />
+                            <View style={{backgroundColor:'rgb(251, 255, 5)',...(selected==='highlight' ? {borderColor:theme['color-primary-500'],borderWidth:2,height:32,width:32,borderRadius:16} : {height:30,width:30,borderRadius:15})}} />
                         </Pressable>
                     </View>
                     <View style={{borderRadius:18,overflow:'hidden',marginLeft:10}}>
                         <Pressable style={{padding:2}} tooltip="Hide" onPress={()=>setSelected('hide')}>
-                            <View style={{backgroundColor:'#000',...(selected==='hide' ? {borderColor:theme['color-primary-500'],borderWidth:2,height:30,width:30,borderRadius:15} : {height:28,width:28,borderRadius:14})}} />
+                            <View style={{backgroundColor:'#000',...(selected==='hide' ? {borderColor:theme['color-primary-500'],borderWidth:2,height:32,width:32,borderRadius:16} : {height:30,width:30,borderRadius:15})}} />
                         </Pressable>
                     </View>
                     <View style={{borderRadius:18,overflow:'hidden',marginLeft:10}}>

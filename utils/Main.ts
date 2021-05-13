@@ -2,13 +2,12 @@ import {Alert} from 'react-native'
 import {openBrowserAsync} from 'expo-web-browser'
 import i18n from 'i18n-js'
 
-export const clean=(text)=>{
-    if(typeof text!=='string') return '';
-        text=text.replace(/<script[^>]*>([\s\S]*?)<\/script[^>]*>/i, '').replace(/(<([^>]+)>)/ig,""); 
-        return text;
+export const clean=(text: string)=>{
+    text=text.replace(/<script[^>]*>([\s\S]*?)<\/script[^>]*>/i, '').replace(/(<([^>]+)>)/ig,""); 
+    return text;
 }
   
-export const isEmptyObj=(obj)=>{
+export const isEmptyObj=(obj: Record<string,any>)=>{
     for(let key in obj) {
         if(obj.hasOwnProperty(key)) return false;
     }
@@ -21,9 +20,9 @@ export const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni
 
 export const monthNamesEn=["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export const escapeHTML=(text,withQuote)=>{
+export const escapeHTML=(text: string,withQuote?: boolean)=>{
     if(typeof text!=='string' || text.match(/\S/) === null) return '';
-    let map;
+    let map: Record<string,string>;
     const quote=withQuote||true;
     if(quote) {
       map  = {
@@ -50,9 +49,9 @@ export const stripHTML=(text='')=>{
     return text.replace(/<[^>]*>?/gm,'').replace(/\&\#xA0\;/gm,' ');
 }
   
-export const specialHTML=(text)=>{
+export const specialHTML=(text: string)=>{
     if(typeof text!=='string' || text.match(/\S/) === null) return '';
-    const map = {
+    const map: Record<string,string> = {
       '&amp;': '&',
       '&lt;': '<',
       '&gt;': '>',
@@ -60,17 +59,19 @@ export const specialHTML=(text)=>{
       "&#039;": "'",
       "&nbsp;":" "
     };
-    return text.replace(/(\&amp\;|\&lt\;|\&gt\;|\&quot\;|\&\#039\;|\&nbsp\;)/g, function(m){return map[m]});
+    return text.replace(/(\&amp\;|\&lt\;|\&gt\;|\&quot\;|\&\#039\;|\&nbsp\;)/g, function(m){
+        return map[m];
+    });
 }
 
-export const parseURL=(url)=>{
+export const parseURL=(url: string)=>{
     if(typeof url!=='string') return '';
     const parser=new URL((url.match(/http(s)?/)?url:`http://${url}`));
     const parserr=`${parser.hostname}${parser.pathname}${parser.search}`;
     return parserr.replace("www.", "");
 }
 
-export const ucwords=function(text,func){
+export const ucwords=function(text: string,func?: (value: string)=>void){
     if(typeof text!=='string') return '';
     const str=text.toLowerCase().replace(/\b[a-z]/g, function(letter) {
         return letter.toUpperCase();
@@ -79,7 +80,7 @@ export const ucwords=function(text,func){
     else return str;
 }
 
-export const jsStyles=function(text,func){
+export const jsStyles=function(text: string,func?: (value: string)=>void){
     if(typeof text!=='string') return '';
     let str=text.toLowerCase();
     const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;-";
@@ -99,7 +100,7 @@ export const jsStyles=function(text,func){
     else return str;
 } 
 
-export const firstLetter=function(text,number,func){
+export const firstLetter=function(text: string,number?: number,func?: (value: string)=>void){
     if(typeof text!=='string') return '';
     let str=text.toLowerCase().replace(/\b([a-z])(\S*)/g, function(a,b) {
         return b.toUpperCase();
@@ -109,27 +110,27 @@ export const firstLetter=function(text,number,func){
     else return str;
 }
 
-export const urlToDomain=function(url){
+export const urlToDomain=function(url: string){
     let parser=new URL((url.match(/http(s)?/)?url:`http://${url}`));
     const parserr=parser.hostname;
     return parserr.replace("www.", "");
 }
   
-export const replaceAt=function(text,index, replacement) {
+export const replaceAt=function(text: string,index: number, replacement: string) {
     return text.substr(0, index) + replacement+ text.substr(index + replacement.length);
 };
   
-export const Ktruncate=function(text,num) {
+export const Ktruncate=function(text: string,num: number) {
     if(typeof text!=='string') return '';
     return (text.length <= num)?text:text.slice(0, num) + '...';
 };
   
-export const splice = function(text,idx, rem, str) {
+export const splice = function(text: string,idx: number, rem: number, str: string) {
     if(typeof text!=='string') return '';
     return text.slice(0, idx) + str + text.slice(idx + Math.abs(rem));
 };
 
-export const PNslug = function (text,func,lowercase) {
+export const PNslug = function (text:string,func?: (value: string)=>void,lowercase?:boolean) {
     if(typeof text!=='string') return '';
     lowercase=typeof lowercase==='boolean'&&lowercase===true;
     let str,t=text;
@@ -149,7 +150,7 @@ export const PNslug = function (text,func,lowercase) {
       else return res
 };
 
-export const number_size=(bytes,precision=2)=>{
+export const number_size=(bytes: number,precision=2)=>{
     if(typeof bytes !== 'number' || bytes===0 || bytes===null) return '-';
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     bytes=Math.max(bytes,0);
@@ -173,32 +174,33 @@ export const generateRandom=(number=10)=>{
     return result;
 }
 
-export const time_ago=(seconds)=>{
-    let interval = Math.floor(seconds / 31536000);
+export const time_ago=(seconds: number|string)=>{
+    const sec = Number(seconds);
+    let interval = Math.floor(sec / 31536000);
     if (interval > 1) {
         return interval + " years ago";
     }
-    interval = Math.floor(seconds / 2592000);
+    interval = Math.floor(sec / 2592000);
     if (interval > 1) {
         return interval + " months ago";
     }
-    interval = Math.floor(seconds / 86400);
+    interval = Math.floor(sec / 86400);
     if (interval > 1) {
         return interval + " days ago";
     }
-    interval = Math.floor(seconds / 3600);
+    interval = Math.floor(sec / 3600);
     if (interval > 1) {
         return interval + " hours ago";
     }
-    interval = Math.floor(seconds / 60);
+    interval = Math.floor(sec / 60);
     if (interval > 1) {
         return interval + " minutes ago";
     }
     return "less minutes ago";
 }
 
-export const acronym=(text,lens)=>{
-    let a='',len=lens||2;
+export const acronym=(text: string,length?:number)=>{
+    let a='',len=length||2;
     const aa = text.split(/\s/);
     for(let i=0;i< aa.length && i<len;i++){
       a+=aa[i].charAt(0).toUpperCase();
@@ -206,7 +208,7 @@ export const acronym=(text,lens)=>{
     return a;
 }
   
-export const separateNumber=(angka)=>{
+export const separateNumber=(angka:number)=>{
     try {
       if(angka==0) return '0';
       const num = angka.toString().split(".")
@@ -217,15 +219,15 @@ export const separateNumber=(angka)=>{
     }
 }
   
-export const addslashes=(str)=>{
+export const addslashes=(str:string)=>{
     return (str + '')
       .replace(/[\\"']/g, '\\$&')
       .replace(/\u0000/g, '\\0')
 }
   
-export const adddesc=(str)=>str.replace(/\s+/,' ').replace('"','\"')
+export const adddesc=(str:string)=>str.replace(/\s+/,' ').replace('"','\"')
 
-export function listToMatrix(list, elementsPerSubArray) {
+export function listToMatrix(list: never[], elementsPerSubArray: number) {
     var matrix = [], i, k;
 
     for (i = 0, k = -1; i < list.length; i++) {
@@ -240,13 +242,14 @@ export function listToMatrix(list, elementsPerSubArray) {
     return matrix;
 }
 
-export const extractMeta=(file)=>{
+export const extractMeta=(file: string)=>{
     const fileName = file.split("/").pop();
-    const match = /\.(\w+)$/.exec(fileName);
+    const files = fileName||file
+    const match = /\.(\w+)$/.exec(files);
     return {name:fileName,match}
 }
 
-export const openBrowser=(url,alert=true)=>{
+export const openBrowser=(url: string,alert=true)=>{
     if(alert) {
         Alert.alert(
             i18n.t('title_external_link'),
@@ -258,7 +261,7 @@ export const openBrowser=(url,alert=true)=>{
                 text:i18n.t("open"),
                 onPress:()=>{
                         openBrowserAsync(url,{
-                        enableDefaultShare:true,
+                        enableDefaultShareMenuItem:true,
                         toolbarColor:'#2f6f4e',
                         showTitle:true
                     })
@@ -267,7 +270,7 @@ export const openBrowser=(url,alert=true)=>{
         )
     } else {
         openBrowserAsync(url,{
-            enableDefaultShare:true,
+            enableDefaultShareMenuItem:true,
             toolbarColor:'#2f6f4e',
             showTitle:true
         })
