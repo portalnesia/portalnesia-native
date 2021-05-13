@@ -46,7 +46,14 @@
     "select":"Select %{type}",
     "load_more":"Load more",
     "see_more":"See more",
-    "comments":"Comments",
+    "comment":{
+        "one":"comment",
+        "other":"comments"
+    },
+    "content":{
+        "one":"content",
+        "other":"contents"
+    },
     "reply":"Reply",
     "delete":"Delete",
     "add_type":"Add %{type}",
@@ -65,7 +72,7 @@
     "recommended":"Recommended",
     "recommended_type":"Recommended %{type}",
     "report":"Report",
-    "feedback":"feedback",
+    "feedback":"Feedback",
     "send_type":"Send %{type}",
     "send":"Send",
     "errors":{
@@ -82,7 +89,8 @@
     },
     "report_placeholder":{
         "placeholder_url":"We are sorry for the inconvenience, it seems that there is a problem with our internal server service. Can you tell us how this happened?",
-        "placeholder":"Have feedback? We'd love to hear it, but please don't share sensitive information. Have questions? try support."
+        "placeholder":"Have feedback? We'd love to hear it, but please don't share sensitive information. Have questions? try support.",
+        "placeholder_content":"Tell us why are you reporting this %{type}? Or if you have any feedback, We'd love to hear it, but please don't share sensitive information. Have questions? try support."
     },
     "form":{
         "name":"Name",

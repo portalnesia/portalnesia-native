@@ -35,7 +35,6 @@ import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
 import {getLink} from '@pn/navigation/Linking'
-import {UpdateEventType,addListener as UpdatesAddListener,reloadAsync as UpdatesReloadAsync} from 'expo-updates'
 import { openBrowser } from '@pn/utils/Main';
 
 Notifications.setNotificationHandler({
@@ -136,9 +135,8 @@ const AuthProvider = (props) => {
 		const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.5.0",">=");
 		if(isUpdated) {
 			const title = ['konten','komentar','url'].indexOf(type) !== -1 ? "Send Report" : "Send Feedback";
-			const path = getPath();
 			const {urlreported:urlreport,...other}=params;
-			const urlreported=urlreport||path
+			const urlreported=urlreport||getPath()
 			captureScreen({format:'png',quality:0.9})
 			.then(
 				uri=>{
@@ -252,30 +250,6 @@ const AuthProvider = (props) => {
 			}
 		})
 
-		async function restartApplication(){
-			try {
-				await UpdatesReloadAsync();
-			} catch(e){
-
-			}
-		}
-
-		const updateListener = UpdatesAddListener((update)=>{
-			if(update.type === UpdateEventType.UPDATE_AVAILABLE && update.manifest?.version !== Constants.manifest.version) {
-				Alert.alert(
-					"New Bundle Version Updates",
-					`A new bundle version has been downloaded.\nRestart the application to apply changes!\nv${update.manifest?.version}`,
-					[{
-						text:"Later",
-						onPress:()=>{}
-					},{
-						text:"Restart",
-						onPress:restartApplication
-					}]
-				)
-			}
-		})
-
 		asyncTask().then(()=>{
 			checkAndUpdateOTA();
 		})
@@ -291,7 +265,6 @@ const AuthProvider = (props) => {
 			foregroundListener.remove();
 			netInfoListener();
 			ExpoRemoveListener('url',handleURL)
-			updateListener.remove()
 		}
 	},[])
 

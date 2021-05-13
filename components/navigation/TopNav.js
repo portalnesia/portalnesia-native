@@ -16,7 +16,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 	const index = useNavigationState(state=>state.index);
 	const theme = useTheme()
 
-	const RenderBackBtn=({navigation,index})=>{
+	const RenderBackBtn=()=>{
 		if(withClose) {
 			return(
 				<TopNavigationAction tooltip={i18n.t('close')} icon={CloseIcon} onPress={() => {{
@@ -48,7 +48,7 @@ export default function({withBack,title,menu,navigation,align,subtitle,withClose
 			title={evaProps => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
 			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
 			alignment={align}
-			{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn navigation={navigation} index={index} /> } : {})}
+			{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn /> } : {})}
 			{...(menu ? {accessoryRight:menu} : {})}
 		/>
 		{withClose && whiteBg ? null : <Divider />}

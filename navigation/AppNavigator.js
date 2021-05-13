@@ -164,7 +164,7 @@ const getScreen=()=>{
 		{name:"SecondScreen",component:SecondScreen},
 		{name:"Setting",component:Setting},
 		{name:"NotificationEvent",component:NotificationEvent},
-		//{name:"ReportScreen",component:ReportScreen},
+		{name:"ReportScreen",component:ReportScreen},
 		{name:"Comments",component:Comments},
 		//{name:"ReportModal",component:ReportModal,options:{gestureEnabled:false,...TransitionPresets.ModalSlideFromBottomIOS}},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}

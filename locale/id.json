@@ -46,7 +46,14 @@
     "select":"Pilih %{type}",
     "load_more":"Muat lebih banyak",
     "see_more":"Lihat Lainnya",
-    "comments":"Komentar",
+    "comment":{
+        "one":"komentar",
+        "other":"komentar"
+    },
+    "content":{
+        "one":"konten",
+        "other":"konten"
+    },
     "reply":"Balas",
     "delete":"Hapus",
     "add_type":"Tambah %{type}",
@@ -65,7 +72,7 @@
     "recommended":"Rekomendasi",
     "recommended_type":"%{type} Rekomendasi",
     "report":"Lapor",
-    "feedback":"umpan balik",
+    "feedback":"Masukan",
     "send_type":"Kirim %{type}",
     "send":"Kirim",
     "errors":{
@@ -82,7 +89,8 @@
     },
     "report_placeholder":{
         "placeholder_url":"Mohon maaf atas ketidaknyamanannya, sepertinya ada masalah dengan layanan server internal kami. Bisakah Anda memberi tahu kami bagaimana ini bisa terjadi?",
-        "placeholder":"Punya feedback/umpan balik? Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungkan di Kontak kami."
+        "placeholder":"Punya masukan? Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungan di Kontak kami.",
+        "placeholder_content":"Beritahu kami mengapa Anda melaporkan %{type} ini? Atau jika Anda memiliki masukan, Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungan di Kontak kami."
     },
     "form":{
         "name":"Nama",

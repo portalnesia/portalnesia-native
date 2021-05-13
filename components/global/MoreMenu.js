@@ -6,15 +6,21 @@ import analytics from '@react-native-firebase/analytics'
 
 import TopNavigationAction from '../navigation/TopAction'
 import {URL} from '@env'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 import useClipboard from '@pn/utils/clipboard'
 import {openBrowser} from '@pn/utils/Main'
 import i18n from 'i18n-js'
 import useAPI from '@pn/utils/API'
 
 const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
+const FeedbackIcon=(props)=><Icon {...props} name="feedback" pack="material" />
 
-export const MenuToggle=({onPress})=><TopNavigationAction tooltip={i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />
+export const FeedbackToggle=React.memo(()=>{
+    const context = React.useContext(AuthContext)
+    const {sendReport}=context;
+    return <TopNavigationAction tooltip={i18n.t('feedback')} icon={FeedbackIcon} onPress={()=>sendReport('feedback')} />
+})
+export const MenuToggle=React.memo(({onPress})=><TopNavigationAction tooltip={i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />)
 
 const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
     const context = React.useContext(AuthContext)
@@ -46,7 +52,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
         })
         if(type && item_id && !__DEV__) {
             try {
-                const a = await Promise.all([
+                await Promise.all([
                     analytics().logShare({
                         content_type:type,
                         item_id:String(item_id),
@@ -54,7 +60,6 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
                     }),
                     PNpost(`/backend/shared?native=true`,{type,posid:item_id})
                 ])
-                console.log(a[1]);
             } catch(e) {}
         }
     },[type,item_id])
@@ -82,6 +87,8 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
                     openBrowser(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
                 } else if(selectedMenu?.action === 'report') {
                     setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,urlreported:`${URL}${share?.link}`}))
+                } else if(selectedMenu?.action === 'feedback') {
+                    setTimeout(()=>sendReport('feedback',{urlreported:`${URL}${share?.link}`}))
                 }
             }
             setSelectedMenu(null)

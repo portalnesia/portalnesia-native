@@ -11,6 +11,7 @@ import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
+import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 
 const {width} = Dimensions.get('window')
 
@@ -106,7 +107,7 @@ export default function ({ navigation }) {
 	}
 
 	return (
-		<Layout navigation={navigation} title="News" withBack={false}>
+		<Layout navigation={navigation} title="News" withBack={false} menu={()=><FeedbackToggle />}>
 			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 				<FlatList
 					ListEmptyComponent={renderEmpty}

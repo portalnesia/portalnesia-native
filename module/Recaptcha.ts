@@ -10,6 +10,7 @@ export default function verifyRecaptcha(setNotif?:(type: boolean | 'error' | 'su
             Portalnesia.verifyWithRecaptcha().then(res);
         } else {
             if(setNotif) setNotif(true,'Error','Please update your apps to the latest version');
+            rej({message:'Please update your apps to the latest version'})
         }
     })
 }

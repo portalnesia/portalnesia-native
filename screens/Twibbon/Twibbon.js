@@ -8,6 +8,7 @@ import Layout from '@pn/components/global/Layout';
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
+import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 
 export default function Twibbon({ navigation }) {
 	const {
@@ -122,7 +123,7 @@ export default function Twibbon({ navigation }) {
 	}
 
 	return (
-		<Layout navigation={navigation} title="Twibbon" withBack>
+		<Layout navigation={navigation} title="Twibbon" withBack menu={()=><FeedbackToggle />}>
 			<FlatList
 				columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 				ListEmptyComponent={renderEmpty}

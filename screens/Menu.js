@@ -30,7 +30,7 @@ const supportedAbi = ['arm64-v8a','armeabi-v7a','x86','x86_64']
 
 export default function({navigation}){
     const auth = React.useContext(AuthContext)
-    const {setNotif} = auth;
+    const {setNotif,sendReport} = auth;
     const user = auth.state.user
     const {PNget} = useAPI(false)
     const theme = useTheme()
@@ -154,7 +154,7 @@ export default function({navigation}){
                     <React.Fragment key={i}>
                         <Text appearance="hint" style={{paddingLeft:15,paddingRight:15,marginBottom:5,fontSize:13}}>{dt.title}</Text>
                         <Lay level="2" style={{marginBottom:20}}>
-                            {_renderMenu(dt.menu,i,navigation,theme,checkUpdates)}
+                            {_renderMenu(dt.menu,i,navigation,theme,checkUpdates,sendReport)}
                         </Lay>
                     </React.Fragment>
                 ))}
@@ -169,7 +169,7 @@ export default function({navigation}){
     )
 }
 
-const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
+const _renderMenu=(dt,i,navigation,theme,checkUpdates,sendReport)=>{
     return (
         <Menu>
             {dt.map((it,ii)=>{
@@ -204,6 +204,7 @@ const _renderMenu=(dt,i,navigation,theme,checkUpdates)=>{
                     }
                     const onPress=()=>{
                         if(it?.to === "CheckUpdate") checkUpdates();
+                        else if(it?.to === 'SendFeedback') sendReport('feedback');
                         else if(it.to) linkTo(it.to)
                         else if(it.link) {
                             if(!it.link?.match(/https?\:\/\/+/)) {

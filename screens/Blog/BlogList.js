@@ -11,6 +11,7 @@ import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {ucwords} from '@pn/utils/Main'
 import i18n from 'i18n-js'
+import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 
 export default function BlogList({navigation,route}){
     const { width } = useWindowDimensions();
@@ -102,7 +103,7 @@ export default function BlogList({navigation,route}){
 	}
 
     return (
-		<Layout navigation={navigation} title={`${ucwords(blogType)} - Blog`} subtitle={ucwords(slug.replace(/\-/g," "))}>
+		<Layout navigation={navigation} title={`${ucwords(blogType)} - Blog`} subtitle={ucwords(slug.replace(/\-/g," "))} menu={()=><FeedbackToggle />}>
 			{['tags','category'].indexOf(blogType) === -1 ? (
                 <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
             ) : isLoadingInitialData ? (

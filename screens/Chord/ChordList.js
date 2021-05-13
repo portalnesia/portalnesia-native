@@ -10,6 +10,7 @@ import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import { ucwords } from '@pn/utils/Main';
 import i18n from 'i18n-js'
+import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 
 const RenderChord=React.memo(({item,index,width,data,navigation})=>{
 	const angka = index % 2;
@@ -109,7 +110,7 @@ export default function ({ navigation,route }) {
 	}
 
 	return (
-		<Layout navigation={navigation} title={slug ? `Chord By ${artist}` : "Chord Artists"}>
+		<Layout navigation={navigation} title={slug ? `Chord By ${artist}` : "Chord Artists"} menu={()=><FeedbackToggle />}>
 			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 				<FlatList
 					columnWrapperStyle={{flexWrap:'wrap',flex:1}}

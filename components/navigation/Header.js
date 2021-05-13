@@ -130,7 +130,7 @@ export const useHeader=(height=58,onScrollProps)=>{
 const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,margin})=>{
 	const index = useNavigationState(state=>state.index);
 
-	const RenderBackBtn=({navigation})=>{
+	const RenderBackBtn=()=>{
 		if(withBack) {
 			return(
 				<TopNavigationAction tooltip={i18n.t('back')} icon={BackIcon} onPress={() => {
@@ -152,7 +152,7 @@ const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,m
 			title={evaProps => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
 			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
 			alignment={align}
-			{...(withBack ? {accessoryLeft:()=><RenderBackBtn navigation={navigation} />} : {})}
+			{...(withBack ? {accessoryLeft:()=><RenderBackBtn />} : {})}
 			{...(menu ? {accessoryRight:menu} : {})}
 		/>
         {children}

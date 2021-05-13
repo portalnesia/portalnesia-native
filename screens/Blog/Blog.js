@@ -11,6 +11,7 @@ import usePagination from '@pn/utils/usePagination'
 //import Image from '@pn/components/global/Image'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import i18n from 'i18n-js'
+import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 
 export default function ({ navigation }) {
     const { width } = useWindowDimensions();
@@ -99,7 +100,7 @@ export default function ({ navigation }) {
 	}
 
 	return (
-		<Layout navigation={navigation} title="Blog">
+		<Layout navigation={navigation} title="Blog" menu={()=><FeedbackToggle />}>
 			{isLoadingInitialData ? (
 				<View style={{height:'100%'}}><Skeleton type="grid" number={4} image /></View>
 			) : (

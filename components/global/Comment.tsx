@@ -12,7 +12,7 @@ import {linkTo} from '@pn/navigation/useRootNavigation'
 import ListItem from './ListItem'
 import Pressable from '@pn/components/global/Pressable';
 import Backdrop from '@pn/components/global/Backdrop';
-import useClipboard,{copyTextType} from '@pn/utils/clipboard'
+import useClipboard from '@pn/utils/clipboard'
 import {URL} from '@env'
 import Button from '@pn/components/global/Button'
 import Avatar from '@pn/components/global/Avatar'
@@ -107,7 +107,7 @@ type CommentType={
     onLoading:()=>void,
     onStopLoading:()=>void,
     isLoading: boolean,
-    copyText: copyTextType,
+    copyText: (text: string,type?:string)=>void,
     type: 'comment'|'reply',
     onReply: (params: ReplyValueType)=>void,
     anyReply: boolean,
@@ -585,7 +585,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
         <Lay style={{borderTopLeftRadius:15,borderTopRightRadius:15}}>
                 <Pressable default onPress={()=>modalRef?.current?.open("top")}>
                     <View style={{paddingHorizontal:15,paddingVertical:15,paddingBottom:25,justifyContent:'center',borderTopLeftRadius:15,borderTopRightRadius:15}}>
-                        <Text>{i18n.t('add_type',{type:i18n.t('comments')})}</Text>
+                        <Text>{i18n.t('add_type',{type:i18n.t('comment',{count:1})})}</Text>
                     </View>
                 </Pressable>
                 {/*(
@@ -647,7 +647,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
                                 <Input
                                     ref={textRef}
                                     value={value}
-                                    label={i18n.t('comments')}
+                                    label={ucwords(i18n.t('comment',{count:1}))}
                                     onChangeText={(val)=>setValue(val)}
                                     disabled={loading!==null}
                                     textStyle={{minHeight:100,maxHeight:100}}
@@ -909,7 +909,7 @@ export default class CommentButton extends React.PureComponent<CommentButtonProp
         return (
             <Pressable onPress={this.open} style={{paddingVertical:10,paddingHorizontal:15}}>
                 <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text category="h5" style={{fontWeight:"600"}}>{i18n.t('comments')}</Text>
+                    <Text category="h5" style={{fontWeight:"600"}}>{ucwords(i18n.t('comment',{count:2}))}</Text>
                     <Text>{total}</Text>
                 </View>
             </Pressable>

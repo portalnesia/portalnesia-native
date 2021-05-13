@@ -71,16 +71,15 @@ export const parseURL=(url: string)=>{
     return parserr.replace("www.", "");
 }
 
-export const ucwords=function(text: string,func?: (value: string)=>void){
+export const ucwords=function(text: string){
     if(typeof text!=='string') return '';
     const str=text.toLowerCase().replace(/\b[a-z]/g, function(letter) {
         return letter.toUpperCase();
     });
-    if(typeof func === 'function') return func(str);
-    else return str;
+    return str;
 }
 
-export const jsStyles=function(text: string,func?: (value: string)=>void){
+export const jsStyles=function(text: string){
     if(typeof text!=='string') return '';
     let str=text.toLowerCase();
     const from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;-";
@@ -95,19 +94,16 @@ export const jsStyles=function(text: string,func?: (value: string)=>void){
     str=str.replace(/^\b[A-Z]/g, function(p1) {
         return p1.toLowerCase()
     });
-    str=str.replace(/\s/g,"")
-    if(typeof func === 'function') return func(str);
-    else return str;
+    return str.replace(/\s/g,"")
 } 
 
-export const firstLetter=function(text: string,number?: number,func?: (value: string)=>void){
+export const firstLetter=function(text: string,number?: number){
     if(typeof text!=='string') return '';
     let str=text.toLowerCase().replace(/\b([a-z])(\S*)/g, function(a,b) {
         return b.toUpperCase();
     }).replace(/\s/g,"");
     if(typeof number==='number') str=str.substring(0,number);
-    if(typeof func === 'function') return func(str);
-    else return str;
+    return str;
 }
 
 export const urlToDomain=function(url: string){
@@ -130,7 +126,7 @@ export const splice = function(text: string,idx: number, rem: number, str: strin
     return text.slice(0, idx) + str + text.slice(idx + Math.abs(rem));
 };
 
-export const PNslug = function (text:string,func?: (value: string)=>void,lowercase?:boolean) {
+export const PNslug = function (text:string,lowercase?:boolean) {
     if(typeof text!=='string') return '';
     lowercase=typeof lowercase==='boolean'&&lowercase===true;
     let str,t=text;
@@ -145,9 +141,7 @@ export const PNslug = function (text:string,func?: (value: string)=>void,lowerca
       for (var i=0, l=from.length ; i<l ; i++) {
           str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
       }
-      const res=str.replace(/^(-|\s| )]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
-      if(typeof func === 'function') return func(res);
-      else return res
+      return str.replace(/^(-|\s| )]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
 };
 
 export const number_size=(bytes: number,precision=2)=>{

@@ -3,7 +3,7 @@
 		"name": "Portalnesia",
 		"slug": "portalnesia",
 		"scheme": "pn",
-		"version": "1.7.1",
+		"version": "1.7.2",
 		"sdkVersion": "40.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",

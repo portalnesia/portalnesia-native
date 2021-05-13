@@ -117,7 +117,7 @@ export default function ReportScreen({navigation,route}){
                     <TextInput
                         value={input}
                         onChangeText={setInput}
-                        placeholder={type==='url' ? i18n.t('report_placeholder.placeholder_url') : i18n.t('report_placeholder.placeholder')}
+                        placeholder={type==='url' ? i18n.t('report_placeholder.placeholder_url') : (type === 'feedback' ? i18n.t('report_placeholder.placeholder') : i18n.t('report_placeholder.placeholder_content',{type:(type === 'konten' ? i18n.t('content',{count:1}) : i18n.t('comment',{count:1}))}))}
                         multiline
                         placeholderTextColor={theme['text-hint-color']}
                         style={{color:theme['text-basic-color'],padding:0,fontSize:15,margin:0,flex:1}}

@@ -11,6 +11,7 @@ import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
 import i18n from 'i18n-js'
+import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 
 const Recent=({headerHeight,navigation,...other})=>{
 	const {
@@ -223,7 +224,7 @@ export default function ({ navigation,route }) {
 		
 		return (
 			<Animated.View testID="Test-Header-Chord" style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
-				<Header title="Chord" navigation={navigation} height={56}>
+				<Header title="Chord" navigation={navigation} height={56} menu={()=><FeedbackToggle />}>
 					<TabBar
 						{...props}
 						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}

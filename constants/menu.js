@@ -106,6 +106,10 @@ export const menu=(i18n)=>([
                 //icon:['privacy-tip','material'],
             },
             {
+                title:"Feedback",
+                to:"SendFeedback",
+            },
+            {
                 title:i18n.t("donate"),
                 link:"https://paypal.me/adityatranasuta",
                 //icon:['donate','font_awesome'],
