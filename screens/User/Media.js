@@ -70,7 +70,7 @@ const RenderMedia=React.forwardRef((props,ref)=>{
     const {setNotif} = context
     const theme=useTheme();
     const navigation = useNavigation();
-    const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.media_private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/media` : null,'media',24,false,false)
+    const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.media_private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/media` : null,'media',24,false)
     
     return <RenderMediaClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} setNotif={setNotif} />
 })

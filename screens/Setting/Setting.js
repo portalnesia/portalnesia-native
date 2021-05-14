@@ -5,6 +5,7 @@ import Modal from 'react-native-modal'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 import Backdrop from '@pn/components/global/Backdrop';
+import {startActivityAsync,ACTION_APP_NOTIFICATION_SETTINGS} from 'expo-intent-launcher'
 
 //import Button from '@pn/components/global/Button'
 import Layout from '@pn/components/global/Layout'
@@ -16,6 +17,7 @@ import ListItem from '@pn/components/global/ListItem'
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
 const menuSettingArr=[
+    {key:"notification"},
     {key:"appearance"},
     {key:"lang"},
     {key:"cache"}
@@ -53,13 +55,13 @@ export default function Setting({navigation}){
         }
     },[user])
 
-    const handleChangeTheme=async(value)=>{
+    const handleChangeTheme=React.useCallback(async(value)=>{
         await setTheme(themeArr[value?.row])
-    }
+    },[])
 
-    const handleChangeLang=async(value)=>{
+    const handleChangeLang=React.useCallback(async(value)=>{
         await setLang(langArr[value?.row])
-    }
+    },[])
 
     React.useEffect(()=>{
         async function childCalculate(caches){
@@ -89,7 +91,7 @@ export default function Setting({navigation}){
         })()
     },[])
 
-    const handleCacheDelete=async()=>{
+    const handleCacheDelete=React.useCallback(async()=>{
         RNFS.readdir(RNFS.CachesDirectoryPath)
         .then(async(caches)=>{
             for(const cache of caches) {
@@ -99,9 +101,9 @@ export default function Setting({navigation}){
             setCacheSize("0 KB")
         })
         .catch(()=>setNotif(true,"Error",i18n.t('errors.general')))
-    }
+    },[])
 
-    const handleLogout=()=>{
+    const handleLogout=React.useCallback(()=>{
         Alert.alert(
             "Are you sure?",
             `Logout @${user?.username}`,
@@ -117,7 +119,15 @@ export default function Setting({navigation}){
                 }
             }]
         )
-    }
+    },[user])
+
+    const openNotification = React.useCallback(async()=>{
+        if(user===true) {
+
+        } else {
+            await startActivityAsync(ACTION_APP_NOTIFICATION_SETTINGS,{extra:{"android.provider.extra.APP_PACKAGE":"com.portalnesia.app"}});
+        }
+    },[user])
 
     const renderItem=({item:dt,index:i})=>{
         let desc=undefined,name='';
@@ -138,6 +148,9 @@ export default function Setting({navigation}){
             name = i18n.t('language');
             desc = langTitle[indexLang];
             func = ()=>setOpen("lang");
+        } else if(dt?.key =='notification') {
+            name=ucwords(i18n.t('notification',{count:2}));
+            func=openNotification
         }
 
         return (

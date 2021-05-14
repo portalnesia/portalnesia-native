@@ -3,10 +3,10 @@ import {View,Dimensions,TouchableOpacity,Animated,RefreshControl} from 'react-na
 import {Layout as Lay,Text,useTheme,Icon,Divider,ListItem} from '@ui-kitten/components'
 import {useNavigation} from '@react-navigation/native'
 
-import Image from '@pn/components/global/Image'
+//import Image from '@pn/components/global/Image'
 import usePagination from '@pn/utils/usePagination'
-import useSWR from '@pn/utils/swr'
-import Button from '@pn/components/global/Button'
+//import useSWR from '@pn/utils/swr'
+//import Button from '@pn/components/global/Button'
 import Avatar from '@pn/components/global/Avatar'
 import RenderPrivate,{RenderSuspend} from './PrivateUser'
 import { ucwords } from '@pn/utils/Main'
@@ -46,7 +46,7 @@ const SkeletonFollow=()=>{
 }
 
 const RenderFollow=React.forwardRef((props,ref)=>{
-    const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/${props.type}` : null,props.type,20,false,false)
+    const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/${props.type}` : null,props.type,20,false)
     const theme=useTheme()
     return <RenderFollowClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} />
 })

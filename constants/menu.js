@@ -106,7 +106,7 @@ export const menu=(i18n)=>([
                 //icon:['privacy-tip','material'],
             },
             {
-                title:"Feedback",
+                title:i18n.t("feedback"),
                 to:"SendFeedback",
             },
             {

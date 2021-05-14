@@ -1,14 +1,16 @@
 import React from 'react';
-import {Icon,Divider, TopNavigation,Text} from '@ui-kitten/components'
-import {Animated,StatusBar} from 'react-native'
+import {Divider} from '@ui-kitten/components'
+import {Animated,NativeScrollEvent,NativeSyntheticEvent} from 'react-native'
 import {useNavigationState} from '@react-navigation/native'
 import {AuthContext} from '@pn/provider/AuthProvider'
-import LottieView from 'lottie-react-native'
+import LottieView,{AnimatedLottieViewProps} from 'lottie-react-native'
 import TopNavigationAction from './TopAction'
-import i18n from'i18n-js'
-import {resetRoot} from '@pn/navigation/useRootNavigation'
+import TopNav,{TopNavigationProps} from './TopNav';
 
-//const STATUS_BAR_HEIGHT = StatusBar.currentHeight
+export interface HeaderProps extends TopNavigationProps {
+    children?: React.ReactNode
+    height?: number
+}
 
 const {diffClamp} = Animated;
 export const headerHeight = {
@@ -16,26 +18,24 @@ export const headerHeight = {
     sub:56
 }
 
-const BackIcon=(props)=>(
-	<Icon {...props} name='arrow-back' />
-)
-
 export const TopAction = TopNavigationAction;
 
 const RefreshingHeight = 100;
-export const Lottie=({style={},...other})=>{
+
+export const Lottie=(props: AnimatedLottieViewProps)=>{
+    const {style,...other} = props
 	const context = React.useContext(AuthContext)
 	const {theme} = context
 
-	return <LottieView style={{height:RefreshingHeight,position:'absolute',top:5,left:0,right:0,...style}} autoPlay source={theme==='dark' ? require('@pn/assets/animation/loading-dark.json') : require('@pn/assets/animation/loading-dark.json')} {...other} />
+	return <LottieView style={[{height:RefreshingHeight,position:'absolute',top:5,left:0,right:0},style]} autoPlay {...other} source={theme==='dark' ? require('@pn/assets/animation/loading-dark.json') : require('@pn/assets/animation/loading-dark.json')} />
 }
 
-export const useHeader=(height=58,onScrollProps)=>{
+export const useHeader=(height=58,onScrollProps?: (event: NativeSyntheticEvent<NativeScrollEvent>)=>void)=>{
 	const index = useNavigationState(state=>state.index);
 	const clampedScrollValue = React.useRef(0)
 	const offsetValue = React.useRef(0)
 	const scrollValue = React.useRef(0)
-	const scrollEndTimer = React.useRef();
+	const scrollEndTimer = React.useRef<NodeJS.Timeout>();
 
 	const scrollAnim = new Animated.Value(0)
 	const offsetAnim = new Animated.Value(0)
@@ -57,7 +57,9 @@ export const useHeader=(height=58,onScrollProps)=>{
 	}
 
 	const onMomentumScrollBegin = () => {
-        clearTimeout(scrollEndTimer.current);
+        if(scrollEndTimer.current) {
+            clearTimeout(scrollEndTimer.current);
+        }
     };
 
 	const onMomentumScrollEnd = () => {
@@ -81,7 +83,7 @@ export const useHeader=(height=58,onScrollProps)=>{
             clampedScrollValue.current > (toolbarHeight) / 2;
     }
 
-	const onScroll = Animated.event(
+	const onScroll = Animated.event<NativeScrollEvent>(
 		[
 			{
 				nativeEvent:{
@@ -127,41 +129,35 @@ export const useHeader=(height=58,onScrollProps)=>{
 	return {onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag,onScroll,translateY,scrollEventThrottle:5}
 }
 
-const Header = ({withBack,title,menu,navigation,align,children,height,subtitle,margin})=>{
-	const index = useNavigationState(state=>state.index);
-
-	const RenderBackBtn=()=>{
-		if(withBack) {
-			return(
-				<TopNavigationAction tooltip={i18n.t('back')} icon={BackIcon} onPress={() => {
-					if(index > 0) {
-						navigation.goBack();
-					} else {
-						resetRoot()
-					}
-				}} />
-			)
-		}
-		else return null;
+export default class Header extends React.PureComponent<HeaderProps> {
+	constructor(props: HeaderProps){
+		super(props)
 	}
 
-	return(
-		<>
-		<TopNavigation
-            style={{height:(height||56)}}
-			title={evaProps => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
-			{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
-			alignment={align}
-			{...(withBack ? {accessoryLeft:()=><RenderBackBtn />} : {})}
-			{...(menu ? {accessoryRight:menu} : {})}
-		/>
-        {children}
-		<Divider />
-		</>
-	)
-}
+	static defaultProps={
+		align:'center'
+	}
 
-Header.defaultProps={
-	align:'center'
+	render(){
+		const {withBack,title,menu,navigation,align,children,height,subtitle,margin,withClose,whiteBg} = this.props;
+		return(
+			<>
+				<TopNav
+					navigation={navigation}
+					title={title}
+					withBack={withBack ? true : false}
+					align={align}
+					subtitle={subtitle}
+					menu={menu}
+					withClose={withClose}
+					margin={margin}
+					whiteBg={whiteBg}
+					withDivider={false}
+					style={{height:height||56}}
+				/>
+				{children}
+				<Divider />
+			</>
+		)
+	}
 }
-export default Header

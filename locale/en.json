@@ -34,6 +34,7 @@
     "new_type":"New %{type}",
     "text":"Text",
     "setting":"Setting",
+    "setting_type":"%{type} setting",
     "appearance":"Appearance",
     "clear":"Clear %{type}",
     "deleted":"%{type} deleted",
@@ -46,6 +47,10 @@
     "select":"Select %{type}",
     "load_more":"Load more",
     "see_more":"See more",
+    "notification":{
+        "one":"notification",
+        "other":"notifications"
+    },
     "comment":{
         "one":"comment",
         "other":"comments"

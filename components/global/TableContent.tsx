@@ -68,7 +68,7 @@ const RenderList = React.memo(({item,index,onPress}: RenderListProps)=>{
                 style={{
                     width: fontSize / 2.8,
                     height: fontSize / 2.8,
-                    marginTop: fontSize / 1.5,
+                    marginTop: fontSize / 1.7,
                     borderRadius: fontSize / 2.8,
                     backgroundColor: theme['text-basic-color'],
                 }}

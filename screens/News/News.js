@@ -27,7 +27,7 @@ export default function ({ navigation }) {
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData,response
+		mutate,isValidating
 	} = usePagination("/news","data",24,true,false)
 	const ref = React.useRef(null)
 	useScrollToTop(ref)

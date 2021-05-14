@@ -34,6 +34,7 @@
     "new_type":"%{type} Baru",
     "text":"Teks",
     "setting":"Pengaturan",
+    "setting_type":"Pengaturan %{type}",
     "appearance":"Tampilan",
     "clear":"Bersihkan %{type}",
     "deleted":"%{type} berhasil dihapus",
@@ -46,6 +47,10 @@
     "select":"Pilih %{type}",
     "load_more":"Muat lebih banyak",
     "see_more":"Lihat Lainnya",
+    "notification":{
+        "one":"pemberitahuan",
+        "other":"pemberitahuan"
+    },
     "comment":{
         "one":"komentar",
         "other":"komentar"

@@ -24,8 +24,8 @@ export default function BlogList({navigation,route}){
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
-	} = usePagination(`/blog/${blogType}/${slug}`,"blog",15,false,false)
+		mutate,isValidating
+	} = usePagination(`/blog/${blogType}/${slug}`,"blog",15,false)
 
 	const [refreshing,setRefreshing]=React.useState(false)
 
@@ -106,39 +106,33 @@ export default function BlogList({navigation,route}){
 		<Layout navigation={navigation} title={`${ucwords(blogType)} - Blog`} subtitle={ucwords(slug.replace(/\-/g," "))} menu={()=><FeedbackToggle />}>
 			{['tags','category'].indexOf(blogType) === -1 ? (
                 <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-            ) : isLoadingInitialData ? (
-				<View style={{height:'100%'}}><Skeleton type="grid" number={4} image /></View>
-			) : (
+            ) : (
 				<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-					{error ? (
-						<Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-					) : (
-						<FlatList
-							ListEmptyComponent={renderEmpty}
-							columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-							contentContainerStyle={{
-								...(error ? {flex:1} : {})
-							}}
-							numColumns={2}
-							data={data}
-							renderItem={renderNews}
-							ListFooterComponent={Footer}
-							refreshControl={
-								<RefreshControl
-									colors={['white']}
-									progressBackgroundColor="#2f6f4e"
-									onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-									refreshing={refreshing}
-								/>
+					<FlatList
+						ListEmptyComponent={renderEmpty}
+						columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+						contentContainerStyle={{
+							...(error ? {flex:1} : {})
+						}}
+						numColumns={2}
+						data={data}
+						renderItem={renderNews}
+						ListFooterComponent={Footer}
+						refreshControl={
+							<RefreshControl
+								colors={['white']}
+								progressBackgroundColor="#2f6f4e"
+								onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+								refreshing={refreshing}
+							/>
+						}
+						onEndReachedThreshold={0.01}
+						onEndReached={()=>{
+							if(!isReachingEnd && !isLoadingMore) {
+								setSize(size+1)
 							}
-							onEndReachedThreshold={0.01}
-							onEndReached={()=>{
-								if(!isReachingEnd && !isLoadingMore) {
-									setSize(size+1)
-								}
-							}}
-						/>
-					)}
+						}}
+					/>
 				</Lay>
 			)}
 		</Layout>

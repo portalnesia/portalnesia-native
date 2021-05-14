@@ -101,8 +101,8 @@ const Recent=({headerHeight,navigation,...other})=>{
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
-	} = usePagination("/twitter?type=recent","data",20,false,false)
+		mutate,isValidating
+	} = usePagination("/twitter?type=recent","data",20,false)
 
 	const [refreshing,setRefreshing]=React.useState(false)
 
@@ -163,9 +163,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 			numColumns={2}
 			data={data}
 			renderItem={_renderItem}
-			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
-			//onEndReachedThreshold={0.05}
 			refreshControl={
 				<RefreshControl
 					colors={['white']}
@@ -191,8 +189,8 @@ const Popular=({headerHeight,navigation,...other})=>{
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
-	} = usePagination("/twitter?type=popular","data",20,false,false)
+		mutate,isValidating
+	} = usePagination("/twitter?type=popular","data",20,false)
 
 	const [refreshing,setRefreshing]=React.useState(false)
 

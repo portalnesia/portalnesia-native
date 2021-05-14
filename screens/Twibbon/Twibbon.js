@@ -18,7 +18,7 @@ export default function Twibbon({ navigation }) {
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
+		mutate,isValidating
 	} = usePagination("/twibbon","twibbon",12)
 	const {width}=useWindowDimensions()
 

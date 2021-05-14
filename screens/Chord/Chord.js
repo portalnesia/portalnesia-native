@@ -21,8 +21,8 @@ const Recent=({headerHeight,navigation,...other})=>{
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
-	} = usePagination("/chord?type=recent","chord",20,false,false)
+		mutate,isValidating
+	} = usePagination("/chord?type=recent","chord",20,false)
 	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
@@ -77,34 +77,34 @@ const Recent=({headerHeight,navigation,...other})=>{
 	}
 
 	return (
-				<Animated.FlatList
-					ListEmptyComponent={renderEmpty}
-					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-					contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
-					numColumns={2}
-					data={data}
-					ref={ref}
-					renderItem={_renderItem}
-					//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
-					ListFooterComponent={Footer}
-					//onEndReachedThreshold={0.01}
-					refreshControl={
-						<RefreshControl
-							style={{zIndex:2}}
-							colors={['white']}
-							progressBackgroundColor="#2f6f4e"
-							progressViewOffset={headerHeight}
-							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-							refreshing={refreshing}
-						/>	
-					}
-					onEndReached={()=>{
-						if(!isLoadingMore) {
-							setSize(size+1)
-						}
-					}}
-					{...other}
-				/>
+		<Animated.FlatList
+			ListEmptyComponent={renderEmpty}
+			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			numColumns={2}
+			data={data}
+			ref={ref}
+			renderItem={_renderItem}
+			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
+			ListFooterComponent={Footer}
+			//onEndReachedThreshold={0.01}
+			refreshControl={
+				<RefreshControl
+					style={{zIndex:2}}
+					colors={['white']}
+					progressBackgroundColor="#2f6f4e"
+					progressViewOffset={headerHeight}
+					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+					refreshing={refreshing}
+				/>	
+			}
+			onEndReached={()=>{
+				if(!isLoadingMore) {
+					setSize(size+1)
+				}
+			}}
+			{...other}
+		/>
 	)
 }
 
@@ -116,8 +116,8 @@ const Popular=({headerHeight,navigation,...other})=>{
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
-	} = usePagination("/chord?type=popular","chord",20,false,false)
+		mutate,isValidating
+	} = usePagination("/chord?type=popular","chord",20,false)
 	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
@@ -172,36 +172,33 @@ const Popular=({headerHeight,navigation,...other})=>{
 	}
 
 	return (
-		<>
-			
-				<Animated.FlatList
-					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-					ListEmptyComponent={renderEmpty}
-					contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
-					numColumns={2}
-					data={data}
-					ref={ref}
-					renderItem={_renderItem}
-					//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
-					ListFooterComponent={Footer}
-					//onEndReachedThreshold={0.02}
-					refreshControl={
-						<RefreshControl
-							colors={['white']}
-							progressBackgroundColor="#2f6f4e"
-							progressViewOffset={headerHeight}
-							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-							refreshing={refreshing}
-						/>	
-					}
-					onEndReached={()=>{
-						if(!isLoadingMore) {
-							setSize((a)=>a+1)
-						}
-					}}
-					{...other}
-				/>
-		</>
+		<Animated.FlatList
+			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+			ListEmptyComponent={renderEmpty}
+			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			numColumns={2}
+			data={data}
+			ref={ref}
+			renderItem={_renderItem}
+			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
+			ListFooterComponent={Footer}
+			//onEndReachedThreshold={0.02}
+			refreshControl={
+				<RefreshControl
+					colors={['white']}
+					progressBackgroundColor="#2f6f4e"
+					progressViewOffset={headerHeight}
+					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+					refreshing={refreshing}
+				/>	
+			}
+			onEndReached={()=>{
+				if(!isLoadingMore) {
+					setSize((a)=>a+1)
+				}
+			}}
+			{...other}
+		/>
 	)
 }
 

@@ -24,6 +24,6 @@
         "@pn/navigation/*":["navigation/*"]
       }
     },
-    "exclude": ["node_modules","android","babel.config.js","metro.config.js","jest.config.js"],
-    //"include": ["**/*.ts", "**/*.tsx","**/*.js","**/*.jsx"]
+    "exclude": ["node_modules","android","metro.config.js","jest.config.js"],
+    "include": ["**/*.ts", "**/*.tsx","**/*.js","**/*.jsx"]
   }

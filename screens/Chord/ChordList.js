@@ -89,7 +89,7 @@ export default function ({ navigation,route }) {
 		size,
 		setSize,
 		isReachingEnd,
-		mutate,isValidating,isLoadingInitialData
+		mutate,isValidating
 	} = usePagination(`/chord/artist${slug ? `/${slug}` : ""}`,"chord",20,false,false)
 
 	const [refreshing,setRefreshing]=React.useState(false)
