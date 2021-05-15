@@ -100,7 +100,7 @@ export default function ({ navigation }) {
 	}
 
 	return (
-		<Layout navigation={navigation} title="Blog" menu={()=><FeedbackToggle />}>
+		<Layout navigation={navigation} title="Blog" menu={()=><FeedbackToggle link="/blog" />}>
 			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 				<FlatList
 					ListEmptyComponent={renderEmpty}

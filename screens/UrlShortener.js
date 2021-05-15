@@ -173,6 +173,9 @@ export default function URLshortener({navigation}){
                 },{
                     title:"Open in browser",
                     action:'browser'
+                },{
+                    title:i18n.t('feedback'),
+                    action:'feedback'
                 }]}
             />
         </>

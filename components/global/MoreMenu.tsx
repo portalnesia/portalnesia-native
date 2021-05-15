@@ -12,25 +12,59 @@ import {openBrowser} from '@pn/utils/Main'
 import i18n from 'i18n-js'
 import useAPI from '@pn/utils/API'
 
-const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
-const FeedbackIcon=(props)=><Icon {...props} name="feedback" pack="material" />
+const MoreIcon=(props?: {style: Record<string,any>})=><Icon {...props} name="more-vertical" />
+const FeedbackIcon=(props?: {style: Record<string,any>})=><Icon {...props} name="feedback" pack="material" />
 
-export const FeedbackToggle=React.memo(()=>{
+export type FeedbackToggleProps = {
+    link?: string
+}
+export const FeedbackToggle=React.memo(({link}: FeedbackToggleProps)=>{
     const context = React.useContext(AuthContext)
     const {sendReport}=context;
-    return <TopNavigationAction tooltip={i18n.t('feedback')} icon={FeedbackIcon} onPress={()=>sendReport('feedback')} />
-})
-export const MenuToggle=React.memo(({onPress})=><TopNavigationAction tooltip={i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />)
 
-const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
+    const onPress=React.useCallback(()=>{
+        if(link) sendReport('feedback',{urlreported:`${URL}${link}`})
+        else sendReport('feedback')
+    },[link])
+
+    return <TopNavigationAction tooltip={i18n.t('feedback')} icon={FeedbackIcon} onPress={onPress} />
+})
+
+export type MenuToggleProps = {
+    onPress:()=>void
+}
+export const MenuToggle=React.memo(({onPress}: MenuToggleProps)=><TopNavigationAction tooltip={i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />)
+
+export type MenuType = {
+    title: string,
+    onPress?:()=>void,
+    action?:string,
+    beforeAction?:()=>void
+}
+export type ShareType = {
+    link: string,
+    dialog?: string,
+    title?: string
+}
+
+export interface MenuContainerProps {
+    menu:MenuType[],
+    visible:boolean,
+    onClose?:()=>void,
+    onClosed?:()=>void,
+    share?:ShareType,
+    type?: string,
+    item_id?: string|number
+}
+const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContainerProps)=>{
     const context = React.useContext(AuthContext)
-    const {setNotif,sendReport} = context
+    const {sendReport} = context
     const {copyText} = useClipboard()
     const {PNpost} = useAPI();
-    const [selectedMenu,setSelectedMenu]=React.useState(null)
+    const [selectedMenu,setSelectedMenu]=React.useState<MenuType|null>(null)
     //const {width}=useWindowDimensions()
     const theme=useTheme()
-    const ref = React.useRef(null)
+    const ref = React.useRef<Modalize>();
     const Header = (
         <View style={{alignItems:'center',justifyContent:'center',padding:9}}>
             <View style={{width:60,height:7,backgroundColor:theme['text-hint-color'],borderRadius:5}} />
@@ -64,7 +98,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
         }
     },[type,item_id])
 
-    const handleOnPress=(dt)=>{
+    const handleOnPress=(dt: MenuType)=>{
         setSelectedMenu(dt);
     }
 
@@ -88,7 +122,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
                 } else if(selectedMenu?.action === 'report') {
                     setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,urlreported:`${URL}${share?.link}`}))
                 } else if(selectedMenu?.action === 'feedback') {
-                    setTimeout(()=>sendReport('feedback',{urlreported:`${URL}${share?.link}`}))
+                    setTimeout(()=>sendReport('feedback',{...(share?.link ? {urlreported:`${URL}${share?.link}`} : {} )}))
                 }
             }
             setSelectedMenu(null)
@@ -123,29 +157,3 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id,...props})=>{
     )
 }
 export const MenuContainer = React.memo(MenuCont)
-
-/*
-    <BackDr
-            visible={visible||false}
-            header={Header}
-            containerStyle={{
-                backgroundColor:theme['background-basic-color-1'],
-                borderTopLeftRadius:20,
-                borderTopRightRadius:20,
-            }}
-            overlayColor="rgba(0, 0, 0, 0.52)"
-            {...props}
-        >
-            <Layout>
-                <Layout style={{marginBottom:10}}>
-                    <Menu appearance="noDivider">
-                        {menu?.map((dt,i)=>{
-                            const onPress=dt?.onPress
-                            return <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={dt.title} onPress={onPress} />
-                            
-                        })}
-                    </Menu>
-                </Layout>
-            </Layout>
-        </BackDr>
-*/

@@ -1,6 +1,6 @@
 import React from 'react';
-import {  View,FlatList,useWindowDimensions,RefreshControl,Dimensions } from 'react-native';
-import {Layout as Lay,Text,Card} from '@ui-kitten/components'
+import {  View,FlatList,RefreshControl,Dimensions } from 'react-native';
+import {Layout as Lay,Text,Card, Divider, useTheme} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from 'react-native-fast-image'
 import i18n from 'i18n-js'
@@ -12,12 +12,29 @@ import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
+import useSWR from '@pn/utils/swr';
 
 const {width} = Dimensions.get('window')
 
-const renderRecommend=()=>{
-
-}
+const RenderRecommend=(({item,index:i})=>{
+	return (
+		<Card key={i} onPress={()=>pushTo(item?.url?.substring(23))}>
+			<View style={{alignItems:'center'}}>
+				<Image
+					resizeMode="center"
+					style={{
+						height: 200,
+						width: 200,
+					}}
+					source={{uri:item?.image}}
+				/>
+			</View>
+			<Text category="p1" style={{marginTop:10,fontWeight:"600"}}>{item.title}</Text>
+            <Text category="label" appearance="hint" style={{marginTop:10}}>{item.source}</Text>
+            <Text category="label" appearance="hint" style={{fontSize:10}}>{item.date_string}</Text>
+		</Card>
+	);
+})
 
 export default function ({ navigation }) {
 	const {
@@ -29,8 +46,10 @@ export default function ({ navigation }) {
 		isReachingEnd,
 		mutate,isValidating
 	} = usePagination("/news","data",24,true,false)
+	const {data:dataRecom,error:errorRecom,mutate: mutateRecom} = useSWR("/news/recommend");
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
+	const theme=useTheme();
 
 	const [refreshing,setRefreshing]=React.useState(false)
 
@@ -51,11 +70,11 @@ export default function ({ navigation }) {
 		if(angka===0) {
 			return (
 				<React.Fragment key={`fragment-${index}`}>
-					{ads === 0 ? (
+					{ads === 0 && index !==0 ? (
 						<View key={`ads-1-${index}`}>
 							<AdsBanner />
 						</View>
-					) : ads === 10 ? (
+					) : ads === 10 && index !==0 ? (
 						<View key={`ads-2-${index}`}>
 							<AdsBanners />
 						</View>
@@ -101,13 +120,39 @@ export default function ({ navigation }) {
 		}
 	}
 
+	const renderHeader=()=>{
+		return (
+			<Lay level="2">
+				<View style={{marginBottom:30}}><AdsBanner /></View>
+				<Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>
+				{(!dataRecom && !errorRecom) ? <View style={{paddingHorizontal:15}}><Skeleton type='caraousel' image height={300} /></View>
+				: errorRecom || dataRecom?.error==1 ? (
+					<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+				) : dataRecom?.recommend?.length > 0 ? (
+					<Carousel
+						data={dataRecom?.recommend}
+						renderItem={(props)=><RenderRecommend {...props} />}
+						autoplay
+					/>
+				) : (
+					<Text style={{paddingHorizontal:15}}>No posts</Text>
+				)}
+				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
+			</Lay>
+		)
+	}
+
 	const renderEmpty=()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
 	}
 
+	React.useEffect(()=>{
+		mutateRecom()
+	},[])
+
 	return (
-		<Layout navigation={navigation} title="News" withBack={false} menu={()=><FeedbackToggle />}>
+		<Layout navigation={navigation} title="News" withBack={false} menu={()=><FeedbackToggle link="/news" />}>
 			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 				<FlatList
 					ListEmptyComponent={renderEmpty}
@@ -116,6 +161,7 @@ export default function ({ navigation }) {
 						...(error ? {flex:1} : {})
 					}}
 					data={data}
+					ListHeaderComponent={renderHeader}
 					renderItem={renderNews}
 					ListFooterComponent={Footer}
 					numColumns={2}

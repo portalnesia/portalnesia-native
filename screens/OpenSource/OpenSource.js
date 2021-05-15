@@ -75,13 +75,14 @@ const RenderHeader=React.memo(()=>{
 export default function OpenSourceScreen({navigation}){
 
     const licenses=React.useMemo(()=>{
-        return Object.keys(licenseArr).map((it)=>{
-            const version = it.match(/\d+(\.\d+)*/);
-            const title = it.replace(version ? version[0] : '','').replace(/(?:@$)/gi,'');
+        return Object.keys(licenseArr).map((it,iii)=>{
+            let version = it.match(/@\d+(\.\d+)*/);
+            version = version ? version[0]?.substring(1) : '';
+            const title = it.replace(version,'').replace(/(?:@$)/gi,'');
             const url = getURL(licenseArr[it]?.licenseUrl,title);
             return {
                 title,
-                version: version ? version[0] : '',
+                version: version,
                 url,
                 license: licenseArr[it]?.licenses
             }

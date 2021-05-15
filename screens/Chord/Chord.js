@@ -1,6 +1,6 @@
 import React from 'react';
 import { Animated,RefreshControl,View,useWindowDimensions,FlatList } from 'react-native';
-import {Layout as Lay,Text,Card,Tab,useTheme} from '@ui-kitten/components'
+import {Layout as Lay,Text,Card,Tab,useTheme,Divider} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import {TabView,TabBar} from 'react-native-tab-view'
 
@@ -12,6 +12,46 @@ import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
 import i18n from 'i18n-js'
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
+import Carousel from '@pn/components/global/Carousel';
+import useSWR from '@pn/utils/swr';
+
+const RenderCaraousel = React.memo(({item, index:i}) => {
+	return (
+		<Card key={i} onPress={()=>pushTo(`/chord/${item?.slug}`)}>
+			<Text category="p1" style={{fontWeight:"600"}}>{`${item?.artist} - ${item?.title}`}</Text>
+            <Text category="label" style={{marginTop:10}}>{item?.original}</Text>
+		</Card>
+	);
+})
+
+const useRecommend=()=>useSWR('/chord/recommend')
+
+const RenderRecommend=React.memo(({swr})=>{
+	const {data,error,mutate} = useRecommend();
+	const theme = useTheme();
+	
+	React.useEffect(()=>{
+		mutate();
+	},[])
+	return (
+		<Lay level="2" style={{paddingTop:15}}>
+			<Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>
+			{(!data && !error) ? <View style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></View>
+			: error || data?.error==1 ? (
+				<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+			) : data?.recommend?.length > 0 ? (
+				<Carousel
+					data={data?.recommend}
+					renderItem={(props)=><RenderCaraousel {...props} />}
+					autoplay
+				/>
+			) : (
+				<Text style={{paddingHorizontal:15}}>No posts</Text>
+			)}
+			<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
+		</Lay>
+	)
+})
 
 const Recent=({headerHeight,navigation,...other})=>{
 	const {
@@ -85,6 +125,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 			data={data}
 			ref={ref}
 			renderItem={_renderItem}
+			ListHeaderComponent={()=><RenderRecommend />}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.01}
@@ -180,6 +221,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 			data={data}
 			ref={ref}
 			renderItem={_renderItem}
+			ListHeaderComponent={()=><RenderRecommend />}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.02}
@@ -221,7 +263,7 @@ export default function ({ navigation,route }) {
 		
 		return (
 			<Animated.View testID="Test-Header-Chord" style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
-				<Header title="Chord" navigation={navigation} height={56} menu={()=><FeedbackToggle />}>
+				<Header title="Chord" navigation={navigation} height={56} menu={()=><FeedbackToggle link={`/chord${tabIndex === 1 ? "/popular" : ""}`} />}>
 					<TabBar
 						{...props}
 						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}

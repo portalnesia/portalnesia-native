@@ -125,12 +125,6 @@
         "licenseUrl": "https://github.com/terrylinla/react-native-sketch-canvas/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@types/i18n-js@3.8.0": {
-        "licenses": "MIT",
-        "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
-        "licenseUrl": "https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "@ui-kitten/components@5.0.0": {
         "licenses": "MIT",
         "repository": "https://github.com/akveo/react-native-ui-kitten",

@@ -6,7 +6,6 @@ import i18n from 'i18n-js'
 import Modal from 'react-native-modal'
 import {linkTo} from '@pn/navigation/useRootNavigation'
 
-import TopAction from '@pn/components/navigation/TopAction'
 import Layout from '@pn/components/global/Layout';
 import Button from '@pn/components/global/Button'
 import Pressable from '@pn/components/global/Pressable'
@@ -18,9 +17,50 @@ import Skeleton from '@pn/components/global/Skeleton'
 import useAPI from '@pn/utils/API'
 import verifyRecaptcha from '@pn/module/Recaptcha'
 import { AuthContext } from '@pn/provider/Context';
+import Carousel from '@pn/components/global/Carousel';
+import useSWR from '@pn/utils/swr';
+import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 
 const {width} = Dimensions.get('window')
 const InputIcon = (props)=><Icon {...props} name="plus-circle-outline" />
+
+const RenderCaraousel = React.memo(({item, index:i}) => {
+	return (
+		<Card key={i} onPress={()=>pushTo(`/twitter/thread/${item?.id}`)}>
+			<Text category="p1" style={{fontWeight:"600"}}>{specialHTML(item?.title)}</Text>
+            <Text appearance="hint" category="label" style={{marginTop:10}}>{`Thread by @${item?.screen_name}`}</Text>
+		</Card>
+	);
+})
+
+const useRecommend=()=>useSWR('/twitter/recommend')
+
+const RenderRecommend=React.memo(({swr})=>{
+	const {data,error,mutate} = useRecommend();
+	const theme = useTheme();
+	
+	React.useEffect(()=>{
+		mutate();
+	},[])
+	return (
+		<Lay level="2" style={{paddingTop:15}}>
+			<Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>
+			{(!data && !error) ? <View style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></View>
+			: error || data?.error==1 ? (
+				<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+			) : data?.recommend?.length > 0 ? (
+				<Carousel
+					data={data?.recommend}
+					renderItem={(props)=><RenderCaraousel {...props} />}
+					autoplay
+				/>
+			) : (
+				<Text style={{paddingHorizontal:15}}>No posts</Text>
+			)}
+			<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
+		</Lay>
+	)
+})
 
 const RenderInput=React.memo(({onClose})=>{
 	const [input,setInput]=React.useState("")
@@ -164,6 +204,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 			data={data}
 			renderItem={_renderItem}
 			ListFooterComponent={Footer}
+			ListHeaderComponent={()=><RenderRecommend />}
 			refreshControl={
 				<RefreshControl
 					colors={['white']}
@@ -251,6 +292,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 			numColumns={2}
 			data={data}
 			renderItem={_renderItem}
+			ListHeaderComponent={()=><RenderRecommend />}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.05}
@@ -285,12 +327,13 @@ export default function ({ navigation,route }) {
 	const headerHeight={...headerHeightt,sub:46}
 	const heightHeader = headerHeight?.main + headerHeight?.sub
 	const [open,setOpen]=React.useState(false);
+	const [menu,setMenu]=React.useState(false)
 
 	const renderTabBar=(props)=>{
 		
 		return (
 			<Animated.View style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
-				<Header title="Twitter Thread Reader" navigation={navigation} height={56} withBack menu={()=><TopAction icon={InputIcon} tooltip={i18n.t("new_type",{type:i18n.t('twitter_thread')})} onPress={()=>setOpen(true)} />} >
+				<Header title="Twitter Thread Reader" navigation={navigation} height={56} withBack menu={()=><MenuToggle onPress={()=>setMenu(true)} />} >
 					<TabBar
 						{...props}
 						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
@@ -328,6 +371,20 @@ export default function ({ navigation,route }) {
 	return (
 		<Layout navigation={navigation}>
 			{renderTabView()}
+			<MenuContainer
+				visible={menu}
+				onClose={()=>setMenu(false)}
+				share={{
+                    link:`/twitter/thread${tabIndex === 1 ? "/popular" : ""}`,
+				}}
+				menu={[{
+					title:`${i18n.t("new_type",{type:i18n.t('twitter_thread')})}`,
+					onPress:()=>setOpen(true)
+				},{
+					title:i18n.t('feedback'),
+					action:'feedback'
+				}]}
+			/>
 			<Modal
                 isVisible={open}
                 style={{margin:0,justifyContent:'center',alignItems:'center'}}

@@ -123,7 +123,7 @@ export default function Twibbon({ navigation }) {
 	}
 
 	return (
-		<Layout navigation={navigation} title="Twibbon" withBack menu={()=><FeedbackToggle />}>
+		<Layout navigation={navigation} title="Twibbon" withBack menu={()=><FeedbackToggle link="/twibbon" />}>
 			<FlatList
 				columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 				ListEmptyComponent={renderEmpty}

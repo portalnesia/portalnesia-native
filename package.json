@@ -29,7 +29,6 @@
     "@react-navigation/native": "^5.7.6",
     "@react-navigation/stack": "^5.9.3",
     "@terrylinla/react-native-sketch-canvas": "^0.8.0",
-    "@types/i18n-js": "^3.8.0",
     "@ui-kitten/components": "^5.0.0",
     "@ui-kitten/eva-icons": "^5.0.0",
     "array-move": "^3.0.1",
@@ -117,6 +116,7 @@
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
+    "@types/i18n-js": "^3.8.1",
     "@types/jest": "^26.0.22",
     "@types/react": "^17.0.3",
     "@types/react-native": "^0.64.2",
@@ -131,7 +131,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }

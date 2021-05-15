@@ -1,6 +1,7 @@
+import { LinkingOptions } from '@react-navigation/native';
 import {createURL,getInitialURL as expoGetInitialURL} from 'expo-linking'
 
-export const getLink=(link,a=true)=>{
+export const getLink=(link: string,a=true)=>{
     let url = link.replace("https://portalnesia.com/","");
     url = url.replace("pn://","");
     const uri = url.split("?")[0];
@@ -88,7 +89,7 @@ const getScreen={
     NotFound: '*',
 }
 
-export const linking = {
+export const linking: LinkingOptions = {
     prefixes:[createURL('/'),'https://portalnesia.com'],
     config:{
         screens:{
@@ -154,35 +155,8 @@ export const linking = {
     },
     async getInitialURL(){
         const url = await expoGetInitialURL()
-        const notCorona = url!==null && url?.match(/\/corona+/) ===null;
-        if(notCorona) {
+        if(url!==null && url?.match(/\/corona+/) ===null) {
             return getLink(url)
         }
     },
-    /*subcribe(listener){
-        const onReceiveURL = ({url})=>{
-            console.log(url)
-            const notCorona = typeof url === 'string' && url?.match(/\/corona+/) === null;
-            
-            if(notCorona) {
-                const link = getLink(url)
-                return listener(link)
-            }
-        }
-        const notificationFunction = (data) =>{
-            if(data?.notification?.request?.content?.data?.url) {
-                const url = data?.notification?.request?.content?.data?.url
-                const link = getLink(url)
-                return listener(link)
-            }
-        }
-
-        ExpoAddListener('url',onReceiveURL)
-        const notificationListener = addNotificationResponseReceivedListener(notificationFunction)
-
-        return ()=>{
-            ExpoRemoveListener('url',onReceiveURL);
-            notificationListener.remove();
-        }
-    }*/
 }
