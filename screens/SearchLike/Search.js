@@ -237,7 +237,7 @@ export default function Search({navigation,route}){
                     setError(true)
                 }
             })
-            .catch(()=>setError(true))
+            .catch((e)=>console.log(e),setError(true))
             .finally(()=>{
                 setLoading(false)
             })

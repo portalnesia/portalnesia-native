@@ -112,6 +112,7 @@ export default function useAPI(){
                     ...(user === false || user === null ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                 },
             }
+            console.log(session);
             API.get(baseURL,opt)
             .then((response)=>{
                 if(response?.data?.error == 1 && catchError) {
@@ -131,7 +132,7 @@ export default function useAPI(){
                         setNotif("error","Error",i18n.t('errors.general'))
                     }
                 }
-                rej();
+                rej(err);
             })
         })
     }

@@ -392,7 +392,7 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
         figure:{renderer:FigureRender,wrapper:"View"},
     }
 
-    const rendererProps={
+    const renderersProps={
         theme,
         iklan,
         screenWidth,
@@ -402,25 +402,72 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
         onReceiveId
     }
 
-    const alterData=(node)=>{
+    /*const alterData=(node)=>{
         const {parent,data} = node
         if(parent?.name=='code') {
             return data.replace(/REPLACER_N/g,"<br>")
         }
-    }
+    }*/
+
     const onParsed=(dom,RNElement)=>{
         return RNElement;
     }
     
     const htmlProps={
-        renderers:renderers,
+        source:{html:source},
+        renderers,
         ignoredTags:[...IGNORED_TAGS,...TABLE_IGNORED_TAGS],
         contentWidth:screenWidth,
         WebView,
         defaultTextProps:{flexWrap:'wrap',fontSize:15,color:theme['text-basic-color'],selectable:selectable||false},
-        onLinkPress:onLinkPress,
+        onLinkPress,
         defaultWebViewProps:{style:{opacity:0.99,overflow:'hidden'}},
-        onParsed:onParsed
+        onParsed,
+        tagsStyles:{
+            code:{
+                fontFamily:(Platform.OS ==  'ios' ? 'Menlo-Regular' : 'monospace'),
+                fontSize:14
+            },
+            p:{
+                fontSize:15,
+                color:theme['text-basic-color']
+            },
+            ul:{
+                fontSize:15,
+                color:theme['text-basic-color'],
+            },
+            li:{
+                fontSize:15,
+                color:theme['text-basic-color'],
+                lineHeight:23
+            },
+            a:{
+                color:theme['link-color'],
+                fontSize:15,
+            }
+        },
+        listsPrefixesRenderers:{
+            ul:()=>(
+                <View
+                    style={{
+                        marginRight: 10,
+                        width: 15 / 2.8,
+                        height: 15 / 2.8,
+                        marginTop: 15 / 1.5,
+                        borderRadius: 15 / 2.8,
+                        backgroundColor: theme['text-basic-color'],
+                    }}
+                />
+            ),
+            ol:(a,b,c,props)=>(
+                <Text
+                    style={{ marginRight: 5, fontSize:15,marginTop:1 }}
+                >
+                    {props?.index + 1})
+                </Text>
+            )
+        },
+        renderersProps,
     }
 
     React.useEffect(()=>{
@@ -430,61 +477,14 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
     },[source])
 
     return (
-        <HTML
-            source={{html:source}}
-            tagsStyles={{
-                code:{
-                    fontFamily:(Platform.OS ==  'ios' ? 'Menlo-Regular' : 'monospace'),
-                    fontSize:14
-                },
-                p:{
-                    fontSize:15,
-                    color:theme['text-basic-color']
-                },
-                ul:{
-                    fontSize:15,
-                    color:theme['text-basic-color'],
-                },
-                li:{
-                    fontSize:15,
-                    color:theme['text-basic-color'],
-                    lineHeight:23
-                },
-                a:{
-                    color:theme['link-color'],
-                    fontSize:15,
-                }
-            }}
-            listsPrefixesRenderers={{
-                ul:()=>(
-                    <View
-                        style={{
-                            marginRight: 10,
-                            width: 15 / 2.8,
-                            height: 15 / 2.8,
-                            marginTop: 15 / 1.5,
-                            borderRadius: 15 / 2.8,
-                            backgroundColor: theme['text-basic-color'],
-                        }}
-                    />
-                ),
-                ol:(a,b,c,props)=>(
-                    <Text
-                        style={{ marginRight: 5, fontSize:15,marginTop:1 }}
-                    >
-                        {props?.index + 1})
-                    </Text>
-                )
-            }}
-            renderersProps={rendererProps}
-            {...htmlProps}
-        />
+        <HTML {...htmlProps} />
     )
 })
 
+const marked=require('marked');
+const sanitizeHtml = require('sanitize-html')
+
 export const Markdown=({source,skipHtml,...other})=>{
-    const marked=require('marked');
-    const sanitizeHtml = require('sanitize-html')
     const html = React.useMemo(()=>{
         marked.setOptions({
             breaks:true
@@ -499,8 +499,6 @@ export const Markdown=({source,skipHtml,...other})=>{
             disallowedTagsMode:'escape',
             allowedSchemesAppliedToAttributes:['href','src','cite','data-*','srcset'],
         })
-        //return hhtm;
-        //return DOMpurify.sanitize(hhtm, {FORBID_TAGS: forb,USE_PROFILES: {html: true}})
     },[source,skipHtml])
 
     return <Parser source={html} {...other} />

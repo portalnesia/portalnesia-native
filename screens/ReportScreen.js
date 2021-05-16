@@ -50,7 +50,7 @@ export default function ReportScreen({navigation,route}){
     },[type])
 
     const SystemInfo=React.useMemo(()=>{
-        const info=[
+        let info=[
             {key:"Report type",value:ContentType},
             ...(contentType ? [{key:"Content type",value:ucwords(contentType)}] : []),
             ...(contentId ? [{key:type==='konten' ? "Content ID" : "Comment ID",value:contentId}] : []),
@@ -71,6 +71,14 @@ export default function ReportScreen({navigation,route}){
             ...(Cellular.mobileCountryCode !== null ? [{key:"Network MCC code",value:Cellular.mobileCountryCode}] : []),
             ...(Cellular.mobileNetworkCode !== null ? [{key:"Network MNC code",value:Cellular.mobileNetworkCode}] : []),
         ];
+        if(user !== false) {
+            const dtUser=[
+                {key:"Username",value:user.username},
+                {key:"Name",value:user.name},
+                {key:"Email",value:user.email}
+            ]
+            info = dtUser.concat(info);
+        }
         return info;
     },[title])
 

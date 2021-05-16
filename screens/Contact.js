@@ -53,9 +53,9 @@ export default function Contact({navigation,route}){
     const subject = route.params?.subject
     const {PNpost} = useAPI(false)
     const context = React.useContext(AuthContext)
-    const {setNotif} = context
+    const {setNotif,state:{user}} = context
     const {copyText} = useClipboard()
-    const [input,setInput] = React.useState({name:user===null ?'':user?.user_nama,email:user===null ? '' : user.user_email,subject:'',message:''})
+    const [input,setInput] = React.useState({name:user===false ?'':user?.name,email:user===false ? '' : user.email,subject:'',message:''})
     const [loading,setLoading] = React.useState(false)
     const {height,width}=useWindowDimensions()
     const theme = useTheme()
@@ -145,7 +145,7 @@ export default function Contact({navigation,route}){
                                             label="Name"
                                             value={input.name}
                                             onChangeText={handleInputChange('name')}
-                                            disabled={user!==null||loading}
+                                            disabled={user!==false||loading}
                                             placeholder="John Doe"
                                             returnKeyType="next"
                                             onSubmitEditing={()=>emailRef?.current?.focus()}
@@ -161,7 +161,7 @@ export default function Contact({navigation,route}){
                                             label="Email"
                                             value={input.email}
                                             onChangeText={handleInputChange('email')}
-                                            disabled={user!==null||loading}
+                                            disabled={user!==false||loading}
                                             ref={emailRef}
                                             keyboardType="email-address"
                                             autoCompleteType="email"
@@ -178,7 +178,7 @@ export default function Contact({navigation,route}){
                                             label="Subject"
                                             value={input.subject}
                                             onChangeText={handleInputChange('subject')}
-                                            disabled={user!==null||loading}
+                                            disabled={loading}
                                             returnKeyType="next"
                                             autoCompleteType="off"
                                             ref={subjectRef}
@@ -192,7 +192,7 @@ export default function Contact({navigation,route}){
                                             label="Messages"
                                             value={input.message}
                                             onChangeText={handleInputChange('message')}
-                                            disabled={user!==null||loading}
+                                            disabled={loading}
                                             ref={msgRef}
                                             multiline
                                             textStyle={{minHeight:150,maxHeight:350}}
