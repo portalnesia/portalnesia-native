@@ -18,11 +18,12 @@ import {CONTENT_URL} from '@env'
 import downloadFile from '@pn/utils/Download'
 import verifyRecaptcha from '@pn/module/Recaptcha'
 import { openBrowser } from '@pn/utils/Main';
+import i18n from 'i18n-js'
 
 export default function URLshortener({navigation}){
     const {PNpost} = useAPI(false)
     const context = React.useContext(AuthContext)
-    const {setNotif} = context
+    const {setNotif,state:{user}} = context
     const {copyText} = useClipboard()
     const [open,setOpen]=React.useState(false)
     const [input,setInput] = React.useState({url:'',custom:''})
@@ -33,7 +34,7 @@ export default function URLshortener({navigation}){
     const customRef=React.useRef(null)
 
     const handleInputChange=(name)=>val=>{
-        if(name==='custom') {
+        if(name==='custom' && user===false) {
             return;
         } else {
             setInput({
@@ -44,8 +45,10 @@ export default function URLshortener({navigation}){
     }
 
     const handleCustomFocus=()=>{
-        setNotif(true,"Under Maintenance","Only for registered users");
-        customRef.current?.blur()
+        if(user===false) {
+            setNotif(true,"Under Maintenance","Only for registered users");
+            ustomRef.current?.blur()
+        }
     }
 
     const handleSubmit=()=>{
@@ -118,7 +121,8 @@ export default function URLshortener({navigation}){
                                     <Lay style={{paddingVertical:10}}>
                                         <Input
                                             label="Custom"
-                                            value={""}
+                                            value={input.custom}
+                                            onChangeText={handleInputChange('custom')}
                                             disabled={loading}
                                             onFocus={handleCustomFocus}
                                             ref={customRef}
@@ -166,12 +170,12 @@ export default function URLshortener({navigation}){
                 }}
                 menu={[{
                     action:"share",
-                    title:"Share",
+                    title:i18n.t('share'),
                 },{
-                    title:"Copy link",
+                    title:i18n.t('copy_link'),
                     action:'copy'
                 },{
-                    title:"Open in browser",
+                    title:i18n.t('open_in_browser'),
                     action:'browser'
                 },{
                     title:i18n.t('feedback'),

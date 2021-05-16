@@ -135,7 +135,8 @@ const loginArray=()=>([
 		key:"chord",
 		title:i18n.t('chord'),
 		data:null,
-		icon:["library-music","material"]
+		icon:["library-music","material"],
+		to:'/chord'
 	},
 	{
 		key:"session",
@@ -147,19 +148,22 @@ const loginArray=()=>([
 		key:"twibbon",
 		title:"Twibbon",
 		data:null,
-		icon:['ios-image','ionicons']
+		icon:['ios-image','ionicons'],
+		to:'/twibbon'
 	},
 	{
 		key:"url",
 		title:"URL",
 		data:null,
-		icon:['link','font_awesome']
+		icon:['link','font_awesome'],
+		to:'/url'
 	},
 	{
 		key:"blog",
 		title:"Blog",
 		data:null,
-		icon:['article','material']
+		icon:['article','material'],
+		to:'/blog'
 	}
 ])
 
@@ -168,11 +172,17 @@ const RenderInformation=React.memo(({data,item,index})=>{
 	const cardSize=(width/2)-7
 	const next = data?.[index+1]?.key ? data?.[index+1] : false;
 	const theme = useTheme();
+
+	const onPress=(it)=>()=>{
+		if(it?.to) {
+			linkTo(it?.to)
+		}
+	}
 	
 	if(angka===0) {
 		return (
 			<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-				<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} >
+				<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={onPress(item)} >
 					{item?.data === null ? (
 						<Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']} height={item?.icon ? 65 : 115}>
 							<Skltn.Item width={cardSize-30} >
@@ -199,7 +209,7 @@ const RenderInformation=React.memo(({data,item,index})=>{
 					)}
 				</Card>
 				{next ? (
-					<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}}>
+					<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={onPress(next)}>
 						{next?.data === null ? (
 							<Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']} height={next?.icon ? 65 : 115}>
 								<Skltn.Item width={cardSize-30} >
