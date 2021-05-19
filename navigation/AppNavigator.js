@@ -37,6 +37,7 @@ import ImagesChecker from '../screens/Tools/ImagesChecker'
 import UrlShortener from '../screens/UrlShortener'
 import Contact from '../screens/Contact'
 import User from '../screens/User/User'
+import EditUserScreen from '../screens/User/Edit'
 import Setting from '../screens/Setting/Setting'
 import Search from '../screens/SearchLike/Search'
 import SearchFilter from '../screens/SearchLike/SearchFilter'
@@ -166,7 +167,6 @@ const getScreen=()=>{
 		{name:"NotificationEvent",component:NotificationEvent},
 		{name:"ReportScreen",component:ReportScreen},
 		{name:"Comments",component:Comments},
-		//{name:"ReportModal",component:ReportModal,options:{gestureEnabled:false,...TransitionPresets.ModalSlideFromBottomIOS}},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }
@@ -274,6 +274,7 @@ const MainNavigator=()=>(
 	}}>
 		<MainStack.Screen name="MainTab" component={MainTabNavigator} />
 		<MainStack.Screen name="ReportScreen" component={ReportScreen} />
+		<MainStack.Screen name="EditUserScreen" component={EditUserScreen} options={{gestureEnabled:false}} />
 	</MainStack.Navigator>
 )
 

@@ -1,4 +1,5 @@
 import initials from 'initials';
+import {randomInt} from '@pn/utils/Main'
 
 export const abbr = (name) => {
   let abbr = initials(name);
@@ -42,7 +43,9 @@ export const generateBackgroundStyle = (name, bgColor, bgColors) => {
     background = bgColor;
   } else {
     // Pick a deterministic color from the list
-    const i = sumChars(name) % bgColors.length;
+    //const i = generateRan
+    const i = randomInt(bgColors.length);
+    //const i = sumChars(name) % bgColors.length;
     background = bgColors[i];
   }
   return {backgroundColor: background};

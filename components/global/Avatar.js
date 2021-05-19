@@ -8,7 +8,7 @@ import {
     generateBackgroundStyle,
 } from './Avatar/helpers';
 
-const UserAvatar = (props) => {
+const UserAvatar = React.memo((props) => {
     const {
       name,
       src,
@@ -41,7 +41,7 @@ const UserAvatar = (props) => {
         ) : <TextAvatar textColor={textColor} size={size} name={name} /> }
       </View>
     );
-};
+});
   
 UserAvatar.defaultProps = {
     size: 32,
@@ -75,4 +75,4 @@ Avatar.defaultProps={
     avatar:false,
     customStyle:{}
 }
-export default Avatar
+export default React.memo(Avatar)

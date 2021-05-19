@@ -1,8 +1,7 @@
 import React from 'react'
 import {  View,ScrollView,Dimensions } from 'react-native';
 import {Layout as Lay,Text,Divider,useTheme, Icon} from '@ui-kitten/components'
-import * as ImagePicker from 'expo-image-picker'
-import * as FileSystem from 'expo-file-system'
+import {MediaTypeOptions} from 'expo-image-picker'
 import FastImage from 'react-native-fast-image'
 import Skltn from 'react-native-skeleton-placeholder'
 import RNFS from 'react-native-fs'
@@ -21,6 +20,7 @@ import {AuthContext} from '@pn/provider/AuthProvider'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import i18n from 'i18n-js'
 import { ucwords } from '@pn/utils/Main';
+import { pickImage } from '@pn/utils/PickLibrary';
 
 const {width:winWidth,height:winHeight} = Dimensions.get("window");
 const SupportIcon = (props)=> <Icon {...props} name="question-mark-circle-outline" />
@@ -66,34 +66,9 @@ export default function TwibbonDetail({navigation,route}){
     )
 
     const openImage=React.useCallback(()=>{
-        ImagePicker.requestMediaLibraryPermissionsAsync()
-        .then(({status})=>{
-            return new Promise((res,rej)=>{
-                if(status !== 'granted') return rej({type:1,message:"Sorry, we need camera roll permissions"})
-                return res();
-            })
-        })
-        .then(()=>{
-            return ImagePicker.launchImageLibraryAsync({
-                mediaTypes:ImagePicker.MediaTypeOptions.Images
-            })
-        })
-        .then(result=>{
-            return new Promise((res,rej)=>{
-                if(result.cancelled) return rej({type:0})
-                return res(result)
-            })
-        })
+        pickImage({mediaTypes:MediaTypeOptions.Images})
         .then((result)=>{
-            return FileSystem.getInfoAsync(result.uri)
-        })
-        .then((result)=>{
-            return new Promise((res,rej)=>{
-                if(!result.exists) return rej({type:1,message:"Cannot find image"})
-                return res(result)
-            })
-        })
-        .then((result)=>{
+            if(!result.exists) return setNotif(true,"Error",i18n.t('errors.no_image'));
             setFile(result?.uri)
         })
         .catch(err=>{

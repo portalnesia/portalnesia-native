@@ -229,7 +229,7 @@ export default function Search({navigation,route}){
             ])
             .then((result)=>{
                 const res = result[0];
-                if(!res?.error) {
+                if(!Boolean(res?.error)) {
                     //console.log(res?.data?.[2]?.data);
                     if(res?.data?.length === 0) setEmpty(true)
                     setData(res?.data)
@@ -237,7 +237,7 @@ export default function Search({navigation,route}){
                     setError(true)
                 }
             })
-            .catch((e)=>console.log(e),setError(true))
+            .catch((e)=>setError(true))
             .finally(()=>{
                 setLoading(false)
             })
@@ -294,7 +294,7 @@ export default function Search({navigation,route}){
                 ])
                 .then((result)=>{
                     const res = result[0];
-                    if(!res?.error) {
+                    if(!Boolean(res?.error)) {
                         //console.log(res?.data?.[2]?.data);
                         if(res?.data?.length === 0) setEmpty(true)
                         setData(res?.data)

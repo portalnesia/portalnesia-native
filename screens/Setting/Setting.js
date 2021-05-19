@@ -28,14 +28,14 @@ const langTitle=['System language','Bahasa Indonesia','English'];
 
 export default function Setting({navigation}){
     const context = React.useContext(AuthContext)
-    const {setTheme,userTheme,setNotif,state,lang,setLang} = context;
+    const {setTheme,userTheme,setNotif,state,lang,setLang,dispatch} = context;
     const {user} = state;
     const [open,setOpen]=React.useState(null)
     const [loading,setLoading] = React.useState(false)
     const {width} = useWindowDimensions()
     const theme = useTheme()
     const [cacheSize,setCacheSize]=React.useState("Calculating...")
-    const {logout} = useLogin();
+    const {logout} = useLogin({dispatch,state,setNotif});
 
     const indexTheme = React.useMemo(()=>{
         return themeArr.indexOf(userTheme)

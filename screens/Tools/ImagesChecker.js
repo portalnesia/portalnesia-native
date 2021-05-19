@@ -1,8 +1,7 @@
 import React from 'react';
 import {  View,ScrollView,Dimensions,LogBox } from 'react-native';
 import {Layout as Lay,Text,Card,Input,List,ListItem,Divider,useTheme} from '@ui-kitten/components'
-import * as ImagePicker from 'expo-image-picker'
-import * as FileSystem from 'expo-file-system'
+import {MediaTypeOptions} from 'expo-image-picker'
 import i18n from 'i18n-js'
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
@@ -17,6 +16,7 @@ import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
 import verifyRecaptcha from '@pn/module/Recaptcha'
+import { pickImage } from '@pn/utils/PickLibrary';
 
 const {width:screenWidth} = Dimensions.get("window")
 
@@ -37,8 +37,6 @@ export default function({navigation}){
     const [yOffset,setYOffset] = React.useState(null)
     const scrollRef=React.useRef(null)
     const {showAds} = showInterstisial()
-
-    const dtFileImg = React.useMemo(()=>dataFile,[dataFile])
 
     const inputBlur=()=>{
         if(url.trim().match(/^https?\:\/\//i) !== null) {
@@ -114,35 +112,10 @@ export default function({navigation}){
     },[backdrop])
 
     const openImage=React.useCallback(()=>{
-        ImagePicker.requestMediaLibraryPermissionsAsync()
-        .then(({status})=>{
-            return new Promise((res,rej)=>{
-                if(status !== 'granted') return rej({type:1,message:i18n.t('errors.permission_storage')})
-                return res();
-            })
-        })
-        .then(()=>{
-            return ImagePicker.launchImageLibraryAsync({
-                mediaTypes:ImagePicker.MediaTypeOptions.Images
-            })
-        })
-        .then(result=>{
-            return new Promise((res,rej)=>{
-                if(result.cancelled) return rej({type:0})
-                return res(result)
-            })
-        })
+        pickImage({mediaTypes:MediaTypeOptions.Images})
         .then((result)=>{
-            return FileSystem.getInfoAsync(result.uri)
-        })
-        .then((result)=>{
-            return new Promise((res,rej)=>{
-                if(!result.exists) return rej({type:1,message:i18n.t('errors.no_image')})
-                return res(result)
-            })
-        })
-        .then((result)=>{
-            if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('errors.size_image'))
+            if(!result.exists) return setNotif(true,"Error",i18n.t('errors.no_image'));
+            if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('errors.size_image'));
             setFile(result?.uri)
             setDataFile(result?.uri)
         })
@@ -169,7 +142,7 @@ export default function({navigation}){
                             <Text>This online tool will help you to check if your image contains NSFW (Not Safe To Work) or not. Using 5 categories: Sexy, Neutral, Porn, Drawing, or Hentai.</Text>
                         </Lay>
                         <Lay style={{paddingVertical:10}}>
-                            <RenderImage dataFile={dtFileImg} openImage={openImage} />
+                            <RenderImage dataFile={dataFile} openImage={openImage} />
                         </Lay>
                         <Lay style={[style.container,{paddingVertical:10}]}>
                             <Text style={{marginBottom:10}}>You can also use an image URL for analysis</Text>

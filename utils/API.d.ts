@@ -5,7 +5,7 @@ export interface APIResponseTypes {
     PNget:<R = any>(url: string,catchError?: boolean)=>Promise<R>;
     PNgraph:<R = any>(url: string,query: string)=>Promise<R>;
     fetcher:<R = any>(url: string)=>Promise<R>;
-
+    PNgetPkey:()=>Promise<{pkey: string}>
 }
 
 export const API: AxiosInstance;

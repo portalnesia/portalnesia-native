@@ -6,6 +6,7 @@ import useAPI from '@pn/utils/API'
 import {CONTENT_URL,API_URL} from '@env'
 import i18n from 'i18n-js'
 import {useScrollToTop} from '@react-navigation/native'
+import FastImage from 'react-native-fast-image'
 
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 import {linkTo} from '@pn/navigation/useRootNavigation'
@@ -18,6 +19,8 @@ import {specialHTML} from '@pn/utils/Main'
 import Skltn from 'react-native-skeleton-placeholder'
 import CountUp from '@pn/components/global/Countup'
 import Skeleton from '@pn/components/global/Skeleton';
+import { getLocation, reverseGeocode } from '@pn/utils/Location';
+import { LocationAccuracy } from 'expo-location';
 
 const {width} = Dimensions.get('window')
 
@@ -182,7 +185,7 @@ const RenderInformation=React.memo(({data,item,index})=>{
 	if(angka===0) {
 		return (
 			<View key={`view-${index}`} style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-				<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} onPress={onPress(item)} >
+				<Card key={0} style={{width:cardSize,margin:5,marginRight:2}} {...(item?.to ? {onPress:onPress(item)} : {disabled:true})} >
 					{item?.data === null ? (
 						<Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']} height={item?.icon ? 65 : 115}>
 							<Skltn.Item width={cardSize-30} >
@@ -198,6 +201,13 @@ const RenderInformation=React.memo(({data,item,index})=>{
 							<Text>Error</Text>
 							<Text>Something went wrong.</Text>
 						</View>
+					) : item?.key==='weather' ? (
+						<View style={{marginBottom:10}}>
+							<Text category="h2" style={{fontFamily:"Inter_Medium"}}>{item?.data?.temperature}</Text>
+							<Text>{item?.data?.text}</Text>
+							<Text>{item?.data?.title}</Text>
+							{item?.data?.icon && <FastImage style={{width:50,height:50}} source={{uri:item?.data?.icon}} /> }
+						</View>
 					) : (
 						<View style={{marginBottom:10}}>
 							<Text category="h2" style={{fontFamily:"Inter_Medium"}}><CountUp data={{number:item?.data,format:`${item?.data}`}} /></Text>
@@ -209,7 +219,7 @@ const RenderInformation=React.memo(({data,item,index})=>{
 					)}
 				</Card>
 				{next ? (
-					<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} onPress={onPress(next)}>
+					<Card key={1} style={{width:cardSize,margin:5,marginLeft:2}} {...(next?.to ? {onPress:onPress(next)} : {disabled:true})}>
 						{next?.data === null ? (
 							<Skltn backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']} height={next?.icon ? 65 : 115}>
 								<Skltn.Item width={cardSize-30} >
@@ -244,26 +254,28 @@ const RenderInformation=React.memo(({data,item,index})=>{
 
 const Dashboard=({loading,data,error,navigation,onMutate})=>{
 	const context = React.useContext(AuthContext)
+	const {setNotif} = context
 	const ref=React.useRef(null)
 	const theme=useTheme();
+	const {PNpost} = useAPI();
+	const [cuaca,setCuaca]=React.useState(null);
+
 	useScrollToTop(ref)
 	const dt = React.useMemo(()=>{
 		const array = loginArray();
-		if(data) {
-			const obj = Object.keys(array).map((k)=>{
-				const i = Number(k)
-				const item = array[i]
-				if(loading) array[i].data=null;
-				else if(error) array[i].data=false;
-				else if(data?.data?.count?.[item.key]) {
-					array[i].data = Number(data?.data?.count?.[item.key]);
-				}
-				return array[i];
-			})
-			return obj;
-		}
-		return array;
-	},[data,context,loading,error])
+		const obj = Object.keys(array).map((k)=>{
+			const i = Number(k)
+			const item = array[i]
+			if(item.key === 'weather') item.data=cuaca;
+			else if(loading) item.data=null;
+			else if(error) item.data=false;
+			else if(data?.data?.count?.[item.key]) {
+				item.data = Number(data?.data?.count?.[item.key]);
+			}
+			return item;
+		})
+		return obj;
+	},[data,context,loading,error,cuaca])
 
 	const renderFooter=()=>(
 		<React.Fragment>
@@ -324,11 +336,34 @@ const Dashboard=({loading,data,error,navigation,onMutate})=>{
 		</>
 	)
 
+	const getCuaca=React.useCallback(()=>{
+		getLocation({accuracy:LocationAccuracy.Lowest})
+		.then(({coords:{latitude,longitude}})=>{
+			return reverseGeocode({latitude,longitude})
+		})
+		.then((geocode)=>{
+			return PNpost('/weather',geocode[0]);
+		})
+		.then(res=>{
+			setCuaca(res);
+		})
+		.catch(e=>{
+			if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
+		})
+	},[])
+
 	const onRefresh=()=>{
 		if(!loading && onMutate) {
 			onMutate();
+			getCuaca()
 		}
 	}
+
+	React.useEffect(()=>{
+		if(cuaca===null) {
+			getCuaca()
+		}
+	},[])
 
 	return (
 		<Layout navigation={navigation} title="Portalnesia" align="start" withBack={false} menu={toggle}>

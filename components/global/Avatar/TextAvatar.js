@@ -33,4 +33,4 @@ const TextAvatar = (props) => {
   );
 };
 
-export default TextAvatar;
+export default React.memo(TextAvatar);

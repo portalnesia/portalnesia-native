@@ -9,7 +9,7 @@ const LoadingComponent=(props)=>(
     </View>
 )
 
-const Button=React.forwardRef(({size,onPress,disabled,loading,status,appearance,outlined,children,text,accessoryLeft: accessLeft,accessoryRight: accessRight,...others},ref)=>{
+const Button=React.forwardRef(({size,onPress,onLongPress,disabled,loading,status,appearance,outlined,children,text,accessoryLeft: accessLeft,accessoryRight: accessRight,...others},ref)=>{
     const stat = outlined ? "basic" : text ? "basic" : status;
     const appear = outlined ? "outline" : text ? "ghost" : appearance;
     const theme = useTheme();
@@ -33,6 +33,8 @@ const Button=React.forwardRef(({size,onPress,disabled,loading,status,appearance,
                 <Pressable
                     disabled={disabled}
                     onPress={onPress}
+                    onLongPress={onLongPress}
+                    ref={ref}
                     android_ripple={{color:theme['riple-color'],borderless:false}}
                 >
                     <View pointerEvents="none">
@@ -43,7 +45,6 @@ const Button=React.forwardRef(({size,onPress,disabled,loading,status,appearance,
                             disabled={disabled}
                             accessoryLeft={accessoryLeft}
                             accessoryRight={accessoryRight}
-                            ref={ref}
                             {...others}
                         >
                             {children}
@@ -62,6 +63,7 @@ const Button=React.forwardRef(({size,onPress,disabled,loading,status,appearance,
             accessoryLeft={accessoryLeft}
             accessoryRight={accessoryRight}
             onPress={onPress}
+            onLongPress={onLongPress}
             ref={ref}
             {...others}
             

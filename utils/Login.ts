@@ -8,8 +8,7 @@ import * as Application from 'expo-application'
 
 import {API as APIaxios} from '@pn/utils/API'
 import {CLIENT_ID,API} from '@env'
-import {generateRandom} from '@pn/utils/Main'
-import {AuthContext} from '@pn/provider/Context'
+import {DispatchArgument, StateType} from '@pn/provider/Context'
 
 maybeCompleteAuthSession();
 
@@ -19,51 +18,60 @@ const discovery = {
     revocationEndpoint:`${API}/v2/oauth/revoke`
 }
 
-export default function useLogin() {
-    const context = React.useContext(AuthContext)
-    const {dispatch,state,setNotif} = context;
+export async function getProfile(token: TokenResponse){
+    let data;
+    try {
+        const result = await APIaxios.get('/v2/me',{headers:{'PN-Client-Id':CLIENT_ID,'Authorization':`Bearer ${token.accessToken}`}})
+        if(result?.data?.result) {
+            data = result.data.result;
 
-    async function getProfile(token: TokenResponse){
-        let data;
-        try {
-            const result = await APIaxios.get('/v2/me',{headers:{'PN-Client-Id':CLIENT_ID,'Authorization':`Bearer ${token.accessToken}`}})
-            if(result?.data?.result) {
-                data = result.data.result;
-
-            } else {
-                data = result?.data?.error_description||"Something went wrong"
-            }
-        } catch(e){
-            console.log(e?.request)
-            data = "Something went wrong";
+        } else {
+            data = result?.data?.error_description||"Something went wrong"
         }
-        return data;
+    } catch(e){
+        //console.log(e?.request)
+        data = "Something went wrong";
     }
+    return data;
+}
 
+type UseLoginOptions = {
+    dispatch: React.Dispatch<DispatchArgument>,
+    state: StateType,
+    setNotif:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any} | undefined) => void
+}
+
+export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
     async function login() {
-        if(state.user === false) {
-            const data = await login_in();
-            if(data !== false) {
-                console.log(data);
-                const profile = await getProfile(data)
-                if(typeof profile !== 'string') {
-                    await Promise.all([
-                        Secure.setItemAsync('token',JSON.stringify(data)),
-                        Secure.setItemAsync('user',JSON.stringify(profile))
-                    ])
-                    if(typeof dispatch === 'function') dispatch({type:"LOGIN",payload:{user:profile,token:data,session:profile?.session_id}})
-                    setNotif(false,"Logged in",`Welcome back, ${profile?.username}`);
-                    return true;
+        try {
+            if(state.user === false) {
+                const data = await login_in();
+                if(data !== false) {
+                    //console.log(data);
+                    const profile = await getProfile(data)
+                    if(typeof profile !== 'string') {
+                        await Promise.all([
+                            Secure.setItemAsync('token',JSON.stringify(data)),
+                            Secure.setItemAsync('user',JSON.stringify(profile))
+                        ])
+                        if(typeof dispatch === 'function') dispatch({type:"LOGIN",payload:{user:profile,token:data,session:profile?.session_id}})
+                        setNotif(false,"Logged in",`Welcome back, ${profile?.username}`);
+                        return true;
+                    } else {
+                        setNotif(true,"Error",profile);
+                        return true;
+                    }
                 } else {
-                    setNotif(true,"Error",profile);
                     return true;
                 }
             } else {
                 return true;
             }
-        } else {
+        } catch(e) {
+            console.log(e)
             return true;
         }
+        
     }
 
     async function logout() {
@@ -86,15 +94,27 @@ export default function useLogin() {
     async function refreshToken() {
         const token_string = await Secure.getItemAsync('token');
         if(token_string!==null) {
-            const token: TokenResponse = JSON.parse(token_string);
+            let token: TokenResponse = JSON.parse(token_string);
             const date_now = Number((new Date().getTime()/1000).toFixed(0));
             if((date_now - token.issuedAt) > (token.expiresIn||3600 - 1000)) {
-                const data = await refreshingToken(token);
-                if(data) {
-                    await  Secure.setItemAsync('token',JSON.stringify(data))
-                    if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token:data}})
+                token = await refreshingToken(token);
+                if(token) {
+                    const user = await getProfile(token);
+                    await Promise.all([
+                        Secure.setItemAsync('token',JSON.stringify(token)),
+                        ...(typeof user !== 'string' ? [Secure.setItemAsync('user',JSON.stringify(user))] : [])
+                    ])
+                    if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
                 }
+            } else {
+                const user = await getProfile(token);
+                if(typeof user !== 'string') {
+                    await Secure.setItemAsync('user',JSON.stringify(user))
+                }
+                if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
             }
+        } else {
+            if(typeof dispatch === 'function') dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Application.androidId}})
         }
     }
 
@@ -158,7 +178,7 @@ async function exchangeToken(code: string,request: AuthRequest){
     return result;
 }
 
-async function refreshingToken(token: TokenResponse) {
+export async function refreshingToken(token: TokenResponse) {
     const config: RefreshTokenRequestConfig = {
         clientId:CLIENT_ID,
         refreshToken: token.refreshToken,

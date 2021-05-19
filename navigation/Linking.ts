@@ -1,21 +1,6 @@
 import { LinkingOptions } from '@react-navigation/native';
 import {createURL,getInitialURL as expoGetInitialURL} from 'expo-linking'
 
-export const getLink=(link: string,a=true)=>{
-    let url = link.replace("https://portalnesia.com/","");
-    url = url.replace("pn://","");
-    const uri = url.split("?")[0];
-    const split = uri.split("/")[0];
-    let firstPath='';
-    if(split === 'news') firstPath='NewsStack';
-    else if(split==='chord') firstPath='ChordStack';
-    else if(split==='search') firstPath='SearchPath';
-    else if(['pages','setting','contact','url','blog','twibbon','login-callback','twitter'].indexOf(split) !== -1) firstPath='MenuStack';
-    else firstPath="HomeStack";
-    const finalPath = a ? `https://portalnesia.com/MainStack/MainTab/${firstPath}/${url}` : `/MainStack/MainTab/${firstPath}/${url}`
-    return finalPath;
-}
-
 const getScreen={
     Setting:{
         path:'setting',
@@ -148,15 +133,13 @@ export const linking: LinkingOptions = {
                     },
                     ReportScreen:{
                         path:'ReportScreen'
+                    },
+                    EditUserScreen:{
+                        path:"user/:username/edit",
+                        exact:true
                     }
                 }
             }
-        }
-    },
-    async getInitialURL(){
-        const url = await expoGetInitialURL()
-        if(url!==null && url?.match(/\/corona+/) ===null) {
-            return getLink(url)
         }
     },
 }

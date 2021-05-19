@@ -1,6 +1,7 @@
 import React from 'react'
 import { Platform,View } from 'react-native'
-import { WebView } from 'react-native-webview'
+import { WebView, WebViewMessageEvent } from 'react-native-webview'
+import {RECAPTCHA_SITEKEY,URL} from '@env'
 
 const patchPostMessageJsCode = `
     (function(){
@@ -13,7 +14,7 @@ const patchPostMessageJsCode = `
     })();
 `
 
-const getExecutionFunction = (siteKey, action) => {
+const getExecutionFunction = (siteKey: string, action: string) => {
     return `window.grecaptcha.execute('${siteKey}', { action: '${action}' }).then(
       function(args) {
         window.ReactNativeWebView.postMessage(args);
@@ -21,18 +22,26 @@ const getExecutionFunction = (siteKey, action) => {
     )`
 }
 
-const getInvisibleRecaptchaContent = (siteKey, action) => {
+const getInvisibleRecaptchaContent = (siteKey: string, action: string) => {
     return `<!DOCTYPE html><html><head>
       <script src="https://www.google.com/recaptcha/api.js?render=${siteKey}"></script>
       <script>window.grecaptcha.ready(function() { ${getExecutionFunction(siteKey, action)} });</script>
       </head></html>`
 }
 
-export default class Recaptcha extends React.PureComponent{
+export interface RecaptchaProps {
+    onReceiveToken?:(token:string)=>void,
+    action?:string,
 
-    constructor(props){
+}
+
+export default class Recaptcha extends React.PureComponent<RecaptchaProps>{
+
+    private webViewRef: React.RefObject<WebView>
+
+    constructor(props: RecaptchaProps){
         super(props)
-        this.webViewRef=React.createRef(null)
+        this.webViewRef=React.createRef<WebView>()
     }
 
     static defaultProps={
@@ -42,7 +51,7 @@ export default class Recaptcha extends React.PureComponent{
 
     refreshToken() {
         if (Platform.OS === 'ios' && this.webViewRef.current !== null) {
-            this.webViewRef.current.injectJavaScript(getExecutionFunction(this.props.siteKey, this.props.action))
+            this.webViewRef.current.injectJavaScript(getExecutionFunction(RECAPTCHA_SITEKEY, this.props.action||""))
         } else if (Platform.OS === 'android' && this.webViewRef.current !== null) {
             this.webViewRef.current.reload()
         }
@@ -59,11 +68,11 @@ export default class Recaptcha extends React.PureComponent{
                     mixedContentMode={'always'}
                     injectedJavaScript={patchPostMessageJsCode}
                     source={{
-                        html: getInvisibleRecaptchaContent("6LdeqPYUAAAAAL-nPJZjgAE0gYD5DeyH7-i-_Hee", this.props.action),
-                        baseUrl: 'https://portalnesia.com'
+                        html: getInvisibleRecaptchaContent(RECAPTCHA_SITEKEY, this.props.action||""),
+                        baseUrl: URL
                     }}
-                    onMessage={(e) => {
-                        this.props.onReceiveToken(e.nativeEvent.data)
+                    onMessage={(e: WebViewMessageEvent) => {
+                        this.props.onReceiveToken && this.props.onReceiveToken(e.nativeEvent.data)
                     }}
                 />
             </View>

@@ -22,4 +22,4 @@ const CustomAvatar = (props) => {
     </View>
   );
 };
-export default CustomAvatar;
+export default React.memo(CustomAvatar);

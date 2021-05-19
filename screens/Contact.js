@@ -1,5 +1,5 @@
 import React from 'react';
-import {  View,ScrollView,useWindowDimensions,KeyboardAvoidingView,Linking,Alert } from 'react-native';
+import {  View,ScrollView,KeyboardAvoidingView,Linking,Alert } from 'react-native';
 import {Layout as Lay,Text,Spinner,Input,useTheme,Icon } from '@ui-kitten/components'
 //import useSWR from '@pn/utils/swr'
 
@@ -15,6 +15,7 @@ import { AuthContext } from '@pn/provider/AuthProvider';
 import {CONTENT_URL,URL} from '@env'
 import { openBrowser, ucwords } from '@pn/utils/Main';
 import verifyRecaptcha from '@pn/module/Recaptcha'
+import I18n from 'i18n-js';
 
 const user=null;
 
@@ -57,7 +58,6 @@ export default function Contact({navigation,route}){
     const {copyText} = useClipboard()
     const [input,setInput] = React.useState({name:user===false ?'':user?.name,email:user===false ? '' : user.email,subject:'',message:''})
     const [loading,setLoading] = React.useState(false)
-    const {height,width}=useWindowDimensions()
     const theme = useTheme()
     const [result,setResult]=React.useState(null)
     const emailRef=React.useRef(null)
@@ -72,7 +72,7 @@ export default function Contact({navigation,route}){
         const arrInput = Object.keys(input);
         let checkError=[];
         arrInput.map((inp)=>{
-            if(input[inp].trim().match(/\S/) === null) checkError.push(`${ucwords(inp)} cannot be empty`)
+            if(input[inp].trim().match(/\S/) === null) checkError.push(I18n.t('errors.form_validation',{type:I18n.t(`form.${inp}`)}))
         })
         if(checkError.length > 0) return setNotif(true,"Error",checkError.join("\n"));
         

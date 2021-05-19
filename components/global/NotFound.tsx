@@ -1,12 +1,16 @@
 import React from 'react'
-import {useWindowDimensions,View} from 'react-native'
+import {View} from 'react-native'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import LottieView from 'lottie-react-native'
 
-export default function NotFound({children,status=404}){
+export interface NotFoundProps {
+    children?: React.ReactText;
+    status?: number
+}
+
+export default function NotFound({children,status=404}: NotFoundProps){
     const auth = React.useContext(AuthContext);
 	const {theme:selectedTheme} = auth;
-    const {width} = useWindowDimensions()
 
     const animSource=React.useMemo(()=>{
         if(status!==404) {
@@ -17,6 +21,7 @@ export default function NotFound({children,status=404}){
             else return require('@pn/assets/animation/404light.json')
         }
     },[status,selectedTheme])
+
     return (
         <View style={{flex:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}}>
             <LottieView source={animSource} autoPlay loop />

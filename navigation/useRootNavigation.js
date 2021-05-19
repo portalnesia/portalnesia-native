@@ -1,6 +1,8 @@
 import React from 'react'
 import {getActionFromState,getPathFromState,getStateFromPath,StackActions} from '@react-navigation/native'
 import {linking} from './Linking'
+import {openBrowser} from '@pn/utils/Main'
+import {URL} from '@env'
 
 export const navigationRef = React.createRef();
 
@@ -24,17 +26,27 @@ export const resetRoot=()=>{
     const state = navigationRef?.current?.getRootState();
     // PR
     //console.log(firstPathSplit,state?.routes?.[0]?.state?.routes?.[0]?.state?.routes);
-    const routes=state?.routes?.map((dt,i)=>{
-        if(dt?.state?.routes?.[0]?.name === "MainTab") {
-            dt.state.routes[0].state.index=0;
-            dt.state.routes[0].state.routes = dt?.state?.routes?.[0]?.state?.routes?.map((it,ii)=>{
-                if(it?.name === firstPathSplit) {
-                    delete it.state;
-                }
-                return it;
-            })
+    const routes=state?.routes?.map((dt)=>{
+        const route = dt?.state?.routes?.map((r)=>{
+            if(r?.name === 'MainTab') {
+                r.state.index=0;
+                r.state.routes = r?.state?.routes?.map((it)=>{
+                    if(it?.name === 'firstPathSplit') {
+                        delete it.state;
+                    }
+                    return it;
+                })
+                return r;
+            } else {
+                return undefined;
+            }
+        })
+        if(typeof route?.[0] === 'object') {
+            dt.state.routes=route;
+        } else {
+            delete dt.state;
         }
-        return dt
+        return dt;
     })
     navigationRef?.current?.resetRoot({
         index:0,
@@ -114,6 +126,36 @@ export const getActionLink=(path)=>{
         return getActionFromState(state);
     }
     return undefined;
+}
+
+export const handleLinking=(url)=>{
+    const link = getLink(url,false);
+    if(link?.match(/\/corona+/) !== null) {
+        openBrowser(link,false);
+    } else {
+        linkTo(link,false);
+    }
+}
+
+export const getLink=(link,a=true)=>{
+    if(link?.match(/\/corona+/) !== null) return `${URL}/corona`
+    let url = link.replace(`${URL}/`,"");
+    url = url.replace("pn://","");
+    const uri = url.split("?")[0];
+    const split = uri.split("/");
+    let finalPath=''
+    if(split?.[0] === 'user' && split?.[2] === 'edit') {
+        finalPath = a ? `${URL}/MainStack/${uri}` : `/MainStack/${uri}`
+    } else {
+        let firstPath='';
+        if(split[0] === 'news') firstPath='NewsStack';
+        else if(split[0]==='chord') firstPath='ChordStack';
+        else if(split[0]==='search') firstPath='SearchPath';
+        else if(['pages','setting','contact','url','blog','twibbon','login-callback','twitter'].indexOf(split[0]) !== -1) firstPath='MenuStack';
+        else firstPath="HomeStack";
+        finalPath = a ? `${URL}/MainStack/MainTab/${firstPath}/${url}` : `/MainStack/MainTab/${firstPath}/${url}`
+    }
+    return finalPath;
 }
 
 export default useRootNavigation=()=>({navigationRef,linkTo})

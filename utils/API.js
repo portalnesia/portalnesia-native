@@ -120,7 +120,7 @@ export default function useAPI(){
                 res(response?.data);
             })
             .catch((err)=>{
-                //console.log(`PNGET: ${url}`,err?.response?.data,opt)
+                console.log(`PNGET: ${url}`,err?.response?.data)
                 if(catchError) {
                     if(err?.response?.data) {
                         setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");
@@ -191,5 +191,28 @@ export default function useAPI(){
         })
     }
 
-    return {PNpost,PNget,fetcher,PNgraph}
+    const PNgetPkey=()=>{
+        return new Promise((res,rej)=>{
+            if(user===false) return rej({message: "Only for registered users"});
+            const opt={
+                headers:{
+                    'X-Session-Id':(session !== null ? session : Application.androidId),
+                    ...(user === false || user === null ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
+                },
+            }
+            API.get(`${APII}/v2/pkey`,opt)
+            .then((result)=>{
+                if(result?.data?.result) {
+                    res(result.data.result);
+                } else {
+                    rej({message:result?.data?.error_description||"Something went wrong"})
+                }
+            })
+            .catch(e=>{
+                rej({message:"Something went wrong"})
+            })
+        })
+    }
+
+    return {PNpost,PNget,fetcher,PNgraph,PNgetPkey}
 }

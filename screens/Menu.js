@@ -30,7 +30,7 @@ const supportedAbi = ['arm64-v8a','armeabi-v7a','x86','x86_64']
 
 export default function({navigation}){
     const auth = React.useContext(AuthContext)
-    const {setNotif,sendReport} = auth;
+    const {setNotif,sendReport,dispatch,state} = auth;
     const user = auth.state.user
     const {PNget} = useAPI(false)
     const theme = useTheme()
@@ -39,7 +39,7 @@ export default function({navigation}){
 	const heightHeader = heightt?.main + heightt?.sub + 20
     const [loading,setLoading] = React.useState(false)
     const menu = getMenu(i18n)
-    const {login} = useLogin();
+    const {login} = useLogin({dispatch,state,setNotif});
     const ref=React.useRef(null);
     useScrollToTop(ref)
 

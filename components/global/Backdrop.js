@@ -21,7 +21,6 @@ const LoadingBackdrop=({visible,onClose,text,theme,width})=>(
 export default function Backdrop({progress,visible,onClose,loading,text="Loading..."}){
     const theme = useTheme();
     const {width} = useWindowDimensions()
-    if(loading) return <LoadingBackdrop visible={visible} onClose={onClose} text={text} theme={theme} width={width} />
     
     const animation = React.useRef(new Animated.Value(0));
     const [scale,setScale]=React.useState(0);
@@ -40,6 +39,8 @@ export default function Backdrop({progress,visible,onClose,loading,text="Loading
         })
         return ()=>animation.current.removeAllListeners();
     },[])
+
+    if(loading) return <LoadingBackdrop visible={visible} onClose={onClose} text={text} theme={theme} width={width} />
 
     return (
         <Modal

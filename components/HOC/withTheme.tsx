@@ -1,13 +1,16 @@
 import { useTheme } from '@ui-kitten/components'
 import React from 'react'
 
-type WithThemeProps = {
-    theme: Record<string,string>
-}
+export default function withTheme<P>(Component: React.ComponentClass<P>){
+    type ComponentInstance = InstanceType<typeof Component>
+    type WrapperComponent = Omit<P,"theme"> & {
+        ref?: React.LegacyRef<ComponentInstance>
+        theme?: Record<string,string>
+    }
 
-export default function withTheme<P extends WithThemeProps>(Component: React.ComponentType<P>){
-    return function(props: P){
+    return function(props: WrapperComponent){
+        const {ref,...other}=props;
         const theme = useTheme();
-        return <Component {...props} theme={theme} />
+        return <Component {...other as P} ref={ref} theme={theme} />
     }
 }

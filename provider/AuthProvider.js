@@ -7,7 +7,7 @@ import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
-import useRootNavigation,{getPath} from '../navigation/useRootNavigation'
+import useRootNavigation,{handleLinking} from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme,PermissionsAndroid,Alert} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -18,7 +18,7 @@ import {AdsConsent, AdsConsentStatus} from '@react-native-firebase/admob'
 import {captureScreen} from 'react-native-view-shot'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
-import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener} from 'expo-linking'
+import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
 
 import {URL,ADS_PUBLISHER_ID} from '@env'
 import * as Notifications from 'expo-notifications'
@@ -29,13 +29,11 @@ import i18n from 'i18n-js'
 import {AuthContext} from './Context'
 import {API} from '@pn/utils/API'
 import {checkAndUpdateOTA} from '@pn/utils/Updates'
-import {refreshToken} from '@pn/utils/Login'
+import useLogin,{getProfile,refreshingToken} from '@pn/utils/Login'
 import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
-import {getLink} from '@pn/navigation/Linking'
-import { openBrowser } from '@pn/utils/Main';
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -53,8 +51,6 @@ const getNotifOption=(id)=>({
 	vibrationPattern:[250],
 	enableVibrate:true
 })
-
-
 
 const reducer=(prevState,action)=>{
 	switch(action?.type){
@@ -94,7 +90,8 @@ const AuthProvider = (props) => {
 	const [lang,changeLang]=React.useState("auto");
 	const lastNotif = Notifications.useLastNotificationResponse()
 	const forceUpdate = useForceUpdate();
-	const {linkTo,navigationRef} = useRootNavigation()
+	const {navigationRef} = useRootNavigation()
+	const {refreshToken} = useLogin({dispatch,state,setNotif})
 
 	const selectedTheme = React.useMemo(()=>{
 		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
@@ -153,6 +150,7 @@ const AuthProvider = (props) => {
 	}
 
 	useEffect(()=>{
+		let interval=null;
 		function registerNotificationToken(token,user){
 			API.post('/native/send_notification_token',`token=${token?.data}`,{...(user !==null ? {headers:{'X-Session-Id':user?.session_id}} : {})})
 		}
@@ -160,10 +158,10 @@ const AuthProvider = (props) => {
 			try {
 				let [user,res,lang] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
 
-				const token = await refreshToken()
+				/*const token = await refreshToken()
 				if(user !== null) {
 					user = JSON.parse(user);
-				}
+				}*/
 				//Set Theme
 				if(res !== null) setTema(res);
 				if(lang !== null) changeLang(lang);
@@ -196,11 +194,12 @@ const AuthProvider = (props) => {
 				}
 
 				//Dispatch reducer
-				if(token !== null) {
+				await refreshToken();
+				/*if(token !== null) {
 					dispatch({ type:"MANUAL",payload:{user:user,token:token,session:user?.session_id}})
 				} else {
 					dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
-				}
+				}*/
 				return;
 			} catch(err){
 				console.log("ERR",err);
@@ -235,8 +234,7 @@ const AuthProvider = (props) => {
 		}
 		function handleURL({url}){
 			if(url !== null) {
-				const link = getLink(url,false);
-				linkTo(link,false)
+				handleLinking(url)
 			}
 		}
 
@@ -251,7 +249,25 @@ const AuthProvider = (props) => {
 		})
 
 		asyncTask().then(()=>{
-			checkAndUpdateOTA();
+			checkAndUpdateOTA()
+			interval = setInterval(async()=>{
+				const token_string = await Secure.getItemAsync('token');
+				if(token_string!==null) {
+					let token = JSON.parse(token_string);
+					const date_now = Number((new Date().getTime()/1000).toFixed(0));
+					if((date_now - token.issuedAt) > (token.expiresIn||3600 - 1200)) {
+						token = await refreshingToken(token);
+						if(token) {
+							const user = await getProfile(token);
+							await Promise.all([
+								Secure.setItemAsync('token',JSON.stringify(token)),
+								...(typeof user !== 'string' ? [Secure.setItemAsync('user',JSON.stringify(user))] : [])
+							])
+							dispatch({type:"MANUAL",payload:{token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
+						}
+					}
+				}
+			},1200)
 		})
 		setNotificationChannel();
 		createFolder();
@@ -265,6 +281,7 @@ const AuthProvider = (props) => {
 			foregroundListener.remove();
 			netInfoListener();
 			ExpoRemoveListener('url',handleURL)
+			if(interval !== null) clearInterval(interval);
 		}
 	},[])
 
@@ -299,29 +316,34 @@ const AuthProvider = (props) => {
 				const res = await AsyncStorage.getItem("last_notification")
 				if(res !== id) {
 					const urls = lastNotif?.notification?.request?.content?.data?.url
-					if(urls?.match(/\/corona+/)) {
-						const url = urls?.replace(/^pn\:\/\//,"https://portalnesia.com/");
-						openBrowser(url,false)
-					} else {
-						const url = getLink(urls,false);
-						linkTo(url,false);
+					if(typeof urls ==='string') {
+						handleLinking(urls)
 					}
 					await AsyncStorage.setItem("last_notification",id);
 				}
 			}
 		}
-		setTimeout(checkNotification,500)
-	},[lastNotif])
+		if(state.user !== null) {
+			setTimeout(checkNotification,500)
+		}
+	},[lastNotif,state.user])
+
+	React.useEffect(()=>{
+		async function getInitialLink() {
+			const url = await getInitialURL();
+			if(typeof url === 'string') {
+				handleLinking(url);
+			}
+		}
+		if(state.user !== null) {
+			setTimeout(getInitialLink,500)
+		}
+	},[state.user])
 
 	const onTap=(dt)=>{
 		const urls = dt?.payload?.url
 		if(urls) {
-			if(urls?.match(/\/corona+/)) {
-				const url = urls?.replace("pn://","https://portalnesia.com/");
-				return openBrowser(url,false)
-			}
-			const url = getLink(urls,false);
-			linkTo(url,false);
+			handleLinking(urls);
 		}
 		
 	}

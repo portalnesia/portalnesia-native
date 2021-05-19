@@ -10,18 +10,21 @@ import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
 import {resetRoot} from '@pn/navigation/useRootNavigation'
 
+import Pressable from "@pn/components/global/Pressable";
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image,{ImageFull} from '@pn/components/global/Image'
 import useSWR from '@pn/utils/swr'
 import Button from '@pn/components/global/Button'
+import Avatar from '@pn/components/global/Avatar'
 import {TabBarHeight,HeaderHeight} from './utils'
 
 import RenderFollow from './Follow'
 import RenderAbout from './About'
 import RenderMedia from './Media'
-
-const user=false;
+import { AuthContext } from '@pn/provider/Context'
+import { CONTENT_URL } from '@env'
+import { ucwords } from '@pn/utils/Main'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 const {event,Value,createAnimatedComponent} = Animated
@@ -76,11 +79,14 @@ const SkeletonHeader=()=>{
 
 const tabIndexArray=['about','follower','following','media'];
 export default function UserScreen({navigation,route}){
+    const context = React.useContext(AuthContext)
+    const {state:{user}}=context
     const [ready,setReady]=React.useState(false)
     const scrollY = React.useRef(new Value(0)).current;
     const theme=useTheme();
     const {username,slug}=route.params;
     const {data,error,mutate,isValidating}=useSWR(`/user/${username}`,{},user)
+    //const swrEdit = useSWR(user && user?.id == username ? `/user/${username}/edit` : null);
     const [openMenu,setOpenMenu]=React.useState(false)
     const [refreshing,setRefreshing]=React.useState(false)
 	React.useEffect(()=>{
@@ -92,7 +98,7 @@ export default function UserScreen({navigation,route}){
             mutate();
         }
     }
-    //React.useEffect(()=>console.log(data?.users),[data]);
+    //React.useEffect(()=>console.log(data?.users?.id,user.id),[data,user]);
     //const data=undefined,error=undefined;
     const [tabIndex,setTabIndex] = React.useState(()=>{
         if(slug) {
@@ -220,12 +226,32 @@ export default function UserScreen({navigation,route}){
                 ) : (
                     <Lay style={{paddingHorizontal:15,height:HeaderHeight,justifyContent:'flex-end',flex:1,paddingBottom:10}}>
                         <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                            <View>
-                                {data?.users?.image && <Image source={{uri:`${data?.users?.image}&size=100&watermark=no`}} dataSrc={{uri:`${data?.users?.image}&watermark=no`}} style={{height:100,width:100,borderRadius:50}} fancybox />}
-                            </View>
+                            {typeof data?.users?.image !== 'undefined' && (
+                                <Lay>
+                                    <Lay style={{flexDirection:'row',justifyContent:'center',position:'relative'}}>
+                                        {data?.users?.image !== null ? (
+                                            <Image source={{uri:`${data?.users?.image}&size=100&watermark=no`}} dataSrc={{uri:`${data?.users?.image}&watermark=no`}} style={{height:100,width:100,borderRadius:50}} fancybox />
+                                        ) : (
+                                            <Avatar name={ucwords(data?.users?.name)} size={100} />
+                                        )}
+                                        <View style={{backgroundColor:theme['color-danger-600'],height:40,width:40,borderRadius:30,position:'absolute',top:60,left:60,flexDirection:'row',justifyContent:'center',alignItems:'center',overflow:'hidden'}}>
+                                            <Pressable tooltip="QR Code" style={{padding:8}} onPress={()=>handleOpenMenu('qrcode')({})}>
+                                                <Icon name="qr-code" style={{width:24,height:24,tintColor:'#fff'}} pack="material" />
+                                            </Pressable>
+                                        </View>
+                                    </Lay>
+                                </Lay>
+                            )}
                             <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
-                                <Button style={{marginRight:10}}>Follow</Button>
-                                <Button accessoryLeft={MsgIcon} status="basic" appearance="ghost" />
+                                {user?.id == data?.users?.id ? (
+                                    <Button style={{marginRight:10}} onPress={()=>navigation?.navigate("MainStack",{screen:"EditUserScreen"})}>{`Edit ${i18n.t('profile')}`}</Button>
+                                ) : (
+                                    <>
+                                        <Button style={{marginRight:10}}>Follow</Button>
+                                        <Button accessoryLeft={MsgIcon} status="basic" appearance="ghost" />
+                                    </>
+                                )}
+                                
                             </View>
                         </View>
                         <Text style={{fontSize:30,marginTop:10,fontFamily:"Inter_Bold"}}>{data?.users?.name||""}</Text>
@@ -289,9 +315,9 @@ export default function UserScreen({navigation,route}){
     }
 
     const handleOpenMenu=(tipe)=>(data)=>{
-        console.log(tipe,data)
+        //.log(tipe,data)
         setOpen({modal:tipe,...data})
-        if(tipe !== 'media') setTimeout(ref.modal?.current?.open,100)
+        if(['media','qrcode'].indexOf(tipe) === -1) setTimeout(ref.modal?.current?.open,100)
     }
     
     const handleCloseMenu=()=>{
@@ -312,10 +338,10 @@ export default function UserScreen({navigation,route}){
             mutate();
         }
 
-        return ()=>{
+        /*return ()=>{
             if(ready) setReady(false)
-        }
-    },[data,username,ready])
+        }*/
+    },[data,username,ready,user])
 
     return (
         <>
@@ -345,14 +371,22 @@ export default function UserScreen({navigation,route}){
                 </Lay>
             </Modalize>
             <Modal
-                isVisible={open?.modal==='media'}
+                isVisible={open !== null && ['media','qrcode'].indexOf(open?.modal) !== -1}
                 style={{margin:0,justifyContent:'center'}}
                 onBackdropPress={()=>setOpen(null)}
                 animationIn="fadeIn"
                 animationOut="fadeOut"
+                onBackButtonPress={()=>setOpen(null)}
             >
                 <Lay style={{maxWidth:winWidth-20,margin:10,paddingVertical:20,paddingHorizontal:10,borderRadius:10}}>
-                    {open!==null ? (
+                    {open?.modal === 'qrcode' ? (
+                        <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
+                            <ImageFull contentWidth={winWidth-40} source={{uri:`${CONTENT_URL}/qr/user/${data?.users?.username}`}} />
+                            <View style={{marginTop:15,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                <Button text>Download</Button>
+                            </View>
+                        </View>
+                    ) : open!==null ? (
                         <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
                             <ImageFull contentWidth={winWidth-40} source={{uri:`${open.src}&watermark=no`}} thumbnail={{uri:`${open.src}&size=50`}} />
                             <Text style={{marginTop:10}}>{open?.title}</Text>

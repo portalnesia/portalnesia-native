@@ -23,4 +23,4 @@ const ImageAvatar = (props) => {
   return React.createElement(Image, newProps);
 };
 
-export default ImageAvatar;
+export default React.memo(ImageAvatar);
