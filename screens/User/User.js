@@ -243,7 +243,7 @@ export default function UserScreen({navigation,route}){
                                 </Lay>
                             )}
                             <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
-                                {user?.id == data?.users?.id ? (
+                                {user && user?.id == data?.users?.id ? (
                                     <Button style={{marginRight:10}} onPress={()=>navigation?.navigate("MainStack",{screen:"EditUserScreen"})}>{`Edit ${i18n.t('profile')}`}</Button>
                                 ) : (
                                     <>
