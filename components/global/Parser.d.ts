@@ -14,9 +14,11 @@ export interface ParserProps {
     source: string;
     selectable?: boolean;
     iklan?: boolean;
-    scrollRef: React.MutableRefObject<ScrollView>;
+    scrollRef?: React.MutableRefObject<ScrollView>;
     yLayout?: number;
-    onReceiveId:(data: ContentType[])=>void
+    padding?: boolean;
+    editor?: boolean;
+    onReceiveId?:(data: ContentType[])=>void
 }
 
 export interface MarkdownProps extends ParserProps {

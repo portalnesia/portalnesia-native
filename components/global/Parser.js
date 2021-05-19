@@ -1,5 +1,5 @@
 import React from 'react'
-import {useWindowDimensions,View,Platform, Pressable} from 'react-native'
+import {View,Platform, Dimensions} from 'react-native'
 import {Text,useTheme,Divider} from '@ui-kitten/components'
 import WebView from 'react-native-webview'
 import HTML,{IGNORED_TAGS,domNodeToHTMLString,getClosestNodeParentByTag} from 'react-native-render-html'
@@ -22,6 +22,8 @@ import {pushTo} from '../../navigation/useRootNavigation'
 let Hid = [];
 
 const Url = require('url-parse')
+
+const {width: screenWidth} = Dimensions.get('window')
 
 const GlobalImageRender=({src,dataSrc,thumbnail})=>{
     return <Image source={{uri:src}} fullSize fancybox dataSrc={{uri:dataSrc}} {...(thumbnail ? {thumbnail:{uri:thumbnail}} : {})} />
@@ -59,16 +61,18 @@ const onLinkPress=(e,href)=>{
 }
 
 const TextRender=(attribs,children,style,props)=>{
+    const padding=props?.renderersProps?.padding;
     if(['img','picture'].indexOf(props?.domNode?.children?.[0]?.name) !== -1 || ['a'].indexOf(props?.domNode?.children?.[0]?.name) !== -1 && typeof props?.domNode?.children?.[0]?.attribs?.['data-fancybox'] === 'string') return children;
-    if(['a'].indexOf(props?.domNode?.children?.[0]?.name) !== -1) return <Text selectable={props?.selectable||false} key={props?.key} style={[global_style.container,{marginVertical:10,flexWrap:'wrap',lineHeight:23}]}>{children}</Text>
+    if(['a'].indexOf(props?.domNode?.children?.[0]?.name) !== -1) return <Text selectable={props?.selectable||false} key={props?.key} style={{marginVertical:10,flexWrap:'wrap',lineHeight:23,...(padding ? {...global_style.container} : {})}}>{children}</Text>
     if(props?.data && (props?.data?.length === 0 || props?.data == '&nbsp;')) return null
     return (
-        <Text selectable={props?.selectable||false} key={props?.key} style={[global_style.container,{marginVertical:10,flexWrap:'wrap',lineHeight:23}]}>{(props?.domNode?.data || props.data || children)}</Text>
+        <Text  selectable={props?.selectable||false} key={props?.key} style={{marginVertical:10,flexWrap:'wrap',lineHeight:23,...(padding ? {...global_style.container} : {})}}>{(props?.domNode?.data || props.data || children)}</Text>
     )
 }
 
 const ARender=(attribs,children,style,props)=>{
     const {href}=attribs
+    const padding=props?.renderersProps?.padding;
     if( attribs?.['data-fancybox']
         || href?.match(/^javascript\:/)
         || href?.match(/^\/+/)
@@ -79,7 +83,7 @@ const ARender=(attribs,children,style,props)=>{
         const scrollRef=props?.renderersProps?.scrollRef;
         const yLayout=props?.renderersProps?.yLayout;
         const onPress=()=>{
-            onLinkPagePress(attribs?.href?.substring(1),yLayout,scrollRef)
+            if(scrollRef && yLayout) onLinkPagePress(attribs?.href?.substring(1),yLayout,scrollRef)
         }
         return (
             <Text selectable={props?.selectable||false} key={props?.key} onPress={onPress}>
@@ -97,7 +101,7 @@ const ARender=(attribs,children,style,props)=>{
             selectable={props?.selectable||false}
             onPress={onPress}
             key={props?.key}
-            style={[global_style.container,style,{lineHeight:23,textDecorationLine:"underline"}]}
+            style={{lineHeight:23,textDecorationLine:"underline",...(padding ? {...global_style.container} : {})}}
             status="info"
             >
             {props?.domNode?.children?.[0]?.data || props?.domNode?.data || props.data}
@@ -124,8 +128,9 @@ const TableRender=(attribs,children,style,props)=>{
 }
 
 const CaptionRender=(attribs,children,style,props)=>{
+    const padding=props?.renderersProps?.padding;
     return (
-        <Text selectable={props?.selectable||false} key={props?.key} appearance="hint" category="c1" style={[global_style.container,{flexWrap:'wrap'}]}>{props?.domNode?.children?.[0]?.data||props?.data||children}</Text>
+        <Text selectable={props?.selectable||false} key={props?.key} appearance="hint" category="c1" style={{flexWrap:'wrap',...(padding ? {...global_style.container} : {})}}>{props?.domNode?.children?.[0]?.data||props?.data||children}</Text>
     )
 }
 
@@ -147,8 +152,8 @@ const ImageRender=(attribs,children,style,props)=>{
     const {src}=node?.attribs;
     const withPng = node?.attribs?.['data-png'] == "true";
     const srrrc=node?.attribs?.['data-src']||src;
-    const dtSrc = aa !== null && aa?.attribs?.['data-src'] ? `${aa?.attribs?.['data-src']}${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
-    const dtCaption = aa !== null && aa?.attribs?.['data-caption'] ? aa?.attribs?.['data-caption'] : "";
+    const dtSrc = aa?.attribs?.['data-src'] ? `${aa?.attribs?.['data-src']}${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
+    const dtCaption = aa?.attribs?.['data-caption'] ? aa?.attribs?.['data-caption'] : "";
     const srrc=!srrrc?.match(/portalnesia\.com\/+/) ? `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=400${withPng ? '&output=png' : '&output=webp'}` : `${srrrc}${withPng ? '&output=png' : ''}`;
     let thumb;
     if(!withPng) {
@@ -166,6 +171,7 @@ const ImageRender=(attribs,children,style,props)=>{
 }
 
 const HRender=(type)=>(attribs,children,style,props)=>{
+    const padding=props?.renderersProps?.padding;
     const scrollRef=props?.renderersProps?.scrollRef;
     const yLayout=props?.renderersProps?.yLayout;
     const onReceiveId=props?.renderersProps?.onReceiveId;
@@ -180,6 +186,11 @@ const HRender=(type)=>(attribs,children,style,props)=>{
         id = name.split(' ').slice(0,3).join(' ');
         id = jsStyles(id);
     }
+
+    const onPress=()=>{
+        if(scrollRef && yLayout) onLinkPagePress(id,yLayout,scrollRef)
+    }
+
     const withTableClass = props?.domNode?.attribs?.class?.match(/no-table-content/);
     const withTable = withTableClass === undefined || withTableClass === null;
     const withUnderlineClass = props?.domNode?.attribs?.class?.match(/no-underline/);
@@ -198,7 +209,7 @@ const HRender=(type)=>(attribs,children,style,props)=>{
 
     return (
         <View key={props?.key} onLayout={onLayout} >
-            <Text onPress={()=>typeof block === 'undefined' && withTable && onLinkPagePress(id,yLayout,scrollRef)} selectable={props?.selectable||false} category={heading} style={[global_style.container,{marginTop:20,marginBottom:10,...(withUnderline ? {paddingBottom:5,borderBottomColor:props?.renderersProps?.theme['border-text-color'],borderBottomWidth:2} : {})}]}>{children||props?.data}</Text>
+            <Text onPress={()=>typeof block === 'undefined' && withTable && onPress()} selectable={props?.selectable||false} category={heading} style={{marginTop:20,marginBottom:10,...(withUnderline ? {paddingBottom:5,borderBottomColor:props?.renderersProps?.theme['border-text-color'],borderBottomWidth:2} : {}),...(padding ? {...global_style.container} : {})}}>{children||props?.data}</Text>
         </View>
     )
 }
@@ -225,12 +236,12 @@ const DivRender=(attribs,children,style,props)=>{
 
 const IframeRender=(attribs,children,style,props)=>{
     const {src,width,height} = attribs
-    if(!width || !height) {
+    if(!width||!height) {
         return (
-            <WebView
+            <AutoHeightWebView
                 allowsFullscreenVideo
                 key={props?.key}
-                style={{ width: props?.renderersProps?.screenWidth, marginVertical: 10,marginHorizontal:15}}
+                style={{ width: screenWidth, marginVertical: 10,marginHorizontal:15}}
                 source={{uri:src}}
                 //viewportContent={'width=device-width, user-scalable=no'}
             />
@@ -238,7 +249,7 @@ const IframeRender=(attribs,children,style,props)=>{
     }
     const ratio = Number(height)/Number(width)
     return (
-        <View key={props?.key} style={{width:props?.renderersProps?.screenWidth,height:Number((props?.renderersProps?.screenWidth * ratio))}}>
+        <View key={props?.key} style={{width:screenWidth,height:Number((screenWidth * ratio))}}>
             <WebView source={{uri:src}} allowsFullscreenVideo style={{opacity:0.99,overflow:'hidden'}} />
         </View>
     )
@@ -246,34 +257,37 @@ const IframeRender=(attribs,children,style,props)=>{
 
 const CodeRender=(attribs,children,style,props)=>{
     let data
-    if(props?.domNode?.children?.[0]?.data) {
+    const padding=props?.renderersProps?.padding;
+    const node = props?.domNode;
+    const pre = getClosestNodeParentByTag(node,"pre");
+    const editor=props?.renderersProps?.editor;
+    const widthh = editor ? screenWidth-30 : screenWidth;
+    
+    if(pre && props?.domNode?.children?.[0]?.data) {
         data = props?.domNode?.children?.[0]?.data
-
-        if(attribs?.class && attribs?.class?.match(/language\-(\w+)/) !== null) {
-            const lang = attribs?.class?.match(/language\-(\w+)/)
-            return (
-                <View key={props?.key} style={[global_style.container,{width:props?.renderersProps?.screenWidth}]}>
-                    <Syntax language={(lang[1] === 'js' ? 'javascript' : lang[1])} fontSize={14} style={androidstudio} customStyle={{borderRadius:5,padding:0}} codeTagProps={{style:{padding:8}}}>{data}</Syntax>
-                </View>
-            )
-        }
-
-        data = <Text selectable={props?.selectable||false} style={{...(props?.tagsStyles?.code||{}),lineHeight:23}}>{data}</Text>
-    } else {
-        data = children||props?.data
-    }
-
-    return (
-        <View key={props?.key} style={[global_style.container,{width:props?.renderersProps?.screenWidth}]}>
-            <View style={{flex:1,borderRadius:5,backgroundColor:'#282B2E',padding:8,overflow:'scroll'}}>
-                {data}
+        data = data.substring(data?.length-1,data?.length) === '\n' ? data.substring(0,data?.length -1) : data;
+        const lang = attribs?.class ? attribs?.class?.match(/language\-(\w+)/) : null;
+        return (
+            <View key={props?.key} style={{width:widthh,flex:1,...(padding ? {...global_style.container} : {})}}>
+                <Syntax language={(lang === null ? 'text' : lang[1].toLowerCase() === 'js' ? 'javascript' : lang[1].toLowerCase())} fontSize={14} style={androidstudio} customStyle={{borderRadius:5,padding:0}} codeTagProps={{style:{padding:8}}}>{data}</Syntax>
             </View>
-        </View>
-    )
+        )
+    } else {
+        return (
+            <Text key={props?.key} style={{fontSize:14,lineHeight:14+10,borderRadius:5,backgroundColor:'rgba(0,0,0,0.04)'}}>
+                {props?.domNode?.children?.[0]?.data||props?.data ? (
+                    <Text style={{color:'#e83e8c',fontFamily:(Platform.OS ==  'ios' ? 'Menlo-Regular' : 'monospace'),fontSize:14}}>{` ${(props?.domNode?.children?.[0]?.data||props?.data)} `}</Text>
+                ) : children}
+            </Text>
+        )
+    }
 }
 
 const BlockRender=(attribs,children,style,props)=>{
+    const padding=props?.renderersProps?.padding;
     const selectedTheme=props?.renderersProps?.selectedTheme;
+    const editor=props?.renderersProps?.editor;
+    const widthh = editor ? screenWidth-40 : screenWidth-10;
     if(attribs?.class == "tiktok-embed") {
         let ht = domNodeToHTMLString(props?.domNode);
         let html=`<script async src="https://www.tiktok.com/embed.js"></script>${ht}`;
@@ -281,7 +295,7 @@ const BlockRender=(attribs,children,style,props)=>{
         return (
             <AutoHeightWebView
                 key={props?.key}
-                style={{ width: props?.renderersProps?.screenWidth - 10, marginVertical: 20,marginHorizontal:5 }}
+                style={{ width: screenWidth, marginVertical: 20,marginHorizontal:5 }}
                 source={{html,baseUrl:"https://www.tiktok.com"}}
                 javaScriptEnabled
                 viewportContent={'width=device-width, user-scalable=no'}
@@ -296,7 +310,7 @@ const BlockRender=(attribs,children,style,props)=>{
         return (
             <AutoHeightWebView
                 key={props?.key}
-                style={{ width: props?.renderersProps?.screenWidth - 10, marginVertical: 20,marginHorizontal:5 }}
+                style={{ width: screenWidth, marginVertical: 20,marginHorizontal:5 }}
                 source={{html,baseUrl:"https://platform.twitter.com"}}
                 javaScriptEnabled
                 viewportContent={'width=device-width, user-scalable=no'}
@@ -309,7 +323,7 @@ const BlockRender=(attribs,children,style,props)=>{
         return (
             <AutoHeightWebView
                 key={props?.key}
-                style={{ width: props?.renderersProps?.screenWidth - 10, marginVertical: 20,marginHorizontal:5 }}
+                style={{ width: screenWidth, marginVertical: 20,marginHorizontal:5 }}
                 source={{html,baseUrl:"https://www.instagram.com"}}
                 javaScriptEnabled
                 injectedJavaScript={`
@@ -331,7 +345,7 @@ const BlockRender=(attribs,children,style,props)=>{
     }
 
     return (
-        <View key={props?.key} style={[global_style.container,{width:props?.renderersProps?.screenWidth}]}>
+        <View key={props?.key} style={{width:widthh,...(padding ? {...global_style.container} : {})}}>
             <View style={{flex:1,borderRadius:5,backgroundColor:props?.renderersProps?.theme['color-code-background'],padding:8,borderLeftColor:props?.renderersProps?.theme['color-code-border'],borderLeftWidth:5}}>
                 {data}
             </View>
@@ -341,11 +355,15 @@ const BlockRender=(attribs,children,style,props)=>{
 
 const FigureRender=(attribs,children,style,props)=>children
 
-export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yLayout=0,onReceiveId})=>{
-    const {width: screenWidth} = useWindowDimensions()
+const DelRender=(attribs,children,style,props)=>{
+    return <Text key={props?.key} style={{marginVertical:10,flexWrap:'wrap',lineHeight:23,textDecorationLine:'line-through',textDecorationStyle:'solid'}}>{(props?.domNode?.data || props.data || children)}</Text>
+}
+
+export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yLayout=0,onReceiveId,padding=true,editor=false})=>{
     const theme = useTheme()
     const context = React.useContext(AuthContext);
     const {theme:selectedTheme} = context
+    if(source.length === 0 ) return null;
     //const context = React.useContext(AuthContext)
     //const {setNotif} = context
     //const [TableContent,setTableContent]=React.useState([]);
@@ -388,18 +406,22 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
         img:{renderer:ImageRender,wrapper:"View"},
         hr:{renderer:HrRender,wrapper:"View"},
         code:{renderer:CodeRender,wrapper:"Text"},
+        code:{renderer:CodeRender,wrapper:"View"},
         blockquote:{renderer:BlockRender,wrapper:"Text"},
         figure:{renderer:FigureRender,wrapper:"View"},
+        del:{renderer:DelRender,wrapper:"Text"},
+        del:{renderer:DelRender,wrapper:"View"},
     }
 
     const renderersProps={
         theme,
         iklan,
-        screenWidth,
         selectedTheme,
         scrollRef,
         yLayout,
-        onReceiveId
+        onReceiveId,
+        padding,
+        editor
     }
 
     /*const alterData=(node)=>{
@@ -419,7 +441,8 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
         ignoredTags:[...IGNORED_TAGS,...TABLE_IGNORED_TAGS],
         contentWidth:screenWidth,
         WebView,
-        defaultTextProps:{flexWrap:'wrap',fontSize:15,color:theme['text-basic-color'],selectable:selectable||false},
+        defaultTextProps:{selectable:selectable||false},
+        baseFontStyle:{flexWrap:'wrap',fontSize:15,color:theme['text-basic-color']},
         onLinkPress,
         defaultWebViewProps:{style:{opacity:0.99,overflow:'hidden'}},
         onParsed,
@@ -490,7 +513,7 @@ export const Markdown=({source,skipHtml,...other})=>{
             breaks:true
         })
         const hhtm = marked(source)
-        const allowedTags=['p','h1','h2','h3','figcaption','b','strong','li','ul','ol','em','i','hr','pre','code','a','br','small','span','caption','table','tbody','thead','td','tr','tfoot'];
+        const allowedTags=['p','h1','h2','h3','figcaption','b','strong','li','ul','ol','em','i','hr','pre','code','a','br','small','span','caption','table','tbody','thead','td','tr','tfoot','del'];
         const allowed = skipHtml ? allowedTags : allowedTags.concat(['img','iframe']);
         return sanitizeHtml(hhtm,{
             allowedTags:allowed,
@@ -500,6 +523,8 @@ export const Markdown=({source,skipHtml,...other})=>{
             allowedSchemesAppliedToAttributes:['href','src','cite','data-*','srcset'],
         })
     },[source,skipHtml])
+
+    //React.useEffect(()=>console.log("HTML",html),[html])
 
     return <Parser source={html} {...other} />
 }

@@ -27,6 +27,7 @@
     "popular":"Terpopuler",
     "popular_type":"%{type} Terpopuler",
     "change":"Ubah",
+    "change_type":"Ubah %{type}",
     "twitter_thread":"Utas Twitter",
     "news":"Berita",
     "chord":"Kord",
@@ -41,9 +42,19 @@
     "light":"terang",
     "dark":"gelap",
     "device":"perangkat",
+    "profile":"profil",
+    "profile_type":"%{type} profil",
     "theme":"tema",
     "theme_type":"Tema %{type}",
     "image":"gambar",
+    "picture": {
+        "one":"gambar",
+        "other":"gambar"
+    },
+    "photo":  {
+        "one":"foto",
+        "other":"foto"
+    },
     "select":"Pilih %{type}",
     "load_more":"Muat lebih banyak",
     "see_more":"Lihat Lainnya",
@@ -61,6 +72,8 @@
     },
     "reply":"Balas",
     "delete":"Hapus",
+    "remove":"Hapus",
+    "remove_type":"Hapus %{type}",
     "add_type":"Tambah %{type}",
     "no_comment":"Belum ada komentar.",
     "no_reply":"Belum ada balasan.",
@@ -83,14 +96,17 @@
     "errors":{
         "general":"Kesalahan",
         "server":"Kesalahan internal server",
-        "permission_storage":"Maaf, kami membutuhkan izin penyimpanan",
+        "permission_storage":"Maaf, kami membutuhkan izin penyimpanan internal",
+        "permission_location":"Maaf, kami membutuhkan izin lokasi",
         "form_validation":"%{type} tidak boleh kosong",
         "image":"Pilih gambar terlebih dahulu",
         "no_image":"Tidak dapat menemukan gambar",
         "upload":"Kesalahan ketika mengunggah gambar Anda",
         "size_image":"Maaf, ukuran file terlalu besar. Ukuran maksimal gambar adalah 5MB",
         "youtube_service":"Anda harus menginstal aplikasi youtube resmi untuk dapat menonton video.\n\nKlik di sini untuk menonton dalam mode layar penuh.",
-        "invalid":"%{type} tidak valid"
+        "invalid":"%{type} tidak valid",
+        "sure":"Apakah Anda yakin?",
+        "location_disabled":"Layanan lokasi Anda tidak aktif"
     },
     "report_placeholder":{
         "placeholder_url":"Mohon maaf atas ketidaknyamanannya, sepertinya ada masalah dengan layanan server internal kami. Bisakah Anda memberi tahu kami bagaimana ini bisa terjadi?",
@@ -99,7 +115,9 @@
     },
     "form":{
         "name":"Nama",
-        "email":"Surel"
+        "email":"Surel",
+        "subject":"Subjek",
+        "message":"Pesan"
     },
     "home_not_login":{
         "news":"Kumpulan berita yang diperbarui setiap harinya.",
@@ -137,5 +155,9 @@
     "media":{
         "video_player":"pemutar video",
         "music_player":"pemutar musik"
+    },
+    "gender":{
+        "male":"Laki-laki",
+        "female":"Perempuan"
     }
 }

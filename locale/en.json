@@ -27,6 +27,7 @@
     "popular":"Popular",
     "popular_type":"Popular %{type}",
     "change":"Change",
+    "change_type":"Change %{type}",
     "twitter_thread":"Twitter Thread",
     "news":"News",
     "chord":"Chord",
@@ -41,9 +42,19 @@
     "light":"light",
     "dark":"dark",
     "device":"device",
+    "profile":"profile",
+    "profile_type":"profile %{type}",
     "theme":"theme",
     "theme_type":"%{type} theme",
     "image":"Image",
+    "picture": {
+        "one":"picture",
+        "other":"pictures"
+    },
+    "photo": {
+        "one":"photo",
+        "other":"photos"
+    },
     "select":"Select %{type}",
     "load_more":"Load more",
     "see_more":"See more",
@@ -61,6 +72,8 @@
     },
     "reply":"Reply",
     "delete":"Delete",
+    "remove":"Remove",
+    "remove_type":"Remove %{type}",
     "add_type":"Add %{type}",
     "no_comment":"There are no comments yet.",
     "no_reply":"There are no reply yet.",
@@ -84,13 +97,16 @@
         "general":"Something went wrong",
         "server":"Internal server error",
         "permission_storage":"Sorry, we need storage permissions",
+        "permission_location":"Sorry, we need location permissions",
         "form_validation":"%{type} cannot be empty",
         "image":"Please select image first",
         "no_image":"Cannot find image",
         "upload":"Sorry, error while uploading your image",
         "size_image":"Sorry, your file is too large. Maximum images size is 5 MB",
         "youtube_service":"You have to install the official youtube apps to be able to watch videos.\n\nClick here to watch in fullscreen mode.",
-        "invalid":"Invalid %{type}"
+        "invalid":"Invalid %{type}",
+        "sure":"Are you sure?",
+        "location_disabled":"Your location services is not active"
     },
     "report_placeholder":{
         "placeholder_url":"We are sorry for the inconvenience, it seems that there is a problem with our internal server service. Can you tell us how this happened?",
@@ -99,7 +115,9 @@
     },
     "form":{
         "name":"Name",
-        "email":"Email"
+        "email":"Email",
+        "subject":"Subject",
+        "message":"Message"
     },
     "home_not_login":{
         "news":"A collection of news that is updated every day.",
@@ -136,5 +154,9 @@
     "media":{
         "video_player":"video player",
         "music_player":"music_player"
+    },
+    "gender":{
+        "male":"Male",
+        "female":"Female"
     }
 }
