@@ -83,55 +83,59 @@ export default function({navigation,route}){
 
     return (
         <>
-            <Layout navigation={navigation} custom={
+            <Layout navigation={navigation}>
                 <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 2,transform: [{translateY}]}}>
                     <Header title={navbar||"Pages"} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />} />
                 </Animated.View>
-            }>
                 {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
-                {!data && !error ? (
-                    <View style={{height:'100%',paddingTop:heightHeader+8}}>
-                        <Skeleton type="article" />
-                    </View>
-                ) : error || data?.error ? (
-                    <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-                ) : data?.pages?.text ? (
-                    <Animated.ScrollView
-                        ref={scrollRef}
-                        contentContainerStyle={{
-                            flexGrow: 1,
-                            paddingTop:heightHeader+2
-                        }}
-                        {...other}
-                        {...((!data && !error) || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
-                    >
-                    <Lay style={[style.container,{paddingVertical:20}]}>
-                        <Text category="h2" style={{paddingVertical:10}}>{data?.pages?.title}</Text>
-                        <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text style={{fontSize:13}}>{`Last modified ${data?.pages?.date}`}</Text>
-                            <Text style={{fontSize:13}}>{`${data?.pages?.seen?.format} views`}</Text>
-                        </Lay>
-                        <Lay style={{paddingBottom:5,flexDirection:'row'}}>
-                            <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}}>{"Portalnesia"}</Text>
-                        </Lay>
-                    </Lay>
-                    {content?.length > 0 && (
+                
+                <Animated.ScrollView
+                    ref={scrollRef}
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        paddingTop:heightHeader+2
+                    }}
+                    refreshControl={
+                        <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                    }
+                    {...other}
+                >
+                    {!data && !error ? (
+                        <View style={{height:'100%',paddingTop:heightHeader+2}}>
+                            <Skeleton type="article" />
+                        </View>
+                    ) : error || data?.error ? (
+                        <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
+                    ) : data?.pages?.text ? (
                         <>
+                            <Lay style={[style.container,{paddingVertical:20}]}>
+                                <Text category="h2" style={{paddingVertical:10}}>{data?.pages?.title}</Text>
+                                <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                                    <Text style={{fontSize:13}}>{`Last modified ${data?.pages?.date}`}</Text>
+                                    <Text style={{fontSize:13}}>{`${data?.pages?.seen?.format} views`}</Text>
+                                </Lay>
+                                <Lay style={{paddingBottom:5,flexDirection:'row'}}>
+                                    <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}}>{"Portalnesia"}</Text>
+                                </Lay>
+                            </Lay>
+                            {content?.length > 0 && (
+                                <>
+                                    <Divider style={{backgroundColor:theme['border-text-color']}} />
+                                    <TableContent.Text onPress={onShowContent} />
+                                </>
+                            )}
                             <Divider style={{backgroundColor:theme['border-text-color']}} />
-                            <TableContent.Text onPress={onShowContent} />
+                            <Lay style={{paddingBottom:50}} onLayout={onLayout}>
+                                {data?.pages?.format === 'html' ? (
+                                    <Parser source={data?.pages?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                                ) : (
+                                    <Markdown source={data?.pages?.text} skipHtml={false} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                                )}
+                                
+                            </Lay>
                         </>
-                    )}
-                    <Divider style={{backgroundColor:theme['border-text-color']}} />
-                    <Lay style={{paddingBottom:50}} onLayout={onLayout}>
-                        {data?.pages?.format === 'html' ? (
-                            <Parser source={data?.pages?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
-                        ) : (
-                            <Markdown source={data?.pages?.text} skipHtml={false} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
-                        )}
-                        
-                    </Lay>
-                    </Animated.ScrollView>
-                ) : null}
+                    ) : null}
+                </Animated.ScrollView>
             </Layout>
             {data && data?.error==0 && (
                  <MenuContainer

@@ -84,82 +84,85 @@ export default function({navigation,route}){
 
     return (
         <>
-        <Layout navigation={navigation} custom={
+        <Layout navigation={navigation}>
             <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 2,transform: [{translateY}]}}>
 				<Header title='Blog' subtitle={data?.blog?.title||""} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />} />
 			</Animated.View>
-        }>
             {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
-            {!data && !error ? (
-                <View style={{height:'100%',paddingTop:heightHeader+8}}>
-                    <Skeleton type="article" />
-                </View>
-            ) : error || data?.error ? (
-                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-            ) : data?.blog?.text ? (
-                <Animated.ScrollView
+            <Animated.ScrollView
                 ref={scrollRef}
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        paddingTop:heightHeader+2
-                    }}
-                    {...other}
-                    {...((!data && !error) || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
-                >
-                    <Lay style={[style.container,{paddingVertical:20}]}>
-                        <Text category="h2" style={{paddingVertical:10}}>{data?.blog?.title}</Text>
-                        <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text  numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.blog?.date}`}</Text>
-                            <Text style={{fontSize:13}}><Text><CountUp data={data?.blog?.seen} /></Text> <Text>views</Text></Text>
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    paddingTop:heightHeader+2
+                }}
+                refreshControl={
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                }
+                {...other}
+            >
+                {!data && !error ? (
+                    <View style={{height:'100%',paddingTop:heightHeader+2}}>
+                        <Skeleton type="article" />
+                    </View>
+                ) : error || data?.error ? (
+                    <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
+                ) : data?.blog?.text ? (
+                    <>
+                        <Lay style={[style.container,{paddingVertical:20}]}>
+                            <Text category="h2" style={{paddingVertical:10}}>{data?.blog?.title}</Text>
+                            <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                                <Text  numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.blog?.date}`}</Text>
+                                <Text style={{fontSize:13}}><Text><CountUp data={data?.blog?.seen} /></Text> <Text>views</Text></Text>
+                            </Lay>
+                            <Text>
+                                <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.blog?.users?.username}`)}>{data?.blog?.users?.name||"Portalnesia"}</Text>
+                            </Text>
                         </Lay>
-                        <Text>
-                            <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.blog?.users?.username}`)}>{data?.blog?.users?.name||"Portalnesia"}</Text>
-                        </Text>
-                    </Lay>
-                    {content?.length > 0 && (
-                        <>
-                            <Divider style={{backgroundColor:theme['border-text-color']}} />
-                            <TableContent.Text onPress={onShowContent} />
-                        </>
-                    )}
-                    <Divider style={{backgroundColor:theme['border-text-color']}} />
-                    <Lay style={{paddingBottom:20}} onLayout={onLayout}>
-                        {data?.blog?.format === 'html' ? (
-                            <Parser source={data?.blog?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
-                        ) : (
-                            <Markdown source={data?.blog?.text} skipHtml={false} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                        {content?.length > 0 && (
+                            <>
+                                <Divider style={{backgroundColor:theme['border-text-color']}} />
+                                <TableContent.Text onPress={onShowContent} />
+                            </>
                         )}
-                    </Lay>
-                    <Divider style={{backgroundColor:theme['border-text-color']}} />
-                    <Lay style={[style.container,{paddingBottom:20,paddingTop:20}]}>
-                        <Text>Category: <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/category/${PNslug(data?.blog?.category)}`)} >{ucwords(data?.blog?.category)}</Text></Text>
-                        <Text><Text>Tags: </Text>
-                            {data?.blog?.tag?.map((dt,i)=>(
-                                <React.Fragment key={i}>
-                                    <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/tags/${PNslug(dt)}`)}>{`${dt}`}</Text>
-                                    {i+1 !== data?.blog?.tag?.length && <Text>, </Text>}
-                                </React.Fragment>
-                            ))}
-                        </Text>
-                    </Lay>
-                    <Lay style={{paddingVertical:5}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                    {data && data?.others?.length > 0 ? (
-                        <Lay style={{paddingVertical:10,paddingBottom:20}}>
-                            <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('others_type',{type:i18n.t('post')})}</Text>
-                            <Carousel
-                                data={data?.others}
-                                renderItem={(props)=><RenderCaraousel {...props} />}
-                                autoplay
-                            />
+                        <Divider style={{backgroundColor:theme['border-text-color']}} />
+                        <Lay style={{paddingBottom:20}} onLayout={onLayout}>
+                            {data?.blog?.format === 'html' ? (
+                                <Parser source={data?.blog?.text} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                            ) : (
+                                <Markdown source={data?.blog?.text} skipHtml={false} selectable scrollRef={scrollRef} yLayout={yLayout} onReceiveId={onReceiveId} />
+                            )}
                         </Lay>
-                    ): null}
-                    {data && data?.blog?.id ? (
-                        <Lay style={{paddingBottom:50}}>
-                            <Comment navigation={navigation} total={data?.blog?.comment_count} type="chord" posId={data?.blog?.id} posUrl={`chord/${data?.blog?.slug}`} />
+                        <Divider style={{backgroundColor:theme['border-text-color']}} />
+                        <Lay style={[style.container,{paddingBottom:20,paddingTop:20}]}>
+                            <Text>Category: <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/category/${PNslug(data?.blog?.category)}`)} >{ucwords(data?.blog?.category)}</Text></Text>
+                            <Text><Text>Tags: </Text>
+                                {data?.blog?.tag?.map((dt,i)=>(
+                                    <React.Fragment key={i}>
+                                        <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/blog/tags/${PNslug(dt)}`)}>{`${dt}`}</Text>
+                                        {i+1 !== data?.blog?.tag?.length && <Text>, </Text>}
+                                    </React.Fragment>
+                                ))}
+                            </Text>
                         </Lay>
-                    ): null}
-                </Animated.ScrollView>
-            ) : null}
+                        <Lay style={{paddingVertical:5}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                        {data && data?.others?.length > 0 ? (
+                            <Lay style={{paddingVertical:10,paddingBottom:20}}>
+                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('others_type',{type:i18n.t('post')})}</Text>
+                                <Carousel
+                                    data={data?.others}
+                                    renderItem={(props)=><RenderCaraousel {...props} />}
+                                    autoplay
+                                />
+                            </Lay>
+                        ): null}
+                        {data && data?.blog?.id ? (
+                            <Lay style={{paddingBottom:50}}>
+                                <Comment navigation={navigation} total={data?.blog?.comment_count} type="chord" posId={data?.blog?.id} posUrl={`chord/${data?.blog?.slug}`} />
+                            </Lay>
+                        ): null}
+                    </>
+                ) : null}
+            </Animated.ScrollView>
         </Layout>
         {data && data?.error==0 && (
             <MenuContainer

@@ -87,8 +87,8 @@ export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
                 if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
                 setNotif(false,"You've successfully logged out.")
             }
-            
         }
+        return;
     }
 
     async function refreshToken() {
@@ -96,7 +96,7 @@ export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
         if(token_string!==null) {
             let token: TokenResponse = JSON.parse(token_string);
             const date_now = Number((new Date().getTime()/1000).toFixed(0));
-            if((date_now - token.issuedAt) > (token.expiresIn||3600 - 1000)) {
+            if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
                 token = await refreshingToken(token);
                 if(token) {
                     const user = await getProfile(token);
@@ -120,6 +120,7 @@ export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
             ])
             if(typeof dispatch === 'function') dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Application.androidId}})
         }
+        return;
     }
 
     return {login,logout,refreshToken}

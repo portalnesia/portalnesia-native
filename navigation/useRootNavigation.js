@@ -80,8 +80,9 @@ export const pushTo=(path,parseLink=true)=>{
         } else {
             const index_of=['/','/chord','/news','/login-callback','/search'].indexOf(path);
             if(index_of !== -1) {
-                const firstScreen=['HomeStack','ChordStack','NewsStack','MenuStack','SearchStack'];
-                finalPath=`/MainStack/MainTab/${firstScreen[index_of]}${path}`;
+                return linkTo(path);
+                //const firstScreen=['HomeStack','ChordStack','NewsStack','MenuStack','SearchStack'];
+                //finalPath=`/MainStack/MainTab/${firstScreen[index_of]}${path}`;
             } else {
                 const firstPathSplit = getRootPath();
                 finalPath=`/MainStack/MainTab/${firstPathSplit}${path}`;
@@ -95,7 +96,7 @@ export const pushTo=(path,parseLink=true)=>{
     if(state) {
         const action = getActionFromState(state);
         if(action !== undefined) {
-            const PushAction = StackActions.push(action?.payload?.params?.screen,action?.payload?.params?.params)
+            const PushAction = StackActions.push(action?.payload?.params?.params?.params?.screen,action?.payload?.params?.params?.params?.params)
             dispatch(PushAction);
         } else {
             reset(state)

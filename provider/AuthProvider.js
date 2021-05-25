@@ -246,7 +246,7 @@ const AuthProvider = (props) => {
 				if(token_string!==null) {
 					let token = JSON.parse(token_string);
 					const date_now = Number((new Date().getTime()/1000).toFixed(0));
-					if((date_now - token.issuedAt) > (token.expiresIn||3600 - 1200)) {
+					if((date_now - token.issuedAt) > (token.expiresIn||3600 - 300)) {
 						token = await refreshingToken(token);
 						if(token) {
 							const user = await getProfile(token);
@@ -258,7 +258,7 @@ const AuthProvider = (props) => {
 						}
 					}
 				}
-			},1200)
+			},295 * 1000)
 		})
 		setNotificationChannel();
 		createFolder();

@@ -197,150 +197,154 @@ function ChordDetailScreen({navigation,route}){
                     ) : null}
                 </Header>
             </AnimLay>
-            {!data && !error ? (
-                <View style={{height:'100%',paddingTop:heightHeader+8}}>
-                    <Skeleton type="article" />
-                </View>
-            ) : error || data?.error ? (
-                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-            ) : data?.chord?.text ? (
-                <Animated.ScrollView
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        ...(!viewVideo ? {paddingTop:heightHeader+2} : {})
-                    }}
-                    onScroll={onScroll}
-                    {...other}
-                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" refreshing={isValidating} onRefresh={()=>mutate()} {...(!viewVideo ? {progressViewOffset:heightHeader} : {})} /> } : {})}
-                >
-                    <Lay key={0} style={[style.container,{paddingTop:10}]}>
-                        <Text category="h3">{data?.chord?.title}</Text>
-                        <Lay key="lay-0" style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text numberOfLines={1} style={{flex:1,marginRight:20}}>
-                                <Text style={{fontSize:13}}>Artist: </Text>
-                                <Text style={{fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>linkTo(`/chord/artist/${data?.chord?.slug_artist}`)} >{data?.chord?.artist}</Text>
-                            </Text>
-                            <Text style={{fontSize:13}}><Text><CountUp data={data?.chord?.seen} /></Text> <Text>views</Text></Text>
+            <Animated.ScrollView
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    ...(!viewVideo ? {paddingTop:heightHeader+2} : {})
+                }}
+                onScroll={onScroll}
+                refreshControl={
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                }
+                {...other}
+            >
+                {!data && !error ? (
+                    <View style={{height:'100%',paddingTop:heightHeader+2}}>
+                        <Skeleton type="article" />
+                    </View>
+                ) : error || data?.error ? (
+                    <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
+                ) : data?.chord?.text ? (
+                    <>
+                        <Lay key={0} style={[style.container,{paddingTop:10}]}>
+                            <Text category="h3">{data?.chord?.title}</Text>
+                            <Lay key="lay-0" style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                                <Text numberOfLines={1} style={{flex:1,marginRight:20}}>
+                                    <Text style={{fontSize:13}}>Artist: </Text>
+                                    <Text style={{fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>linkTo(`/chord/artist/${data?.chord?.slug_artist}`)} >{data?.chord?.artist}</Text>
+                                </Text>
+                                <Text style={{fontSize:13}}><Text><CountUp data={data?.chord?.seen} /></Text> <Text>views</Text></Text>
+                            </Lay>
+                            <Lay key="lay-1" style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                                <Text numberOfLines={1} style={{flex:1,marginRight:20}}>
+                                    <Text style={{fontSize:13}}>Author: </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.chord?.users?.username}`)}>{data?.chord?.users?.name||"Portalnesia"}</Text>
+                                </Text>
+                                <Text style={{fontSize:13}}>{`${data?.chord?.date}`}</Text>
+                            </Lay>
                         </Lay>
-                        <Lay key="lay-1" style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                            <Text numberOfLines={1} style={{flex:1,marginRight:20}}>
-                                <Text style={{fontSize:13}}>Author: </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.chord?.users?.username}`)}>{data?.chord?.users?.name||"Portalnesia"}</Text>
-                            </Text>
-                            <Text style={{fontSize:13}}>{`${data?.chord?.date}`}</Text>
-                        </Lay>
-                    </Lay>
 
-                    <Lay><Divider style={{marginVertical:10,height:2,backgroundColor:theme['border-text-color']}} /></Lay>
-                    
-                    
-                    <Lay key={1} style={{paddingBottom:20}}>
-                        <Lay style={{marginVertical:10,marginBottom:20}}><AdsBanner /></Lay>
-                        <ScrollView
-                            horizontal
-                            contentContainerStyle={{
-                                flexGrow: 1,
-                            }}
+                        <Lay><Divider style={{marginVertical:10,height:2,backgroundColor:theme['border-text-color']}} /></Lay>
+                        
+                        
+                        <Lay key={1} style={{paddingBottom:20}}>
+                            <Lay style={{marginVertical:10,marginBottom:20}}><AdsBanner /></Lay>
+                            <ScrollView
+                                horizontal
+                                contentContainerStyle={{
+                                    flexGrow: 1,
+                                }}
+                            >
+                                <Lay key={2} style={style.container}>
+                                    <Chord template={data?.chord?.text} transpose={transpose} fontSize={fontArray[fSize]} />
+                                </Lay>
+                            </ScrollView>
+                        </Lay>
+
+                        <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                        
+                        <Lay style={[style.container]}>
+                            <Text>Your chord aren't here? <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/contact?subject=${encodeURIComponent("Request Chord")}`)}>request your chord</Text>.</Text>
+                            <Lay style={{marginTop:20}}><AdsBanners size="MEDIUM_RECTANGLE" /></Lay>
+                        </Lay>
+                        <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
+                        {data && data?.chord?.id ? (
+                            <>
+                                <Lay style={{paddingBottom:20}}>
+                                    <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended_type',{type:i18n.t('chord')})}</Text>
+                                    {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                                    : errorOthers || dataOthers?.error==1 ? (
+                                        <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                                    ) : dataOthers?.relateds?.length > 0 ? (
+                                        <Carousel
+                                            data={dataOthers?.relateds}
+                                            renderItem={(props)=><RenderCaraousel {...props} />}
+                                            autoplay
+                                        />
+                                    ) : (
+                                        <Text style={{paddingHorizontal:15}}>No posts</Text>
+                                    )}
+                                </Lay>
+                                <Lay style={{paddingBottom:20}}>
+                                    <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('popular_type',{type:i18n.t('chord')})}</Text>
+                                    {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                                    : errorOthers || dataOthers?.error==1 ? (
+                                        <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                                    ) : dataOthers?.populars?.length > 0 ? (
+                                        <Carousel
+                                            data={dataOthers?.populars}
+                                            renderItem={(props)=><RenderCaraousel {...props} />}
+                                            autoplay
+                                        />
+                                    ) : (
+                                        <Text style={{paddingHorizontal:15}}>No posts</Text>
+                                    )}
+                                </Lay>
+                                <Lay style={{paddingBottom:20}}>
+                                    <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
+                                    {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                                    : errorOthers || dataOthers?.error==1 ? (
+                                        <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
+                                    ) : dataOthers?.recents?.length > 0 ? (
+                                        <Carousel
+                                            data={dataOthers?.recents}
+                                            renderItem={(props)=><RenderCaraousel {...props} />}
+                                            autoplay
+                                        />
+                                    ) : (
+                                        <Text style={{paddingHorizontal:15}}>No posts</Text>
+                                    )}
+                                </Lay>
+                                <Divider style={{backgroundColor:theme['border-text-color']}} />
+                                <Lay style={{paddingBottom:50,paddingTop:10}}>
+                                    <Comment navigation={navigation} total={data?.chord?.comment_count} type="chord" posId={data?.chord?.id} posUrl={`chord/${data?.chord?.slug}`} />
+                                </Lay>
+                            </>
+                        ): null}
+                        
+                        <Modal
+                            isVisible={showMenu!==null}
+                            style={{margin:0,justifyContent:'center',alignItems:'center'}}
+                            onBackdropPress={()=>{setShowMenu(null)}}
+                            animationIn="fadeIn"
+                            animationOut="fadeOut"
                         >
-                            <Lay key={2} style={style.container}>
-                                <Chord template={data?.chord?.text} transpose={transpose} fontSize={fontArray[fSize]} />
-                            </Lay>
-                        </ScrollView>
-                    </Lay>
-
-                    <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                    
-                    <Lay style={[style.container]}>
-                        <Text>Your chord aren't here? <Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>linkTo(`/contact?subject=${encodeURIComponent("Request Chord")}`)}>request your chord</Text>.</Text>
-                        <Lay style={{marginTop:20}}><AdsBanners size="MEDIUM_RECTANGLE" /></Lay>
-                    </Lay>
-                    <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>
-                    {data && data?.chord?.id ? (
-                        <>
-                            <Lay style={{paddingBottom:20}}>
-                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended_type',{type:i18n.t('chord')})}</Text>
-                                {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
-                                : errorOthers || dataOthers?.error==1 ? (
-                                    <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
-                                ) : dataOthers?.relateds?.length > 0 ? (
-                                    <Carousel
-                                        data={dataOthers?.relateds}
-                                        renderItem={(props)=><RenderCaraousel {...props} />}
-                                        autoplay
-                                    />
-                                ) : (
-                                    <Text style={{paddingHorizontal:15}}>No posts</Text>
-                                )}
-                            </Lay>
-                            <Lay style={{paddingBottom:20}}>
-                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('popular_type',{type:i18n.t('chord')})}</Text>
-                                {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
-                                : errorOthers || dataOthers?.error==1 ? (
-                                    <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
-                                ) : dataOthers?.populars?.length > 0 ? (
-                                    <Carousel
-                                        data={dataOthers?.populars}
-                                        renderItem={(props)=><RenderCaraousel {...props} />}
-                                        autoplay
-                                    />
-                                ) : (
-                                    <Text style={{paddingHorizontal:15}}>No posts</Text>
-                                )}
-                            </Lay>
-                            <Lay style={{paddingBottom:20}}>
-                                <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
-                                {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
-                                : errorOthers || dataOthers?.error==1 ? (
-                                    <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
-                                ) : dataOthers?.recents?.length > 0 ? (
-                                    <Carousel
-                                        data={dataOthers?.recents}
-                                        renderItem={(props)=><RenderCaraousel {...props} />}
-                                        autoplay
-                                    />
-                                ) : (
-                                    <Text style={{paddingHorizontal:15}}>No posts</Text>
-                                )}
-                            </Lay>
-                            <Divider style={{backgroundColor:theme['border-text-color']}} />
-                            <Lay style={{paddingBottom:50,paddingTop:10}}>
-                                <Comment navigation={navigation} total={data?.chord?.comment_count} type="chord" posId={data?.chord?.id} posUrl={`chord/${data?.chord?.slug}`} />
-                            </Lay>
-                        </>
-                    ): null}
-                    
-                    <Modal
-                        isVisible={showMenu!==null}
-                        style={{margin:0,justifyContent:'center',alignItems:'center'}}
-                        onBackdropPress={()=>{setShowMenu(null)}}
-                        animationIn="fadeIn"
-                        animationOut="fadeOut"
-                    >
-                        <Card style={{width:width-30,justifyContent:'center',alignItems:'center'}} disabled header={(props)=><View {...props}><Text>{ucwords(showMenu)}</Text></View>}>
-                            <View style={{flexDirection:'row',alignItems:'center'}}>
-                                {showMenu === 'transpose' ? (
-                                    <>
-                                        <Button style={{borderWidth:0,height:37.8}} accessoryLeft={XIcon} disabled={transpose === 0} size="small" status="danger" onPress={handleTranspose('reset')} />
-                                        <ButtonGroup size="small">
-                                            <Button disabled={transpose<=-12} accessoryLeft={MinusIcon} onPress={handleTranspose('min')} />
-                                            <Button disabled status="basic"><Text>{transpose.toString()}</Text></Button>
-                                            <Button accessoryLeft={PlusIcon} disabled={transpose >= 12} onPress={handleTranspose('plus')} />
-                                        </ButtonGroup>
-                                    </>
-                                ): showMenu === 'font size' ? (
-                                    <>
-                                        <Button style={{borderWidth:0,height:37.8}} accessoryLeft={XIcon} disabled={fSize === 4} size="small" status="danger" onPress={handleFont('reset')} />
-                                        <ButtonGroup size="small">
-                                            <Button disabled={fSize<=0} accessoryLeft={MinusIcon} onPress={handleFont('min')} />
-                                            <Button disabled status="basic"><Text>{fSize.toString()}</Text></Button>
-                                            <Button accessoryLeft={PlusIcon} disabled={fSize >= 8} onPress={handleFont('plus')} />
-                                        </ButtonGroup>
-                                    </>
-                                ) : <Text>Under Maintenance</Text> }
-                            </View>
-                        </Card>
-                    </Modal>
-                </Animated.ScrollView>
-            ) : null}
+                            <Card style={{width:width-30,justifyContent:'center',alignItems:'center'}} disabled header={(props)=><View {...props}><Text>{ucwords(showMenu)}</Text></View>}>
+                                <View style={{flexDirection:'row',alignItems:'center'}}>
+                                    {showMenu === 'transpose' ? (
+                                        <>
+                                            <Button style={{borderWidth:0,height:37.8}} accessoryLeft={XIcon} disabled={transpose === 0} size="small" status="danger" onPress={handleTranspose('reset')} />
+                                            <ButtonGroup size="small">
+                                                <Button disabled={transpose<=-12} accessoryLeft={MinusIcon} onPress={handleTranspose('min')} />
+                                                <Button disabled status="basic"><Text>{transpose.toString()}</Text></Button>
+                                                <Button accessoryLeft={PlusIcon} disabled={transpose >= 12} onPress={handleTranspose('plus')} />
+                                            </ButtonGroup>
+                                        </>
+                                    ): showMenu === 'font size' ? (
+                                        <>
+                                            <Button style={{borderWidth:0,height:37.8}} accessoryLeft={XIcon} disabled={fSize === 4} size="small" status="danger" onPress={handleFont('reset')} />
+                                            <ButtonGroup size="small">
+                                                <Button disabled={fSize<=0} accessoryLeft={MinusIcon} onPress={handleFont('min')} />
+                                                <Button disabled status="basic"><Text>{fSize.toString()}</Text></Button>
+                                                <Button accessoryLeft={PlusIcon} disabled={fSize >= 8} onPress={handleFont('plus')} />
+                                            </ButtonGroup>
+                                        </>
+                                    ) : <Text>Under Maintenance</Text> }
+                                </View>
+                            </Card>
+                        </Modal>
+                    </>
+                ) : null}
+            </Animated.ScrollView>
         </Layout>
         <Backdrop loading visible={backdrop} />
         {data && !data?.error && (

@@ -210,36 +210,35 @@ export default function TwitterThread({navigation,route}){
         return null;
     }
 
+    const renderEmpty=()=>{
+		if(error || Boolean(data?.error)) return <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
+		return <View style={{height:'100%'}}><Skeleton type="article" /></View>
+	}
+
     return (
         <>
-        <Layout navigation={navigation} custom={
+        <Layout navigation={navigation}>
             <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
 				<Header title={"Twitter Thread Reader"} subtitle={data?.screen_name ? `Thread by @${data?.screen_name}` : ""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />} />
             </Animated.View>
-        }>
-            {!data && !error ? (
-                <View style={{height:'100%',paddingTop:heightHeader+8}}>
-                    <Skeleton type="article" />
-                </View>
-            ) : error || data?.error ? (
-                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-            ) : data ? (
-                <Animated.FlatList
-                    ListHeaderComponentStyle={{
-                        flexGrow: 1,
-                        paddingTop:heightHeader + 2,
-                    }}
-                    {...(!data && !error || (!isValidating && (!error || data?.error==0)) ? {refreshControl: <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating} onRefresh={()=>mutate()} /> } : {})}
-                    data={data?.tweets}
-                    ListHeaderComponent={HeaderComp}
-                    renderItem={({item,index})=>(
-                        <RenderTwitter index={index} item={item} setMenu={setMenu} />
-                    )}
-                    keyExtractor={(item, index) => 'twitter-thread-'+index}
-                    ListFooterComponent={RenderFooter}
-                    {...other}
-                />
-            ) : null }
+            <Animated.FlatList
+                ListEmptyComponent={renderEmpty}
+                ListHeaderComponentStyle={{
+                    flexGrow: 1,
+                    paddingTop:heightHeader + 2,
+                }}
+                refreshControl={
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                }
+                data={data ? data?.tweets : []}
+                ListHeaderComponent={HeaderComp}
+                renderItem={({item,index})=>(
+                    <RenderTwitter index={index} item={item} setMenu={setMenu} />
+                )}
+                keyExtractor={(item, index) => 'twitter-thread-'+index}
+                ListFooterComponent={RenderFooter}
+                {...other}
+            />
         </Layout>
         {data && !data?.error && (
                 <>

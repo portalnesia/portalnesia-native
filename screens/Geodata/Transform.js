@@ -50,7 +50,7 @@ export default function({navigation}){
     const [modal,setModal]=React.useState(null)
     const {data,error}=useSWR(`/geodata/epsg?page=${page}&q=${encodeURIComponent(search)}`,{},true)
     const {height}=useWindowDimensions()
-    const [scrollOffset,setScrollOffset] = React.useState(null)
+    //const [scrollOffset,setScrollOffset] = React.useState(null)
     const theme = useTheme()
     const [total,setTotal]=React.useState(1)
     const [sistem,setSistem]=React.useState({insrc:"EPSG:4326",outsrc:"EPSG:4326"})

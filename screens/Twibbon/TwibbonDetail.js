@@ -1,5 +1,5 @@
 import React from 'react'
-import {  View,ScrollView,Dimensions } from 'react-native';
+import {  View,ScrollView,Dimensions,RefreshControl } from 'react-native';
 import {Layout as Lay,Text,Divider,useTheme, Icon} from '@ui-kitten/components'
 import {MediaTypeOptions} from 'expo-image-picker'
 import FastImage from 'react-native-fast-image'
@@ -52,7 +52,7 @@ export default function TwibbonDetail({navigation,route}){
     const context = React.useContext(AuthContext)
     const {setNotif} = context;
     const theme = useTheme();
-    const {data,error} = useSWR(slug ? `/twibbon/${slug}` : null,{},true)
+    const {data,error,mutate,isValidating} = useSWR(slug ? `/twibbon/${slug}` : null,{},true)
     const [file,setFile] = React.useState(null);
     const captureRef = React.useRef(null)
     const modalRef = React.useRef(null)
@@ -105,55 +105,60 @@ export default function TwibbonDetail({navigation,route}){
     return (
         <>
             <Layout navigation={navigation} title="Twibbon" {...(data && data?.twibbon) ? {subtitle:data?.twibbon?.title} : {}} withBack menu={Menu} margin={35} align="start">
-                <AdsBanner />
-                {!data && !error ? <SkeletonTwibbon /> 
-                : error || data?.error ? (
-                    <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-                ) : (
-                    <ScrollView
-                        contentContainerStyle={{
-                            flex:1
-                        }}
-                    >
-                        <Lay style={{flex:1,marginTop:10}}>
-                            <View testID="View-shot">
-                                {file !== null ? (
-                                    <ImageCropper
-                                        captureRef={captureRef}
-                                        background={<FastImage source={require('@pn/assets/transparent.png')} style={{width:winWidth,height:winWidth,}} />}
-                                        imageUri={file}
-                                        cropAreaWidth={winWidth}
-                                        rotation={rotation}
-                                        cropAreaHeight={winWidth}
-                                        areaColor='transparent'
-                                        containerColor='transparent'
-                                        areaOverlay={<FastImage source={{uri:data?.twibbon?.image}} style={{width:winWidth,height:winWidth}} />}
-                                    />
-                                ) : (
-                                    <View style={{width:winWidth,height:winWidth,overflow: 'hidden',alignItems: 'center',justifyContent: 'center'}}>
-                                        <FastImage source={require('@pn/assets/transparent.png')} style={{width:winWidth,height:winWidth,position:'absolute',top:0,left:0}} />
-                                        <FastImage source={{uri:data?.twibbon?.image}} style={{width:winWidth,height:winWidth,position:'absolute',top:0,left:0}} />
-                                    </View>
-                                )}
-                                    
-                            </View>
-                            <View style={{margin:15}}>
-                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                    <Button disabled={loading} appearance='ghost' status='basic' onPress={openImage}>{i18n.t('select',{type:i18n.t('image')})}</Button>
-                                    {file !== null && (
-                                        <>
-                                            <Button tooltip="Rotate" disabled={loading} status='danger' onPress={rotateImage} accessoryLeft={RotateIcon} />
-                                            <Button disabled={loading} loading={loading} onPress={saveImage}>{ucwords(i18n.t('save'))}</Button>
-                                        </>
-                                    ) }
+                <ScrollView
+                    contentContainerStyle={{
+                        flex:1
+                    }}
+                    refreshControl={
+                        <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e"  refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                    }
+                >
+                    {!data && !error ? <SkeletonTwibbon /> 
+                    : error || data?.error ? (
+                        <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
+                    ) : (
+                        <>
+                            <AdsBanner />
+                            <Lay style={{flex:1,marginTop:10}}>
+                                <View testID="View-shot">
+                                    {file !== null ? (
+                                        <ImageCropper
+                                            captureRef={captureRef}
+                                            background={<FastImage source={require('@pn/assets/transparent.png')} style={{width:winWidth,height:winWidth,}} />}
+                                            imageUri={file}
+                                            cropAreaWidth={winWidth}
+                                            rotation={rotation}
+                                            cropAreaHeight={winWidth}
+                                            areaColor='transparent'
+                                            containerColor='transparent'
+                                            areaOverlay={<FastImage source={{uri:data?.twibbon?.image}} style={{width:winWidth,height:winWidth}} />}
+                                        />
+                                    ) : (
+                                        <View style={{width:winWidth,height:winWidth,overflow: 'hidden',alignItems: 'center',justifyContent: 'center'}}>
+                                            <FastImage source={require('@pn/assets/transparent.png')} style={{width:winWidth,height:winWidth,position:'absolute',top:0,left:0}} />
+                                            <FastImage source={{uri:data?.twibbon?.image}} style={{width:winWidth,height:winWidth,position:'absolute',top:0,left:0}} />
+                                        </View>
+                                    )}
+                                        
                                 </View>
-                            </View>
-                            <View>
-                                <AdsBanners />
-                            </View>
-                        </Lay>
-                    </ScrollView>
-                )}
+                                <View style={{margin:15}}>
+                                    <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                        <Button disabled={loading} appearance='ghost' status='basic' onPress={openImage}>{i18n.t('select',{type:i18n.t('image')})}</Button>
+                                        {file !== null && (
+                                            <>
+                                                <Button tooltip="Rotate" disabled={loading} status='danger' onPress={rotateImage} accessoryLeft={RotateIcon} />
+                                                <Button disabled={loading} loading={loading} onPress={saveImage}>{ucwords(i18n.t('save'))}</Button>
+                                            </>
+                                        ) }
+                                    </View>
+                                </View>
+                                <View>
+                                    <AdsBanners />
+                                </View>
+                            </Lay>
+                        </>
+                    )}
+                </ScrollView>
             </Layout>
             <Portal>
                 <Modalize
