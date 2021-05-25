@@ -36,6 +36,7 @@
     "text":"Text",
     "setting":"Setting",
     "setting_type":"%{type} setting",
+    "without_type":"without %{type}",
     "appearance":"Appearance",
     "clear":"Clear %{type}",
     "deleted":"%{type} deleted",
@@ -62,6 +63,11 @@
         "one":"notification",
         "other":"notifications"
     },
+    "account":{
+        "one":"account",
+        "other":"accounts"
+    },
+    "security":"security",
     "comment":{
         "one":"comment",
         "other":"comments"
@@ -69,6 +75,10 @@
     "content":{
         "one":"content",
         "other":"contents"
+    },
+    "session":{
+        "one":"session",
+        "other":"sessions"
     },
     "reply":"Reply",
     "delete":"Delete",
@@ -93,6 +103,12 @@
     "feedback":"Feedback",
     "send_type":"Send %{type}",
     "send":"Send",
+    "open_source_libraries":"Open Source Libraries",
+    "authentication":"authentication",
+    "auth_type":"%{type} authentication",
+    "fingerprint":"fingerprint",
+    "privacy":"privacy",
+    "social_media":"social media",
     "errors":{
         "general":"Something went wrong",
         "server":"Internal server error",
@@ -117,7 +133,11 @@
         "name":"Name",
         "email":"Email",
         "subject":"Subject",
-        "message":"Message"
+        "message":"Message",
+        "username":"Username",
+        "gender":"Gender",
+        "birthday":"Birthday",
+        "about":"About"
     },
     "home_not_login":{
         "news":"A collection of news that is updated every day.",
@@ -158,5 +178,28 @@
     "gender":{
         "male":"Male",
         "female":"Female"
+    },
+    "follow":"follow",
+    "follower":"follower",
+    "following":"following",
+    "unfollow":"unfollow",
+    "settings":{
+        "account":{
+            "private":"Set profile to private",
+            "media_private":"Set media profile to private",
+            "private_tip":"Only your followers can see your profile",
+            "media_private_tip":"Only your followers can see your media",
+            "change_password":"Change Password",
+            "deactivate":"Deactivate Account",
+            "unlink":"Unlink connection to your %{type} account?",
+            "delete":{
+                "one":"Please make sure that you will make a request to deactivate your account.",
+                "two":"You can reactivate your account at any time. We will give instructions via email. Please check your inbox or spam folder.",
+                "three":"You will not be able to access your account until you reactivate it."
+            }
+        },
+        "security":{
+
+        }
     }
 }

@@ -32,3 +32,9 @@ export interface PortalnesiaInterface {
     uriToFileProvider:(path: string) => Promise<string>;
     verifyWithRecaptcha:()=>Promise<string>;
 }
+
+export interface BrighnessInterface {
+    getBrightness():Promise<number>;
+    setBrightness(value: number): Promise<void>;
+    getSystemBrightness(): Promise<number>;
+}

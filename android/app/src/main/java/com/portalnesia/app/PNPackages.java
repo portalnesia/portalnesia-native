@@ -21,6 +21,7 @@ public class PNPackages implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext){
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new PNModules(reactContext));
+        modules.add(new PNBrightness(reactContext));
         return modules;
     }
 }

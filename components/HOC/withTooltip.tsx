@@ -1,6 +1,5 @@
 import React from 'react'
 import {Tooltip} from '@ui-kitten/components'
-import { GestureResponderEvent } from 'react-native'
 
 type WithTooltipProps = {
     /**
@@ -29,7 +28,7 @@ export default function withTooltip<P>(Component: React.ComponentType<P>){
                 </Tooltip>
             )
         } else {
-            return <Component {...props} onLongPress={onPress} />
+            return <Component {...props} />
         }
     }
 }

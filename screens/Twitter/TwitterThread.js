@@ -130,7 +130,7 @@ export default function TwitterThread({navigation,route}){
     //const context = React.useContext(AuthContext);
     //const {state} = context
     const theme=useTheme()
-    const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/twitter/${slug}` : null,{},false)
+    const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/twitter/${slug}` : null)
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id ? `/twitter/others/${data?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)

@@ -27,7 +27,7 @@ import {pushTo} from '@pn/navigation/useRootNavigation'
 export default function({navigation,route}){
     const {source,title} = route.params
     const theme=useTheme()
-    const {data,error,mutate,isValidating}=useSWR(`/news/${source}/${title}`,{},false)
+    const {data,error,mutate,isValidating}=useSWR(`/news/${source}/${title}`)
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id ? `/news/others/${data.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)

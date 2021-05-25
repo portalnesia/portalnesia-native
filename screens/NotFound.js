@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import {Layout as Lay,Icon,TopNavigationAction,useTheme,Text,Divider} from '@ui-kitten/components'
 import {Modalize} from 'react-native-modalize'
 
+import {Portal} from '@gorhom/portal'
 import styles from '@pn/components/global/style'
 import Layout from '@pn/components/global/Layout';
 import NotFound from '@pn/components/global/NotFound'
@@ -35,32 +36,34 @@ export default function NotFoundScreen({navigation}){
             <Layout navigation={navigation} withBack title="Not Found" menu={()=><TopNavigationAction icon={SupportIcon} onPress={()=>ref?.current?.open()} />} >
                 <NotFound status={404} />
             </Layout>
-            <Modalize
-                ref={ref}
-                withHandle={false}
-                modalStyle={{
-                    backgroundColor:theme['background-basic-color-1'],
-                }}
-                adjustToContentHeight
-            >
-                <Lay style={{borderTopLeftRadius:20,
-                    borderTopRightRadius:20}}>
-                    {Header}
-                    <View style={{marginVertical:5}}>
-                        {penjelasan?.map((dt,i)=>(
-                            <View key={i.toString()} style={{marginTop:10,marginVertical:20}}>
-                                <View style={styles.container}>
-                                    <Text category="h6">{dt?.title}</Text>
+            <Portal>
+                <Modalize
+                    ref={ref}
+                    withHandle={false}
+                    modalStyle={{
+                        backgroundColor:theme['background-basic-color-1'],
+                    }}
+                    adjustToContentHeight
+                >
+                    <Lay style={{borderTopLeftRadius:20,
+                        borderTopRightRadius:20}}>
+                        {Header}
+                        <View style={{marginVertical:5}}>
+                            {penjelasan?.map((dt,i)=>(
+                                <View key={i.toString()} style={{marginTop:10,marginVertical:20}}>
+                                    <View style={styles.container}>
+                                        <Text category="h6">{dt?.title}</Text>
+                                    </View>
+                                    <Divider style={{backgroundColor:theme['border-text-color'],marginVertical:5}} />
+                                    <View style={styles.container}>
+                                        <Text>{dt?.description}</Text>
+                                    </View>
                                 </View>
-                                <Divider style={{backgroundColor:theme['border-text-color'],marginVertical:5}} />
-                                <View style={styles.container}>
-                                    <Text>{dt?.description}</Text>
-                                </View>
-                            </View>
-                        ))}
-                    </View>
-                </Lay>
-            </Modalize>
+                            ))}
+                        </View>
+                    </Lay>
+                </Modalize>
+            </Portal>
         </>
     )
 }

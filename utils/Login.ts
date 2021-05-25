@@ -114,6 +114,10 @@ export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
                 if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
             }
         } else {
+            await Promise.all([
+                Secure.deleteItemAsync('user'),
+                Secure.deleteItemAsync('token')
+            ])
             if(typeof dispatch === 'function') dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Application.androidId}})
         }
     }

@@ -137,6 +137,12 @@
         "licenseUrl": "https://github.com/akveo/react-native-ui-kitten",
         "parents": "portal-native"
     },
+    "@ui-kitten/moment@5.1.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/akveo/react-native-ui-kitten",
+        "licenseUrl": "https://github.com/akveo/react-native-ui-kitten",
+        "parents": "portal-native"
+    },
     "array-move@3.0.1": {
         "licenses": "MIT",
         "repository": "https://github.com/sindresorhus/array-move",
@@ -252,12 +258,6 @@
         "parents": "portal-native"
     },
     "expo-linking@2.0.1": {
-        "licenses": "MIT",
-        "repository": "https://github.com/expo/expo",
-        "licenseUrl": "https://github.com/expo/expo",
-        "parents": "portal-native"
-    },
-    "expo-local-authentication@9.5.0": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -422,6 +422,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/Rapsssito/react-native-background-actions",
         "licenseUrl": "https://github.com/Rapsssito/react-native-background-actions/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-biometrics@2.1.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/SelfLender/react-native-biometrics",
+        "licenseUrl": "https://github.com/SelfLender/react-native-biometrics/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-chart-kit@6.11.0": {

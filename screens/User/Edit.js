@@ -22,6 +22,7 @@ import Avatar from '@pn/components/global/Avatar'
 import { pickImage } from '@pn/utils/PickLibrary';
 import Recaptcha from '@pn/components/global/Recaptcha'
 import useAPI from '@pn/utils/API'
+import useUnsaved from '@pn/utils/useUnsaved'
 
 const {width}=Dimensions.get('window')
 const dateService = new MomentDateService();
@@ -33,7 +34,7 @@ export default function EditUserScreen({navigation,route}){
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
     const {PNpost} = useAPI();
     const theme = useTheme();
-    const {data,error,mutate,isValidating}=useSWR(`/user/${user?.username}/edit`)
+    const {data,error,mutate,isValidating}=useSWR(`/user/${user?.username}/edit`,{},true)
     const [name,setName]=React.useState("");
     const [about,setAbout]=React.useState("");
     const [gender,setGender]=React.useState(new IndexPath(0));
@@ -47,6 +48,7 @@ export default function EditUserScreen({navigation,route}){
     const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [validate,setValidate]=React.useState(false);
+    const setCanBack = useUnsaved(true);
 
     const genderArr=React.useMemo(()=>{
         return getGenderArr();
@@ -63,12 +65,31 @@ export default function EditUserScreen({navigation,route}){
     },[data])
 
     React.useEffect(()=>{
-        if(!data) mutate();
-    },[])
-
-    React.useEffect(()=>{
         if(!isValidating) setValidate(false);
     },[isValidating])
+
+    const handleChange=(type)=>(val)=>{
+        if(type==='date') {
+            if(val === data?.users?.birthday) setCanBack(true)
+            else setCanBack(false)
+            setDate(val);
+        }
+        else if(type==='name') {
+            if(val === data?.users?.name) setCanBack(true)
+            else setCanBack(false)
+            setName(val);
+        }
+        else if(type==='about') {
+            if(val === data?.users?.biodata) setCanBack(true)
+            else setCanBack(false)
+            setAbout(val);
+        }
+        else if(type==='gender') {
+            if(val === data?.users?.gender) setCanBack(true)
+            else setCanBack(false)
+            setGender(val);
+        }
+    }
 
     const handleRemoveImage=()=>{
         if(!data) return;
@@ -209,9 +230,9 @@ export default function EditUserScreen({navigation,route}){
                         )}
                         <Lay style={{paddingTop:10}}>
                             <Input
-                                label="Name"
+                                label={i18n.t('form.name')}
                                 value={name}
-                                onChangeText={setName}
+                                onChangeText={handleChange('name')}
                                 autoCompleteType="name"
                                 textContentType="name"
                                 disabled={backdrop!==null||loading}
@@ -220,8 +241,8 @@ export default function EditUserScreen({navigation,route}){
                         <Lay style={{paddingTop:10}}>
                             <Select
                                 selectedIndex={gender}
-                                onSelect={setGender}
-                                label="Gender"
+                                onSelect={handleChange('gender')}
+                                label={i18n.t('form.gender')}
                                 value={genderArr[gender.row]}
                                 disabled={backdrop!==null||loading}
                             >
@@ -235,8 +256,8 @@ export default function EditUserScreen({navigation,route}){
                                 dateService={dateService}
                                 placeholder="Pick date"
                                 date={date}
-                                onSelect={setDate}
-                                label="Birthday"
+                                onSelect={handleChange('date')}
+                                label={i18n.t('form.birthday')}
                                 max={moment().subtract(13,"years")}
                                 min={moment().subtract(60,"years")}
                                 disabled={backdrop!==null||loading}
@@ -244,10 +265,10 @@ export default function EditUserScreen({navigation,route}){
                         </Lay>
                     </Lay>
                     <Lay style={{paddingTop:10}}>
-                        <MarkdownEditor disabled={backdrop!==null||loading} ref={markdownRef} value={about} label="About" theme={theme} onChangeText={setAbout} />
+                        <MarkdownEditor disabled={backdrop!==null||loading} ref={markdownRef} value={about} label={i18n.t('form.about')} theme={theme} onChangeText={handleChange('about')} />
                     </Lay>
                     <Lay style={{padding:15}}>
-                        <Button onPress={handleSubmit} disabled={backdrop!==null||loading} loading={loading}>Save</Button>
+                        <Button onPress={handleSubmit} disabled={backdrop!==null||loading} loading={loading}>{ucwords(i18n.t("save"))}</Button>
                     </Lay>
                 </ScrollView>
             )}

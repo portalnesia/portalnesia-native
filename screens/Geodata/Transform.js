@@ -4,6 +4,7 @@ import {Layout as Lay,Text,Card,Spinner,Input,Divider,useTheme,Toggle} from '@ui
 import useSWR from '@pn/utils/swr'
 import {Modalize} from 'react-native-modalize'
 import i18n from 'i18n-js'
+import {Portal} from '@gorhom/portal'
 //import Carousel from '@pn/components/global/Carousel';
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -47,7 +48,7 @@ export default function({navigation}){
     const textRef=React.useRef(null)
     const [page,setPage]=React.useState(1)
     const [modal,setModal]=React.useState(null)
-    const {data,error}=useSWR(`/geodata/epsg?page=${page}&q=${encodeURIComponent(search)}`,{revalidateOnMount:true},false)
+    const {data,error}=useSWR(`/geodata/epsg?page=${page}&q=${encodeURIComponent(search)}`,{},true)
     const {height}=useWindowDimensions()
     const [scrollOffset,setScrollOffset] = React.useState(null)
     const theme = useTheme()
@@ -175,29 +176,31 @@ export default function({navigation}){
                     </Lay>
                 </ScrollView>
             </Layout>
-            <Modalize
-                modalStyle={{
-                    backgroundColor:theme['background-basic-color-1'],
-                    borderTopLeftRadius:15,borderTopRightRadius:15
-                }}
-                snapPoint={300}
-                ref={modalRef}
-                flatListProps={{
-                    ListHeaderComponent:<HeaderModal search={search} setSearch={setSearch} setPage={setPage} />,
-                    ListFooterComponent:footerModal,
-                    data:(data?.data||[]),
-                    stickyHeaderIndices:[0],
-                    renderItem:(props)=><RenderRow key={props?.item?.epsg} {...props} onChange={onModalChange(modal)} />,
-                    ItemSeparatorComponent:Divider,
-                    keyExtractor:(item)=>item.epsg,
-                }}
-                onClosed={()=>{
-                    setPage(1)
-                    setSearch("")
-                    setModal(null)
-                }}
-                modalHeight={height-100}
-            />
+            <Portal>
+                <Modalize
+                    modalStyle={{
+                        backgroundColor:theme['background-basic-color-1'],
+                        borderTopLeftRadius:15,borderTopRightRadius:15
+                    }}
+                    snapPoint={300}
+                    ref={modalRef}
+                    flatListProps={{
+                        ListHeaderComponent:<HeaderModal search={search} setSearch={setSearch} setPage={setPage} />,
+                        ListFooterComponent:footerModal,
+                        data:(data?.data||[]),
+                        stickyHeaderIndices:[0],
+                        renderItem:(props)=><RenderRow key={props?.item?.epsg} {...props} onChange={onModalChange(modal)} />,
+                        ItemSeparatorComponent:Divider,
+                        keyExtractor:(item)=>item.epsg,
+                    }}
+                    onClosed={()=>{
+                        setPage(1)
+                        setSearch("")
+                        setModal(null)
+                    }}
+                    modalHeight={height-150}
+                />
+            </Portal>
             <MenuContainer
                 visible={open}
                 handleOpen={()=>setOpen(true)}

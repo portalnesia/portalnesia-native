@@ -27,6 +27,7 @@
     "popular":"Terpopuler",
     "popular_type":"%{type} Terpopuler",
     "change":"Ubah",
+    "change_type":"Ubah %{type}",
     "twitter_thread":"Utas Twitter",
     "news":"Berita",
     "chord":"Kord",
@@ -34,21 +35,51 @@
     "new_type":"%{type} Baru",
     "text":"Teks",
     "setting":"Pengaturan",
+    "setting_type":"Pengaturan %{type}",
+    "without_type":"tanpa %{type}",
     "appearance":"Tampilan",
     "clear":"Bersihkan %{type}",
     "deleted":"%{type} berhasil dihapus",
     "light":"terang",
     "dark":"gelap",
     "device":"perangkat",
+    "profile":"profil",
+    "profile_type":"%{type} profil",
     "theme":"tema",
     "theme_type":"Tema %{type}",
     "image":"gambar",
+    "picture": {
+        "one":"gambar",
+        "other":"gambar"
+    },
+    "photo":  {
+        "one":"foto",
+        "other":"foto"
+    },
     "select":"Pilih %{type}",
     "load_more":"Muat lebih banyak",
     "see_more":"Lihat Lainnya",
-    "comments":"Komentar",
+    "notification":{
+        "one":"pemberitahuan",
+        "other":"pemberitahuan"
+    },
+    "account":{
+        "one":"akun",
+        "other":"akun"
+    },
+    "security":"keamanan",
+    "comment":{
+        "one":"komentar",
+        "other":"komentar"
+    },
+    "content":{
+        "one":"konten",
+        "other":"konten"
+    },
     "reply":"Balas",
     "delete":"Hapus",
+    "remove":"Hapus",
+    "remove_type":"Hapus %{type}",
     "add_type":"Tambah %{type}",
     "no_comment":"Belum ada komentar.",
     "no_reply":"Belum ada balasan.",
@@ -65,28 +96,43 @@
     "recommended":"Rekomendasi",
     "recommended_type":"%{type} Rekomendasi",
     "report":"Lapor",
-    "feedback":"umpan balik",
+    "feedback":"Masukan",
     "send_type":"Kirim %{type}",
     "send":"Kirim",
+    "authentication":"otentikasi",
+    "auth_type":"otentikasi %{type}",
+    "fingerprint":"sidik jari",
+    "privacy":"privasi",
+    "social_media":"media sosial",
     "errors":{
         "general":"Kesalahan",
         "server":"Kesalahan internal server",
-        "permission_storage":"Maaf, kami membutuhkan izin penyimpanan",
+        "permission_storage":"Maaf, kami membutuhkan izin penyimpanan internal",
+        "permission_location":"Maaf, kami membutuhkan izin lokasi",
         "form_validation":"%{type} tidak boleh kosong",
         "image":"Pilih gambar terlebih dahulu",
         "no_image":"Tidak dapat menemukan gambar",
         "upload":"Kesalahan ketika mengunggah gambar Anda",
         "size_image":"Maaf, ukuran file terlalu besar. Ukuran maksimal gambar adalah 5MB",
         "youtube_service":"Anda harus menginstal aplikasi youtube resmi untuk dapat menonton video.\n\nKlik di sini untuk menonton dalam mode layar penuh.",
-        "invalid":"%{type} tidak valid"
+        "invalid":"%{type} tidak valid",
+        "sure":"Apakah Anda yakin?",
+        "location_disabled":"Layanan lokasi Anda tidak aktif"
     },
     "report_placeholder":{
         "placeholder_url":"Mohon maaf atas ketidaknyamanannya, sepertinya ada masalah dengan layanan server internal kami. Bisakah Anda memberi tahu kami bagaimana ini bisa terjadi?",
-        "placeholder":"Punya feedback/umpan balik? Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungkan di Kontak kami."
+        "placeholder":"Punya masukan? Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungan di Kontak kami.",
+        "placeholder_content":"Beritahu kami mengapa Anda melaporkan %{type} ini? Atau jika Anda memiliki masukan, Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungan di Kontak kami."
     },
     "form":{
         "name":"Nama",
-        "email":"Surel"
+        "email":"Surel",
+        "subject":"Subjek",
+        "message":"Pesan",
+        "username":"Nama Pengguna",
+        "gender":"Jenis Kelamin",
+        "birthday":"Ulang Tahun",
+        "about":"Tentang"
     },
     "home_not_login":{
         "news":"Kumpulan berita yang diperbarui setiap harinya.",
@@ -124,5 +170,32 @@
     "media":{
         "video_player":"pemutar video",
         "music_player":"pemutar musik"
+    },
+    "gender":{
+        "male":"Laki-laki",
+        "female":"Perempuan"
+    },
+    "follow":"ikuti",
+    "follower":"pengikut",
+    "following":"mengikuti",
+    "unfollow":"batal mengikuti",
+    "settings":{
+        "account":{
+            "private":"Setel profil ke pribadi",
+            "media_private":"Setel media profil ke pribadi",
+            "private_tip":"Hanya pengikut Anda yang dapat melihat profil Anda",
+            "media_private_tip":"Hanya pengikut Anda yang dapat melihat media Anda",
+            "change_password":"Ubah Kata Sandi",
+            "deactivate":"Nonaktifkan Akun",
+            "unlink":"Putuskan koneksi ke akun %{type} Anda?",
+            "delete":{
+                "one":"Harap pastikan bahwa Anda akan membuat permintaan untuk menonaktifkan akun Anda.",
+                "two":"Anda dapat mengaktifkan kembali akun Anda kapan saja. Kami akan memberikan instruksi melalui email. Silahkan periksa kotak masuk atau folder spam email Anda.",
+                "three":"Anda tidak akan dapat mengakses akun Anda sampai Anda mengaktifkannya kembali."
+            }
+        },
+        "security":{
+
+        }
     }
 }

@@ -7,7 +7,7 @@ import { default as theme } from '../theme.json';
 import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
-import useRootNavigation,{handleLinking} from '../navigation/useRootNavigation'
+import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
 import {useColorScheme,PermissionsAndroid,Alert} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -20,7 +20,7 @@ import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
 
-import {URL,ADS_PUBLISHER_ID} from '@env'
+import {URL,ADS_PUBLISHER_ID,CLIENT_ID} from '@env'
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
@@ -34,6 +34,8 @@ import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
+
+const urlParse = require('url-parse')
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -151,47 +153,32 @@ const AuthProvider = (props) => {
 
 	useEffect(()=>{
 		let interval=null;
-		function registerNotificationToken(token,user){
-			API.post('/native/send_notification_token',`token=${token?.data}`,{...(user !==null ? {headers:{'X-Session-Id':user?.session_id}} : {})})
-		}
+		
+		
 		async function asyncTask(){
 			try {
 				let [user,res,lang] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
 
-				/*const token = await refreshToken()
+				/*const token = await refreshToken()*/
 				if(user !== null) {
 					user = JSON.parse(user);
-				}*/
+				}
 				//Set Theme
 				if(res !== null) setTema(res);
 				if(lang !== null) changeLang(lang);
 
-				//Init Notification
-				const {status:existingStatus} = await Notifications.getPermissionsAsync();
-				let finalStatus = existingStatus;
-				if(finalStatus !== 'granted') {
-					const {status} = await Notifications.requestPermissionsAsync();
-					finalStatus = status;
-				}
-				if(finalStatus === 'granted') {
-					try {
-						const notif_token = await Notifications.getDevicePushTokenAsync();
-						registerNotificationToken(notif_token,user);
-					} catch(err) {
-						console.log(err.message);
+				try {
+					const consentInfo = await AdsConsent.requestInfoUpdate([ADS_PUBLISHER_ID])
+					if(consentInfo.isRequestLocationInEeaOrUnknown && consentInfo.status == AdsConsentStatus.UNKNOWN) {
+						const formResult = await AdsConsent.showForm({
+							privacyPolicy:`${URL}/pages/privacy-policy`,
+							withAdFree:false,
+							withPersonalizedAds:true,
+							withNonPersonalizedAds:true
+						})
+						await AsyncStorage.setItem('ads',formResult.status);
 					}
-				}
-
-				const consentInfo = await AdsConsent.requestInfoUpdate([ADS_PUBLISHER_ID])
-				if(consentInfo.isRequestLocationInEeaOrUnknown && consentInfo.status == AdsConsentStatus.UNKNOWN) {
-					const formResult = await AdsConsent.showForm({
-						privacyPolicy:`${URL}/pages/privacy-policy`,
-						withAdFree:false,
-						withPersonalizedAds:true,
-						withNonPersonalizedAds:true
-					})
-					await AsyncStorage.setItem('ads',formResult.status);
-				}
+				} catch(e){}
 
 				//Dispatch reducer
 				await refreshToken();
@@ -234,6 +221,10 @@ const AuthProvider = (props) => {
 		}
 		function handleURL({url}){
 			if(url !== null) {
+				const parsed = urlParse(url,true);
+				if(parsed?.query?.msg) {
+					setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg)
+				}
 				handleLinking(url)
 			}
 		}
@@ -273,11 +264,9 @@ const AuthProvider = (props) => {
 		createFolder();
 		ExpoAddListener('url',handleURL)
 
-		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
 		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
 
 		return ()=>{
-			tokenChangeListener.remove();
 			foregroundListener.remove();
 			netInfoListener();
 			ExpoRemoveListener('url',handleURL)
@@ -323,22 +312,69 @@ const AuthProvider = (props) => {
 				}
 			}
 		}
+
 		if(state.user !== null) {
 			setTimeout(checkNotification,500)
 		}
+
 	},[lastNotif,state.user])
 
 	React.useEffect(()=>{
+		function registerNotificationToken(token){
+			if(!__DEV__) {
+				if(state.user && state.token) {
+					API.post('/native_secure/send_notification_token',`token=${token?.data}`,{
+						headers:{
+							'X-Session-Id':state.user?.session_id,
+							'Authorization':`Bearer ${state.token?.accessToken}`,
+							'PN-Client-Id':CLIENT_ID
+						}
+					});
+				} else {
+					API.post('/native/send_notification_token',`token=${token?.data}`)
+				}
+			}
+		}
+
+		async function checkInitial(){
+			//Init Notification
+			const {status:existingStatus} = await Notifications.getPermissionsAsync();
+			let finalStatus = existingStatus;
+			if(finalStatus !== 'granted') {
+				const {status} = await Notifications.requestPermissionsAsync();
+				finalStatus = status;
+			}
+			if(finalStatus === 'granted') {
+				try {
+					const notif_token = await Notifications.getDevicePushTokenAsync();
+					registerNotificationToken(notif_token);
+				} catch(err) {
+					console.log(err.message);
+				}
+			}
+		}
+
 		async function getInitialLink() {
 			const url = await getInitialURL();
 			if(typeof url === 'string') {
+				const parsed = urlParse(url,true);
+				if(parsed?.query?.msg) {
+					setTimeout(()=>setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg),1000)
+				}
 				handleLinking(url);
 			}
 		}
 		if(state.user !== null) {
 			setTimeout(getInitialLink,500)
 		}
-	},[state.user])
+
+		checkInitial();
+		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
+
+		return ()=>{
+			tokenChangeListener.remove();
+		}
+	},[state.user,state.token])
 
 	const onTap=(dt)=>{
 		const urls = dt?.payload?.url

@@ -125,12 +125,6 @@
         "licenseUrl": "https://github.com/terrylinla/react-native-sketch-canvas/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@types/i18n-js@3.8.0": {
-        "licenses": "MIT",
-        "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
-        "licenseUrl": "https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "@ui-kitten/components@5.0.0": {
         "licenses": "MIT",
         "repository": "https://github.com/akveo/react-native-ui-kitten",
@@ -138,6 +132,12 @@
         "parents": "portal-native"
     },
     "@ui-kitten/eva-icons@5.0.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/akveo/react-native-ui-kitten",
+        "licenseUrl": "https://github.com/akveo/react-native-ui-kitten",
+        "parents": "portal-native"
+    },
+    "@ui-kitten/moment@5.1.0": {
         "licenses": "MIT",
         "repository": "https://github.com/akveo/react-native-ui-kitten",
         "licenseUrl": "https://github.com/akveo/react-native-ui-kitten",
@@ -258,12 +258,6 @@
         "parents": "portal-native"
     },
     "expo-linking@2.0.1": {
-        "licenses": "MIT",
-        "repository": "https://github.com/expo/expo",
-        "licenseUrl": "https://github.com/expo/expo",
-        "parents": "portal-native"
-    },
-    "expo-local-authentication@9.5.0": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -428,6 +422,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/Rapsssito/react-native-background-actions",
         "licenseUrl": "https://github.com/Rapsssito/react-native-background-actions/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-biometrics@2.1.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/SelfLender/react-native-biometrics",
+        "licenseUrl": "https://github.com/SelfLender/react-native-biometrics/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-chart-kit@6.11.0": {

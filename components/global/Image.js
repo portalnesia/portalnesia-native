@@ -8,20 +8,22 @@ import Img from 'react-native-fast-image'
 
 import { AuthContext } from '@pn/provider/AuthProvider';
 
-export const ImageFull=React.memo(({source,style,alt,contentWidth,fancybox,dataSrc,forceFancybox,thumbnail,zoomable,animated=true,...other})=>{
+export const ImageFull=React.memo(({source,style,alt,contentWidth,fancybox,dataSrc,forceFancybox,thumbnail,zoomable,onOpen,onClose,animated=true,...other})=>{
     const {width: screenWidth} = useWindowDimensions()
     const context = React.useContext(AuthContext)
     const {theme:selectedTheme} = context
     const theme = useTheme()
 
-    const onOpen=React.useCallback(()=>{
+    const onOpened=React.useCallback(()=>{
         setStatusBarStyle("light")
         setStatusBarBackgroundColor("#000",true)
-    },[])
-    const onClose=React.useCallback(()=>{
+        typeof onOpen === 'function' && onOpen();
+    },[onOpen])
+    const onClosed=React.useCallback(()=>{
         setStatusBarStyle(selectedTheme==='light' ? 'dark' : 'light')
         setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
-    },[theme,selectedTheme]);
+        typeof onClose === 'function' && onClose();
+    },[theme,selectedTheme,onClose]);
 
     const ImageComponent=()=>(
         <ImageFullComp
@@ -47,27 +49,30 @@ export const ImageFull=React.memo(({source,style,alt,contentWidth,fancybox,dataS
     //navigator={dataSrc?.uri ? dataSrc?.uri : forceFancybox && source?.uri ? source?.uri : undefined}
     if(fancybox) {
         return (
-            <ImageModal onOpen={onOpen} willClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid isTranslucent >
+            <ImageModal onOpen={onOpened} willClose={onClosed} source={dataSrc||source} renderToHardwareTextureAndroid isTranslucent >
                 <ImageComponent />
             </ImageModal>
         )
     } else return <ImageComponent />
 })
 
-function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFancybox,thumbnail,zoomable,animated=true,...other},ref){
+function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFancybox,thumbnail,zoomable,animated=true,onOpen,onClose,...other},ref){
     const {width: screenWidth} = useWindowDimensions()
     const context = React.useContext(AuthContext)
     const {theme:selectedTheme} = context
     const theme = useTheme()
 
-    const onOpen=React.useCallback(()=>{
+    const onOpened=React.useCallback(()=>{
         setStatusBarStyle("light")
         setStatusBarBackgroundColor("#000",true)
-    },[])
-    const onClose=React.useCallback(()=>{
+        typeof onOpen === 'function' && onOpen();
+    },[onOpen])
+
+    const onClosed=React.useCallback(()=>{
         setStatusBarStyle(selectedTheme==='light' ? 'dark' : 'light')
         setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
-    },[theme,selectedTheme]);
+        typeof onClose === 'function' && onClose();
+    },[theme,selectedTheme,onClose]);
 
     const RenderDataSrc=React.useMemo(()=>{
         return (
@@ -118,7 +123,7 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
     
     if(fancybox) {
         return (
-            <ImageModal onOpen={onOpen} willClose={onClose} source={dataSrc||source} renderToHardwareTextureAndroid>
+            <ImageModal onOpen={onOpened} willClose={onClosed} source={dataSrc||source} renderToHardwareTextureAndroid>
                 <ImageComponent />
             </ImageModal>
         )

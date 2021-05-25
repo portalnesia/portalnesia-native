@@ -44,7 +44,7 @@ function ChordDetailScreen({navigation,route}){
         return null;
     }
     const theme=useTheme()
-    const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/chord/${slug}` : null,{},false)
+    const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/chord/${slug}` : null)
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.chord?.id ? `/chord/others/${data?.chord?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)

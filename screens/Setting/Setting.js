@@ -13,14 +13,19 @@ import {AuthContext} from '@pn/provider/Context'
 import { ucwords,number_size } from '@pn/utils/Main';
 import useLogin from '@pn/utils/Login'
 import ListItem from '@pn/components/global/ListItem'
+import { linkTo } from '@pn/navigation/useRootNavigation'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
 const menuSettingArr=[
-    {key:"notification"},
     {key:"appearance"},
     {key:"lang"},
-    {key:"cache"}
+    {key:"cache"},
+    {header:"About"},
+    {key:"contact",desc:false,to:"/contact"},
+    {key:"terms_of_service",desc:false,to:"/pages/terms-of-service?navbar=Terms of Service"},
+    {key:"privacy_policy",desc:false,to:"/pages/privacy-policy?navbar=Privacy Policy"},
+    {key:"open_source_libraries",desc:false,to:"/opensource"},
 ]
 const themeArr=['light','dark','auto'];
 const langArr=['auto','id','en'];
@@ -46,12 +51,25 @@ export default function Setting({navigation}){
     },[lang])
 
     const menuSetting = React.useMemo(()=>{
-        if(user !== false) {
-            return [...menuSettingArr,
-                {key:"logout",name:"Logout"}
-            ]
+        if(user) {
+            const newArr=[...menuSettingArr,
+                {key:"logout"}
+            ];
+            newArr.unshift(
+                {header:"Account"},
+                {key:"account",to:"/setting/account"},
+                {key:"security",to:"/setting/security"},
+                {key:"notification",to:"/setting/account"},
+                {header:"General"}
+            );
+            return newArr;
         } else {
-            return menuSettingArr;
+            const newArr=[...menuSettingArr];
+            newArr.unshift(
+                {header:"General"},
+                {key:"notification",to:"/setting/account"},
+            );
+            return newArr;
         }
     },[user])
 
@@ -130,6 +148,13 @@ export default function Setting({navigation}){
     },[user])
 
     const renderItem=({item:dt,index:i})=>{
+        if(dt?.header) {
+            return (
+                <Lay level="2" style={{paddingTop:15,paddingBottom:5,paddingHorizontal:15}} key={`header-${i}`}>
+                    <Text appearance="hint">{dt?.header}</Text>
+                </Lay>
+            )
+        }
         let desc=undefined,name='';
         let func=()=>dt?.to && navigation.navigate(dt?.to)
         if(dt?.key==="cache") {
@@ -150,7 +175,12 @@ export default function Setting({navigation}){
             func = ()=>setOpen("lang");
         } else if(dt?.key =='notification') {
             name=ucwords(i18n.t('notification',{count:2}));
+            desc=ucwords(i18n.t('setting_type',{type:i18n.t('notification',{count:2})}))
             func=openNotification
+        } else if(dt?.to) {
+            name=ucwords(i18n.t(dt?.key,{count:1}));
+            if(dt?.desc !== false) desc=ucwords(i18n.t('setting_type',{type:i18n.t(dt?.key,{count:1})}))
+            func=()=>linkTo(dt?.to)
         }
 
         return (
@@ -161,16 +191,16 @@ export default function Setting({navigation}){
     return (
         <>
             <Layout navigation={navigation} title={i18n.t('setting')} withBack >
-                <Lay>
-                    <FlatList
-                        data={menuSetting}
-                        renderItem={renderItem}
-                        ItemSeparatorComponent={Divider}
-                        contentContainerStyle={{
-                            backgroundColor:theme['background-color-basic-1']
-                        }}
-                    />
-                </Lay>
+                <FlatList
+                    data={menuSetting}
+                    renderItem={renderItem}
+                    ItemSeparatorComponent={Divider}
+                    contentContainerStyle={{
+                        backgroundColor:theme['background-basic-color-1'],
+                    }}
+                    ListFooterComponent={()=><Lay level="2" style={{height:30}} />}
+                    keyExtractor={(item)=>item?.key ? `key-${item?.key}` : `header-${item?.header}`}
+                />
             </Layout>
             <Modal
                 isVisible={open!==null}

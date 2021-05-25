@@ -21,6 +21,7 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import i18n from 'i18n-js'
 import { ucwords } from '@pn/utils/Main';
 import { pickImage } from '@pn/utils/PickLibrary';
+import {Portal} from '@gorhom/portal'
 
 const {width:winWidth,height:winHeight} = Dimensions.get("window");
 const SupportIcon = (props)=> <Icon {...props} name="question-mark-circle-outline" />
@@ -51,7 +52,7 @@ export default function TwibbonDetail({navigation,route}){
     const context = React.useContext(AuthContext)
     const {setNotif} = context;
     const theme = useTheme();
-    const {data,error} = useSWR(slug ? `/twibbon/${slug}` : null,{revalidateOnMount:true})
+    const {data,error} = useSWR(slug ? `/twibbon/${slug}` : null,{},true)
     const [file,setFile] = React.useState(null);
     const captureRef = React.useRef(null)
     const modalRef = React.useRef(null)
@@ -154,47 +155,49 @@ export default function TwibbonDetail({navigation,route}){
                     </ScrollView>
                 )}
             </Layout>
-            <Modalize
-                ref={modalRef}
-                withHandle={false}
-                modalStyle={{
-                    backgroundColor:theme['background-basic-color-1'],
-                }}
-                adjustToContentHeight
-            >
-                <Lay style={{borderTopLeftRadius:20,
-                    borderTopRightRadius:20}}>
-                    {Header}
-                    <View style={{marginVertical:5}}>
-                        <View style={{marginTop:10,paddingHorizontal:15}}>
-                            <Text category="h6">{i18n.t('usage_guide',{type:"Twibbon"})}</Text>
+            <Portal>
+                <Modalize
+                    ref={modalRef}
+                    withHandle={false}
+                    modalStyle={{
+                        backgroundColor:theme['background-basic-color-1'],
+                    }}
+                    adjustToContentHeight
+                >
+                    <Lay style={{borderTopLeftRadius:20,
+                        borderTopRightRadius:20}}>
+                        {Header}
+                        <View style={{marginVertical:5}}>
+                            <View style={{marginTop:10,paddingHorizontal:15}}>
+                                <Text category="h6">{i18n.t('usage_guide',{type:"Twibbon"})}</Text>
+                            </View>
+                            <Divider style={{backgroundColor:theme['border-text-color'],marginVertical:5}} />
+                            <View style={{marginTop:10,paddingHorizontal:15}}>
+                                <View key={0} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
+                                    <Text style={{marginRight:5}}>1.</Text>
+                                    <Text>{i18n.t('twibbon.usage.first')} <Text style={{fontFamily:'Inter_SemiBold',textDecorationLine:"underline"}} status="info" onPress={()=>(openImage(),modalRef?.current?.close())}>{i18n.t('button_type',{type:i18n.t('select',{type:i18n.t('image')})})}</Text>.</Text>
+                                </View>
+                                <View key={1} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
+                                    <Text style={{marginRight:5}}>2.</Text>
+                                    <Text>{i18n.t('twibbon.usage.second')}</Text>
+                                </View>
+                                <View key={2} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
+                                    <Text style={{marginRight:5}}>3.</Text>
+                                    <Text>{i18n.t('twibbon.usage.third')}</Text>
+                                </View>
+                                <View key={4} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
+                                    <Text style={{marginRight:5}}>4.</Text>
+                                    <Text>{i18n.t('twibbon.usage.fourth')} <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('button_type',{type:i18n.t('save')})}</Text>.</Text>
+                                </View>
+                                <View key={5} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
+                                    <Text style={{marginRight:5}}>5.</Text>
+                                    <Text>{i18n.t('twibbon.usage.fifth')}</Text>
+                                </View>
+                            </View>
                         </View>
-                        <Divider style={{backgroundColor:theme['border-text-color'],marginVertical:5}} />
-                        <View style={{marginTop:10,paddingHorizontal:15}}>
-                            <View key={0} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
-                                <Text style={{marginRight:5}}>1.</Text>
-                                <Text>{i18n.t('twibbon.usage.first')} <Text style={{fontFamily:'Inter_SemiBold',textDecorationLine:"underline"}} status="info" onPress={()=>(openImage(),modalRef?.current?.close())}>{i18n.t('button_type',{type:i18n.t('select',{type:i18n.t('image')})})}</Text>.</Text>
-                            </View>
-                            <View key={1} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
-                                <Text style={{marginRight:5}}>2.</Text>
-                                <Text>{i18n.t('twibbon.usage.second')}</Text>
-                            </View>
-                            <View key={2} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
-                                <Text style={{marginRight:5}}>3.</Text>
-                                <Text>{i18n.t('twibbon.usage.third')}</Text>
-                            </View>
-                            <View key={4} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
-                                <Text style={{marginRight:5}}>4.</Text>
-                                <Text>{i18n.t('twibbon.usage.fourth')} <Text style={{fontFamily:'Inter_SemiBold'}}>{i18n.t('button_type',{type:i18n.t('save')})}</Text>.</Text>
-                            </View>
-                            <View key={5} style={{marginBottom:5,flexDirection:'row',alignItems:'flex-start'}}>
-                                <Text style={{marginRight:5}}>5.</Text>
-                                <Text>{i18n.t('twibbon.usage.fifth')}</Text>
-                            </View>
-                        </View>
-                    </View>
-                </Lay>
-            </Modalize>
+                    </Lay>
+                </Modalize>
+            </Portal>
             {data && !data?.error ? (
                 <MenuContainer
                     visible={open}

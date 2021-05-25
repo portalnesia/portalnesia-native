@@ -5,6 +5,12 @@ const getScreen={
     Setting:{
         path:'setting',
     },
+    AccountSettingScreen:{
+        path:'setting/account',
+    },
+    SecuritySettingScreen:{
+        path:'setting/security',
+    },
     NewsDetail:{
         path:'news/:source/:title',
     },

@@ -31,7 +31,7 @@ const supportedAbi = ['arm64-v8a','armeabi-v7a','x86','x86_64']
 export default function({navigation}){
     const auth = React.useContext(AuthContext)
     const {setNotif,sendReport,dispatch,state} = auth;
-    const user = auth.state.user
+    const {user,token} = state
     const {PNget} = useAPI(false)
     const theme = useTheme()
     const heightt = {...headerHeight,sub:100}
@@ -123,7 +123,7 @@ export default function({navigation}){
             }
         })
         .finally(()=>setLoading(false))
-    },[])
+    },[PNget])
 
     return (
         <>

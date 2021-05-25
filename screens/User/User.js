@@ -1,6 +1,6 @@
 import React from 'react'
 import {View,Dimensions,Animated,RefreshControl,Alert} from 'react-native'
-import {Layout as Lay,Text,useTheme,TopNavigation,TopNavigationAction,Icon,Divider,Menu,MenuItem} from '@ui-kitten/components'
+import {Layout as Lay,Text,useTheme,TopNavigation,Icon,Divider,Menu,MenuItem} from '@ui-kitten/components'
 import {TabView,TabBar} from 'react-native-tab-view'
 import {useNavigationState} from '@react-navigation/native'
 import {Modalize} from 'react-native-modalize'
@@ -18,13 +18,18 @@ import useSWR from '@pn/utils/swr'
 import Button from '@pn/components/global/Button'
 import Avatar from '@pn/components/global/Avatar'
 import {TabBarHeight,HeaderHeight} from './utils'
+import Brightness from '@pn/module/Brightness'
+import TopNavigationAction from '@pn/components/navigation/TopAction'
 
 import RenderFollow from './Follow'
 import RenderAbout from './About'
 import RenderMedia from './Media'
 import { AuthContext } from '@pn/provider/Context'
-import { CONTENT_URL } from '@env'
+import { CONTENT_URL,URL } from '@env'
 import { ucwords } from '@pn/utils/Main'
+import useAPI from '@pn/utils/API'
+import downloadFile from '@pn/utils/Download'
+import { Portal } from '@gorhom/portal'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 const {event,Value,createAnimatedComponent} = Animated
@@ -41,14 +46,15 @@ const MsgIcon=(props)=>(
 
 const RenderBackButton=React.memo(({navigation})=>{
     const index = useNavigationState(state=>state.index);
+    const handleBack=React.useCallback(()=>{
+        if(navigation?.canGoBack() && index > 0) {
+            navigation.goBack();
+        } else {
+            resetRoot();
+        }
+},[navigation,index])
     return (
-        <TopNavigationAction icon={BackIcon} onPress={() => {{
-            if(index > 0) {
-                navigation.goBack();
-            } else {
-                resetRoot();
-            }
-        }}} />
+        <TopNavigationAction icon={BackIcon} onPress={handleBack} tooltip={i18n.t('back')} />
     )
 })
 
@@ -80,15 +86,17 @@ const SkeletonHeader=()=>{
 const tabIndexArray=['about','follower','following','media'];
 export default function UserScreen({navigation,route}){
     const context = React.useContext(AuthContext)
-    const {state:{user}}=context
+    const {state:{user},setNotif,lang}=context
+    const {PNpost} = useAPI()
     const [ready,setReady]=React.useState(false)
     const scrollY = React.useRef(new Value(0)).current;
     const theme=useTheme();
     const {username,slug}=route.params;
-    const {data,error,mutate,isValidating}=useSWR(`/user/${username}`,{},user)
+    const {data,error,mutate,isValidating}=useSWR(`/user/${username}`,{},true);
     //const swrEdit = useSWR(user && user?.id == username ? `/user/${username}/edit` : null);
     const [openMenu,setOpenMenu]=React.useState(false)
     const [refreshing,setRefreshing]=React.useState(false)
+    const [loading,setLoading]=React.useState(false);
 	React.useEffect(()=>{
 		if(!isValidating) setRefreshing(false);
 	},[isValidating])
@@ -107,12 +115,12 @@ export default function UserScreen({navigation,route}){
         }
         return 0;
     });
-    const [routes]=React.useState([
-        {key:'about',title:"About"},
-        {key:'follower',title:"Follower"},
-        {key:'following',title:"Following"},
+    const routes=React.useMemo(()=>([
+        {key:'about',title:ucwords(i18n.t("form.about"))},
+        {key:'follower',title:ucwords(i18n.t("follower"))},
+        {key:'following',title:ucwords(i18n.t("following"))},
         {key:'media',title:"Media"}
-    ])
+    ]),[lang])
 
     let listRefArr=React.useRef([
         {key:'about',value:undefined},
@@ -181,6 +189,29 @@ export default function UserScreen({navigation,route}){
         })
     }
 
+    const handleFollow=()=>{
+        if(!loading) {
+            setLoading(true);
+            PNpost(`/backend/follow`,{token:data?.users?.token_follow}).then((res)=>{
+                if(!res.error){
+                    setNotif(false,"Success!",res?.msg);
+                    mutate({
+                        ...data,
+                        users:{
+                            ...data.users,
+                            isFollowing:res.follow,
+                            isPending:res.pending,
+                            token_follow:res.new_token
+                        }
+                    })
+                }
+            })
+            .finally(()=>{
+                setLoading(false)
+            })
+        }
+    }
+
     const onMomentumScrollBegin=()=>{
         isListGliding.current = true;
     }
@@ -247,8 +278,17 @@ export default function UserScreen({navigation,route}){
                                     <Button style={{marginRight:10}} onPress={()=>navigation?.navigate("MainStack",{screen:"EditUserScreen"})}>{`Edit ${i18n.t('profile')}`}</Button>
                                 ) : (
                                     <>
-                                        <Button style={{marginRight:10}}>Follow</Button>
-                                        <Button accessoryLeft={MsgIcon} status="basic" appearance="ghost" />
+                                        <Button
+                                            onPress={handleFollow}
+                                            style={{marginRight:10}}
+                                            status={data?.users?.isFollowing && !data?.users?.isPending ? 'danger' : !data?.users?.isFollowing && data?.users?.isPending ? 'basic' : 'primary'}
+                                            disabled={loading}
+                                            loading={loading}
+                                            tooltip={data?.users?.isFollowing && !data?.users?.isPending ? ucwords(i18n.t('unfollow')) : data?.users?.isPending ? `Pending` : ucwords(i18n.t('follow'))}
+                                        >
+                                            {data?.users?.isFollowing && !data?.users?.isPending ? ucwords(i18n.t('unfollow')) : data?.users?.isPending ? `Pending` : ucwords(i18n.t('follow'))}
+                                        </Button>
+                                        <Button accessoryLeft={MsgIcon} text onPress={()=>setNotif(true,'Error','Under maintenance')} disabled={loading} tooltip={i18n.t('send_type',{type:i18n.t('form.message')})} />
                                     </>
                                 )}
                                 
@@ -294,8 +334,8 @@ export default function UserScreen({navigation,route}){
             onScrollEndDrag,
             onGetRef:onGetRef(route)
         }
-        if(route.key == 'follower') return <RenderFollow type="follower" {...props} ref={ref.follower} onOpen={handleOpenMenu('follower')} />
-        if(route.key == 'following') return <RenderFollow type="following" {...props} ref={ref.following} onOpen={handleOpenMenu('following')} />
+        if(route.key == 'follower') return <RenderFollow type="follower" {...props} ref={ref.follower} />
+        if(route.key == 'following') return <RenderFollow type="following" {...props} ref={ref.following} />
         if(route.key == 'media') return <RenderMedia {...props} ref={ref.media} onOpen={handleOpenMenu('media')} />
         if(route.key == 'about') return <RenderAbout {...props} mutate={handleRefreshing} isValidating={refreshing} />
         return null;
@@ -315,13 +355,17 @@ export default function UserScreen({navigation,route}){
     }
 
     const handleOpenMenu=(tipe)=>(data)=>{
-        //.log(tipe,data)
         setOpen({modal:tipe,...data})
-        if(['media','qrcode'].indexOf(tipe) === -1) setTimeout(ref.modal?.current?.open,100)
+        if(tipe==='qrcode') {
+            Brightness.setBrightness(0.8);
+        }
     }
     
-    const handleCloseMenu=()=>{
+    const handleCloseMenu=async()=>{
         setOpen(null)
+        const system = await Brightness.getSystemBrightness();
+        const brightness = system*1/16;
+        await Brightness.setBrightness(brightness)
     }
 
     React.useEffect(()=>{
@@ -334,14 +378,26 @@ export default function UserScreen({navigation,route}){
                 setReady(true)
             })()
         }
-        if(!data) {
-            mutate();
+    },[data,username,ready,user])
+
+    const handleDownloadQR=React.useCallback(async()=>{
+        if(!data?.users?.username) return;
+
+        const url = `${CONTENT_URL}/qr/user/${data?.users?.username}`;
+        const filename = `[portalnesia.com]_${data?.users?.username}_QRcode.png`;
+
+        try {
+            const down = await downloadFile(url,filename,`pn://user/${data?.users?.username}`,`pn://second-screen?type=open_file&file=${encodeURIComponent(filename)}&mime=${encodeURIComponent('image/png')}`)
+            if(down) {
+                await handleCloseMenu();
+                setNotif(false,"Download","Start downloading...");
+                await down.start();
+            }
+        } catch(err) {
+            setNotif(true,"Error",err?.message||"Something went wrong");
         }
 
-        /*return ()=>{
-            if(ready) setReady(false)
-        }*/
-    },[data,username,ready,user])
+    },[data,setNotif,handleCloseMenu])
 
     return (
         <>
@@ -349,51 +405,33 @@ export default function UserScreen({navigation,route}){
                 {renderNavbar()}
                 {renderTabView()}
             </Layout>
-            <Modalize
-                ref={ref.modal}
-                withHandle={false}
-                modalStyle={{
-                    backgroundColor:theme['background-basic-color-1'],
-                }}
-                adjustToContentHeight
-                onClosed={handleCloseMenu}
-            >
-                <Lay style={{borderTopLeftRadius:20,borderTopRightRadius:20}}>
-                    <View style={{alignItems:'center',justifyContent:'center',padding:9}}>
-                        <View style={{width:60,height:7,backgroundColor:theme['text-hint-color'],borderRadius:5}} />
-                    </View>
-                    <Lay style={{marginBottom:10}}>
-                        <Menu appearance="noDivider">
-                            <MenuItem title="Follow" />
-                            <MenuItem title="Report" />
-                        </Menu>
-                    </Lay>
-                </Lay>
-            </Modalize>
-            <Modal
-                isVisible={open !== null && ['media','qrcode'].indexOf(open?.modal) !== -1}
-                style={{margin:0,justifyContent:'center'}}
-                onBackdropPress={()=>setOpen(null)}
-                animationIn="fadeIn"
-                animationOut="fadeOut"
-                onBackButtonPress={()=>setOpen(null)}
-            >
-                <Lay style={{maxWidth:winWidth-20,margin:10,paddingVertical:20,paddingHorizontal:10,borderRadius:10}}>
-                    {open?.modal === 'qrcode' ? (
-                        <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
-                            <ImageFull contentWidth={winWidth-40} source={{uri:`${CONTENT_URL}/qr/user/${data?.users?.username}`}} />
-                            <View style={{marginTop:15,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                                <Button text>Download</Button>
+            <Portal>
+                <Modal
+                    isVisible={open !== null && ['media','qrcode'].indexOf(open?.modal) !== -1}
+                    style={{margin:0,justifyContent:'center'}}
+                    onBackdropPress={handleCloseMenu}
+                    onBackButtonPress={handleCloseMenu}
+                    animationIn="fadeIn"
+                    animationOut="fadeOut"
+                    coverScreen={false}
+                >
+                    <Lay style={{maxWidth:winWidth-20,margin:10,paddingVertical:20,paddingHorizontal:10,borderRadius:10}}>
+                        {open?.modal === 'qrcode' ? (
+                            <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
+                                <ImageFull contentWidth={winWidth-40} source={{uri:`${CONTENT_URL}/qr/user/${data?.users?.username}`}} />
+                                <View style={{marginTop:15,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                    <Button text onPress={handleDownloadQR}>Download</Button>
+                                </View>
                             </View>
-                        </View>
-                    ) : open!==null ? (
-                        <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
-                            <ImageFull contentWidth={winWidth-40} source={{uri:`${open.src}&watermark=no`}} thumbnail={{uri:`${open.src}&size=50`}} />
-                            <Text style={{marginTop:10}}>{open?.title}</Text>
-                        </View>
-                    ) : null}
-                </Lay>
-            </Modal>
+                        ) : open!==null ? (
+                            <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
+                                <ImageFull contentWidth={winWidth-40} source={{uri:`${open.src}&watermark=no`}} thumbnail={{uri:`${open.src}&size=50`}} />
+                                <Text style={{marginTop:10}}>{open?.title}</Text>
+                            </View>
+                        ) : null}
+                    </Lay>
+                </Modal>
+            </Portal>
             {data && (
                 <MenuContainer
                     visible={openMenu}

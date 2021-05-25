@@ -27,11 +27,15 @@ export const resetRoot=()=>{
     // PR
     //console.log(firstPathSplit,state?.routes?.[0]?.state?.routes?.[0]?.state?.routes);
     const routes=state?.routes?.map((dt)=>{
-        const route = dt?.state?.routes?.map((r)=>{
+        /*const route = dt?.state?.routes?.map((r)=>{
+            r.state.index=0;
+            if(r?.state?.params) r.state.params=undefined;
+            if(r?.params) r.params = undefined;
+
             if(r?.name === 'MainTab') {
-                r.state.index=0;
                 r.state.routes = r?.state?.routes?.map((it)=>{
-                    if(it?.name === 'firstPathSplit') {
+                    if(it?.name === firstPathSplit) {
+                        it.params=undefined;
                         delete it.state;
                     }
                     return it;
@@ -41,11 +45,19 @@ export const resetRoot=()=>{
                 return undefined;
             }
         })
+
+        dt.state.index=0;
+        dt.params=undefined;
         if(typeof route?.[0] === 'object') {
             dt.state.routes=route;
+            dt.state.params = undefined
         } else {
             delete dt.state;
-        }
+        }*/
+        dt.params=undefined;
+        dt.state.index=0;
+        if(dt?.state) delete dt.state;
+
         return dt;
     })
     navigationRef?.current?.resetRoot({

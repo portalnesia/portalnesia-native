@@ -22,28 +22,24 @@ export interface LayoutProps extends TopNavigationProps {
     static defaultProps={
         title:undefined,
         withBack:true,
-        align:'center'
+        align:'center',
+        canBack:true
     }
 
     render() {
-        const props = this.props;
+        const {custom,title,withClose,whiteBg,children,withBack,...rest} = this.props;
         return (
-            <Lay style={styles.container} {...(props.whiteBg ? {level:"1"} : {level:"2"})}>
-                {props.custom ? props.custom : props.title || props.withClose ? (
+            <Lay style={styles.container} {...(whiteBg ? {level:"1"} : {level:"2"})}>
+                {custom ? custom : title || withClose ? (
                     <TopNav
-                        navigation={props.navigation}
-                        title={props.title}
-                        withBack={props.withBack ? true : false}
-                        align={props.align}
-                        subtitle={props.subtitle}
-                        menu={props.menu}
-                        withClose={props.withClose}
-                        margin={props?.margin}
-                        whiteBg={props.whiteBg}
-                        withDivider={props.withDivider||true}
+                        title={title}
+                        withBack={withBack ? true : false}
+                        withClose={withClose}
+                        whiteBg={whiteBg}
+                        {...rest}
                     />
                 ) : null}
-                {props.children}
+                {children}
             </Lay>
         )
     }

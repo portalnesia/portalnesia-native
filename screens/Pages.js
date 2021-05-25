@@ -23,7 +23,7 @@ import TableContent from '@pn/components/global/TableContent'
 export default function({navigation,route}){
     const {slug,navbar} = route.params
     const [open,setOpen]=React.useState(false)
-    const {data,error,mutate,isValidating}=useSWR(`/pages/${slug}`,{},false)
+    const {data,error,mutate,isValidating}=useSWR(`/pages/${slug}`)
     const theme = useTheme()
     const [ready,setReady]=React.useState(false)
     const heightt = {...headerHeight,sub:0}	

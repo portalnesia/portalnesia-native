@@ -19,6 +19,7 @@ import downloadFile from '@pn/utils/Download'
 import verifyRecaptcha from '@pn/module/Recaptcha'
 import { openBrowser } from '@pn/utils/Main';
 import i18n from 'i18n-js'
+import Brightness from '@pn/module/Brightness';
 
 export default function URLshortener({navigation}){
     const {PNpost} = useAPI(false)
@@ -94,6 +95,16 @@ export default function URLshortener({navigation}){
         }
     }
 
+    const handleOpenQR=async()=>{
+        await Brightness.setBrightness(0.8);
+    }
+
+    const handleCloseQR=async()=>{
+        const system = await Brightness.getSystemBrightness();
+        const brightness = system*1/16;
+        await Brightness.setBrightness(brightness)
+    }
+
     return (
         <>
             <Layout navigation={navigation} title="URL Shortener" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
@@ -134,7 +145,7 @@ export default function URLshortener({navigation}){
                                 {result !== null && (
                                     <View style={style.container}>
                                         <View style={{flex:1,flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
-                                            <Image fancybox source={{uri:`${CONTENT_URL}/qr/url/${result.custom}`}} fullSize contentWidth={200} animated={false} forceFancybox />
+                                            <Image onOpen={handleOpenQR} onClose={handleCloseQR} fancybox source={{uri:`${CONTENT_URL}/qr/url/${result.custom}`}} fullSize contentWidth={200} animated={false} forceFancybox />
                                         </View>
                                         <Text category="h5" style={{marginVertical:10}}>{result.status==0 ? "URL has been successfully shortened." : "URL already been shortened by others."}</Text>
                                         <Text><Text>Short URL: </Text><Text status="info" style={{textDecorationLine:"underline"}} onPress={()=>openBrowser(result.short_url,false)}>{result.short_url}</Text></Text>

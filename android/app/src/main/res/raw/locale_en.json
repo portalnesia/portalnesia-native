@@ -27,6 +27,7 @@
     "popular":"Popular",
     "popular_type":"Popular %{type}",
     "change":"Change",
+    "change_type":"Change %{type}",
     "twitter_thread":"Twitter Thread",
     "news":"News",
     "chord":"Chord",
@@ -34,21 +35,55 @@
     "new_type":"New %{type}",
     "text":"Text",
     "setting":"Setting",
+    "setting_type":"%{type} setting",
+    "without_type":"without %{type}",
     "appearance":"Appearance",
     "clear":"Clear %{type}",
     "deleted":"%{type} deleted",
     "light":"light",
     "dark":"dark",
     "device":"device",
+    "profile":"profile",
+    "profile_type":"profile %{type}",
     "theme":"theme",
     "theme_type":"%{type} theme",
     "image":"Image",
+    "picture": {
+        "one":"picture",
+        "other":"pictures"
+    },
+    "photo": {
+        "one":"photo",
+        "other":"photos"
+    },
     "select":"Select %{type}",
     "load_more":"Load more",
     "see_more":"See more",
-    "comments":"Comments",
+    "notification":{
+        "one":"notification",
+        "other":"notifications"
+    },
+    "account":{
+        "one":"account",
+        "other":"accounts"
+    },
+    "security":"security",
+    "comment":{
+        "one":"comment",
+        "other":"comments"
+    },
+    "content":{
+        "one":"content",
+        "other":"contents"
+    },
+    "session":{
+        "one":"session",
+        "other":"sessions"
+    },
     "reply":"Reply",
     "delete":"Delete",
+    "remove":"Remove",
+    "remove_type":"Remove %{type}",
     "add_type":"Add %{type}",
     "no_comment":"There are no comments yet.",
     "no_reply":"There are no reply yet.",
@@ -65,28 +100,44 @@
     "recommended":"Recommended",
     "recommended_type":"Recommended %{type}",
     "report":"Report",
-    "feedback":"feedback",
+    "feedback":"Feedback",
     "send_type":"Send %{type}",
     "send":"Send",
+    "open_source_libraries":"Open Source Libraries",
+    "authentication":"authentication",
+    "auth_type":"%{type} authentication",
+    "fingerprint":"fingerprint",
+    "privacy":"privacy",
+    "social_media":"social media",
     "errors":{
         "general":"Something went wrong",
         "server":"Internal server error",
         "permission_storage":"Sorry, we need storage permissions",
+        "permission_location":"Sorry, we need location permissions",
         "form_validation":"%{type} cannot be empty",
         "image":"Please select image first",
         "no_image":"Cannot find image",
         "upload":"Sorry, error while uploading your image",
         "size_image":"Sorry, your file is too large. Maximum images size is 5 MB",
         "youtube_service":"You have to install the official youtube apps to be able to watch videos.\n\nClick here to watch in fullscreen mode.",
-        "invalid":"Invalid %{type}"
+        "invalid":"Invalid %{type}",
+        "sure":"Are you sure?",
+        "location_disabled":"Your location services is not active"
     },
     "report_placeholder":{
         "placeholder_url":"We are sorry for the inconvenience, it seems that there is a problem with our internal server service. Can you tell us how this happened?",
-        "placeholder":"Have feedback? We'd love to hear it, but please don't share sensitive information. Have questions? try support."
+        "placeholder":"Have feedback? We'd love to hear it, but please don't share sensitive information. Have questions? try support.",
+        "placeholder_content":"Tell us why are you reporting this %{type}? Or if you have any feedback, We'd love to hear it, but please don't share sensitive information. Have questions? try support."
     },
     "form":{
         "name":"Name",
-        "email":"Email"
+        "email":"Email",
+        "subject":"Subject",
+        "message":"Message",
+        "username":"Username",
+        "gender":"Gender",
+        "birthday":"Birthday",
+        "about":"About"
     },
     "home_not_login":{
         "news":"A collection of news that is updated every day.",
@@ -123,5 +174,32 @@
     "media":{
         "video_player":"video player",
         "music_player":"music_player"
+    },
+    "gender":{
+        "male":"Male",
+        "female":"Female"
+    },
+    "follow":"follow",
+    "follower":"follower",
+    "following":"following",
+    "unfollow":"unfollow",
+    "settings":{
+        "account":{
+            "private":"Set profile to private",
+            "media_private":"Set media profile to private",
+            "private_tip":"Only your followers can see your profile",
+            "media_private_tip":"Only your followers can see your media",
+            "change_password":"Change Password",
+            "deactivate":"Deactivate Account",
+            "unlink":"Unlink connection to your %{type} account?",
+            "delete":{
+                "one":"Please make sure that you will make a request to deactivate your account.",
+                "two":"You can reactivate your account at any time. We will give instructions via email. Please check your inbox or spam folder.",
+                "three":"You will not be able to access your account until you reactivate it."
+            }
+        },
+        "security":{
+
+        }
     }
 }

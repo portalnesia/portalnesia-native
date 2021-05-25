@@ -36,6 +36,7 @@
     "text":"Teks",
     "setting":"Pengaturan",
     "setting_type":"Pengaturan %{type}",
+    "without_type":"tanpa %{type}",
     "appearance":"Tampilan",
     "clear":"Bersihkan %{type}",
     "deleted":"%{type} berhasil dihapus",
@@ -62,6 +63,11 @@
         "one":"pemberitahuan",
         "other":"pemberitahuan"
     },
+    "account":{
+        "one":"akun",
+        "other":"akun"
+    },
+    "security":"keamanan",
     "comment":{
         "one":"komentar",
         "other":"komentar"
@@ -93,6 +99,11 @@
     "feedback":"Masukan",
     "send_type":"Kirim %{type}",
     "send":"Kirim",
+    "authentication":"otentikasi",
+    "auth_type":"otentikasi %{type}",
+    "fingerprint":"sidik jari",
+    "privacy":"privasi",
+    "social_media":"media sosial",
     "errors":{
         "general":"Kesalahan",
         "server":"Kesalahan internal server",
@@ -117,7 +128,11 @@
         "name":"Nama",
         "email":"Surel",
         "subject":"Subjek",
-        "message":"Pesan"
+        "message":"Pesan",
+        "username":"Nama Pengguna",
+        "gender":"Jenis Kelamin",
+        "birthday":"Ulang Tahun",
+        "about":"Tentang"
     },
     "home_not_login":{
         "news":"Kumpulan berita yang diperbarui setiap harinya.",
@@ -159,5 +174,28 @@
     "gender":{
         "male":"Laki-laki",
         "female":"Perempuan"
+    },
+    "follow":"ikuti",
+    "follower":"pengikut",
+    "following":"mengikuti",
+    "unfollow":"batal mengikuti",
+    "settings":{
+        "account":{
+            "private":"Setel profil ke pribadi",
+            "media_private":"Setel media profil ke pribadi",
+            "private_tip":"Hanya pengikut Anda yang dapat melihat profil Anda",
+            "media_private_tip":"Hanya pengikut Anda yang dapat melihat media Anda",
+            "change_password":"Ubah Kata Sandi",
+            "deactivate":"Nonaktifkan Akun",
+            "unlink":"Putuskan koneksi ke akun %{type} Anda?",
+            "delete":{
+                "one":"Harap pastikan bahwa Anda akan membuat permintaan untuk menonaktifkan akun Anda.",
+                "two":"Anda dapat mengaktifkan kembali akun Anda kapan saja. Kami akan memberikan instruksi melalui email. Silahkan periksa kotak masuk atau folder spam email Anda.",
+                "three":"Anda tidak akan dapat mengakses akun Anda sampai Anda mengaktifkannya kembali."
+            }
+        },
+        "security":{
+
+        }
     }
 }

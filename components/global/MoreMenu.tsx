@@ -11,6 +11,7 @@ import useClipboard from '@pn/utils/clipboard'
 import {openBrowser} from '@pn/utils/Main'
 import i18n from 'i18n-js'
 import useAPI from '@pn/utils/API'
+import {Portal} from '@gorhom/portal'
 
 const MoreIcon=(props?: {style: Record<string,any>})=><Icon {...props} name="more-vertical" />
 const FeedbackIcon=(props?: {style: Record<string,any>})=><Icon {...props} name="feedback" pack="material" />
@@ -77,7 +78,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
         }
     },[visible])
 
-    const handleShare=React.useCallback(async(text,url,dialog)=>{
+    const handleShare=async(text?: string,url?: string,dialog?: string)=>{
         Share.share({
             message:`${text} ${url}`,
             url:url
@@ -96,7 +97,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
                 ])
             } catch(e) {}
         }
-    },[type,item_id])
+    }
 
     const handleOnPress=(dt: MenuType)=>{
         setSelectedMenu(dt);
@@ -104,7 +105,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
 
     React.useEffect(()=>{
         if(selectedMenu !== null) {
-            ref?.current?.close();
+            setTimeout(()=>ref?.current?.close());
         }
     },[selectedMenu])
 
@@ -120,7 +121,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
                 } else if(selectedMenu?.action === 'browser') {
                     openBrowser(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
                 } else if(selectedMenu?.action === 'report') {
-                    setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,urlreported:`${URL}${share?.link}`}))
+                    setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,...(share?.link ? {urlreported:`${URL}${share?.link}`} : {} )}))
                 } else if(selectedMenu?.action === 'feedback') {
                     setTimeout(()=>sendReport('feedback',{...(share?.link ? {urlreported:`${URL}${share?.link}`} : {} )}))
                 }
@@ -131,29 +132,31 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
     }
 
     return (
-        <Modalize
-            ref={ref}
-            withHandle={false}
-            modalStyle={{
-                backgroundColor:theme['background-basic-color-1'],
-            }}
-            onClose={onClose}
-            adjustToContentHeight
-            onClosed={onModalClosed}
-        >
-            <Layout style={{borderTopLeftRadius:20,
-                borderTopRightRadius:20}}>
-                {Header}
-                <Layout style={{marginBottom:10}}>
-                    <Menu appearance="noDivider">
-                        {menu?.map((dt,i)=>{
-                            return <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={dt.title||""} onPress={()=>handleOnPress(dt)} />
-                            
-                        })}
-                    </Menu>
+        <Portal>
+            <Modalize
+                ref={ref}
+                withHandle={false}
+                modalStyle={{
+                    backgroundColor:theme['background-basic-color-1'],
+                }}
+                onClose={onClose}
+                adjustToContentHeight
+                onClosed={onModalClosed}
+            >
+                <Layout style={{borderTopLeftRadius:20,
+                    borderTopRightRadius:20}}>
+                    {Header}
+                    <Layout style={{marginBottom:15,paddingTop:10}}>
+                        <Menu appearance="noDivider">
+                            {menu?.map((dt,i)=>{
+                                return <MenuItem style={{paddingHorizontal:15,paddingVertical:12}} key={`${i}`} title={()=><Text>{dt.title||""}</Text>} onPress={()=>handleOnPress(dt)} />
+                                
+                            })}
+                        </Menu>
+                    </Layout>
                 </Layout>
-            </Layout>
-        </Modalize>
+            </Modalize>
+        </Portal>
     )
 }
 export const MenuContainer = React.memo(MenuCont)

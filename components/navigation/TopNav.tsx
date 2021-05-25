@@ -1,9 +1,10 @@
 import React from 'react';
 import {resetRoot} from '@pn/navigation/useRootNavigation'
-import {useNavigationState} from '@react-navigation/native'
 import {Icon,Divider, TopNavigation,Text,useTheme, TextProps} from '@ui-kitten/components'
 import TopNavigationAction from './TopAction'
 import i18n from 'i18n-js'
+import { useNavigationState } from '@react-navigation/core';
+import { Alert, BackHandler } from 'react-native';
 
 export interface TopNavigationProps {
     /**
@@ -49,35 +50,31 @@ const CloseIcon=(props?: StyleIcon)=>(
 	<Icon {...props} name='close' />
 )
 
-export default function(props: TopNavigationProps){
-    const {withBack,title,menu,navigation,align,subtitle,withClose,whiteBg,margin,withDivider,style}=props;
-	const index = useNavigationState(state=>state.index);
-	const theme = useTheme()
+const RenderBackBtn=React.memo(({withClose,withBack,navigation}: Pick<TopNavigationProps,'withBack'|'withClose'|'navigation'>)=>{
+	const index = useNavigationState(state=>state.index)
+	const handleBack=React.useCallback(()=>{
+			if(navigation?.canGoBack() && index > 0) {
+				navigation.goBack();
+			} else {
+				resetRoot();
+			}
+	},[navigation,index])
 
-	const RenderBackBtn=()=>{
-		if(withClose) {
-			return(
-				<TopNavigationAction tooltip={i18n.t('close')} icon={CloseIcon} onPress={() => {{
-					if(index > 0) {
-						navigation.goBack();
-					} else {
-						resetRoot();
-					}
-				}}} />
-			)
-		} else if(withBack) {
-			return(
-				<TopNavigationAction tooltip={i18n.t('back')} icon={BackIcon} onPress={() => {{
-					if(index > 0) {
-						navigation.goBack();
-					} else {
-						resetRoot();
-					}
-				}}} />
-			)
-		}
-		else return null;
+	if(withClose) {
+		return(
+			<TopNavigationAction tooltip={i18n.t('close')} icon={CloseIcon} onPress={handleBack} />
+		)
+	} else if(withBack) {
+		return(
+			<TopNavigationAction tooltip={i18n.t('back')} icon={BackIcon} onPress={handleBack} />
+		)
 	}
+	else return null;
+})
+
+export default function TopNav(props: TopNavigationProps){
+    const {withBack,title,menu,navigation,align,subtitle,withClose,whiteBg,margin,withDivider,style}=props;
+	const theme = useTheme()
 
 	return(
 		<>
@@ -86,7 +83,7 @@ export default function(props: TopNavigationProps){
 				title={(evaProps) => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
 				{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
 				alignment={align}
-				{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn /> } : {})}
+				{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn withBack={withBack} withClose={withClose} navigation={navigation} /> } : {})}
 				{...(menu ? {accessoryRight:menu} : {})}
 			/>
 			{(withClose && whiteBg) || withDivider===false ? null : <Divider />}

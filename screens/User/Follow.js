@@ -2,37 +2,53 @@ import React from 'react'
 import {View,Dimensions,TouchableOpacity,Animated,RefreshControl} from 'react-native'
 import {Layout as Lay,Text,useTheme,Icon,Divider,ListItem} from '@ui-kitten/components'
 import {useNavigation} from '@react-navigation/native'
+import i18n from 'i18n-js'
 
-//import Image from '@pn/components/global/Image'
 import usePagination from '@pn/utils/usePagination'
-//import useSWR from '@pn/utils/swr'
-//import Button from '@pn/components/global/Button'
 import Avatar from '@pn/components/global/Avatar'
 import RenderPrivate,{RenderSuspend} from './PrivateUser'
 import { ucwords } from '@pn/utils/Main'
 import {ListSkeleton} from '@pn/components/global/Skeleton'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
+import Pressable from '@pn/components/global/Pressable'
+import { Portal } from '@gorhom/portal'
+import { MenuContainer } from '@pn/components/global/MoreMenu'
+import Backdrop from '@pn/components/global/Backdrop'
+import { AuthContext } from '@pn/provider/Context'
+import useAPI from '@pn/utils/API'
 
 const user=false;
 
 const winHeight = Dimensions.get('window').height;
-
-const MemoAvatar=React.memo(({item})=>(
-    <Avatar style={{marginRight:10}} {...(item?.image !== null ? {src:`${item?.image}&size=50&watermark=no`} : {name:ucwords(item?.name)})} size={45} />
+const OptionIcon=React.memo((props)=><Icon {...props} name="more-vertical" />)
+const MemoAvatar=React.memo(({name,image})=>(
+    <Avatar style={{marginRight:10}} {...(image !== null ? {src:`${image}&size=50&watermark=no`} : {name:ucwords(name)})} size={45} />
 ))
 /*
 accessoryRight={(props)=>(
     <TouchableOpacity activeOpacity={0.7} style={{padding:5}} onPress={()=>onOpen(item)}><Icon {...props} name="more-vertical" /></TouchableOpacity>
 )}
 */
+const RenderIcon=React.memo(({item,onOpen})=>{
+    const theme = useTheme();
+    return (
+        <View style={{borderRadius:22,overflow:'hidden'}}>
+            <Pressable style={{padding:10}} onPress={()=>onOpen(item)}>
+                <OptionIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
+            </Pressable>
+        </View>
+    )
+})
 const RenderUser=React.memo(({item,index,onOpen})=>{
-    const navigation=useNavigation()
+    const navigation=useNavigation();
+
     return (
         <ListItem
             key={index.toString()}
             title={item?.name}
             description={`@${item?.username}`}
-            accessoryLeft={()=><MemoAvatar item={item} />}
+            accessoryLeft={()=><MemoAvatar name={item?.name} image={item?.image} />}
+            accessoryRight={()=><RenderIcon item={item} onOpen={onOpen} />}
             onPress={()=>navigation.push("User",{username:item?.username})}
         />
     )
@@ -46,9 +62,13 @@ const SkeletonFollow=()=>{
 }
 
 const RenderFollow=React.forwardRef((props,ref)=>{
+    const context = React.useContext(AuthContext);
+    const {setNotif} = context;
+    const {PNpost} = useAPI()
     const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/${props.type}` : null,props.type,20,false)
     const theme=useTheme()
-    return <RenderFollowClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} />
+    const navigation=useNavigation();
+    return <RenderFollowClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} setNotif={setNotif} PNpost={PNpost} />
 })
 
 class RenderFollowClass extends React.PureComponent{
@@ -57,12 +77,14 @@ class RenderFollowClass extends React.PureComponent{
         this.refresh=this.refresh.bind(this)
         this.loadMore=this.loadMore.bind(this)
         this.state={
-            refreshing:false
+            refreshing:false,
+            menu:null,
+            loading:false
         }
     }
 
     handleOpenMenu = (item)=>{
-        this.props.onOpen && this.props.onOpen(item)
+        this.setState({menu:item})
     }
 
     refresh=()=>{
@@ -88,6 +110,21 @@ class RenderFollowClass extends React.PureComponent{
         }
     }
 
+    handleFollow(menu){
+        const {PNpost,setNotif,mutate} = this.props;
+        this.setState({loading:true})
+        console.log(menu)
+        PNpost(`/backend/follow`,{token:menu?.token_follow}).then((res)=>{
+            if(!res.error){
+                setNotif(false,"Success!",res?.msg);
+                mutate();
+            }
+        })
+        .finally(()=>{
+            this.setState({loading:false})
+        })
+    }
+
     renderFooter(){
         const {isReachingEnd,isLoadingMore}=this.props;
         if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:10,textAlign:'center'}}>You have reach the bottom of the page</Text>
@@ -96,7 +133,8 @@ class RenderFollowClass extends React.PureComponent{
     }
 
     render(){
-        const {data,error,theme,dt,isValidating,isLoadingInitialData,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}=this.props
+        const {menu,loading}=this.state;
+        const {navigation,data,error,theme,dt,isValidating,isLoadingInitialData,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}=this.props
 
         if(isLoadingInitialData || (!data && !error) || (data?.error || error) || data?.users?.private===true || data?.users?.suspend===true) {
             return (
@@ -132,6 +170,7 @@ class RenderFollowClass extends React.PureComponent{
             )
         }
         return (
+            <>
                 <Animated.FlatList
                     data={dt}
                     renderItem={(props)=> <RenderUser {...props} onOpen={this.handleOpenMenu.bind(this)} />}
@@ -171,6 +210,32 @@ class RenderFollowClass extends React.PureComponent{
                     onEndReached={()=>this.loadMore()}
                     onEndReachedThreshold={0.02}
                 />
+
+                <Backdrop loading visible={loading} />
+
+                <Portal>
+                    <MenuContainer
+                        visible={menu !== null}
+                        onClose={()=>this.setState({menu:null})}
+                        type="user"
+                        item_id={menu?.id}
+                        share={{
+                            link:`/user/${menu?.username}`,
+                            title:`${menu?.name} (@${menu?.username}) - Portalnesia`
+                        }}
+                        menu={[{
+                            title:ucwords(`${i18n.t('open')} ${i18n.t('profile')}`),
+                            onPress:()=>navigation.push("User",{username:menu?.username})
+                        },{
+                            title:ucwords(i18n.t(menu?.isFollowing ? 'unfollow' : 'follow')),
+                            onPress:()=>this.handleFollow(menu)
+                        },{
+                            title:i18n.t('report'),
+                            action:'report'
+                        }]}
+                    />
+                </Portal>
+            </>
         )
     }
 }

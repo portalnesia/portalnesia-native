@@ -35,6 +35,9 @@ export const AdsBanner=React.memo(({size})=>{
             .catch(()=>{})
         }
     },[])
+    const onError=React.useCallback((error)=>{
+        console.log(error)
+    },[])
     React.useEffect(()=>{
         if(size) setSize(size)
     },[size])
@@ -47,6 +50,7 @@ export const AdsBanner=React.memo(({size})=>{
                 requestOptions={{
                     requestNonPersonalizedAdsOnly:ads
                 }}
+                onAdFailedToLoad={onError}
             />
         </View>
     )
@@ -56,6 +60,9 @@ export const AdsBanners=React.memo(({size})=>{
     const [sizeAds,setSize]=React.useState(()=>typeof size==='undefined' ? BannerAdSize.SMART_BANNER : size)
     const [load,setLoad] = React.useState(false)
     const [ads,setAds] = React.useState(false)
+    const onError=React.useCallback((error)=>{
+        console.log(error)
+    },[])
     React.useEffect(()=>{
         if(isUpdated) {
             admob().setRequestConfiguration({
@@ -87,6 +94,7 @@ export const AdsBanners=React.memo(({size})=>{
                 requestOptions={{
                     requestNonPersonalizedAdsOnly:ads
                 }}
+                onAdFailedToLoad={onError}
             />
         </View>
     )
@@ -96,12 +104,12 @@ export function showInterstisial(){
     const [loaded,setLoaded]=React.useState(false)
     const interstisial = InterstitialAd.createForAdRequest(InterID);
     React.useEffect(()=>{
-        const eventListener = interstisial.onAdEvent(type=>{
+        const eventListener = interstisial.onAdEvent((type,error)=>{
             if(type == AdEventType.LOADED) {
                 setLoaded(true)
             }
             if(type == AdEventType.ERROR) {
-                console.log("Ads Error")
+                console.log("Interstisial error",error);
             }
         })
         interstisial.load();

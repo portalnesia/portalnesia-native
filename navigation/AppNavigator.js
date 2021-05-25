@@ -39,6 +39,8 @@ import Contact from '../screens/Contact'
 import User from '../screens/User/User'
 import EditUserScreen from '../screens/User/Edit'
 import Setting from '../screens/Setting/Setting'
+import AccountSettingScreen from '../screens/Setting/Account'
+import SecuritySettingScreen from '../screens/Setting/Security'
 import Search from '../screens/SearchLike/Search'
 import SearchFilter from '../screens/SearchLike/SearchFilter'
 import Twibbon from '../screens/Twibbon/Twibbon'
@@ -135,7 +137,7 @@ const MainTabs=()=>(
 )*/
 
 let screenChange=0;
-const disableAdsArr = ["Setting","Contact","Pages",'NotFound','ImageModal'];
+const disableAdsArr = ["Setting","Contact","Pages",'NotFound','ImageModal','Menu','AccountSettingScreen','EditUserScreen','ReportScreen','ReportModal','Comments'];
 
 const getScreen=()=>{
 	return [
@@ -163,10 +165,12 @@ const getScreen=()=>{
 		{name:"OpenSource",component:OpenSource},
 		{name:"OpenSourceDetail",component:OpenSourceDetail},
 		{name:"SecondScreen",component:SecondScreen},
-		{name:"Setting",component:Setting},
 		{name:"NotificationEvent",component:NotificationEvent},
 		{name:"ReportScreen",component:ReportScreen},
 		{name:"Comments",component:Comments},
+		{name:"Setting",component:Setting},
+		{name:"AccountSettingScreen",component:AccountSettingScreen},
+		{name:"SecuritySettingScreen",component:SecuritySettingScreen},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }

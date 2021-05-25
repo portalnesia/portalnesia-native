@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView,View,Dimensions,FlatList,RefreshControl } from 'react-native';
+import {ScrollView,View,Dimensions,FlatList,RefreshControl,AppState } from 'react-native';
 import {Layout as Lay, Text,Card,Spinner,useTheme,Icon, Divider} from '@ui-kitten/components'
 import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
@@ -145,6 +145,7 @@ const loginArray=()=>([
 		key:"session",
 		title:"Session",
 		data:null,
+		to:'/setting/security',
 		icon:["security","material"]
 	},
 	{
@@ -259,6 +260,7 @@ const Dashboard=({loading,data,error,navigation,onMutate})=>{
 	const theme=useTheme();
 	const {PNpost} = useAPI();
 	const [cuaca,setCuaca]=React.useState(null);
+	const [sudahCuaca,setSudahCuaca]=React.useState(false)
 
 	useScrollToTop(ref)
 	const dt = React.useMemo(()=>{
@@ -337,19 +339,22 @@ const Dashboard=({loading,data,error,navigation,onMutate})=>{
 	)
 
 	const getCuaca=React.useCallback(()=>{
-		getLocation({accuracy:LocationAccuracy.Lowest})
-		.then(({coords:{latitude,longitude}})=>{
-			return reverseGeocode({latitude,longitude})
-		})
-		.then((geocode)=>{
-			return PNpost('/weather',geocode[0]);
-		})
-		.then(res=>{
-			setCuaca(res);
-		})
-		.catch(e=>{
-			if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
-		})
+		if(AppState.currentState==='active') {
+			getLocation({accuracy:LocationAccuracy.Lowest})
+			.then(({coords:{latitude,longitude}})=>{
+				return reverseGeocode({latitude,longitude})
+			})
+			.then((geocode)=>{
+				return PNpost('/weather',geocode[0]);
+			})
+			.then(res=>{
+				setCuaca(res);
+			})
+			.catch(e=>{
+				console.log(e);
+				if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
+			})
+		}
 	},[])
 
 	const onRefresh=()=>{
@@ -361,7 +366,7 @@ const Dashboard=({loading,data,error,navigation,onMutate})=>{
 
 	React.useEffect(()=>{
 		if(cuaca===null) {
-			getCuaca()
+			getCuaca();
 		}
 	},[])
 
