@@ -17,7 +17,7 @@ import useSWR from '@pn/utils/swr';
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
 	return (
-		<Card key={i} onPress={()=>pushTo(`/chord/${item?.slug}`)}>
+		<Card key={i} onPress={()=>linkTo(`/chord/${item?.slug}`)}>
 			<Text category="p1" style={{fontWeight:"600"}}>{`${item?.artist} - ${item?.title}`}</Text>
             <Text category="label" style={{marginTop:10}}>{item?.original}</Text>
 		</Card>

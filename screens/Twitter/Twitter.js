@@ -26,7 +26,7 @@ const InputIcon = (props)=><Icon {...props} name="plus-circle-outline" />
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
 	return (
-		<Card key={i} onPress={()=>pushTo(`/twitter/thread/${item?.id}`)}>
+		<Card key={i} onPress={()=>linkTo(`/twitter/thread/${item?.id}`)}>
 			<Text category="p1" style={{fontWeight:"600"}}>{specialHTML(item?.title)}</Text>
             <Text appearance="hint" category="label" style={{marginTop:10}}>{`Thread by @${item?.screen_name}`}</Text>
 		</Card>

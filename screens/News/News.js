@@ -18,7 +18,7 @@ const {width} = Dimensions.get('window')
 
 const RenderRecommend=(({item,index:i})=>{
 	return (
-		<Card key={i} onPress={()=>pushTo(item?.url?.substring(23))}>
+		<Card key={i} onPress={()=>linkTo(item?.url?.substring(23))}>
 			<View style={{alignItems:'center'}}>
 				<Image
 					resizeMode="center"
