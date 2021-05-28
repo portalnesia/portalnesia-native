@@ -9,7 +9,7 @@ import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
 import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
 //import {useColorScheme} from 'react-native-appearance'
-import {useColorScheme,PermissionsAndroid,Alert} from 'react-native'
+import {useColorScheme,PermissionsAndroid,LogBox} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
@@ -34,6 +34,9 @@ import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
+import useAppState from '@pn/utils/useAppState';
+
+LogBox.ignoreLogs(['Setting a timer for a long period of time']);
 
 const urlParse = require('url-parse')
 
@@ -94,6 +97,7 @@ const AuthProvider = (props) => {
 	const forceUpdate = useForceUpdate();
 	const {navigationRef} = useRootNavigation()
 	const {refreshToken} = useLogin({dispatch,state,setNotif})
+	const [appState,currentState] = useAppState();
 
 	const selectedTheme = React.useMemo(()=>{
 		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
@@ -152,9 +156,6 @@ const AuthProvider = (props) => {
 	}
 
 	useEffect(()=>{
-		let interval=null;
-		
-		
 		async function asyncTask(){
 			try {
 				let [user,res,lang] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
@@ -202,12 +203,23 @@ const AuthProvider = (props) => {
 		}
 
 		async function setNotificationChannel(){
-			await Promise.all([
-				Notifications.setNotificationChannelAsync("Download", getNotifOption("Download")),
-				Notifications.setNotificationChannelAsync("General", getNotifOption("General")),
-				Notifications.setNotificationChannelAsync("Security", getNotifOption("Security")),
-				Notifications.setNotificationChannelAsync("News", getNotifOption("News")),
-			])
+			try {
+				await Promise.all([
+					Notifications.setNotificationChannelAsync("Download", getNotifOption("Download")),
+					Notifications.setNotificationChannelAsync("General", getNotifOption("General")),
+					Notifications.setNotificationChannelAsync("News", getNotifOption("News")),
+					/*
+					Notifications.setNotificationChannelAsync("Security", getNotifOption("Security")),
+					Notifications.setNotificationChannelAsync("Birthday", getNotifOption("Birthday")),
+					Notifications.setNotificationChannelAsync("Comments", getNotifOption("Comments")),
+					Notifications.setNotificationChannelAsync("Messages", getNotifOption("Messages")),
+					Notifications.setNotificationChannelAsync("Features & Promotion", getNotifOption("Features & Promotion")),
+					*/
+				])
+			} catch(e){
+				console.log("Notification channel error",e);
+			}
+			
 		}
 
 		async function createFolder() {
@@ -241,24 +253,6 @@ const AuthProvider = (props) => {
 
 		asyncTask().then(()=>{
 			checkAndUpdateOTA()
-			interval = setInterval(async()=>{
-				const token_string = await Secure.getItemAsync('token');
-				if(token_string!==null) {
-					let token = JSON.parse(token_string);
-					const date_now = Number((new Date().getTime()/1000).toFixed(0));
-					if((date_now - token.issuedAt) > (token.expiresIn||3600 - 300)) {
-						token = await refreshingToken(token);
-						if(token) {
-							const user = await getProfile(token);
-							await Promise.all([
-								Secure.setItemAsync('token',JSON.stringify(token)),
-								...(typeof user !== 'string' ? [Secure.setItemAsync('user',JSON.stringify(user))] : [])
-							])
-							dispatch({type:"MANUAL",payload:{token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
-						}
-					}
-				}
-			},295 * 1000)
 		})
 		setNotificationChannel();
 		createFolder();
@@ -270,7 +264,6 @@ const AuthProvider = (props) => {
 			foregroundListener.remove();
 			netInfoListener();
 			ExpoRemoveListener('url',handleURL)
-			if(interval !== null) clearInterval(interval);
 		}
 	},[])
 
@@ -375,6 +368,42 @@ const AuthProvider = (props) => {
 			tokenChangeListener.remove();
 		}
 	},[state.user,state.token])
+
+	React.useEffect(()=>{
+		let interval=null;
+		async function handleRefreshToken(){
+			const token_string = await Secure.getItemAsync('token');
+			if(token_string!==null) {
+				let token = JSON.parse(token_string);
+				const date_now = Number((new Date().getTime()/1000).toFixed(0));
+				console.log("Refresh Token",date_now - token.issuedAt,(token.expiresIn||3600) - 300)
+				if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
+					token = await refreshingToken(token);
+					if(token) {
+						const user = await getProfile(token);
+						await Promise.all([
+							Secure.setItemAsync('token',JSON.stringify(token)),
+							...(typeof user !== 'string' ? [Secure.setItemAsync('user',JSON.stringify(user))] : [])
+						])
+						dispatch({type:"MANUAL",payload:{token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
+					}
+				}
+			}
+		}
+		function handleInterval(){
+			interval = setInterval(handleRefreshToken,295 * 1000)
+		}
+		if(typeof state.user === 'object' && appState === 'active') {
+			//console.log(appState)
+			if(currentState.match(/inactive|background/)) handleRefreshToken();
+			handleInterval();
+		}
+
+		return ()=>{
+			if(interval !== null) clearInterval(interval)
+			interval=null;
+		}
+	},[state.user,appState,currentState])
 
 	const onTap=(dt)=>{
 		const urls = dt?.payload?.url

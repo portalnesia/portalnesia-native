@@ -126,7 +126,7 @@ export default function SecuritySettingScreen({navigation,route}){
                     <View style={{paddingHorizontal:15,flexDirection:'row',alignItems:'center',marginBottom:10,justifyContent:'space-between'}}>
                         <View style={{flexDirection:'row',alignItems:'center'}}>
                             <Text>{ucwords(i18n.t('auth_type',{type:ucwords(i18n.t('fingerprint'))}))}</Text>
-                            {/*<Tooltip style={{marginLeft:5}} tooltip={i18n.t('settings.account.private_tip')} name="question-mark-circle-outline" />*/}
+                            <Tooltip style={{marginLeft:5}} tooltip={i18n.t('settings.security.auth_help')} name="question-mark-circle-outline" />
                         </View>
                         <Toggle disabled={loading} checked={fingerprint} onChange={handleBiometrics} />
                     </View>
@@ -141,48 +141,48 @@ export default function SecuritySettingScreen({navigation,route}){
         </Lay>
     )
 
-    const renderIcon=React.useCallback((it,i)=>(
-        <View style={{borderRadius:22,overflow:'hidden'}}>
-            <Pressable style={{padding:10}} onPress={()=>{setSelectedMenu({...it,index:i}),setMenu(true)}}>
-                <OptionIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
-            </Pressable>
-        </View>
-    ),[theme])
+    const handleRemoveMenuClick=React.useCallback(()=>{
+        if(selectedMenu.this_browser) {
+            setNotif(true,"Error",i18n.t('settings.security.logout'));
+        } else {
+            passwordRef.current?.verify()
+        }
+    },[selectedMenu])
+
+    const renderIcon=React.useCallback((it,i)=>{
+        return (
+            <View style={{borderRadius:22,overflow:'hidden'}}>
+                <Pressable style={{padding:10}} onPress={()=>{setSelectedMenu({...it,index:i}),setMenu(true)}}>
+                    <OptionIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
+                </Pressable>
+            </View>
+        )
+    },[theme])
+
+    const renderEmpty=()=>{
+        if(error || data?.error) return <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
+        else return (
+            <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+                <Spinner size="large" />
+            </Lay>
+        )
+    }
 
     return (
         <>
             <Layout navigation={navigation} title={ucwords(i18n.t('setting_type',{type:i18n.t('security')}))}>
-                {(!data && !error) || typeof fingerprint === 'undefined' ? (
-                    <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-                        <Spinner size="large" />
-                    </Lay>
-                ) : error || data?.error ? (
-                    <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-                ) : (
-                    <ScrollView contentContainerStyle={{flexGrow:1}} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled">
-                        <FlatList
-                            data={session}
-                            contentContainerStyle={{backgroundColor:theme['background-basic-color-1'],paddingTop:15}}
-                            ListHeaderComponent={renderHeader}
-                            renderItem={(props)=> <RenderItem {...props} renderIcon={renderIcon} />}
-                            ItemSeparatorComponent={Divider}
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={validate}
-                                    onRefresh={()=>{
-                                        if(!validate) {
-                                            setValidate(true);
-                                            mutate();
-                                        }
-                                    }}
-                                    colors={['white']} progressBackgroundColor="#2f6f4e"
-                                />
-                            }
-                            keyExtractor={(_,i)=>i.toString()}
-                        />
-                    </ScrollView>
-                )}
-                
+                <FlatList
+                    data={session}
+                    ListEmptyComponent={renderEmpty}
+                    keyboardDismissMode="on-drag"
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={{backgroundColor:theme['background-basic-color-1'],paddingTop:15,...(session.length === 0 ? {flex:1} : {})}}
+                    ListHeaderComponent={renderHeader}
+                    renderItem={(props)=> <RenderItem {...props} renderIcon={renderIcon} />}
+                    ItemSeparatorComponent={Divider}
+                    keyExtractor={(_,i)=>i.toString()}
+                    { ...(typeof data !== 'undefined' || typeof error !== 'undefined' ? {refreshControl:<RefreshControl refreshing={validate && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>{!validate && (setValidate(true),mutate())}} colors={['white']} progressBackgroundColor="#2f6f4e" />} : {}) }
+                />
             </Layout>
             <Backdrop visible={loading} loading />
             <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
@@ -193,7 +193,7 @@ export default function SecuritySettingScreen({navigation,route}){
                 menu={[
                     {
                         title:i18n.t('remove'),
-                        onPress:()=>passwordRef.current?.verify()
+                        onPress:handleRemoveMenuClick
                     }
                 ]}
             />
@@ -202,14 +202,14 @@ export default function SecuritySettingScreen({navigation,route}){
 }
 
 const RenderItem=React.memo(({item,index,renderIcon})=>{
-
+    const theme = useTheme();
     const renderDesc=(props)=>{
         return (
             <>
                 <Text {...props}>{`${item?.date}, ${item?.time}`}</Text>
                 <Text {...props}>{`${item?.ip_address}`}</Text>
                 {item?.location && <Text {...props}>{item?.location}</Text> }
-                {item?.this_browser && <Text style={{marginHorizontal:8,fontSize:12,fontFamily:'Inter_Bold'}} >This device</Text>}
+                {item?.this_browser && <Text style={{color:theme['color-indicator-bar'],marginHorizontal:8,fontSize:14,fontFamily:'Inter_Bold'}} >This device</Text>}
             </>
         )
     }

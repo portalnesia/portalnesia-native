@@ -75,7 +75,7 @@ const getRootPath=()=>{
 export const pushTo=(path,parseLink=true)=>{
     let finalPath;
     if(parseLink) {
-        if(path?.match(/^(\/messages|\/support)/) !== null) {
+        if(path?.match(/^(\/messages|\/support|\/login|\/register|\/forgot|\/authentication)/) !== null) {
             finalPath=`/MainStack/${path}`;
         } else {
             const index_of=['/','/chord','/news','/login-callback','/search'].indexOf(path);
@@ -107,7 +107,7 @@ export const pushTo=(path,parseLink=true)=>{
 export const linkTo=(path,parseLink=true)=>{
     let finalPath;
     if(parseLink) {
-        if(path?.match(/^(\/messages|\/support)/) !== null) {
+        if(path?.match(/^(\/messages|\/support|\/login|\/register|\/forgot|\/authentication)/) !== null) {
             finalPath=`/MainStack/${path}`;
         } else {
             const index_of=['/','/chord','/news','/login-callback','/search'].indexOf(path);
@@ -157,7 +157,7 @@ export const getLink=(link,a=true)=>{
     const uri = url.split("?")[0];
     const split = uri.split("/");
     let finalPath=''
-    if(split?.[0] === 'user' && split?.[2] === 'edit') {
+    if(split?.[0] === 'user' && split?.[2] === 'edit' || ['login','register','forgot','authentication'].indexOf(split?.[0]) !== -1) {
         finalPath = a ? `${URL}/MainStack/${uri}` : `/MainStack/${uri}`
     } else {
         let firstPath='';

@@ -63,6 +63,7 @@
         "one":"notification",
         "other":"notifications"
     },
+    "notification_type":"%{type} notification",
     "account":{
         "one":"account",
         "other":"accounts"
@@ -79,6 +80,10 @@
     "session":{
         "one":"session",
         "other":"sessions"
+    },
+    "feature":{
+        "one":"feature",
+        "other":"features"
     },
     "reply":"Reply",
     "delete":"Delete",
@@ -137,7 +142,9 @@
         "username":"Username",
         "gender":"Gender",
         "birthday":"Birthday",
-        "about":"About"
+        "about":"About",
+        "password":"Password",
+        "verification_code":"Verification Code"
     },
     "home_not_login":{
         "news":"A collection of news that is updated every day.",
@@ -199,7 +206,23 @@
             }
         },
         "security":{
-
+            "logout":"You must \"LOGOUT\" to remove this device session",
+            "auth_help":"Instead of using a password, you can use your fingerprint to authenticate your account"
+        },
+        "notification":{
+            "title_feature":"Features & Promotion",
+            "notif_news":"Receive push notifications for the latest news every day",
+            "notif_comment":"Receive push notifications for comments, including someone commenting on your content or someone replying to your comment",
+            "notif_birthday":"Receive push notifications for the birthdays of someone you are following",
+            "notif_message":"Receive push notifications for the new messages",
+            "notif_feature":"Receive push notifications about new features and promotion on Portalnesia",
+            "email_birthday":"Receive email notifications for the birthdays of someone you are following",
+            "email_komentar":"Receive email notifications for comments, including someone commenting on your content or someone replying to your comment",
+            "email_feature":"Receive email notifications about the new features and promotion on Portalnesia"
         }
+    },
+    "auth":{
+        "new_password":"Password Again",
+        "match":"Passwords do not match"
     }
 }

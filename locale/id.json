@@ -63,6 +63,7 @@
         "one":"pemberitahuan",
         "other":"pemberitahuan"
     },
+    "notification_type":"pemberitahuan %{type}",
     "account":{
         "one":"akun",
         "other":"akun"
@@ -75,6 +76,10 @@
     "content":{
         "one":"konten",
         "other":"konten"
+    },
+    "feature":{
+        "one":"fitur",
+        "other":"fitur"
     },
     "reply":"Balas",
     "delete":"Hapus",
@@ -132,7 +137,9 @@
         "username":"Nama Pengguna",
         "gender":"Jenis Kelamin",
         "birthday":"Ulang Tahun",
-        "about":"Tentang"
+        "about":"Tentang",
+        "password":"Kata Sandi",
+        "verification_code":"Kode Verifikasi"
     },
     "home_not_login":{
         "news":"Kumpulan berita yang diperbarui setiap harinya.",
@@ -195,7 +202,23 @@
             }
         },
         "security":{
-
+            "logout":"Anda harus \"LOGOUT\" untuk menghapus perangkat ini",
+            "auth_help":"Alih-alih menggunakan kata sandi, Anda dapat menggunakan sidik jari untuk mengontentikasi akun Anda"
+        },
+        "notification":{
+            "title_feature":"Fitur & Promosi",
+            "notif_news":"Terima pemberitahuan push berita terkini setiap hari",
+            "notif_comment":"Terima pemberitahuan push komentar, termasuk jika seseorang mengomentari konten Anda atau jika seseorang membalas komentar Anda",
+            "notif_birthday":"Terima pemberitahuan push ulang tahun seseorang yang Anda ikuti",
+            "notif_message":"Terima pemberitahuan push jika terdapat pesan baru",
+            "notif_feature":"Terima pemberitahuan push tentang fitur baru dan promosi dari Portalnesia",
+            "email_birthday":"Terima pemberitahuan email ulang tahun seseorang yang Anda ikuti",
+            "email_komentar":"Terima pemberitahuan email komentar, termasuk jika seseorang mengomentari konten Anda atau jika seseorang membalas komentar Anda",
+            "email_feature":"Terima pemberitahuan email tentang fitur baru dan promosi dari Portalnesia"
         }
+    },
+    "auth":{
+        "new_password":"Kata Sandi Lagi",
+        "match":"Kata sandi tidak cocok"
     }
 }

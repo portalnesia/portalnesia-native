@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AppLoading from 'expo-app-loading';
 import { Asset } from 'expo-asset';
-import { StyleSheet,LogBox } from 'react-native';
+import { StyleSheet,LogBox,useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Font from 'expo-font';
 import 'moment/locale/id';
@@ -16,11 +16,26 @@ import {
 import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './provider/AuthProvider';
 import {AppearanceProvider} from 'react-native-appearance'
+//import AsyncStorage from '@react-native-async-storage/async-storage'
 
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
 export default function App() {
 	const [isLoadingComplete, setLoadingComplete] = useState(false);
+	/*const [tema,setTema]=React.useState("auto");
+	const colorScheme=useColorScheme();
+
+	const theme=React.useMemo(()=>{
+		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
+		return 'light';
+	},[colorScheme,tema])
+
+	React.useEffect(()=>{
+		(async function(){
+			const tm = await AsyncStorage.getItem('theme')
+			if(tm !== null) setTema(tm);
+		})();
+	},[])*/
 
 	if (!isLoadingComplete) {
 		return (
@@ -35,7 +50,7 @@ export default function App() {
 		);
 	} else {
 		return (
-			<SafeAreaView style={styles.container}>
+			<SafeAreaView style={[styles.container]}>
 				<AppearanceProvider>
 					<AuthProvider>
 						<AppNavigator />
@@ -56,6 +71,9 @@ async function loadResourcesAsync() {
 			require('./assets/avatar.png'),
 			require('./assets/landing.png'),
 			require('./assets/transparent.png'),
+			require('./assets/login.png'),
+			require('./assets/forget.png'),
+			require('./assets/register.png'),
 		]),
 		Font.loadAsync({
 			Inter_300Light,

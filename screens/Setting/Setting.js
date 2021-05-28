@@ -6,6 +6,7 @@ import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 import Backdrop from '@pn/components/global/Backdrop';
 import {startActivityAsync,ACTION_APP_NOTIFICATION_SETTINGS} from 'expo-intent-launcher'
+import {Constants} from 'react-native-unimodules'
 
 //import Button from '@pn/components/global/Button'
 import Layout from '@pn/components/global/Layout'
@@ -59,7 +60,7 @@ export default function Setting({navigation}){
                 {header:"Account"},
                 {key:"account",to:"/setting/account"},
                 {key:"security",to:"/setting/security"},
-                {key:"notification",to:"/setting/account"},
+                {key:"notification",to:"/setting/notification"},
                 {header:"General"}
             );
             return newArr;
@@ -67,7 +68,7 @@ export default function Setting({navigation}){
             const newArr=[...menuSettingArr];
             newArr.unshift(
                 {header:"General"},
-                {key:"notification",to:"/setting/account"},
+                {key:"notification"},
             );
             return newArr;
         }
@@ -140,8 +141,8 @@ export default function Setting({navigation}){
     },[user])
 
     const openNotification = React.useCallback(async()=>{
-        if(user===true) {
-
+        if(user) {
+            linkTo("/setting/notification");
         } else {
             await startActivityAsync(ACTION_APP_NOTIFICATION_SETTINGS,{extra:{"android.provider.extra.APP_PACKAGE":"com.portalnesia.app"}});
         }
@@ -188,17 +189,24 @@ export default function Setting({navigation}){
         )
     }
 
+    const renderFooter=React.useCallback(()=>(
+        <Lay level="2" style={{paddingHorizontal:15,paddingBottom:20,paddingTop:10,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+            <Text style={{fontSize:12}} appearance="hint">{`v${Constants.nativeAppVersion}`}</Text>
+            <Text style={{fontSize:12}} appearance="hint">{`Portalnesia © ${new Date().getFullYear()}`}</Text>
+        </Lay>
+    ),[])
+
     return (
         <>
             <Layout navigation={navigation} title={i18n.t('setting')} withBack >
                 <FlatList
                     data={menuSetting}
                     renderItem={renderItem}
+                    ListFooterComponent={renderFooter}
                     ItemSeparatorComponent={Divider}
                     contentContainerStyle={{
                         backgroundColor:theme['background-basic-color-1'],
                     }}
-                    ListFooterComponent={()=><Lay level="2" style={{height:30}} />}
                     keyExtractor={(item)=>item?.key ? `key-${item?.key}` : `header-${item?.header}`}
                 />
             </Layout>

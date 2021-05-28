@@ -84,7 +84,7 @@ buck-out/
 metro.config.backup-hahahaha.js
 
 # Expo
-.expo/*
+.vscode/*
 web-build/
 dist/**/*
 

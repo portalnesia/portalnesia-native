@@ -1,5 +1,8 @@
 import React from 'react'
+import {Dimensions} from 'react-native'
 import {Tooltip} from '@ui-kitten/components'
+
+const {width}=Dimensions.get('window')
 
 type WithTooltipProps = {
     /**
@@ -23,6 +26,7 @@ export default function withTooltip<P>(Component: React.ComponentType<P>){
                     anchor={render}
                     visible={visible}
                     onBackdropPress={()=>setVisible(false)}
+                    style={{maxWidth:width-100}}
                 >
                     {tooltip}
                 </Tooltip>

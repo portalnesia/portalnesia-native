@@ -83,6 +83,7 @@ export default function useAPI(){
                 if(response?.data?.error == 1 && catchError) {
                     //console.log(response?.status)
                     setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'));
+                    //throw Error(typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'))
                 }
                 res(response?.data);
             })
@@ -116,11 +117,12 @@ export default function useAPI(){
             .then((response)=>{
                 if(response?.data?.error == 1 && catchError) {
                     setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
+                    //throw Error(typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'))
                 }
                 res(response?.data);
             })
             .catch((err)=>{
-                console.log(`PNGET: ${url}`,err?.response?.data)
+                //console.log(`PNGET: ${url}`,err?.response?.data)
                 if(catchError) {
                     if(err?.response?.data) {
                         setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg : "Something went wrong");

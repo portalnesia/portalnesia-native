@@ -1,13 +1,11 @@
 import React, { useContext } from 'react';
 import {useWindowDimensions} from 'react-native'
-//import * as firebase from 'firebase';
 import { NavigationContainer } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator,TransitionPresets } from '@react-navigation/stack';
-//import {createNativeStackNavigator} from 'react-native-screens/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-//import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+//import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import {StatusBar} from 'expo-status-bar'
-import {BottomNavigation,BottomNavigationTab,Icon,useTheme} from '@ui-kitten/components'
+import {BottomNavigation,BottomNavigationTab,Icon,useTheme,Text} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
 import useRootNavigation from '../navigation/useRootNavigation'
 import {showInterstisial} from '../components/global/Ads'
@@ -41,6 +39,7 @@ import EditUserScreen from '../screens/User/Edit'
 import Setting from '../screens/Setting/Setting'
 import AccountSettingScreen from '../screens/Setting/Account'
 import SecuritySettingScreen from '../screens/Setting/Security'
+import NotificationSettingScreen from '../screens/Setting/Notification'
 import Search from '../screens/SearchLike/Search'
 import SearchFilter from '../screens/SearchLike/SearchFilter'
 import Twibbon from '../screens/Twibbon/Twibbon'
@@ -52,7 +51,11 @@ import SecondScreen from '../screens/SecondScreen'
 import NotificationEvent from '../screens/Notification/NotificationEvent'
 import ReportScreen from '../screens/ReportScreen'
 import ReportModal from '../screens/Modal/ReportModal'
-
+import Login from '../screens/auth/Login'
+import Register from '../screens/auth/Register'
+import Authentication from '../screens/auth/Authentication'
+import ForgetPassword from '../screens/auth/ForgetPassword'
+import ForgetPasswordForm from '../screens/auth/ForgetPasswordForm'
 import { AuthContext } from '../provider/Context';
 
 
@@ -70,16 +73,18 @@ const NewsIcon=(props)=>{
 }
 const MusicIcon=(props)=>{
 	const {selected,...other}=props
-	if(selected) return <Icon {...other} name="music" />
-	else return <Icon {...other} name="music-outline" />
+	if(selected) return <Icon {...other} name="ios-musical-notes" pack="ionicons" />
+	return <Icon {...other} name="ios-musical-notes-outline" pack="ionicons" />
 }
 const MenuIcon=(props)=>{
 	const {selected,...other}=props
-	return <Icon {...other} name="menu" />
+	if(selected) return <Icon {...other} name="ios-menu" pack="ionicons" />
+	return <Icon {...other} name="ios-menu-outline" pack="ionicons" />
 }
 const SearchIcon=(props)=>{
 	const {selected,...other}=props
-	return <Icon {...other} name="search" />
+	if(selected) return <Icon {...other} name="search" pack="font_awesome" />
+	return <Icon {...other} name="search" pack="material" />
 }
 
 const BottomTabBar = ({navigation,state})=>{
@@ -171,6 +176,7 @@ const getScreen=()=>{
 		{name:"Setting",component:Setting},
 		{name:"AccountSettingScreen",component:AccountSettingScreen},
 		{name:"SecuritySettingScreen",component:SecuritySettingScreen},
+		{name:"NotificationSettingScreen",component:NotificationSettingScreen},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }
@@ -245,27 +251,39 @@ const MenuScreenStack = ()=>(
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
 
+const tabLabel=(label)=>({focused,color})=>{
+	if(!focused) return null;
+	return (
+		<Text style={{fontSize:12,fontFamily:"Inter_Bold",color}}>{label}</Text>
+	)
+}
+
 const MainTabNavigator=()=>{
 	const theme=useTheme();
 	return (
 		<Tabs.Navigator
 			initialRouteName="HomeStack"
+			/*activeColor={theme['color-indicator-bar']}
+			inactiveColor={theme['text-hint-color']}
+			shifting={true}
+			barStyle={{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],borderTopWidth:1,height:54}}
+			*/
 			//tabBar={props=><BottomTabBar {...props} />}
 			tabBarOptions={{
 				keyboardHidesTabBar:true,
 				tabStyle:{paddingVertical:5},
-				labelStyle:{fontSize:13},
 				style:{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],height:54},
 				inactiveTintColor:theme['text-hint-color'],
-				activeTintColor:theme['color-indicator-bar']
+				activeTintColor:theme['color-indicator-bar'],
+				allowFontScaling:true
 			}}
 
 		>
-			<Tabs.Screen options={{tabBarLabel:"Home",tabBarIcon:tabBarIcon('home')}} name="HomeStack" component={HomeScreenStack} />
-			<Tabs.Screen options={{tabBarLabel:"News",tabBarIcon:tabBarIcon('news')}} name="NewsStack" component={NewsScreenStack} />
-			<Tabs.Screen options={{tabBarLabel:"Search",tabBarIcon:tabBarIcon('search')}} name="SearchStack" component={SearchScreenStack} />
-			<Tabs.Screen options={{tabBarLabel:"Chord",tabBarIcon:tabBarIcon('chord')}} name="ChordStack" component={ChordScreenStack} />
-			<Tabs.Screen options={{tabBarLabel:"Menu",tabBarIcon:tabBarIcon('menu')}} name="MenuStack" component={MenuScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:tabLabel("Home"),tabBarIcon:tabBarIcon('home')}} name="HomeStack" component={HomeScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:tabLabel("News"),tabBarIcon:tabBarIcon('news')}} name="NewsStack" component={NewsScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:tabLabel("Search"),tabBarIcon:tabBarIcon('search')}} name="SearchStack" component={SearchScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:tabLabel("Chord"),tabBarIcon:tabBarIcon('chord')}} name="ChordStack" component={ChordScreenStack} />
+			<Tabs.Screen options={{tabBarLabel:tabLabel("Menu"),tabBarIcon:tabBarIcon('menu')}} name="MenuStack" component={MenuScreenStack} />
 		</Tabs.Navigator>
 	)
 }
@@ -279,6 +297,11 @@ const MainNavigator=()=>(
 		<MainStack.Screen name="MainTab" component={MainTabNavigator} />
 		<MainStack.Screen name="ReportScreen" component={ReportScreen} />
 		<MainStack.Screen name="EditUserScreen" component={EditUserScreen} options={{gestureEnabled:false}} />
+		<MainStack.Screen name="Login" component={Login} />
+		<MainStack.Screen name="Register" component={Register} />
+		<MainStack.Screen name="Authentication" component={Authentication} />
+		<MainStack.Screen name="ForgetPassword" component={ForgetPassword} />
+		<MainStack.Screen name="ForgetPasswordForm" component={ForgetPasswordForm} />
 	</MainStack.Navigator>
 )
 

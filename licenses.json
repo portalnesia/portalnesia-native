@@ -95,13 +95,7 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-navigation/bottom-tabs@5.11.8": {
-        "licenses": "MIT",
-        "repository": "https://github.com/react-navigation/react-navigation",
-        "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
-    "@react-navigation/drawer@5.12.4": {
+    "@react-navigation/bottom-tabs@5.11.11": {
         "licenses": "MIT",
         "repository": "https://github.com/react-navigation/react-navigation",
         "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
@@ -434,12 +428,6 @@
         "licenses": "UNKNOWN",
         "parents": "portal-native"
     },
-    "react-native-dotenv@2.5.3": {
-        "licenses": "MIT",
-        "repository": "github:goatandsheep/react-native-dotenv",
-        "licenseUrl": "github:goatandsheep/react-native-dotenv",
-        "parents": "portal-native"
-    },
     "react-native-dropdownalert@4.3.0": {
         "licenses": "MIT",
         "repository": "https://github.com/testshallpass/react-native-dropdownalert",
@@ -480,6 +468,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/callstack/react-native-pager-view",
         "licenseUrl": "https://github.com/callstack/react-native-pager-view/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-paper@4.8.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/callstack/react-native-paper",
+        "licenseUrl": "https://github.com/callstack/react-native-paper/raw/master/LICENSE.md",
         "parents": "portal-native"
     },
     "react-native-print@0.7.0": {

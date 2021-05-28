@@ -11,6 +11,9 @@ const getScreen={
     SecuritySettingScreen:{
         path:'setting/security',
     },
+    NotificationSettingScreen:{
+        path:'setting/notification',
+    },
     NewsDetail:{
         path:'news/:source/:title',
     },
@@ -142,6 +145,26 @@ export const linking: LinkingOptions = {
                     },
                     EditUserScreen:{
                         path:"user/:username/edit",
+                        exact:true
+                    },
+                    Login:{
+                        path:"login",
+                        exact:true
+                    },
+                    Register:{
+                        path:"register",
+                        exact:true
+                    },
+                    Authentication:{
+                        path:"authentication",
+                        exact:true
+                    },
+                    ForgetPasswordForm:{
+                        path:"forgot/:token",
+                        exact:true
+                    },
+                    ForgetPassword:{
+                        path:"forgot",
                         exact:true
                     }
                 }

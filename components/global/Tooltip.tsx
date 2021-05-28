@@ -1,9 +1,9 @@
 import React from 'react'
-import {StyleProp, View, ViewStyle} from 'react-native'
-import {Tooltip as Tt,Icon,useTheme} from '@ui-kitten/components'
+import {StyleProp, View, ViewStyle,Dimensions} from 'react-native'
+import {Tooltip as Tt,Icon,useTheme,TooltipProps as TtProps} from '@ui-kitten/components'
 import Pressable from './Pressable'
 
-const BtnIcon = (props: {style:Record<string,any>,name:string,pack?:string}) => <Icon {...props} />
+const {width}=Dimensions.get('window')
 
 export interface TooltipProps {
     name: string;
@@ -12,6 +12,7 @@ export interface TooltipProps {
     pressableStyle?:StyleProp<ViewStyle>;
     tooltip: string;
     size?: number
+    tooltipProps?: TtProps
 }
 
 const defaultSize=24;
@@ -26,7 +27,7 @@ const PressableStyle={
 }
 
 export default function Tooltip(props: TooltipProps){
-    const {name,pack,style,tooltip,size,pressableStyle} = props;
+    const {name,pack,style,tooltip,size,pressableStyle,tooltipProps} = props;
     const theme=useTheme();
 
     const [visible,setVisible]=React.useState(false);
@@ -45,11 +46,14 @@ export default function Tooltip(props: TooltipProps){
         </View>
     )
 
+    //{(props)=><Text {...props}>{tooltip}</Text>}
     return (
         <Tt
+            {...tooltipProps}
             anchor={render}
             visible={visible}
             onBackdropPress={()=>setVisible(false)}
+            style={{maxWidth:width-100}}
         >
             {tooltip}
         </Tt>

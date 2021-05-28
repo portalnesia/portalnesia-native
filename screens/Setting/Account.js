@@ -161,27 +161,16 @@ export default function AccountSettingScreen({navigation,route}){
     return (
         <>
         <Layout navigation={navigation} title={ucwords(i18n.t('setting_type',{type:i18n.t('account',{count:1})}))}>
-            {!data && !error ? (
-                <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-                    <Spinner size="large" />
-                </Lay>
-            ) : error || data?.error ? (
-                <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-            ) : (
-                <ScrollView contentContainerStyle={{flexGrow:1}} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={validate}
-                            onRefresh={()=>{
-                                if(!validate) {
-                                    setValidate(true);
-                                    mutate();
-                                }
-                            }}
-                            colors={['white']} progressBackgroundColor="#2f6f4e"
-                        />
-                    }
-                >
+            <ScrollView contentContainerStyle={{...(!data && !error ? {flex:1} : {flexGrow:1})}} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
+                { ...(typeof data !== 'undefined' || typeof error !== 'undefined' ? {refreshControl:<RefreshControl refreshing={validate && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>{!validate && (setValidate(true),mutate())}} colors={['white']} progressBackgroundColor="#2f6f4e" />} : {}) }    
+            >
+                {!data && !error ? (
+                    <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+                        <Spinner size="large" />
+                    </Lay>
+                ) : error || data?.error ? (
+                    <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
+                ) : (
                     <Lay style={{paddingVertical:15}}>
                         <Lay style={{marginVertical:15}}>
                             <Text category="h5" style={{paddingHorizontal:15,paddingBottom:5,borderBottomColor:theme['border-text-color'],borderBottomWidth:2,marginBottom:10}}>{ucwords(i18n.t('account',{count:1}))}</Text>
@@ -283,8 +272,8 @@ export default function AccountSettingScreen({navigation,route}){
                             <Button disabled={loading} loading={loading} onPress={confirmSave}>{ucwords(i18n.t("save"))}</Button>
                         </Lay>
                     </Lay>
-                </ScrollView>
-            )}
+                )}
+            </ScrollView>
         </Layout>
 
         <Modal

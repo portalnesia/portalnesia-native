@@ -17,7 +17,6 @@ import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
 //import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
-import useLogin from '@pn/utils/Login'
 import Portalnesia from '@pn/module/Portalnesia'
 import downloadFile from '@pn/utils/Download'
 import { openBrowser } from '@pn/utils/Main'
@@ -39,7 +38,6 @@ export default function({navigation}){
 	const heightHeader = heightt?.main + heightt?.sub + 20
     const [loading,setLoading] = React.useState(false)
     const menu = getMenu(i18n)
-    const {login} = useLogin({dispatch,state,setNotif});
     const ref=React.useRef(null);
     useScrollToTop(ref)
 
@@ -74,14 +72,15 @@ export default function({navigation}){
             if(user !== false) {
                 return linkTo(`/user/${user?.username}`)
             } else {
-                setLoading(true)
-                await login();
-                setLoading(false);
+                return navigation.navigate("MainStack",{screen:"Login"})
+                //setLoading(true)
+                //await login();
+                //setLoading(false);
             }
         } else {
             setNotif(true,"Under Maintenance","This feature is under maintenance");
         }
-    },[user])
+    },[user,navigation])
 
     const checkUpdates=React.useCallback(()=>{
         setLoading(true)
@@ -137,7 +136,7 @@ export default function({navigation}){
                             <Text style={{fontSize:12}}>{user !==false ? `@${user?.username}` : `© ${new Date().getFullYear()}`}</Text>
                         </Lay>
                         <Lay level="1" style={{flex:1}}>
-                            <View style={{alignItems:'flex-end'}}><Button onPress={handleLogin}>{user === false ? "Login / Register" : "Profile"}</Button></View>
+                            <View style={{alignItems:'flex-end'}}><Button onPress={handleLogin}>{user === false ? "Login" : "Profile"}</Button></View>
                         </Lay>
                     </Lay>
 				</Header>
