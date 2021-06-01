@@ -7,7 +7,7 @@ import okhttp3.CertificatePinner;
 import okhttp3.OkHttpClient;
 
 public class SSLPinnerFactory implements OkHttpClientFactory {
-    private static String hostname = "portalnesia.com";
+    public final static String hostname = "portalnesia.com";
 
     public OkHttpClient createNewNetworkModuleClient() {
         CertificatePinner certificatePinner = new CertificatePinner.Builder()

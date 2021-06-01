@@ -10,6 +10,10 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+
 @ReactModule(name=PNBrightness.REACT_CLASS)
 public class PNBrightness extends ReactContextBaseJavaModule {
     public static final String REACT_CLASS = "PNBrightness";
@@ -21,6 +25,7 @@ public class PNBrightness extends ReactContextBaseJavaModule {
         this.reactContext=context;
     }
 
+    @NotNull
     @Override
     public String getName(){ return REACT_CLASS;}
 
@@ -31,25 +36,22 @@ public class PNBrightness extends ReactContextBaseJavaModule {
             return;
         }
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-                lp.screenBrightness = brightness;
-                activity.getWindow().setAttributes(lp);
-            }
+        activity.runOnUiThread(() -> {
+            WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+            lp.screenBrightness = brightness;
+            activity.getWindow().setAttributes(lp);
         });
     }
 
     @ReactMethod
     public void getBrightness(Promise promise){
-        WindowManager.LayoutParams lp = getCurrentActivity().getWindow().getAttributes();
+        WindowManager.LayoutParams lp = Objects.requireNonNull(getCurrentActivity()).getWindow().getAttributes();
         promise.resolve(lp.screenBrightness);
     }
 
     @ReactMethod
     public void getSystemBrightness(Promise promise){
-        String brightness = Settings.System.getString(getCurrentActivity().getContentResolver(),"screen_brightness");
+        String brightness = Settings.System.getString(Objects.requireNonNull(getCurrentActivity()).getContentResolver(),"screen_brightness");
         promise.resolve(Integer.parseInt(brightness)/255f);
     }
 }

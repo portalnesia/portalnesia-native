@@ -3,11 +3,11 @@ import {Spinner,Button as Btn,useTheme} from '@ui-kitten/components'
 import {View,Pressable} from 'react-native'
 import withTooltip from '../HOC/withTooltip'
 
-const LoadingComponent=(props)=>(
+const LoadingComponent=React.memo((props)=>(
     <View style={[props.style,{justifyContent:'center',alignItems:'center'}]}>
         <Spinner size='small' />
     </View>
-)
+))
 
 const Button=React.forwardRef(({size,onPress,onLongPress,disabled,loading,status,appearance,outlined,children,text,accessoryLeft: accessLeft,accessoryRight: accessRight,...others},ref)=>{
     const stat = outlined ? "basic" : text ? "basic" : status;

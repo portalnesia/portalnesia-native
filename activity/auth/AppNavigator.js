@@ -1,0 +1,64 @@
+import React, { useContext } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
+import {useTheme} from '@ui-kitten/components'
+import {StatusBar} from 'expo-status-bar'
+import analytics from '@react-native-firebase/analytics'
+import useRootNavigation from '../../navigation/useRootNavigation'
+
+import Login from '../../screens/auth/Login'
+import Register from '../../screens/auth/Register'
+import Authentication from '../../screens/auth/Authentication'
+import ForgetPassword from '../../screens/auth/ForgetPassword'
+import ForgetPasswordForm from '../../screens/auth/ForgetPasswordForm'
+import { AuthContext } from '../../provider/Context';
+
+const MainStack = createStackNavigator();
+
+
+
+export default function(){
+    const {navigationRef} = useRootNavigation();
+    const routeNameRef = React.useRef(null)
+    const auth = useContext(AuthContext);
+	const {theme:selectedTheme} = auth;
+	const theme=useTheme()
+
+    function onReady(){
+		routeNameRef.current = navigationRef.current.getCurrentRoute().name
+	}
+
+	async function onStateChange(){
+		const prevRouteName = routeNameRef.current;
+		const currentRouteName = navigationRef.current.getCurrentRoute().name
+		if(prevRouteName !== currentRouteName && !__DEV__) {
+			await analytics().logScreenView({
+				screen_class: currentRouteName,
+				screen_name: currentRouteName
+			})
+		}
+	}
+
+    return (
+        <>
+            <StatusBar animated style={(selectedTheme==='light' ? "dark" : "light")} translucent animated backgroundColor={theme['background-basic-color-1']} />
+            <NavigationContainer
+                ref={navigationRef}
+                onReady={onReady}
+                onStateChange={onStateChange}
+            >
+                <MainStack.Navigator initialRouteName="Login" screenOptions={{
+                    headerShown:false,
+                    gestureEnabled:true,
+                    ...TransitionPresets.SlideFromRightIOS
+                }}>
+                    <MainStack.Screen name="Login" component={Login} />
+                    <MainStack.Screen name="Register" component={Register} />
+                    <MainStack.Screen name="Authentication" component={Authentication} />
+                    <MainStack.Screen name="ForgetPassword" component={ForgetPassword} />
+                    <MainStack.Screen name="ForgetPasswordForm" component={ForgetPasswordForm} />
+                </MainStack.Navigator>
+            </NavigationContainer>
+        </>
+    )
+}

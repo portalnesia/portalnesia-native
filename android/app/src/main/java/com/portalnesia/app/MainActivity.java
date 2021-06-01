@@ -1,23 +1,30 @@
 package com.portalnesia.app;
-import android.content.res.Configuration;
-import android.content.Intent;
 
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
-import expo.modules.splashscreen.singletons.SplashScreen;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+
 import expo.modules.splashscreen.SplashScreenImageResizeMode;
+import expo.modules.splashscreen.singletons.SplashScreen;
 
 
 public class MainActivity extends ReactActivity {
 
     // Added automatically by Expo Config
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Intent intent = new Intent("onConfigurationChanged");
         intent.putExtra("newConfig", newConfig);
@@ -50,5 +57,15 @@ public class MainActivity extends ReactActivity {
                 return new RNGestureHandlerEnabledRootView(MainActivity.this);
             }
         };
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPicture,Configuration config) {
+        WritableMap params = Arguments.createMap();
+        params.putBoolean("isPIP",isInPicture);
+
+        Objects.requireNonNull(getReactInstanceManager().getCurrentReactContext())
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("onPictureInPictureModeChange",params);
     }
 }

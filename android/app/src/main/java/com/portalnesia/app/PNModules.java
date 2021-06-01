@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 @ReactModule(name=PNModules.REACT_CLASS)
 public class PNModules extends ReactContextBaseJavaModule {
@@ -139,7 +140,7 @@ public class PNModules extends ReactContextBaseJavaModule {
         try {
             Class<?> systemProperties = Class.forName("android.os.SystemProperties");
             Method get = systemProperties.getMethod("get",String.class);
-            return (String) get.invoke(systemProperties,key);
+            return (String) Objects.requireNonNull(get.invoke(systemProperties, key));
         } catch (Exception ignored) {
             return "";
         }
@@ -329,6 +330,12 @@ public class PNModules extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             promise.reject(e);
         }
+    }
+
+    @ReactMethod
+    public void getAction(Promise promise) {
+        Intent intent = Objects.requireNonNull(getCurrentActivity()).getIntent();
+        promise.resolve(intent.getAction());
     }
 
     @ReactMethod

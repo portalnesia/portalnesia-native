@@ -148,7 +148,7 @@ export default function ForgetPasswordFormScreen({ navigation,route }) {
                         </View>
 						<Button disabled={loading} loading={loading} style={{marginTop:20}} onPress={handleForget}>{i18n.t('send')}</Button>
 
-						<View
+						{/*<View
 							style={{
 								flexDirection: 'row',
 								alignItems: 'center',
@@ -175,7 +175,7 @@ export default function ForgetPasswordFormScreen({ navigation,route }) {
 									Login here
 								</Text>
 							</TouchableOpacity>
-						</View>
+						</View>*/}
 					</View>
 				</ScrollView>
 			</Layout>

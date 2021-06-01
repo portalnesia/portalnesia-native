@@ -13,4 +13,6 @@ declare module '@env' {
     export const ADS_PUBLISHER_ID: string;
     export const YOUTUBE_KEY: string;
     export const RECAPTCHA_SITEKEY: string;
+    export const FIREBASE_CLIENT_ID:string;
+    export const FIREBASE_WEB_CLIENT_ID:string;
 }

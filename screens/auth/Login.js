@@ -4,6 +4,7 @@ import Image from 'react-native-fast-image'
 import {useTheme,Layout as Lay, Text,Input,Icon, Divider} from '@ui-kitten/components'
 import {loadAsync} from 'expo-auth-session'
 import Modal from 'react-native-modal'
+import * as GoogleAuth from 'expo-google-sign-in';
 
 import {Markdown} from '@pn/components/global/Parser'
 import Layout from '@pn/components/global/Layout';
@@ -16,25 +17,43 @@ import Recaptcha from '@pn/components/global/Recaptcha'
 import useAPI from '@pn/utils/API';
 import { getLocation, reverseGeocode } from '@pn/utils/Location';
 import i18n from 'i18n-js';
+import Authentication from '@pn/module/Authentication';
+import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
+import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
+import Backdrop from '@pn/components/global/Backdrop';
 
 const {width} = Dimensions.get('window')
 
 export default function LoginScreen({ navigation,route }) {
 	const context = React.useContext(AuthContext)
-	const {state,setNotif,dispatch} = context;
+	const {state,setNotif,theme:selectedTheme} = context;
 	const {user} = state;
 	if(user) return <NotFoundScreen navigation={navigation} route={route} />
 
 	const {PNpost} = useAPI();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(null);
 	const text2 = React.useRef(null)
 	const [recaptcha,setRecaptcha] = useState("");
 	const captchaRef = React.useRef(null)
 	const [dialog,setDialog]=useState(null);
+	const [restart,setRestart]=React.useState(true);
 
-	//React.useEffect(()=>console.log(recaptcha),[recaptcha])
+	React.useEffect(()=>{
+		(async function(){
+			const intent = await Authentication.getIntentExtra()
+			setRestart(typeof intent.restart==='boolean' ? intent.restart : true);
+		})();
+	},[])
+
+	async function getLoginLocation(){
+		const {coords:{latitude,longitude}} = await getLocation();
+		const loc = await reverseGeocode({latitude,longitude})
+		const location = JSON.stringify(loc[0]);
+		const request = await loadAsync(loginConfig,discovery);
+		return {location,request};
+	}
 
 	async function handleLogin() {
 		let error=[];
@@ -42,12 +61,9 @@ export default function LoginScreen({ navigation,route }) {
 		if(password.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.password`)}`}))
 		if(error.length > 0) return setNotif(true,"Error",error.join("\n"));
 
-		setLoading(true);
+		setLoading('login');
 		try {
-			const {coords:{latitude,longitude}} = await getLocation();
-			const loc = await reverseGeocode({latitude,longitude})
-			const location = JSON.stringify(loc[0]);
-			const request = await loadAsync(loginConfig,discovery);
+			const {location,request}=await getLoginLocation();
 			let res;
 			try {
 				res = await PNpost('/auth/login',{email,password,recaptcha,location,code_challenge:request.codeChallenge})
@@ -63,28 +79,84 @@ export default function LoginScreen({ navigation,route }) {
 						const profile = await getProfile(token);
 						if(typeof profile !== 'string') {
 							await loginInit(token,profile);
-							dispatch({type:"LOGIN",payload:{user:profile,token:token,session:profile?.session_id}})
-							setNotif(false,"Logged in",`Welcome back, ${profile?.username}`);
-							navigation?.goBack();
+							Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken,restart);
 						} else {
 							setNotif(true,"Error",profile);
 						}
 					}
 				} else if(res?.action === 'authentication') {
-					navigation.replace("Authentication",{telegram:res?.telegram,token:res?.token,codeVerifier:request.codeVerifier,userid:res?.userid})
+					navigation.replace("Authentication",{telegram:res?.telegram,token:res?.token,codeVerifier:request.codeVerifier,userid:res?.userid,sms:res?.sms})
 				}
 			}
 		} catch(e) {
 			if(e?.message) setNotif(true,"Error",e?.message);
 		} finally {
-			setLoading(false);
+			setLoading(null);
             captchaRef.current?.refreshToken();
 		}
 	}
 
+	const handleGoogleLogin=React.useCallback(async()=>{
+		setLoading('google')
+		try {
+			await GoogleAuth.initAsync({
+				clientId:FIREBASE_CLIENT_ID,
+				webClientId:FIREBASE_WEB_CLIENT_ID,
+				isOfflineEnabled:false,
+				isPromptEnabled:true,
+			})
+			await GoogleAuth.getPlayServiceAvailability(true);
+			const {type,user} = await GoogleAuth.signInAsync();
+			if(type==='success') {
+				let res;
+				const {location,request}=await getLoginLocation();
+				try {
+					res = await PNpost('/auth/google/login',{accessToken:user.auth.accessToken||"",idToken:user.auth.idToken||"",location,code_challenge:request.codeChallenge,recaptcha})
+				} catch(e){
+					console.log(e);
+				} finally {
+					captchaRef.current?.refreshToken();
+				}
+				if(res?.dialog) {
+					Alert.alert(
+						res?.msg,
+						res?.dialog,
+						[{
+							text:"OK",
+							onPress:()=>{}
+						}]
+					)
+				}
+				try{
+					await GoogleAuth.disconnectAsync();
+				} catch(e){}
+				if(res?.error===0) {
+					if(typeof res?.code === 'string') {
+						const token = await exchangeToken(res?.code,request)
+						if(token?.accessToken) {
+							const profile = await getProfile(token);
+							if(typeof profile !== 'string') {
+								await loginInit(token,profile);
+								Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken,restart);
+							} else {
+								setNotif(true,"Error",profile);
+							}
+						}
+					} else if(res?.action === 'authentication') {
+						navigation.replace("Authentication",{telegram:res?.telegram,token:res?.token,codeVerifier:request.codeVerifier,userid:res?.userid,sms:res?.sms})
+					}
+				}
+			}
+		} catch(e){
+			setNotif(true,"Error",e?.message||i18n.t('errors.general'))
+		} finally {
+			setLoading(null)
+		}
+	},[PNpost,recaptcha])
+
 	return (
 		<>
-			<Layout navigation={navigation} whiteBg withClose>
+			<Layout navigation={navigation} whiteBg>
 				<ScrollView
 					contentContainerStyle={{
 						flexGrow: 1,
@@ -139,7 +211,7 @@ export default function LoginScreen({ navigation,route }) {
 								blurOnSubmit={false}
 								returnKeyType="next"
 								onChangeText={(text) => setEmail(text)}
-								disabled={loading}
+								disabled={loading!==null}
 								onSubmitEditing={()=>text2?.current?.focus()}
 							/>
 						</View>
@@ -163,10 +235,14 @@ export default function LoginScreen({ navigation,route }) {
 								textContentType="password"
 								onChangeText={(text) => setPassword(text)}
 								onSubmitEditing={handleLogin}
-								disabled={loading}
+								disabled={loading!==null}
 							/>
 						</View>
-						<Button disabled={loading} loading={loading} style={{marginTop:20}} onPress={handleLogin}>Continue</Button>
+						<Button size="medium" disabled={loading!==null} loading={loading==='login'} style={{marginTop:20}} onPress={handleLogin}>Continue</Button>
+						
+						<View style={{flexDirection:'row',marginTop:10}}>
+							<GoogleSignInButton disabled={loading!==null} size={GoogleSignInButton.SIZE.WIDE} style={{flex:1,width:'100%'}} color={selectedTheme==='dark' ? GoogleSignInButton.Color.DARK : GoogleSignInButton.Color.LIGHT} onPress={handleGoogleLogin} />
+						</View>
 
 						<View
 							style={{
@@ -185,7 +261,7 @@ export default function LoginScreen({ navigation,route }) {
 								}}
 								activeOpacity={0.7}
 							>
-								<Text {...(loading ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
+								<Text {...(loading!==null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
 									Register here
 								</Text>
 							</TouchableOpacity>
@@ -204,7 +280,7 @@ export default function LoginScreen({ navigation,route }) {
 								}}
 								activeOpacity={0.7}
 							>
-								<Text {...(loading ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
+								<Text {...(loading !== null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
 									Forget password
 								</Text>
 							</TouchableOpacity>
@@ -212,6 +288,7 @@ export default function LoginScreen({ navigation,route }) {
 					</View>
 				</ScrollView>
 			</Layout>
+			<Backdrop loading visible={loading==='google'} />
 			<Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} action="login" />
 			<Modal
                 isVisible={dialog!==null}

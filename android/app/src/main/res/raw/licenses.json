@@ -77,6 +77,12 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/app/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@react-native-firebase/auth@12.0.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/auth",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/auth/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@react-native-firebase/crashlytics@11.3.3": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/crashlytics",
@@ -95,13 +101,7 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-navigation/bottom-tabs@5.11.8": {
-        "licenses": "MIT",
-        "repository": "https://github.com/react-navigation/react-navigation",
-        "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
-    "@react-navigation/drawer@5.12.4": {
+    "@react-navigation/bottom-tabs@5.11.11": {
         "licenses": "MIT",
         "repository": "https://github.com/react-navigation/react-navigation",
         "licenseUrl": "https://github.com/react-navigation/react-navigation/raw/master/LICENSE",
@@ -243,6 +243,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-google-sign-in@9.1.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo/raw/master/LICENSE-react-native-google-signin.md",
         "parents": "portal-native"
     },
     "expo-image-picker@9.2.1": {
@@ -388,6 +394,12 @@
         "licenseUrl": "https://github.com/moment/moment/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "pitchfinder@2.3.1": {
+        "licenses": "GNU v3",
+        "repository": "https://github.com/peterkhayes/pitchfinder",
+        "licenseUrl": "https://github.com/peterkhayes/pitchfinder",
+        "parents": "portal-native"
+    },
     "qs@6.9.6": {
         "licenses": "BSD-3-Clause",
         "repository": "https://github.com/ljharb/qs",
@@ -434,12 +446,6 @@
         "licenses": "UNKNOWN",
         "parents": "portal-native"
     },
-    "react-native-dotenv@2.5.3": {
-        "licenses": "MIT",
-        "repository": "github:goatandsheep/react-native-dotenv",
-        "licenseUrl": "github:goatandsheep/react-native-dotenv",
-        "parents": "portal-native"
-    },
     "react-native-dropdownalert@4.3.0": {
         "licenses": "MIT",
         "repository": "https://github.com/testshallpass/react-native-dropdownalert",
@@ -482,6 +488,12 @@
         "licenseUrl": "https://github.com/callstack/react-native-pager-view/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "react-native-paper@4.8.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/callstack/react-native-paper",
+        "licenseUrl": "https://github.com/callstack/react-native-paper/raw/master/LICENSE.md",
+        "parents": "portal-native"
+    },
     "react-native-print@0.7.0": {
         "licenses": "MIT",
         "repository": "github:christopherdro/react-native-print",
@@ -492,6 +504,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/software-mansion/react-native-reanimated",
         "licenseUrl": "https://github.com/software-mansion/react-native-reanimated/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-recording@0.5.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/qiuxiang/react-native-recording",
+        "licenseUrl": "https://github.com/qiuxiang/react-native-recording/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-render-html@5.1.0": {

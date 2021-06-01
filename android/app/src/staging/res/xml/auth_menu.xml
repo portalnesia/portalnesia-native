@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <PreferenceCategory
+        android:title="Settings"
+        android:visibility="visible"
+        tools:visibility="visible">
+        <PreferenceScreen android:key="account_settings" android:title="@string/account_settings" android:summary="" android:visibility="visible" tools:visibility="visible">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="pn://setting/account"
+                android:targetPackage="com.portalnesia.app.beta"/>
+        </PreferenceScreen>
+        <PreferenceScreen android:key="security_settings" android:title="@string/security_settings" android:summary="" android:visibility="visible" tools:visibility="visible">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="pn://setting/security"
+                android:targetPackage="com.portalnesia.app.beta"/>
+        </PreferenceScreen>
+        <PreferenceScreen android:key="notification_settings" android:title="@string/notification_settings" android:summary="" android:visibility="visible" tools:visibility="visible">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="pn://setting/notification"
+                android:targetPackage="com.portalnesia.app.beta"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>

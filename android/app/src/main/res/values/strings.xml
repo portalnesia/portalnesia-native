@@ -10,4 +10,8 @@
     }]
   </string>
   <string name="recaptcha_apikey">6Ldevc8aAAAAAB0ljkqw7coT7lcLUfFjRNiOkah6</string>
+  <string name="account_settings">Account Settings</string>
+  <string name="account_type">com.portalnesia</string>
+  <string name="security_settings">Security Settings</string>
+  <string name="notification_settings">Notification Settings</string>
 </resources>
