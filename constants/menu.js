@@ -22,6 +22,10 @@ export const menu=(i18n)=>([
                 icon:['tools','font_awesome'],
                 menu:[
                     {
+                        title:"Tuner",
+                        to:"/TunerScreen"
+                    },
+                    {
                         title:"QR Code Generator",
                         to:"/qr-code"
                     },

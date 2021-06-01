@@ -16,6 +16,7 @@ import {
 import AppNavigator from './navigation/AppNavigator';
 import { AuthProvider } from './provider/AuthProvider';
 import {AppearanceProvider} from 'react-native-appearance'
+import remoteConfig from '@react-native-firebase/remote-config'
 //import AsyncStorage from '@react-native-async-storage/async-storage'
 
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
@@ -81,7 +82,9 @@ async function loadResourcesAsync() {
 			Inter_Medium:Inter_500Medium,
 			Inter_SemiBold: Inter_600SemiBold,
 			Inter_Bold: Inter_700Bold,
-		})
+		}),
+		remoteConfig().setDefaults({tuner_enabled:false})
+		.then(()=>remoteConfig().fetchAndActivate())
 	]);
 }
 

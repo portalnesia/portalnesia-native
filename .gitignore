@@ -10,6 +10,9 @@ npm-debug.*
 *.orig.*
 web-build/
 *.env
+*.development
+*.production
+*.stagging
 *.backup
 # macOS
 .DS_Store
@@ -62,7 +65,6 @@ yarn-error.log
 buck-out/
 \.buckd/
 *.keystore
-**/debug.keystore
 
 # fastlane
 #

@@ -53,6 +53,9 @@ const getScreen={
     ImagesChecker:{
         path:'images-checker',
     },
+    Tuner:{
+        path:'TunerScreen',
+    },
     QrGenerator:{
         path:'qr-code/:slug?',
     },
@@ -159,14 +162,15 @@ export const linking: LinkingOptions = {
                         path:"authentication",
                         exact:true
                     },
+                    ForgetPassword:{
+                        path:"forgot",
+                        exact:true
+                    },
                     ForgetPasswordForm:{
                         path:"forgot/:token",
                         exact:true
                     },
-                    ForgetPassword:{
-                        path:"forgot",
-                        exact:true
-                    }
+                    
                 }
             }
         }

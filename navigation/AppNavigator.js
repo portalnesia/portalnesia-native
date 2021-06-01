@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import {useWindowDimensions} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
-import { CardStyleInterpolators, createStackNavigator,TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import {StatusBar} from 'expo-status-bar'
@@ -32,6 +31,7 @@ import NumberGenerator from '../screens/Tools/NumberGenerator'
 import QrGenerator from '../screens/Tools/QrGenerator'
 import ParseHtml from '../screens/Tools/ParseHtml'
 import ImagesChecker from '../screens/Tools/ImagesChecker'
+import TunerScreen from '../screens/Tools/Tuner'
 import UrlShortener from '../screens/UrlShortener'
 import Contact from '../screens/Contact'
 import User from '../screens/User/User'
@@ -159,6 +159,7 @@ const getScreen=()=>{
 		{name:"NumberGenerator",component:NumberGenerator},
 		{name:"ParseHtml",component:ParseHtml},
 		{name:"ImagesChecker",component:ImagesChecker},
+		{name:"Tuner",component:TunerScreen},
 		{name:"QrGenerator",component:QrGenerator},
 		{name:"UrlShortener",component:UrlShortener},
 		{name:"Contact",component:Contact},

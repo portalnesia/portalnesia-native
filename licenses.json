@@ -77,6 +77,12 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/app/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@react-native-firebase/auth@12.0.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/auth",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/auth/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@react-native-firebase/crashlytics@11.3.3": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/crashlytics",
@@ -239,6 +245,12 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
+    "expo-google-sign-in@9.1.0": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo/raw/master/LICENSE-react-native-google-signin.md",
+        "parents": "portal-native"
+    },
     "expo-image-picker@9.2.1": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
@@ -382,6 +394,12 @@
         "licenseUrl": "https://github.com/moment/moment/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "pitchfinder@2.3.1": {
+        "licenses": "GNU v3",
+        "repository": "https://github.com/peterkhayes/pitchfinder",
+        "licenseUrl": "https://github.com/peterkhayes/pitchfinder",
+        "parents": "portal-native"
+    },
     "qs@6.9.6": {
         "licenses": "BSD-3-Clause",
         "repository": "https://github.com/ljharb/qs",
@@ -486,6 +504,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/software-mansion/react-native-reanimated",
         "licenseUrl": "https://github.com/software-mansion/react-native-reanimated/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-recording@0.5.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/qiuxiang/react-native-recording",
+        "licenseUrl": "https://github.com/qiuxiang/react-native-recording/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-render-html@5.1.0": {

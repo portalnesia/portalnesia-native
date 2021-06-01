@@ -20,6 +20,7 @@ import i18n from 'i18n-js'
 import Portalnesia from '@pn/module/Portalnesia'
 import downloadFile from '@pn/utils/Download'
 import { openBrowser } from '@pn/utils/Main'
+import Authentication from '@pn/module/Authentication'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
@@ -72,10 +73,7 @@ export default function({navigation}){
             if(user !== false) {
                 return linkTo(`/user/${user?.username}`)
             } else {
-                return navigation.navigate("MainStack",{screen:"Login"})
-                //setLoading(true)
-                //await login();
-                //setLoading(false);
+                Authentication.startAuthActivity();
             }
         } else {
             setNotif(true,"Under Maintenance","This feature is under maintenance");

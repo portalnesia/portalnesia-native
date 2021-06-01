@@ -4,6 +4,7 @@ import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useThe
 import i18n from 'i18n-js'
 import FastImage from 'react-native-fast-image'
 import Modal from 'react-native-modal'
+import * as GoogleAuth from 'expo-google-sign-in';
 
 import Layout from "@pn/components/global/Layout";
 import Button from "@pn/components/global/Button";
@@ -20,19 +21,22 @@ import Recaptcha from '@pn/components/global/Recaptcha'
 import Password from '@pn/components/global/Password'
 import { useBiometrics,createKeys,verifyAuthentication,promptAuthentication,deleteKeys } from '@pn/utils/Biometrics';
 import useAPI from '@pn/utils/API'
+import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
+import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
+import Backdrop from '@pn/components/global/Backdrop'
 
 const {width} = Dimensions.get('window')
 
 export default function AccountSettingScreen({navigation,route}){
     const msg = route?.params?.msg;
     const context = React.useContext(AuthContext);
-    const {setNotif,state:{user}} = context;
+    const {setNotif,state:{user},theme:selectedTheme} = context;
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
     const theme=useTheme();
     const {data,error,mutate,isValidating} = useSWR('/setting/account',{},true);
     const [input,setInput]=React.useState({email:'',google:'',instagram:'',line:'',media_private:false,private:false,telegram:'',twitter:'',username:''})
     const [validate,setValidate]=React.useState(false)
-    const [loading,setLoading]=React.useState(false);
+    const [loading,setLoading]=React.useState(null);
     const [fingerprint,setFingerprint] = React.useState(false)
     const {PNpost} = useAPI()
     const setCanBack = useUnsaved(true);
@@ -42,6 +46,8 @@ export default function AccountSettingScreen({navigation,route}){
     const [newPassword,setNewPassword]=React.useState({newpassword:'',cpassword:''});
     const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
+    const [recaptcha2,setRecaptcha2] = React.useState("");
+    const captchaRef2 = React.useRef(null)
     const passwordRef = React.useRef(null)
 
     React.useEffect(()=>{
@@ -76,7 +82,9 @@ export default function AccountSettingScreen({navigation,route}){
                 onPress:()=>{}
             },{
                 text:"Unlink",
-                onPress:()=>openBrowser(link,false)
+                onPress:()=>{
+                    type==='google' ? handleGoogleUnlink() : openBrowser(link,false);
+                }
             }]
         )
     }
@@ -107,9 +115,9 @@ export default function AccountSettingScreen({navigation,route}){
         passwordRef.current?.verify();
     }
 
-    const handleSubmit=(dt)=>{
+    const handleSubmit=React.useCallback((dt)=>{
         if(dt?.password?.match(/\S+/)===null) return setNotif(true,"Error","Password cannot be empty");
-        setLoading(true)
+        setLoading('save')
         const daa = {...input,...dt,recaptcha}
         PNpost('/setting/general',daa)
         .then(res=>{
@@ -123,10 +131,25 @@ export default function AccountSettingScreen({navigation,route}){
             }
         })
         .finally(()=>{
-            setLoading(false)
+            setLoading(null)
             captchaRef.current?.refreshToken();
         })
-    }
+    },[input,recaptcha,PNpost,password,mutate])
+
+    const handleGoogleUnlink=React.useCallback(()=>{
+        setLoading('google')
+        PNpost('/auth/google/unlink',{recaptcha:recaptcha2})
+        .then(res=>{
+            if(res?.error==0) {
+                setNotif(false,res?.msg);
+                mutate();
+            }
+        })
+        .finally(()=>{
+            setLoading(null)
+            captchaRef2.current?.refreshToken();
+        })
+    },[recaptcha2,PNpost,mutate])
 
     const confirmDelete=()=>{
         const text=[
@@ -150,6 +173,41 @@ export default function AccountSettingScreen({navigation,route}){
     const handleDelete=()=>{
         console.log("Delete");
     }
+
+    const handleGoogleLink=React.useCallback(async()=>{
+        setLoading('google')
+        try {
+            await GoogleAuth.initAsync({
+				clientId:FIREBASE_CLIENT_ID,
+				webClientId:FIREBASE_WEB_CLIENT_ID,
+				isOfflineEnabled:false,
+				isPromptEnabled:true,
+			})
+			await GoogleAuth.getPlayServiceAvailability(true);
+            const {type,user} = await GoogleAuth.signInAsync();
+            if(type==='success') {
+                let res;
+                try {
+					res = await PNpost('/auth/google/link',{accessToken:user.auth.accessToken||"",idToken:user.auth.idToken||"",recaptcha:recaptcha2})
+				} catch(e){
+					console.log(e);
+				} finally {
+					captchaRef2.current?.refreshToken();
+				}
+                try{
+					await GoogleAuth.disconnectAsync();
+				} catch(e){}
+                if(res?.error===0) {
+                    setNotif(false,res?.msg);
+                    mutate();
+                }
+            }
+        } catch(e) {
+            setNotif(true,"Error",e?.message||i18n.t('errors.general'))
+        } finally {
+            setLoading(null)
+        }
+    },[PNpost,recaptcha2])
 
     React.useEffect(()=>{
         if(dialog===null) {
@@ -181,7 +239,7 @@ export default function AccountSettingScreen({navigation,route}){
                                     onChangeText={handleChange('username')}
                                     autoCompleteType="username"
                                     textContentType="username"
-                                    disabled={loading}
+                                    disabled={loading!==null}
                                 />
                             </Lay>
                             <Lay style={{paddingHorizontal:15,paddingTop:10}}>
@@ -191,7 +249,7 @@ export default function AccountSettingScreen({navigation,route}){
                                     onChangeText={handleChange('email')}
                                     autoCompleteType="email"
                                     textContentType="emailAddress"
-                                    disabled={loading}
+                                    disabled={loading!==null}
                                 />
                             </Lay>
                         </Lay>
@@ -204,7 +262,7 @@ export default function AccountSettingScreen({navigation,route}){
                                         <Text>{i18n.t('settings.account.private')}</Text>
                                         <Tooltip style={{marginLeft:5}} tooltip={i18n.t('settings.account.private_tip')} name="question-mark-circle-outline" />
                                     </View>
-                                    <Toggle disabled={loading} checked={input.private} onChange={handleChange('private')} />
+                                    <Toggle disabled={loading!==null} checked={input.private} onChange={handleChange('private')} />
                                 </View>
                             </Lay>
                             <Lay style={{paddingHorizontal:15,paddingTop:10}}>
@@ -213,7 +271,7 @@ export default function AccountSettingScreen({navigation,route}){
                                         <Text>{i18n.t('settings.account.media_private')}</Text>
                                         <Tooltip style={{marginLeft:5}} tooltip={i18n.t('settings.account.media_private_tip')} name="question-mark-circle-outline" />
                                     </View>
-                                    <Toggle disabled={loading} checked={input.media_private} onChange={handleChange('media_private')} />
+                                    <Toggle disabled={loading!==null} checked={input.media_private} onChange={handleChange('media_private')} />
                                 </View>
                             </Lay>
                         </Lay>
@@ -227,7 +285,7 @@ export default function AccountSettingScreen({navigation,route}){
                                     onChangeText={handleChange('instagram')}
                                     autoCompleteType="username"
                                     textContentType="username"
-                                    disabled={loading}
+                                    disabled={loading!==null}
                                     caption="Without @"
                                 />
                             </Lay>
@@ -238,14 +296,16 @@ export default function AccountSettingScreen({navigation,route}){
                                     onChangeText={handleChange('line')}
                                     autoCompleteType="username"
                                     textContentType="username"
-                                    disabled={loading}
+                                    disabled={loading!==null}
                                     caption="Without @"
                                 />
                             </Lay>
                             <Lay style={{paddingHorizontal:15,paddingTop:10}}>
                                 <Text appearance="hint" category="label" style={{marginBottom:5}}>Google</Text>
                                 {input?.google===null ? (
-                                    <Pressable default onPress={()=>openBrowser(`${ACCOUNT_URL}/google/link?redirect=${encodeURIComponent('pn://setting/account')}`,false)}><FastImage source={{uri:`${CONTENT_URL}/social-logo/google-sign-logo.png`}} style={{width:158,height:28}} /></Pressable>
+                                    <View style={{flexDirection:'row',marginTop:10}}>
+                                        <GoogleSignInButton disabled={loading!==null} size={GoogleSignInButton.SIZE.WIDE} style={{flex:1,width:'100%'}} color={selectedTheme==='dark' ? GoogleSignInButton.Color.DARK : GoogleSignInButton.Color.LIGHT} onPress={handleGoogleLink} />
+                                    </View>
                                 ) : (
                                     <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                                         <Text>{input?.google}</Text>
@@ -269,7 +329,7 @@ export default function AccountSettingScreen({navigation,route}){
                         <Lay style={{paddingHorizontal:15,paddingTop:10}}>
                             {/*<Button disabled={loading} text onPress={()=>setDialog('change_password')}>{i18n.t('settings.account.change_password')}</Button>
                             <Button disabled={loading} onPress={confirmDelete} status="danger" style={{marginVertical:15}}>{i18n.t('settings.account.deactivate')}</Button>*/}
-                            <Button disabled={loading} loading={loading} onPress={confirmSave}>{ucwords(i18n.t("save"))}</Button>
+                            <Button disabled={loading!==null} loading={loading==='save'} onPress={confirmSave}>{ucwords(i18n.t("save"))}</Button>
                         </Lay>
                     </Lay>
                 )}
@@ -320,13 +380,15 @@ export default function AccountSettingScreen({navigation,route}){
                 ) : null}
                 <Divider style={{backgroundColor:theme['border-text-color'],marginTop:10}} />
                 <View style={{marginTop:15,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                    <Button status="danger" disabled={loading} onPress={()=>setDialog(null)}>{i18n.t('cancel')}</Button>
+                    <Button status="danger" disabled={loading!==null} onPress={()=>setDialog(null)}>{i18n.t('cancel')}</Button>
                     
                 </View>
             </Lay>
         </Modal>
+        <Backdrop loading visible={loading==='google'} />
         <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
-        <Password supported={fingerprint} loading={loading} ref={passwordRef} onSubmit={handleSubmit} />
+        <Recaptcha ref={captchaRef2} onReceiveToken={setRecaptcha2} action="login" />
+        <Password supported={fingerprint} loading={loading!==null} ref={passwordRef} onSubmit={handleSubmit} />
         </>
     )
 }
