@@ -11,5 +11,6 @@ const CustomPressable=React.forwardRef<InstanceType<typeof View>,PressableProps>
     const theme = useTheme();
     return <Presss ref={ref} {...props} {...(props.default ? {} : {android_ripple:{color:theme['riple-color'],borderless:false}})} />
 })
-const Pressable = withTooltip(CustomPressable);
+const PressableTooltip = withTooltip(CustomPressable);
+const Pressable = React.memo(PressableTooltip);
 export default Pressable;

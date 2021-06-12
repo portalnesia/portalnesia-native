@@ -3,7 +3,7 @@ import {View,Platform, Dimensions} from 'react-native'
 import {Text,useTheme,Divider} from '@ui-kitten/components'
 import WebView from 'react-native-webview'
 import HTML,{IGNORED_TAGS,domNodeToHTMLString,getClosestNodeParentByTag} from 'react-native-render-html'
-import {CONTENT_URL,URL} from '@env'
+import {CONTENT_URL,LINK_URL} from '@env'
 import {ImageFull as Image} from '@pn/components/global/Image'
 import {Buffer} from 'buffer'
 import TableRenderer,{IGNORED_TAGS as TABLE_IGNORED_TAGS} from '@native-html/table-plugin'
@@ -45,7 +45,7 @@ const onLinkPress=(e,href)=>{
         && !href?.match(/portalnesia\.com+/)
         && !href?.match(/^\/+/)
     ) {
-        url = `${URL}/link?u=${Buffer.from(encodeURIComponent(href)).toString('base64')}`
+        url = `${LINK_URL}/link?u=${Buffer.from(encodeURIComponent(href)).toString('base64')}`
         openBrowser(url)
     } else {
         if(href?.match(/^https\:\/\/portalnesia.com/)) {
@@ -91,7 +91,6 @@ const ARender=(attribs,children,style,props)=>{
             </Text>
         );
     }
-    
     const onPress = (evt) =>
         props.onLinkPress && attribs && attribs.href
         ? props.onLinkPress(evt, attribs.href, attribs)
@@ -507,7 +506,7 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
 const marked=require('marked');
 const sanitizeHtml = require('sanitize-html')
 
-export const Markdown=({source,skipHtml,...other})=>{
+const MarkdownFunc=({source,skipHtml,...other})=>{
     const html = React.useMemo(()=>{
         marked.setOptions({
             breaks:true
@@ -517,14 +516,18 @@ export const Markdown=({source,skipHtml,...other})=>{
         const allowed = skipHtml ? allowedTags : allowedTags.concat(['img','iframe']);
         return sanitizeHtml(hhtm,{
             allowedTags:allowed,
-            allowedSchemes:['https','mailto','tel','pn'],
+            allowedSchemes:['https','mailto','tel','pn','http'],
             allowedAttributes:false,
             disallowedTagsMode:'escape',
             allowedSchemesAppliedToAttributes:['href','src','cite','data-*','srcset'],
         })
     },[source,skipHtml])
 
-    //React.useEffect(()=>console.log("HTML",html),[html])
+    /*React.useEffect(()=>{
+        console.log("HTML",html)
+        console.log("SOURCE",source);
+    },[html])*/
 
     return <Parser source={html} {...other} />
 }
+export const Markdown = React.memo(MarkdownFunc);

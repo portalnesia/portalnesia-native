@@ -10,7 +10,8 @@ import { openBrowser } from '@pn/utils/Main'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
-const getURL=(url,title)=>{
+const getURL=(urls,title)=>{
+    let url = urls?.licenseUrl;
     if(title.match(/^\@react\-native\-firebase\/+/)) {
         url = url?.replace(/raw\/master\//,'').replace(/tree/,'raw')
     } else if(title.match(/\^@react\-navigation\/+/)) {
@@ -20,8 +21,10 @@ const getURL=(url,title)=>{
         url = `${url}/raw/master/LICENSE.txt`
     } else if(title.match(/^react-native-unimodules/)) {
         url = url?.replace(/\.md$/,'')
-    } else if(title.match(/^(expo\-|firebase$|hermes\-engine|react\-native\-syntax\-highlighter|use\-count\-up|react\-native\-web$|\@native\-html\/table\-plugin)/)) {
+    } else if(title.match(/^(firebase$|hermes\-engine|react\-native\-syntax\-highlighter|use\-count\-up|react\-native\-web$|\@native\-html\/table\-plugin)/)) {
         url = `${url}/raw/master/LICENSE`
+    } else if(title.match(/^(expo\-)/)) {
+        url = `${urls?.repository}/raw/master/LICENSE`;
     } else if(title.match(/^(react\-native\-dotenv|react\-native\-print)/)) {
         url = url?.replace(/github\:/,"https://github.com/")
         url = `${url}/raw/master/LICENSE`
@@ -79,7 +82,7 @@ export default function OpenSourceScreen({navigation}){
             let version = it.match(/@\d+(\.\d+)*/);
             version = version ? version[0]?.substring(1) : '';
             const title = it.replace(version,'').replace(/(?:@$)/gi,'');
-            const url = getURL(licenseArr[it]?.licenseUrl,title);
+            const url = getURL(licenseArr[it],title);
             return {
                 title,
                 version: version,

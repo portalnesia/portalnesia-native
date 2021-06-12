@@ -3,7 +3,7 @@
 		"name": "Portalnesia",
 		"slug": "portalnesia",
 		"scheme": "pn",
-		"version": "2.1.0",
+		"version": "2.2.0",
 		"sdkVersion": "40.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
@@ -15,7 +15,7 @@
 			"silentLaunch":true
 		},
 		"extra": {
-			"minimumVersion":"2.1.0"
+			"minimumVersion":"2.2.0"
 		},
 		"splash": {
 			"image": "./assets/splash.png",

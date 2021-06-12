@@ -72,7 +72,7 @@ const RenderBackBtn=React.memo(({withClose,withBack,navigation}: Pick<TopNavigat
 	else return null;
 })
 
-export default function TopNav(props: TopNavigationProps){
+function TopNav(props: TopNavigationProps){
     const {withBack,title,menu,navigation,align,subtitle,withClose,whiteBg,margin,withDivider,style}=props;
 	const theme = useTheme()
 
@@ -90,3 +90,4 @@ export default function TopNav(props: TopNavigationProps){
 		</>
 	)
 }
+export default React.memo(TopNav)

@@ -19,7 +19,9 @@
                     "@pn/module":"./module",
                     "@pn/locale":"./locale",
                     "@pn/types":"./types",
-                    "@pn/navigation":"./navigation"
+                    "@pn/navigation":"./navigation",
+                    "@pn/activity":"./activity",
+                    "@pn/services":"./services"
                 }
             }
         ]

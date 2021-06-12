@@ -71,7 +71,7 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/analytics/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/app@11.3.3": {
+    "@react-native-firebase/app@12.0.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/app",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/app/raw/master/LICENSE",
@@ -93,6 +93,12 @@
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/in-app-messaging",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/in-app-messaging/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "@react-native-firebase/messaging@12.0.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/messaging",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/messaging/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "@react-native-firebase/remote-config@11.3.3": {

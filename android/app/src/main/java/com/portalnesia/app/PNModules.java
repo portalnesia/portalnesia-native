@@ -49,7 +49,7 @@ public class PNModules extends ReactContextBaseJavaModule {
     public static final String REACT_CLASS = "Portalnesia";
     public static final String ACTION_INSTALL_COMPLETE = "com.portalnesia.app.INSTALL_COMPLETE";
 
-    private ReactApplicationContext reactContext;
+    private final ReactApplicationContext reactContext;
 
     PNModules(ReactApplicationContext context) {
         super(context);

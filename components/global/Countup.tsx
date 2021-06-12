@@ -8,7 +8,7 @@ export type CountUpProps={
     onComplete:()=>void,
 }
 
-export default function CountUp(props:CountUpProps){
+function CountUp(props:CountUpProps){
     const {data,suffix,prefix,onComplete} = props;
     const start = React.useRef(0);
     const prevStart = React.useRef(0);
@@ -46,3 +46,5 @@ export default function CountUp(props:CountUpProps){
         />
     )
 }
+
+export default React.memo(CountUp);

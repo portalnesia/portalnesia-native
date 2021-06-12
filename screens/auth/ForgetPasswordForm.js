@@ -11,7 +11,9 @@ import i18n from 'i18n-js';
 import useAPI from '@pn/utils/API';
 import Recaptcha from '@pn/components/global/Recaptcha'
 import { getLocation, reverseGeocode } from '@pn/utils/Location';
+import getInfo from '@pn/utils/Info';
 
+const info = getInfo();
 export default function ForgetPasswordFormScreen({ navigation,route }) {
 	const context = React.useContext(AuthContext)
 	const {state:{user},setNotif} = context;
@@ -39,7 +41,7 @@ export default function ForgetPasswordFormScreen({ navigation,route }) {
 			return reverseGeocode({latitude,longitude});
 		})
 		.then(loc=>{
-			return PNpost(`/auth/forget/${token}`,{password,cpassword,recaptcha,location:JSON.stringify(loc[0])})
+			return PNpost(`/auth/forget/${token}`,{password,cpassword,recaptcha,location:JSON.stringify(loc[0]),device:JSON.stringify(info)})
 		})
 		.then(res=>{
 			if(!Boolean(res?.error)) {

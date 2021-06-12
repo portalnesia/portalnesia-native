@@ -8,7 +8,7 @@ export interface NotFoundProps {
     status?: number
 }
 
-export default function NotFound({children,status=404}: NotFoundProps){
+function NotFound({children,status=404}: NotFoundProps){
     const auth = React.useContext(AuthContext);
 	const {theme:selectedTheme} = auth;
 
@@ -32,3 +32,4 @@ export default function NotFound({children,status=404}: NotFoundProps){
         </View>
     )
 }
+export default React.memo(NotFound);

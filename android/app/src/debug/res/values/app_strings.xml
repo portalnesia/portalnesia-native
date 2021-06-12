@@ -2,4 +2,6 @@
 <resources>
   <string name="app_name">Portalnesia Debug</string>
   <string name="account_type">com.portalnesia.debug</string>
+  <string name="file_provider">com.portalnesia.app.debug.fileprovider</string>
+  <string name="sync_provider">com.portalnesia.app.debug.syncprovider</string>
 </resources>

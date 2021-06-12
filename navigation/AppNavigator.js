@@ -306,7 +306,7 @@ const MainNavigator=()=>(
 	</MainStack.Navigator>
 )
 
-export default () => {
+export default React.memo(() => {
 	const {navigationRef} = useRootNavigation();
 	const routeNameRef = React.useRef(null)
 	const auth = useContext(AuthContext);
@@ -360,4 +360,4 @@ export default () => {
 			)}
 		</>
 	);
-};
+});

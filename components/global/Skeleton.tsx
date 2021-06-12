@@ -18,7 +18,7 @@ interface TextProps extends SkeletonPlaceholderItem{
     rootHeight?:number
 }
 
-export const PararaphSkeleton=({number,height}:SkeletonProps)=>{
+export const PararaphSkeleton=React.memo(({number,height}:SkeletonProps)=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     return (
@@ -30,9 +30,9 @@ export const PararaphSkeleton=({number,height}:SkeletonProps)=>{
             </Sklton.Item>
         </Sklton>
     )
-}
+})
 
-export const TextSkeleton=(props: TextProps)=>{
+export const TextSkeleton=React.memo((props: TextProps)=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     const textWidth = props.width||width-30;
@@ -41,9 +41,9 @@ export const TextSkeleton=(props: TextProps)=>{
             <Sklton.Item height={20} justifyContent="flex-start" width={textWidth} borderRadius={4} {...props} />
         </Sklton>
     )
-}
+})
 
-export const RectSkeleton=({width=200,height}:{width?:number,height:number})=>{
+export const RectSkeleton=React.memo(({width=200,height}:{width?:number,height:number})=>{
     const theme=useTheme();
     const {width:screenWidth} = useWindowDimensions();
     width = width||screenWidth;
@@ -52,9 +52,9 @@ export const RectSkeleton=({width=200,height}:{width?:number,height:number})=>{
             <Sklton.Item height={width} width={width} borderRadius={4} />
         </Sklton>
     )
-}
+})
 
-export const GridSkeleton=({number=6,image,gridStyle={},height}:{height:number,number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
+export const GridSkeleton=React.memo(({number=6,image,gridStyle={},height}:{height:number,number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
     
     const {width} = useWindowDimensions();
     const theme=useTheme();
@@ -104,9 +104,9 @@ export const GridSkeleton=({number=6,image,gridStyle={},height}:{height:number,n
             </Sklton.Item>
         </Sklton>
     )
-}
+})
 
-export const ListSkeleton=({number=3,image=false,imageSize=60,height}: {height:number,number?:number,image?:boolean,imageSize?:number})=>{
+export const ListSkeleton=React.memo(({number=3,image=false,imageSize=60,height}: {height:number,number?:number,image?:boolean,imageSize?:number})=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
 
@@ -142,9 +142,9 @@ export const ListSkeleton=({number=3,image=false,imageSize=60,height}: {height:n
             </View>
         </Sklton>
     )
-}
+})
 
-export const ArticleSkeleton=({height}:{height:number})=>{
+export const ArticleSkeleton=React.memo(({height}:{height:number})=>{
     const theme=useTheme();
     const {width} = useWindowDimensions();
     const number=5;
@@ -186,9 +186,9 @@ export const ArticleSkeleton=({height}:{height:number})=>{
             </Sklton.Item>
         </Sklton>
     )
-}
+})
 
-export const CaraouselSkeleton=({image,gridStyle={},height}:{height:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
+export const CaraouselSkeleton=React.memo(({image,gridStyle={},height}:{height:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
     
     const {width} = useWindowDimensions();
     const theme=useTheme();
@@ -223,7 +223,7 @@ export const CaraouselSkeleton=({image,gridStyle={},height}:{height:number,image
             </Sklton.Item>
         </Sklton>
     )
-}
+})
 
 interface SkltnProps extends SkeletonPlaceholderProps {
     theme: Record<string,string>
@@ -239,13 +239,13 @@ class Skltnn extends React.PureComponent<SkltnProps> {
     }
 }
 
-export const SkltnView=(props: SkeletonPlaceholderItem)=>{
+export const SkltnView=React.memo((props: SkeletonPlaceholderItem)=>{
     return <Sklton.Item {...props} />
-}
+})
 
-export const Skltn = withTheme<SkltnProps>(Skltnn);
+export const Skltn = React.memo(withTheme<SkltnProps>(Skltnn));
 
-export default function Skeleton({type,number=3,width,textProps,image,gridStyle,height}: SkeletonProps): JSX.Element|null {
+function Skeleton({type,number=3,width,textProps,image,gridStyle,height}: SkeletonProps): JSX.Element|null {
     const {height:winHeight}=useWindowDimensions()
     height=height||winHeight
     if(type==='paragraph') return <PararaphSkeleton type={type} number={number} height={height} />
@@ -257,3 +257,4 @@ export default function Skeleton({type,number=3,width,textProps,image,gridStyle,
     else if(type=='caraousel') return <CaraouselSkeleton image={image} gridStyle={gridStyle} height={height} />
     return null;
 }
+export default React.memo(Skeleton);

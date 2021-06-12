@@ -7,6 +7,8 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +23,8 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.google.android.gms.common.SignInButton;
 import com.portalnesia.app.AuthActivity;
 import com.portalnesia.app.R;
+import com.portalnesia.app.sync.SyncAdapter;
+import com.portalnesia.app.sync.SyncModule;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,14 +39,15 @@ public class AuthModule extends ReactContextBaseJavaModule {
     public static final String ADD_ACCOUNT = "addaccount";
     public static final String RESTART_APP = "restartapp";
 
-    private ReactApplicationContext reactContext;
-    AccountManager manager = null;
+    private final ReactApplicationContext reactContext;
+    final AccountManager manager;
     Integer accumulator = 0;
     HashMap<Integer,Account> accounts = new HashMap<>();
 
     public AuthModule(ReactApplicationContext context) {
         super(context);
         reactContext=context;
+        manager = (AccountManager)context.getSystemService(Context.ACCOUNT_SERVICE);
     }
 
     @NotNull
@@ -75,7 +80,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getAccounts(Promise promise) {
         String type = reactContext.getResources().getString(R.string.account_type);
-        manager = AccountManager.get(reactContext);
         Account[] account_list = manager.getAccountsByType(type);
         WritableNativeArray result = new WritableNativeArray();
 
@@ -83,7 +87,7 @@ public class AuthModule extends ReactContextBaseJavaModule {
             Integer index = indexForAccount(account);
 
             WritableNativeMap account_object = new WritableNativeMap();
-            account_object.putInt("index",(int)index);
+            account_object.putInt("index", index);
             account_object.putString("name",account.name);
             account_object.putString("type",account.type);
             result.pushMap(account_object);
@@ -94,7 +98,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void addAccountExplicitly(String userName, String password,Promise promise) {
         String type = reactContext.getResources().getString(R.string.account_type);
-        manager = AccountManager.get(reactContext);
         Account account = new Account(userName,type);
         Integer index = indexForAccount(account);
         Bundle userdata = new Bundle();
@@ -106,7 +109,7 @@ public class AuthModule extends ReactContextBaseJavaModule {
             }
 
             WritableNativeMap result = new WritableNativeMap();
-            result.putInt("index",(int)index);
+            result.putInt("index", index);
             result.putString("name",account.name);
             result.putString("type",account.type);
 
@@ -118,7 +121,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void removeAccount(ReadableMap accountObject,Promise promise){
-        manager = AccountManager.get(reactContext);
         int index = accountObject.getInt("index");
         Account account = accounts.get(index);
 
@@ -155,7 +157,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void renameAccount(ReadableMap accountObject,String newName,Promise promise) {
-        manager = AccountManager.get(reactContext);
         int index = accountObject.getInt("index");
         Account account = accounts.get(accountObject.getInt("index"));
         if(account==null) {
@@ -200,7 +201,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setUserData(ReadableMap accountObject,String key,String data,Promise promise){
-        manager = AccountManager.get(reactContext);
         Account account = accounts.get(accountObject.getInt("index"));
         if(account==null) {
             promise.reject("ERROR","Invalid account");
@@ -212,7 +212,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getUserData(ReadableMap accountObject,String key,Promise promise) {
-        manager = AccountManager.get(reactContext);
         Account account = accounts.get(accountObject.getInt("index"));
         if(account==null) {
             promise.reject("ERROR","Invalid account");
@@ -226,7 +225,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getPassword(ReadableMap accountObject,Promise promise){
-        manager = AccountManager.get(reactContext);
         Account account = accounts.get(accountObject.getInt("index"));
         if(account==null) {
             promise.reject("ERROR","Invalid account");
@@ -238,7 +236,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setPassword(ReadableMap accountObject,String password,Promise promise){
-        manager = AccountManager.get(reactContext);
         Account account = accounts.get(accountObject.getInt("index"));
         if(account==null) {
             promise.reject("ERROR","Invalid account");
@@ -251,7 +248,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void setAuthToken(ReadableMap accountObject,String authToken,Promise promise) {
         String type = reactContext.getResources().getString(R.string.account_type);
-        manager = AccountManager.get(reactContext);
         Account account = accounts.get(accountObject.getInt("index"));
         if(account==null) {
             promise.reject("ERROR","Invalid account");
@@ -272,12 +268,18 @@ public class AuthModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getIntentExtra(Promise promise){
-        Intent intent = Objects.requireNonNull(getCurrentActivity()).getIntent();
-        boolean restart = intent.getBooleanExtra(AuthModule.RESTART_APP,true);
-        WritableNativeMap result = new WritableNativeMap();
-        result.putString("name",intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
-        result.putString("type",intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
-        result.putBoolean("restart",restart);
+        final WritableNativeMap result = new WritableNativeMap();
+        try {
+            Intent intent = Objects.requireNonNull(getCurrentActivity()).getIntent();
+            boolean restart = intent.getBooleanExtra(AuthModule.RESTART_APP,true);
+            result.putString("name",intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
+            result.putString("type",intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
+            result.putBoolean("restart",restart);
+        } catch (NullPointerException e) {
+            result.putString("name",null);
+            result.putString("type",null);
+            result.putBoolean("restart",true);
+        }
         promise.resolve(result);
     }
 
@@ -289,35 +291,32 @@ public class AuthModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void addAccount(String userName,String password,String authToken,boolean restart) {
+    public void addAccount(String userName,String password,String authToken) {
         String type = reactContext.getResources().getString(R.string.account_type);
-        manager = AccountManager.get(reactContext);
         final Activity activity = getCurrentActivity();
         assert activity != null;
         final Intent intent = activity.getIntent();
         final AccountAuthenticatorResponse response = intent.getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
-        if(response != null) {
-            if(userName != null) {
+        if(userName != null) {
+            final Account account = new Account(userName,type);
+            manager.addAccountExplicitly(account,password,null);
+            manager.setAuthToken(account,type,authToken);
+            if(response != null) {
                 final Bundle result = new Bundle();
                 result.putString(AccountManager.KEY_ACCOUNT_NAME,userName);
                 result.putString(AccountManager.KEY_ACCOUNT_TYPE,type);
                 result.putString(ACCOUNT_PASSWORD,password);
                 result.putString(AccountManager.KEY_AUTHTOKEN,authToken);
                 response.onResult(result);
-            } else {
-                response.onError(AccountManager.ERROR_CODE_CANCELED,"Canceled");
             }
-        }
-        final Account account = new Account(userName,type);
-        manager.addAccountExplicitly(account,password,null);
-        manager.setAuthToken(account,type,authToken);
-        if(restart) {
-            Intent i = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            activity.startActivity(i);
+            String authority = reactContext.getResources().getString(R.string.sync_provider);
+            SyncAdapter.configurePeriodicSync(getReactApplicationContext(),account, SyncModule.DEFAULT_SYNC_INTERVAL,SyncModule.DEFAULT_SYNC_FLEXTIME);
+            ContentResolver.setSyncAutomatically(account,authority,true);
         } else {
-            activity.setResult(Activity.RESULT_OK);
-            activity.finish();
+            if(response != null) response.onError(AccountManager.ERROR_CODE_CANCELED,"Canceled");
         }
+        Intent i = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        activity.startActivity(i);
     }
 }

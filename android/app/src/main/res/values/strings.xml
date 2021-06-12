@@ -14,4 +14,7 @@
   <string name="account_type">com.portalnesia</string>
   <string name="security_settings">Security Settings</string>
   <string name="notification_settings">Notification Settings</string>
+  <string name="file_provider">com.portalnesia.app.fileprovider</string>
+  <string name="sync_provider">com.portalnesia.app.syncprovider</string>
+  <string name="account_type_sync">Account</string>
 </resources>

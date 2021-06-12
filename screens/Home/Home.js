@@ -253,7 +253,7 @@ const RenderInformation=React.memo(({data,item,index})=>{
 	return null;
 })
 
-const Dashboard=({loading,data,error,navigation,onMutate})=>{
+const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 	const context = React.useContext(AuthContext)
 	const {setNotif} = context
 	const ref=React.useRef(null)
@@ -390,7 +390,7 @@ const Dashboard=({loading,data,error,navigation,onMutate})=>{
 			/>
         </Layout>
 	)
-}
+})
 
 const NotLogin=React.memo(({loading,data,error,navigation})=>{
 	const context = React.useContext(AuthContext)
@@ -500,7 +500,8 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 
 export default function HomeScreen({ navigation }) {
 	const context = React.useContext(AuthContext);
-	const {user} = context.state
+	const {isLogin,state} = context;
+	const {user} = state
 	const [loading,setLoading] = React.useState(true)
 	const [data,setData]=React.useState()
 	const [error,setError] = React.useState(false)
@@ -524,7 +525,7 @@ export default function HomeScreen({ navigation }) {
 			setLoading(true);
 			setError(false)
 		}
-	},[user])
+	},[isLogin])
 
 	const onMutate=React.useCallback(()=>{
 		setLoading(true);
@@ -542,6 +543,6 @@ export default function HomeScreen({ navigation }) {
 		},200)
 	},[user])
 
-	if(user !== false) return <Dashboard onMutate={onMutate} loading={loading} data={data} error={error} navigation={navigation} />
+	if(isLogin) return <Dashboard onMutate={onMutate} loading={loading} data={data} error={error} navigation={navigation} />
 	else return <NotLogin loading={loading} data={data} error={error} navigation={navigation} />
 }

@@ -129,5 +129,5 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
         )
     } else return <ImageComponent />
 }
-
-export default React.forwardRef(Image)
+const ImageRef = React.forwardRef(Image)
+export default React.memo(ImageRef)

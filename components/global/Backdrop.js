@@ -18,7 +18,7 @@ const LoadingBackdrop=({visible,onClose,text,theme,width})=>(
     </Modal>
 )
 
-export default function Backdrop({progress,visible,onClose,loading,text="Loading..."}){
+function Backdrop({progress,visible,onClose,loading,text="Loading..."}){
     const theme = useTheme();
     const {width} = useWindowDimensions()
     
@@ -60,3 +60,4 @@ export default function Backdrop({progress,visible,onClose,loading,text="Loading
         </Modal>
     )
 }
+export default React.memo(Backdrop);

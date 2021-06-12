@@ -21,8 +21,11 @@ import Authentication from '@pn/module/Authentication';
 import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
 import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
 import Backdrop from '@pn/components/global/Backdrop';
+import getInfo from '@pn/utils/Info';
 
 const {width} = Dimensions.get('window')
+
+const info = getInfo();
 
 export default function LoginScreen({ navigation,route }) {
 	const context = React.useContext(AuthContext)
@@ -38,14 +41,6 @@ export default function LoginScreen({ navigation,route }) {
 	const [recaptcha,setRecaptcha] = useState("");
 	const captchaRef = React.useRef(null)
 	const [dialog,setDialog]=useState(null);
-	const [restart,setRestart]=React.useState(true);
-
-	React.useEffect(()=>{
-		(async function(){
-			const intent = await Authentication.getIntentExtra()
-			setRestart(typeof intent.restart==='boolean' ? intent.restart : true);
-		})();
-	},[])
 
 	async function getLoginLocation(){
 		const {coords:{latitude,longitude}} = await getLocation();
@@ -66,9 +61,8 @@ export default function LoginScreen({ navigation,route }) {
 			const {location,request}=await getLoginLocation();
 			let res;
 			try {
-				res = await PNpost('/auth/login',{email,password,recaptcha,location,code_challenge:request.codeChallenge})
+				res = await PNpost('/auth/login',{email,password,recaptcha,location,code_challenge:request.codeChallenge,device:JSON.stringify(info)})
 			} catch(e){}
-
 			if(res?.dialog) {
 				setDialog(res?.dialog);
 			}
@@ -79,7 +73,7 @@ export default function LoginScreen({ navigation,route }) {
 						const profile = await getProfile(token);
 						if(typeof profile !== 'string') {
 							await loginInit(token,profile);
-							Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken,restart);
+							Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken);
 						} else {
 							setNotif(true,"Error",profile);
 						}
@@ -110,8 +104,9 @@ export default function LoginScreen({ navigation,route }) {
 			if(type==='success') {
 				let res;
 				const {location,request}=await getLoginLocation();
+				const body = {accessToken:user.auth.accessToken||"",idToken:user.auth.idToken||"",location,code_challenge:request.codeChallenge,recaptcha,device:JSON.stringify(info)};
 				try {
-					res = await PNpost('/auth/google/login',{accessToken:user.auth.accessToken||"",idToken:user.auth.idToken||"",location,code_challenge:request.codeChallenge,recaptcha})
+					res = await PNpost('/auth/google/login',body)
 				} catch(e){
 					console.log(e);
 				} finally {

@@ -81,4 +81,5 @@ Button.defaultProps={
     appearance:'filled',
     outlined:false
 }
-export default withTooltip(Button)
+const ButtonTooltip = withTooltip(Button);
+export default React.memo(ButtonTooltip);

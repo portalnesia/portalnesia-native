@@ -19,4 +19,4 @@ const TopAction = React.forwardRef<InstanceType<typeof View>,TopActionProps>((pr
     )
 })
 
-export default withTooltip(TopAction)
+export default React.memo(withTooltip(TopAction))

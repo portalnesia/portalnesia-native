@@ -5,6 +5,7 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import com.portalnesia.app.authentication.AuthModule;
+import com.portalnesia.app.sync.SyncModule;
 import com.portalnesia.app.authentication.PNGoogleSignInButton;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,7 @@ public class PNPackages implements ReactPackage {
         modules.add(new PNBrightness(reactContext));
         modules.add(new PNPipModule(reactContext));
         modules.add(new AuthModule(reactContext));
+        modules.add(new SyncModule(reactContext));
         return modules;
     }
 }

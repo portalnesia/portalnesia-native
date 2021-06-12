@@ -2,7 +2,7 @@ import React from 'react'
 import {getActionFromState,getPathFromState,getStateFromPath,StackActions} from '@react-navigation/native'
 import {linking} from './Linking'
 import {openBrowser} from '@pn/utils/Main'
-import {URL} from '@env'
+import {URL,LINK_URL} from '@env'
 
 export const navigationRef = React.createRef();
 
@@ -151,7 +151,7 @@ export const handleLinking=(url)=>{
 }
 
 export const getLink=(link,a=true)=>{
-    if(link?.match(/\/corona+/) !== null) return `${URL}/corona`
+    if(link?.match(/\/corona+/) !== null) return `${LINK_URL}/corona`
     let url = link.replace(`${URL}/`,"");
     url = url.replace("pn://","");
     const uri = url.split("?")[0];

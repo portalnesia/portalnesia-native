@@ -45,7 +45,7 @@ export interface ListItemProps extends PressableProps {
     description?: string | ((props?: PropsType)=>JSX.Element);
 }
 
-export default function ListItem(props: ListItemProps){
+function ListItem(props: ListItemProps){
     const {accessoryLeft,accessoryRight,title,description,...other} = props
     const theme=useTheme();
 
@@ -68,3 +68,4 @@ export default function ListItem(props: ListItemProps){
         </Pressable>
     )
 }
+export default React.memo(ListItem);

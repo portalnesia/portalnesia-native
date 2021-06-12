@@ -1,7 +1,6 @@
 import React from 'react'
-import {Alert} from 'react-native'
 import {maybeCompleteAuthSession} from 'expo-web-browser'
-import {loadAsync,AuthRequest,AccessTokenRequestConfig,AuthRequestConfig, exchangeCodeAsync,RefreshTokenRequestConfig,refreshAsync, TokenResponse,revokeAsync,RevokeTokenRequestConfig,TokenTypeHint} from 'expo-auth-session'
+import {AuthRequest,AccessTokenRequestConfig,AuthRequestConfig, exchangeCodeAsync,RefreshTokenRequestConfig,refreshAsync, TokenResponse,revokeAsync,RevokeTokenRequestConfig,TokenTypeHint} from 'expo-auth-session'
 import {createURL} from 'expo-linking'
 import * as Secure from 'expo-secure-store'
 import * as Application from 'expo-application'
@@ -9,9 +8,8 @@ import * as Notifications from 'expo-notifications'
 
 import {API as APIaxios} from '@pn/utils/API'
 import {CLIENT_ID,API} from '@env'
-import {DispatchArgument, StateType} from '@pn/provider/Context'
+import {DispatchArgument} from '@pn/provider/Context'
 import Authentication, { AccountManagerType } from '@pn/module/Authentication'
-import { generateRandom } from './Main'
 
 maybeCompleteAuthSession();
 
@@ -54,8 +52,7 @@ export async function getProfile(token: ResponseToken){
 
 type UseLoginOptions = {
     dispatch: React.Dispatch<DispatchArgument>,
-    state: StateType,
-    setNotif:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any} | undefined) => void
+    setNotif?:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any} | undefined) => void
 }
 
 export async function loginInit(data: TokenResponse,profile: any) {
@@ -84,7 +81,7 @@ export async function logoutInit() {
     return;
 }
 
-export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
+export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
     const logout=React.useCallback(async(tkn?: ResponseToken,notify?:{type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined})=>{
         let token: ResponseToken|undefined;
         if(!tkn) {
@@ -95,67 +92,57 @@ export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
         } else {
             token = tkn;
         }
-
+        let account: AccountManagerType|undefined;
+        try {
+            const accounts = await Authentication.getAccounts();
+            account = accounts[0];
+        } catch(e){}
         if(token) {
             try {
-                const accounts = await Authentication.getAccounts();
-                const account = accounts[0];
-                console.log(account);
                 await Promise.all([
                     revokeToken(token),
                     logoutInit(),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
                 if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
-                setNotif(notify?.type||false,notify?.title||"Sucess",notify?.msg||"You've successfully logged out.")
+                if(typeof setNotif==='function') setNotif(notify?.type||false,notify?.title||"Sucess",notify?.msg||"You've successfully logged out.")
             } catch(e) {
-                console.log(e);
-                await logoutInit();
+                await Promise.all([
+                    revokeToken(token),
+                    logoutInit(),
+                    [...(account?.name ? [Authentication.removeAccount(account)] : [])]
+                ])
                 if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
             }
         } else {
-            await logoutInit();
+            await Promise.all([
+                logoutInit(),
+                [...(account?.name ? [Authentication.removeAccount(account)] : [])]
+            ])
             if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
         }
-        return;
+        return Promise.resolve();
     },[dispatch,setNotif])
 
     const refreshTokenUtils=React.useCallback(async(token: ResponseToken,account: AccountManagerType,fetchNewRefreshToken=true)=>{
         let new_token:ResponseToken;
-        if(fetchNewRefreshToken) {
+        if(fetchNewRefreshToken && token?.refreshToken) {
             new_token = await refreshingToken(token);
+            await Secure.setItemAsync("token",JSON.stringify(new_token));
         } else {
             new_token = token;
         }
-        try {
-            if(new_token) {
-                const user = await getProfile(new_token);
-                // Try update user database
-                if(typeof user !== 'string') {
-                    if(typeof user?.email === 'string' && account.name !== user.email) await Authentication.renameAccount(account,user?.email);
-                    await Promise.all([
-                        Secure.setItemAsync('user',JSON.stringify(user)),
-                        [...(fetchNewRefreshToken ? [Secure.setItemAsync('token',JSON.stringify(new_token)),Authentication.setAuthToken(account,new_token?.accessToken)] : [])]
-                    ])
-                    if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token:new_token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
-                }
-                // Using old user database
-                else {
-                    const user_string = await Secure.getItemAsync('user');
-                    if(user_string !== null) {
-                        const old_user = JSON.parse(user_string);
-                        if(fetchNewRefreshToken) await Authentication.setAuthToken(account,new_token?.accessToken);
-                        if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token:new_token,user:old_user,session:old_user?.session_id}})
-                    } else {
-                        await logout(new_token,{type:true,title:"Error",msg:`Internal server error\n. Please login again`});
-                    }
-                }
+        if(new_token) {
+            const user_string = await Secure.getItemAsync('user');
+            if(user_string !== null) {
+                const old_user = JSON.parse(user_string);
+                if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token:new_token,user:old_user,session:old_user?.session_id}})
+            } else {
+                throw Error("Internal server error. Please login again")
             }
-        } catch(e) {
-            // Logout when failed to refresh token
-            await logout(new_token,{type:true,title:"Error",msg:`Internal server error.\nPlease login again`});
         }
-    },[dispatch,logout,])
+        return Promise.resolve();
+    },[dispatch,logout])
 
     const refreshToken=React.useCallback(async()=>{
         const token_string = await Secure.getItemAsync('token');
@@ -163,39 +150,52 @@ export default function useLogin({dispatch,state,setNotif}: UseLoginOptions) {
         const accounts = await Authentication.getAccounts();
         let account = accounts[0];
         // Check account manager
-        if(account?.name) {
-            const refresh_token = await Authentication.getPassword(account);
-            // If js token == native token;  && token?.refreshToken == refresh_token
-            if(token!==null) {
-                const date_now = Number((new Date().getTime()/1000).toFixed(0));
-                // Check if token expired;
-                if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
-                    await refreshTokenUtils(token,account);
+        try {
+            if(account?.name) {
+                //const refresh_token = await Authentication.getPassword(account);
+                // If js token == native token;  && token?.refreshToken == refresh_token
+                if(token!==null) {
+                    const date_now = Number((new Date().getTime()/1000).toFixed(0));
+                    // Check if token expired;
+                    if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
+                        await refreshTokenUtils(token,account);
+                    }
+                    // Token not expired
+                    else {
+                        await refreshTokenUtils(token,account,false);
+                    }
                 }
-                // Token not expired
+                // JS token != native token;
                 else {
-                    await refreshTokenUtils(token,account,false);
+                    await Authentication.removeAccount(account);
+                    if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
+                }
+            } 
+            // Account manager empty
+            else {
+                if(token !== null) {
+                    await Promise.all([
+                        Secure.deleteItemAsync("token"),
+                        Secure.deleteItemAsync("user")
+                    ])
+                    await logout(token);
+                } else {
+                    if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
                 }
             }
-            // JS token != native token;
-            else {
-                await Authentication.removeAccount(account);
-                if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
-            }
-        } 
-        // Account manager empty
-        else {
+        } catch(e) {
+            if(account?.name) await Authentication.removeAccount(account);
             if(token !== null) {
                 await Promise.all([
+                    logout(token),
                     Secure.deleteItemAsync("token"),
                     Secure.deleteItemAsync("user")
                 ])
-                await logout(token);
             } else {
                 if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
             }
         }
-        return;
+        return Promise.resolve();
     },[logout,dispatch,refreshTokenUtils])
 
     return {logout,refreshToken}

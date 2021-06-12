@@ -11,6 +11,8 @@ import Register from '../../screens/auth/Register'
 import Authentication from '../../screens/auth/Authentication'
 import ForgetPassword from '../../screens/auth/ForgetPassword'
 import ForgetPasswordForm from '../../screens/auth/ForgetPasswordForm'
+import ReportScreen from '../../screens/ReportScreen'
+import ReportModal from '../../screens/Modal/ReportModal'
 import { AuthContext } from '../../provider/Context';
 
 const MainStack = createStackNavigator();
@@ -57,6 +59,8 @@ export default function(){
                     <MainStack.Screen name="Authentication" component={Authentication} />
                     <MainStack.Screen name="ForgetPassword" component={ForgetPassword} />
                     <MainStack.Screen name="ForgetPasswordForm" component={ForgetPasswordForm} />
+                    <MainStack.Screen name="ReportModal" component={ReportModal} />
+                    <MainStack.Screen name="ReportScreen" component={ReportScreen} />
                 </MainStack.Navigator>
             </NavigationContainer>
         </>

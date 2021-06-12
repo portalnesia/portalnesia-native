@@ -3,8 +3,6 @@
     "start": "npx react-native start",
     "android": "npx react-native run-android",
     "ios": "react-native run-ios",
-    "web": "expo start --web",
-    "eject": "expo eject",
     "bundle": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "export": "expo export -p https://datas.portalnesia.com/updates -t bare",
     "licenses": "npm-license-crawler -onlyDirectDependencies -json licenses.json"
@@ -22,10 +20,11 @@
     "@react-native-community/slider": "3.0.3",
     "@react-native-firebase/admob": "^11.3.3",
     "@react-native-firebase/analytics": "^11.3.3",
-    "@react-native-firebase/app": "^11.3.3",
+    "@react-native-firebase/app": "^12.0.0",
     "@react-native-firebase/auth": "^12.0.0",
     "@react-native-firebase/crashlytics": "^11.3.3",
     "@react-native-firebase/in-app-messaging": "^11.3.3",
+    "@react-native-firebase/messaging": "^12.0.0",
     "@react-native-firebase/remote-config": "^11.3.3",
     "@react-navigation/bottom-tabs": "^5.11.11",
     "@react-navigation/native": "^5.7.6",
@@ -139,7 +138,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }

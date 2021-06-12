@@ -15,4 +15,5 @@ declare module '@env' {
     export const RECAPTCHA_SITEKEY: string;
     export const FIREBASE_CLIENT_ID:string;
     export const FIREBASE_WEB_CLIENT_ID:string;
+    export const LINK_URL: string;
 }

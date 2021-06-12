@@ -32,4 +32,4 @@ const Carousel = React.forwardRef(function({data,renderItem,loop,autoplay,...oth
     )
 })
 
-export default Carousel
+export default React.memo(Carousel)

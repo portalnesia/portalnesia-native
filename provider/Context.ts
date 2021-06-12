@@ -33,6 +33,7 @@ export type ContextType = {
     userTheme: 'light' | 'auto' | 'dark' | string,
     setLang:(value: 'light' | 'auto' | 'dark')=>Promise<void>,
     lang: string,
+    isLogin:boolean,
     sendReport:(type: SendReportType,params?: ParamsReportType)=>void
 }
 
@@ -49,6 +50,7 @@ const defaultValue = {
     userTheme:'auto',
     setLang:async()=>{},
     lang:'auto',
+    isLogin:false,
     sendReport:()=>{}
 }
 

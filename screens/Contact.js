@@ -15,7 +15,7 @@ import { AuthContext } from '@pn/provider/AuthProvider';
 import {CONTENT_URL,URL} from '@env'
 import { openBrowser, ucwords } from '@pn/utils/Main';
 import verifyRecaptcha from '@pn/module/Recaptcha'
-import I18n from 'i18n-js';
+import i18n from 'i18n-js';
 
 const user=null;
 
@@ -72,7 +72,7 @@ export default function Contact({navigation,route}){
         const arrInput = Object.keys(input);
         let checkError=[];
         arrInput.map((inp)=>{
-            if(input[inp].trim().match(/\S/) === null) checkError.push(I18n.t('errors.form_validation',{type:I18n.t(`form.${inp}`)}))
+            if(input[inp].trim().match(/\S/) === null) checkError.push(i18n.t('errors.form_validation',{type:i18n.t(`form.${inp}`)}))
         })
         if(checkError.length > 0) return setNotif(true,"Error",checkError.join("\n"));
         
@@ -140,12 +140,13 @@ export default function Contact({navigation,route}){
                                 </View>
                                 <Text style={{marginBottom:10}}>For a faster response, you should contact us via email or please fill out the form bellow:</Text>
                                 <KeyboardAvoidingView>
-                                    <Lay>
+                                <Lay {...(user!==false ? {pointerEvents:'none'} : {})}>
                                         <Input
-                                            label="Name"
+                                            label={i18n.t('form.name')}
                                             value={input.name}
                                             onChangeText={handleInputChange('name')}
-                                            disabled={user!==false||loading}
+                                            disabled={loading}
+                                            editable={user===false}
                                             placeholder="John Doe"
                                             returnKeyType="next"
                                             onSubmitEditing={()=>emailRef?.current?.focus()}
@@ -156,12 +157,13 @@ export default function Contact({navigation,route}){
                                             enablesReturnKeyAutomatically
                                         />
                                     </Lay>
-                                    <Lay>
+                                    <Lay {...(user!==false ? {pointerEvents:'none'} : {})}>
                                         <Input
-                                            label="Email"
+                                            label={i18n.t('form.email')}
                                             value={input.email}
                                             onChangeText={handleInputChange('email')}
-                                            disabled={user!==false||loading}
+                                            disabled={loading}
+                                            editable={user===false}
                                             ref={emailRef}
                                             keyboardType="email-address"
                                             autoCompleteType="email"

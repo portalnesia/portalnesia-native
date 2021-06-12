@@ -31,7 +31,6 @@ export default function AuthenticationScreen({ navigation,route }) {
 	const captchaRef = React.useRef(null)
 	const [recaptchaL,setRecaptchaL] = React.useState("");
 	const captchaRefL = React.useRef(null)
-	const [restart,setRestart]=React.useState(true);
 	const [menu,setMenu] = React.useState(false);
 	const [confirm,setConfirm]=React.useState();
 	const [canGetSMScode,setCanGetSMScode] = React.useState(false);
@@ -103,11 +102,7 @@ export default function AuthenticationScreen({ navigation,route }) {
 	},[telegram,sms,handleSendTelegram,handleSendSMS])
 
 	React.useEffect(()=>{
-		(async function(){
-			const intent = await Authentication.getIntentExtra()
-			setRestart(typeof intent.restart==='boolean' ? intent.restart : true);
-		})();
-
+		
 		return()=>{
 			if(interval !== null) clearInterval(interval);
 			setWait(30)
@@ -154,7 +149,7 @@ export default function AuthenticationScreen({ navigation,route }) {
 							const profile = await getProfile(token);
 							if(typeof profile !== 'string') {
 								await loginInit(token,profile);
-								Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken,restart);
+								Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken);
 							} else {
 								setNotif(true,"Error",profile);
 							}

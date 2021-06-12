@@ -19,6 +19,7 @@ import {captureScreen} from 'react-native-view-shot'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
+import messaging from '@react-native-firebase/messaging'
 
 import {URL,ADS_PUBLISHER_ID,CLIENT_ID} from '@env'
 import * as Notifications from 'expo-notifications'
@@ -35,6 +36,7 @@ import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
 import useAppState from '@pn/utils/useAppState';
+import handleFCMData from '@pn/services/FCMservices';
 
 LogBox.ignoreLogs(['Setting a timer for a long period of time']);
 
@@ -86,25 +88,29 @@ const initialState={
 	session:null
 }
 
-const AuthProvider = (props) => {
+const AuthProviderFunc = (props) => {
 	const dropdownRef=useRef(null)
 	const currentInternet=useRef(true);
 	const [state,dispatch]=useReducer(reducer,initialState)
 	const colorScheme = useColorScheme()
 	const [tema,setTema]=React.useState('auto')
 	const [lang,changeLang]=React.useState("auto");
-	const lastNotif = Notifications.useLastNotificationResponse()
 	const forceUpdate = useForceUpdate();
 	const {navigationRef} = useRootNavigation()
-	const {refreshToken} = useLogin({dispatch,state,setNotif})
+	const {refreshToken} = useLogin({dispatch,setNotif})
 	const [appState,currentState] = useAppState();
+	const isLogin=React.useMemo(()=>typeof state.user === 'object',[state.user]);
+	const stateUser = React.useMemo(()=>state.user,[state.user]);
+	const stateToken = React.useMemo(()=>state.token,[state.token]);
+	const stateSession = React.useMemo(()=>state.session,[state.session])
+	//const isReady = React.useMemo(()=>state.user !== null,[state.user]);
 
 	const selectedTheme = React.useMemo(()=>{
 		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
 		return 'light'
 	},[colorScheme,tema])
 
-	const setTheme=async(val)=>{
+	const setTheme=React.useCallback(async(val)=>{
 		if(['light','auto','dark'].indexOf(val) !== -1) {
 			try {
 				await AsyncStorage.setItem("theme",val)
@@ -113,9 +119,9 @@ const AuthProvider = (props) => {
 				setNotif(true,"Error",i18n.t('errors.general'))
 			}
 		}
-	}
+	},[])
 
-	const setLang=async(val)=>{
+	const setLang=React.useCallback(async(val)=>{
 		if(['id','auto','en'].indexOf(val) !== -1) {
 			try {
 				await AsyncStorage.setItem("lang",val)
@@ -124,17 +130,17 @@ const AuthProvider = (props) => {
 				setNotif(true,"Error",i18n.t('errors.general'))
 			}
 		}
-	}
+	},[])
 
-	const setNotif=(type,title,msg,data={})=>{
+	const setNotif=React.useCallback((type,title,msg,data={})=>{
 		let tipe=type;
 		if(typeof type === 'boolean') {
 			tipe = type===true ? 'error' : 'success'
 		}
 		dropdownRef.current.alertWithType(tipe||'success',title||"Title",msg,{type:'alert',...data});
-	}
+	},[])
 
-	const sendReport=(type,params={})=>{
+	const sendReport=React.useCallback((type,params={})=>{
 		const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.5.0",">=");
 		if(isUpdated) {
 			const title = ['konten','komentar','url'].indexOf(type) !== -1 ? "Send Report" : "Send Feedback";
@@ -153,18 +159,16 @@ const AuthProvider = (props) => {
 		} else {
 			setNotif(true,"Error","Please update your apps to the latest version");
 		}
-	}
+	},[navigationRef])
 
 	useEffect(()=>{
 		async function asyncTask(){
 			try {
 				let [user,res,lang] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
 
-				/*const token = await refreshToken()*/
 				if(user !== null) {
 					user = JSON.parse(user);
 				}
-				//Set Theme
 				if(res !== null) setTema(res);
 				if(lang !== null) changeLang(lang);
 
@@ -181,26 +185,14 @@ const AuthProvider = (props) => {
 					}
 				} catch(e){}
 
-				//Dispatch reducer
 				await refreshToken();
-				/*if(token !== null) {
-					dispatch({ type:"MANUAL",payload:{user:user,token:token,session:user?.session_id}})
-				} else {
-					dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
-				}*/
 				return;
 			} catch(err){
-				console.log("ERR",err);
+				console.log("Init Err",err);
 				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
 				return;
 			}
 		};
-
-		function showLocalBannerNotification(data){
-			if(data?.request?.content?.title && data?.request?.content?.body) {
-				setNotif("info",data?.request?.content?.title,data?.request?.content?.body,data?.request?.content?.data);
-			}
-		}
 
 		async function setNotificationChannel(){
 			try {
@@ -208,13 +200,6 @@ const AuthProvider = (props) => {
 					Notifications.setNotificationChannelAsync("Download", getNotifOption("Download")),
 					Notifications.setNotificationChannelAsync("General", getNotifOption("General")),
 					Notifications.setNotificationChannelAsync("News", getNotifOption("News")),
-					/*
-					Notifications.setNotificationChannelAsync("Security", getNotifOption("Security")),
-					Notifications.setNotificationChannelAsync("Birthday", getNotifOption("Birthday")),
-					Notifications.setNotificationChannelAsync("Comments", getNotifOption("Comments")),
-					Notifications.setNotificationChannelAsync("Messages", getNotifOption("Messages")),
-					Notifications.setNotificationChannelAsync("Features & Promotion", getNotifOption("Features & Promotion")),
-					*/
 				])
 			} catch(e){
 				console.log("Notification channel error",e);
@@ -229,15 +214,6 @@ const AuthProvider = (props) => {
 				if(!ada) {
 					await RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
 				}
-			}
-		}
-		function handleURL({url}){
-			if(url !== null) {
-				const parsed = urlParse(url,true);
-				if(parsed?.query?.msg) {
-					setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg)
-				}
-				handleLinking(url)
 			}
 		}
 
@@ -256,18 +232,14 @@ const AuthProvider = (props) => {
 		})
 		setNotificationChannel();
 		createFolder();
-		ExpoAddListener('url',handleURL)
-
-		const foregroundListener = Notifications.addNotificationReceivedListener(showLocalBannerNotification);
 
 		return ()=>{
-			foregroundListener.remove();
 			netInfoListener();
-			ExpoRemoveListener('url',handleURL)
 		}
 	},[])
 
-	React.useEffect(()=>{
+	/* LOCALIZATION */
+	useEffect(()=>{
 		function onLocalizationChange(){
 			i18n.translations = {
 				en:en_locale,
@@ -291,62 +263,9 @@ const AuthProvider = (props) => {
 		}
 	},[lang])
 
-	React.useEffect(()=>{
-		async function checkNotification(){
-			if(lastNotif && lastNotif?.notification?.request?.content?.data?.url) {
-				const id = lastNotif?.notification?.request?.identifier;
-				const res = await AsyncStorage.getItem("last_notification")
-				if(res !== id) {
-					const urls = lastNotif?.notification?.request?.content?.data?.url
-					if(typeof urls ==='string') {
-						handleLinking(urls)
-					}
-					await AsyncStorage.setItem("last_notification",id);
-				}
-			}
-		}
-
-		if(state.user !== null) {
-			setTimeout(checkNotification,500)
-		}
-
-	},[lastNotif,state.user])
-
-	React.useEffect(()=>{
-		function registerNotificationToken(token){
-			if(!__DEV__) {
-				if(state.user && state.token) {
-					API.post('/native_secure/send_notification_token',`token=${token?.data}`,{
-						headers:{
-							'X-Session-Id':state.user?.session_id,
-							'Authorization':`Bearer ${state.token?.accessToken}`,
-							'PN-Client-Id':CLIENT_ID
-						}
-					});
-				} else {
-					API.post('/native/send_notification_token',`token=${token?.data}`)
-				}
-			}
-		}
-
-		async function checkInitial(){
-			//Init Notification
-			const {status:existingStatus} = await Notifications.getPermissionsAsync();
-			let finalStatus = existingStatus;
-			if(finalStatus !== 'granted') {
-				const {status} = await Notifications.requestPermissionsAsync();
-				finalStatus = status;
-			}
-			if(finalStatus === 'granted') {
-				try {
-					const notif_token = await Notifications.getDevicePushTokenAsync();
-					registerNotificationToken(notif_token);
-				} catch(err) {
-					console.log(err.message);
-				}
-			}
-		}
-
+	/* NOTIFICATION & DEEP LINK */
+	useEffect(()=>{
+		/* HANDLE DEEP LINK */
 		async function getInitialLink() {
 			const url = await getInitialURL();
 			if(typeof url === 'string') {
@@ -357,44 +276,114 @@ const AuthProvider = (props) => {
 				handleLinking(url);
 			}
 		}
-		if(state.user !== null) {
-			setTimeout(getInitialLink,500)
+		function handleURL({url}){
+			if(url !== null) {
+				const parsed = urlParse(url,true);
+				if(parsed?.query?.msg) {
+					setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg)
+				}
+				handleLinking(url)
+			}
 		}
+		/* HANDLE DEEP LINK */
+
+		/* HANDLE NOTIFICATION */
+		function registerNotificationToken(token){
+			if(!__DEV__) {
+				if(stateToken) {
+					API.post('/native_secure/send_notification_token',`token=${token?.data}`,{
+						headers:{
+							'X-Session-Id':Applications.androidId,
+							'Authorization':`Bearer ${stateToken?.accessToken}`,
+							'PN-Client-Id':CLIENT_ID
+						}
+					});
+				} else {
+					API.post('/native/send_notification_token',`token=${token}`)
+				}
+			}
+		}
+		async function checkInitial(){
+			//Init Notification
+			const {status:existingStatus} = await Notifications.getPermissionsAsync();
+			let finalStatus = existingStatus;
+			if(finalStatus !== 'granted') {
+				const {status} = await Notifications.requestPermissionsAsync();
+				finalStatus = status;
+			}
+			if(finalStatus === 'granted') {
+				try {
+					const notif_token = await messaging().getToken();
+					console.log("Notification token",notif_token);
+					registerNotificationToken(notif_token);
+				} catch(err) {
+					console.log("Notification token error",err.message);
+				}
+			}
+		}
+		async function handleLNotification(url){
+			handleLinking(url);
+		}
+		/* HANDLE NOTIFICATION */
 
 		checkInitial();
-		const tokenChangeListener = Notifications.addPushTokenListener(registerNotificationToken);
-
+		const onNotificationOpenListener = messaging().onNotificationOpenedApp(remote=>{
+			if(remote?.data?.link) {
+				handleLNotification(remote.data.link);
+			}
+		})
+		const onMessageListener = messaging().onMessage(remote=>{
+			if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
+			handleFCMData(remote);
+		})
+		ExpoAddListener('url',handleURL)
+		setTimeout(()=>{
+			messaging().getInitialNotification()
+			.then(remote=>{
+				if(remote) {
+					console.log("INITIAL_NOTIF",remote);
+					if(remote?.data?.link) {
+						handleLNotification(remote.data.link);
+					}
+				}
+			})
+			getInitialLink();
+		},200)
 		return ()=>{
-			tokenChangeListener.remove();
+			onNotificationOpenListener();
+			onMessageListener();
+			ExpoRemoveListener('url',handleURL)
 		}
-	},[state.user,state.token])
+	},[stateToken])
 
+	/* HANDLE AUTHENTICATION TOKEN */
 	React.useEffect(()=>{
 		let interval=null;
 		async function handleRefreshToken(){
 			const token_string = await Secure.getItemAsync('token');
 			if(token_string!==null) {
-				let token = JSON.parse(token_string);
+				const token = JSON.parse(token_string);
 				const date_now = Number((new Date().getTime()/1000).toFixed(0));
-				console.log("Refresh Token",date_now - token.issuedAt,(token.expiresIn||3600) - 300)
-				if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
-					token = await refreshingToken(token);
-					if(token) {
-						const user = await getProfile(token);
-						await Promise.all([
-							Secure.setItemAsync('token',JSON.stringify(token)),
-							...(typeof user !== 'string' ? [Secure.setItemAsync('user',JSON.stringify(user))] : [])
-						])
-						dispatch({type:"MANUAL",payload:{token,...(typeof user !== 'string' ? {user,session:user?.session_id} : {})}})
+				const user_string = await Secure.getItemAsync('user');
+				if(user_string !== null) {
+					console.log("Refresh Token",date_now - token.issuedAt,(token.expiresIn||3600) - 300)
+					const user = JSON.parse(user_string);
+					let new_dispatch={user,session:user?.session_id};
+					if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
+						const new_token = await refreshingToken(token);
+						if(new_token) {
+							new_dispatch.token = new_token;
+							await Secure.setItemAsync('token',JSON.stringify(new_token));
+						}
 					}
+					if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{...new_dispatch}})
 				}
 			}
 		}
 		function handleInterval(){
 			interval = setInterval(handleRefreshToken,295 * 1000)
 		}
-		if(typeof state.user === 'object' && appState === 'active') {
-			//console.log(appState)
+		if(isLogin && appState === 'active') {
 			if(currentState.match(/inactive|background/)) handleRefreshToken();
 			handleInterval();
 		}
@@ -403,20 +392,23 @@ const AuthProvider = (props) => {
 			if(interval !== null) clearInterval(interval)
 			interval=null;
 		}
-	},[state.user,appState,currentState])
+	},[isLogin,appState,currentState])
 
-	const onTap=(dt)=>{
-		const urls = dt?.payload?.url
+	const onTap=React.useCallback((dt)=>{
+		const urls = dt?.payload?.link
 		if(urls) {
 			handleLinking(urls);
 		}
-		
-	}
+	},[])
 
 	return (
 		<AuthContext.Provider
 			value={{
-				state,
+				state:{
+					user:stateUser,
+					token:stateToken,
+					session:stateSession
+				},
 				dispatch,
 				setNotif,
 				setTheme,
@@ -424,7 +416,8 @@ const AuthProvider = (props) => {
 				userTheme:tema,
 				lang,
 				setLang,
-				sendReport
+				sendReport,
+				isLogin
 			}}
 		>
 			<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />
@@ -445,6 +438,6 @@ const AuthProvider = (props) => {
 	);
 };
 
-
+const AuthProvider = React.memo(AuthProviderFunc)
 
 export { AuthContext, AuthProvider };
