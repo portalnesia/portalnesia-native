@@ -97,13 +97,13 @@ Aplikasi ini menggunakan dua tipe versi, karena dibuat menggunakan react native 
 
     Bila ada perubahan atau perbaikan pada kode native, Anda diharuskan untuk mendownload versi terbaru aplikasi ini pada halaman [Releases](https://github.com/putuadityabayu/portalnesia-native/releases).
     
-    Versi terbaru juga dapat dilihat pada layar ***Menu*** > ***Check Update*** / ***Periksa Pembaruan***.
+    Versi terbaru juga dapat dilihat pada layar ***Menu*** > ***Setting*** > ***Check Update*** / ***Periksa Pembaruan***.
 
 - **Versi Bundle**, versi javascript bundle yang dijalankan oleh aplikasi.
 
     Bila ada perubahan atau perbaikan pada kode javascript, Aplikasi akan otomatis mengupdate versi terbaru tersebut secara *over the air* saat perangkat terhubung dengan internet.
 
-*Versi native dan versi bundle aplikasi, dapat dilihat pada layar ***Menu*** > ***Open Source Libraries***.
+*Versi native dan versi bundle aplikasi, dapat dilihat pada layar ***Menu*** > ***Menu*** > ***Open Source Libraries***.
 
 
 ## Kritik / Saran

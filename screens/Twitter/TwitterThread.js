@@ -18,6 +18,7 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Image from '@pn/components/global/Image'
+import NotFoundScreen from '../NotFound'
 import {CONTENT_URL} from '@env'
 import WebView from 'react-native-autoheight-webview'
 import { AuthContext } from '@pn/provider/AuthProvider';
@@ -122,7 +123,8 @@ const RenderTwitter=React.memo(({item,index,setMenu})=>{
 })
 
 export default function TwitterThread({navigation,route}){
-    const {slug} = route.params
+    const slug = route?.params?.slug
+    if(!slug) return <NotFoundScreen navigation={navigation} route={route} />
     if (slug === 'popular') {
         navigation.replace("Twitter",{slug:'popular'})
         return null;
@@ -137,7 +139,6 @@ export default function TwitterThread({navigation,route}){
     const heightt = {...headerHeight,sub:0}	
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
-    const {width} = useWindowDimensions()
     const [menu,setMenu]=React.useState(null)
     const {copyText} = useClipboard()
     const {PNget} = usePost();
@@ -168,18 +169,23 @@ export default function TwitterThread({navigation,route}){
         }
     },[data,ready,route])
 
-    const HeaderComp = ()=>(
-        <Lay style={{flex:1}}>
-            <Lay key={0} style={[style.container,{paddingTop:10}]}>
-                <Text category="h3">{`Thread by @${data?.screen_name}`}</Text>
-                <Lay key="lay-0" style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>openBrowser(`https://twitter.com/${data?.screen_name}/status/${data?.id}`) }>Original Thread</Text>
-                    <Text style={{fontSize:13}}><Text><CountUp data={data?.seen} /></Text> <Text>views</Text></Text>
+    const HeaderComp = ()=>{
+        if(data && data?.id){
+            return (
+                <Lay style={{flex:1}}>
+                    <Lay key={0} style={[style.container,{paddingTop:10}]}>
+                        <Text category="h3">{`Thread by @${data?.screen_name}`}</Text>
+                        <Lay key="lay-0" style={{marginTop:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                            <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>openBrowser(`https://twitter.com/${data?.screen_name}/status/${data?.id}`) }>Original Thread</Text>
+                            <Text style={{fontSize:13}}><Text><CountUp data={data?.seen} /></Text> <Text>views</Text></Text>
+                        </Lay>
+                    </Lay>
+                    <Divider style={{marginVertical:20,marginBottom:0,backgroundColor:theme['border-text-color']}} />
                 </Lay>
-            </Lay>
-            <Divider style={{marginVertical:20,marginBottom:0,backgroundColor:theme['border-text-color']}} />
-        </Lay>
-    )
+            )
+        }
+        return null;
+    }
 
     const RenderFooter=()=>{
         if(data && data?.id){
