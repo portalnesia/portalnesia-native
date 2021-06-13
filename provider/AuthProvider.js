@@ -164,11 +164,8 @@ const AuthProviderFunc = (props) => {
 	useEffect(()=>{
 		async function asyncTask(){
 			try {
-				let [user,res,lang] = await Promise.all([Secure.getItemAsync('user'),AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
+				let [res,lang] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
 
-				if(user !== null) {
-					user = JSON.parse(user);
-				}
 				if(res !== null) setTema(res);
 				if(lang !== null) changeLang(lang);
 
@@ -186,7 +183,7 @@ const AuthProviderFunc = (props) => {
 				} catch(e){}
 
 				await refreshToken();
-				return;
+				return Promise.resolve();
 			} catch(err){
 				console.log("Init Err",err);
 				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})

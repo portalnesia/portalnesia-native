@@ -138,7 +138,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }

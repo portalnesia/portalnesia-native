@@ -313,11 +313,11 @@ export default React.memo(() => {
 	const {state,theme:selectedTheme} = auth;
 	const {user,session} = state
 	const theme=useTheme()
-	const [ready,setReady]=React.useState(false);
+	//const [ready,setReady]=React.useState(false);
 	const {showAds} = showInterstisial();
 
 	function onReady(){
-		setReady(true);
+		//setReady(true);
 		routeNameRef.current = navigationRef.current.getCurrentRoute().name
 	}
 

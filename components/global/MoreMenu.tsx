@@ -5,7 +5,7 @@ import {Modalize} from 'react-native-modalize'
 import analytics from '@react-native-firebase/analytics'
 
 import TopNavigationAction from '../navigation/TopAction'
-import {URL} from '@env'
+import {URL,LINK_URL} from '@env'
 import { AuthContext } from '@pn/provider/Context';
 import useClipboard from '@pn/utils/clipboard'
 import {openBrowser} from '@pn/utils/Main'
@@ -119,7 +119,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
                 } else if(selectedMenu?.action === "copy") {
                     copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`,i18n.t('url'));
                 } else if(selectedMenu?.action === 'browser') {
-                    openBrowser(`${URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
+                    openBrowser(`${LINK_URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
                 } else if(selectedMenu?.action === 'report') {
                     setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,...(share?.link ? {urlreported:`${URL}${share?.link}`} : {} )}))
                 } else if(selectedMenu?.action === 'feedback') {

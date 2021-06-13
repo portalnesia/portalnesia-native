@@ -102,14 +102,17 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                 await Promise.all([
                     revokeToken(token),
                     logoutInit(),
+                    Secure.deleteItemAsync("token"),
+                    Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
                 if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
                 if(typeof setNotif==='function') setNotif(notify?.type||false,notify?.title||"Sucess",notify?.msg||"You've successfully logged out.")
             } catch(e) {
                 await Promise.all([
-                    revokeToken(token),
                     logoutInit(),
+                    Secure.deleteItemAsync("token"),
+                    Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
                 if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
@@ -117,6 +120,8 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
         } else {
             await Promise.all([
                 logoutInit(),
+                Secure.deleteItemAsync("user"),
+                Secure.deleteItemAsync("token"),
                 [...(account?.name ? [Authentication.removeAccount(account)] : [])]
             ])
             if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
@@ -132,14 +137,12 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
         } else {
             new_token = token;
         }
-        if(new_token) {
-            const user_string = await Secure.getItemAsync('user');
-            if(user_string !== null) {
-                const old_user = JSON.parse(user_string);
-                if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token:new_token,user:old_user,session:old_user?.session_id}})
-            } else {
-                throw Error("Internal server error. Please login again")
-            }
+        const user_string = await Secure.getItemAsync('user');
+        if(user_string !== null) {
+            const old_user = JSON.parse(user_string);
+            if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token:new_token,user:old_user,session:old_user?.session_id}})
+        } else {
+            throw Error("Internal server error. Please login again")
         }
         return Promise.resolve();
     },[dispatch,logout])
@@ -175,10 +178,10 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
             else {
                 if(token !== null) {
                     await Promise.all([
+                        logout(token),
                         Secure.deleteItemAsync("token"),
                         Secure.deleteItemAsync("user")
                     ])
-                    await logout(token);
                 } else {
                     if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
                 }
