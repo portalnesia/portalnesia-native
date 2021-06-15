@@ -103,7 +103,7 @@ Aplikasi ini menggunakan dua tipe versi, karena dibuat menggunakan react native 
 
     Bila ada perubahan atau perbaikan pada kode javascript, Aplikasi akan otomatis mengupdate versi terbaru tersebut secara *over the air* saat perangkat terhubung dengan internet.
 
-*Versi native dan versi bundle aplikasi, dapat dilihat pada layar ***Menu*** > ***Menu*** > ***Open Source Libraries***.
+*Versi native dan versi bundle aplikasi, dapat dilihat pada layar ***Menu*** > ***Setting*** > ***Open Source Libraries***.
 
 
 ## Kritik / Saran
