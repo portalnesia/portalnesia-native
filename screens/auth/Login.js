@@ -42,6 +42,7 @@ export default function LoginScreen({ navigation,route }) {
 	const captchaRef = React.useRef(null)
 	const [dialog,setDialog]=useState(null);
 	const [ready,setReady]=React.useState(false);
+	const [captchaReady,setRecaptchaReady]=React.useState(false);
 
 	async function getLoginLocation(){
 		const {coords:{latitude,longitude}} = await getLocation();
@@ -51,7 +52,7 @@ export default function LoginScreen({ navigation,route }) {
 		return {location,request};
 	}
 
-	async function handleLogin() {
+	async function handleLogin(email,password) {
 		let error=[];
 		if(email.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.email`)}/${i18n.t(`form.username`)}`}))
 		if(password.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.password`)}`}))
@@ -152,19 +153,22 @@ export default function LoginScreen({ navigation,route }) {
 
 	React.useEffect(()=>{
 		(async function(){
-
-			try {
-				const creds = await Authentication.prompOneTapSignIn();
-				const {email,password} = creds;
-				setEmail(email)
-				setPassword(password)
-				setTimeout(handleLogin,200);
-			} catch(e) {
-				if(["No saved credentials","Request canceled"].indexOf(e?.message) === -1) {
-					setNotif(true,"Error",e?.message);
+			if(recaptcha.length > 0 && !captchaReady) {
+				try {
+					const creds = await Authentication.prompOneTapSignIn();
+					const {email,password} = creds;
+					setRecaptchaReady(true);
+					handleLogin(email,password);
+				} catch(e) {
+					if(["No saved credentials","Request canceled"].indexOf(e?.message) === -1) {
+						setNotif(true,"Error",e?.message);
+					}
 				}
 			}
 		})()
+	},[recaptcha])
+
+	React.useEffect(()=>{
 		setReady(true);
 	},[])
 
@@ -252,11 +256,11 @@ export default function LoginScreen({ navigation,route }) {
 									importantForAutofill="yes"
 									textContentType="password"
 									onChangeText={(text) => setPassword(text)}
-									onSubmitEditing={handleLogin}
+									onSubmitEditing={()=>handleLogin(email,password)}
 									disabled={loading!==null}
 								/>
 							</View>
-							<Button size="medium" disabled={loading!==null} loading={loading==='login'} style={{marginTop:20}} onPress={handleLogin}>Continue</Button>
+							<Button size="medium" disabled={loading!==null} loading={loading==='login'} style={{marginTop:20}} onPress={()=>handleLogin(email,password)}>Continue</Button>
 							
 							<View style={{flexDirection:'row',marginTop:10}}>
 								<GoogleSignInButton disabled={loading!==null} size={GoogleSignInButton.SIZE.WIDE} style={{flex:1,width:'100%'}} color={selectedTheme==='dark' ? GoogleSignInButton.Color.DARK : GoogleSignInButton.Color.LIGHT} onPress={handleGoogleLogin} />
