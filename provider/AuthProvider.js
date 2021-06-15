@@ -14,12 +14,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
 import RNFS from 'react-native-fs'
-import {AdsConsent, AdsConsentStatus} from '@react-native-firebase/admob'
 import {captureScreen} from 'react-native-view-shot'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
 import messaging from '@react-native-firebase/messaging'
+import {requestPermissionsAsync as AdsRequest} from 'expo-ads-admob'
 
 import {URL,ADS_PUBLISHER_ID,CLIENT_ID} from '@env'
 import * as Notifications from 'expo-notifications'
@@ -164,21 +164,17 @@ const AuthProviderFunc = (props) => {
 	useEffect(()=>{
 		async function asyncTask(){
 			try {
-				let [res,lang] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang")])
+				let [res,lang,ads] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang"),AsyncStorage.getItem("ads")])
 
 				if(res !== null) setTema(res);
 				if(lang !== null) changeLang(lang);
 
 				try {
-					const consentInfo = await AdsConsent.requestInfoUpdate([ADS_PUBLISHER_ID])
-					if(consentInfo.isRequestLocationInEeaOrUnknown && consentInfo.status == AdsConsentStatus.UNKNOWN) {
-						const formResult = await AdsConsent.showForm({
-							privacyPolicy:`${URL}/pages/privacy-policy`,
-							withAdFree:false,
-							withPersonalizedAds:true,
-							withNonPersonalizedAds:true
-						})
-						await AsyncStorage.setItem('ads',formResult.status);
+					if(ads==null) {
+						const permiss = await AdsRequest();
+						if(permiss.status==='denied') {
+							await AsyncStorage.setItem('ads','false');
+						}
 					}
 				} catch(e){}
 
