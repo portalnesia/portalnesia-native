@@ -15,6 +15,7 @@ import { ucwords,number_size } from '@pn/utils/Main';
 import useLogin from '@pn/utils/Login'
 import ListItem from '@pn/components/global/ListItem'
 import { linkTo } from '@pn/navigation/useRootNavigation'
+import Authentication from '@pn/module/Authentication';
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
@@ -133,7 +134,10 @@ export default function Setting({navigation}){
                 text:"Logout",
                 onPress:async()=>{
                     setLoading(true);
-                    await logout();
+                    await Promise.all([
+                        Authentication.oneTapSignOut(),
+                        logout()
+                    ]);
                     setLoading(false);
                 }
             }]

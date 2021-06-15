@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-  <string name="asset_statements">
+  <string name="asset_statements" translatable="false">
     [{
       \"relation\": [\"delegate_permission/common.handle_all_urls\"],
       \"target\": {
         \"namespace\": \"web\",
         \"site\": \"https://portalnesia.com\"
       }
+    },{
+      \"relation\": [\"delegate_permission/common.get_login_creds\"],
+      \"target\": {
+        \"namespace\": \"web\",
+        \"site\": \"https://portalnesia.com\"
+      }
+    },{
+      \"relation\": [\"delegate_permission/common.get_login_creds\"],
+      \"target\": {
+        \"namespace\": \"web\",
+        \"site\": \"https://accounts.portalnesia.com\"
+      }
+    },{
+      \"include\":\"https://portalnesia.com/.well-known/assetlinks.json\"
     }]
   </string>
   <string name="recaptcha_apikey">6Ldevc8aAAAAAB0ljkqw7coT7lcLUfFjRNiOkah6</string>

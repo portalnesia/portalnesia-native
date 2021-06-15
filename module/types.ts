@@ -71,7 +71,9 @@ export interface AuthenticationInterface {
     startAuthActivity(): void;
     restartApps(): void;
     addAccount(username: string,refresh_token: string,authToken: string): void;
-    getIntentExtra(): Promise<{name:string|null,type:string|null,restart:boolean}>
+    getIntentExtra(): Promise<{name:string|null,type:string|null,restart:boolean}>;
+    prompOneTapSignIn(): Promise<{email: string,password: string}>;
+    oneTapSignOut(): Promise<void>;
 }
 export interface SyncModuleInterface {
     sync(): Promise<void>

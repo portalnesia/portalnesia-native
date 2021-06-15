@@ -10,9 +10,12 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.facebook.react.bridge.ActivityEventListener;
+import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -20,7 +23,13 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.auth.api.identity.SignInClient;
+import com.google.android.gms.auth.api.identity.SignInCredential;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.portalnesia.app.AuthActivity;
 import com.portalnesia.app.R;
 import com.portalnesia.app.sync.SyncAdapter;
@@ -38,16 +47,62 @@ public class AuthModule extends ReactContextBaseJavaModule {
     public static final String ACCOUNT_PASSWORD = "password";
     public static final String ADD_ACCOUNT = "addaccount";
     public static final String RESTART_APP = "restartapp";
+    public static final int REQ_ONE_TAP = 1;
 
     private final ReactApplicationContext reactContext;
     final AccountManager manager;
     Integer accumulator = 0;
     HashMap<Integer,Account> accounts = new HashMap<>();
+    private Promise mOneTapPromise;
+    private final SignInClient oneTapClient;
+    private final BeginSignInRequest signInRequest;
 
     public AuthModule(ReactApplicationContext context) {
         super(context);
         reactContext=context;
         manager = (AccountManager)context.getSystemService(Context.ACCOUNT_SERVICE);
+
+        oneTapClient = Identity.getSignInClient(context);
+        signInRequest = BeginSignInRequest.builder()
+            .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
+            .setSupported(true)
+            .build())
+            .build();
+
+        ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
+            @Override
+            public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
+                if (requestCode == REQ_ONE_TAP) {
+                    if (mOneTapPromise != null) {
+                        try {
+                            SignInCredential credential = oneTapClient.getSignInCredentialFromIntent(intent);
+                            String username = credential.getId();
+                            String password = credential.getPassword();
+                            if (password != null) {
+                                WritableNativeMap result = new WritableNativeMap();
+                                result.putString("email", username);
+                                result.putString("password", password);
+                                mOneTapPromise.resolve(result);
+                            }
+                        } catch (ApiException e) {
+                            switch (e.getStatusCode()) {
+                                case CommonStatusCodes.CANCELED:
+                                    mOneTapPromise.reject("CANCELED", "Request canceled", e);
+                                    break;
+                                case CommonStatusCodes.NETWORK_ERROR:
+                                    mOneTapPromise.reject("ERROR", "Network error", e);
+                                    break;
+                                default:
+                                    mOneTapPromise.reject("ERROR", "Something went wrong", e);
+                                    break;
+                            }
+                        }
+                        mOneTapPromise = null;
+                    }
+                }
+            }
+        };
+        context.addActivityEventListener(mActivityEventListener);
     }
 
     @NotNull
@@ -318,5 +373,32 @@ public class AuthModule extends ReactContextBaseJavaModule {
         Intent i = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         activity.startActivity(i);
+    }
+
+    @ReactMethod
+    public void prompOneTapSignIn(Promise promise){
+        Activity activity = getCurrentActivity();
+        if(activity==null){
+            promise.reject("ERROR","Activity doesn't exist");
+            return;
+        }
+        mOneTapPromise = promise;
+        oneTapClient.beginSignIn(signInRequest)
+            .addOnSuccessListener(result -> {
+                try {
+                    activity.startIntentSenderForResult(
+                        result.getPendingIntent().getIntentSender(),REQ_ONE_TAP,null,0,0,0
+                    );
+                } catch (IntentSender.SendIntentException e) {
+                    promise.reject("ERROR","Couldn't start One Tap UI",e);
+                }
+            })
+            .addOnFailureListener(e -> promise.reject("NO_CREDENTIALS","No saved credentials",e));
+    }
+
+    @ReactMethod
+    public void oneTapSignOut(Promise promise) {
+        oneTapClient.signOut();
+        promise.resolve(null);
     }
 }
