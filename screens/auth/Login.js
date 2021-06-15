@@ -41,6 +41,8 @@ export default function LoginScreen({ navigation,route }) {
 	const [recaptcha,setRecaptcha] = useState("");
 	const captchaRef = React.useRef(null)
 	const [dialog,setDialog]=useState(null);
+	const [ready,setReady]=React.useState(false);
+	const [captchaReady,setRecaptchaReady]=React.useState(false);
 
 	async function getLoginLocation(){
 		const {coords:{latitude,longitude}} = await getLocation();
@@ -50,7 +52,7 @@ export default function LoginScreen({ navigation,route }) {
 		return {location,request};
 	}
 
-	async function handleLogin() {
+	async function handleLogin(email,password) {
 		let error=[];
 		if(email.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.email`)}/${i18n.t(`form.username`)}`}))
 		if(password.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.password`)}`}))
@@ -149,139 +151,165 @@ export default function LoginScreen({ navigation,route }) {
 		}
 	},[PNpost,recaptcha])
 
+	React.useEffect(()=>{
+		(async function(){
+			if(recaptcha.length > 0 && !captchaReady) {
+				try {
+					const creds = await Authentication.prompOneTapSignIn();
+					const {email,password} = creds;
+					setRecaptchaReady(true);
+					handleLogin(email,password);
+				} catch(e) {
+					if(["No saved credentials","Request canceled"].indexOf(e?.message) === -1) {
+						setNotif(true,"Error",e?.message);
+					}
+				}
+			}
+		})()
+	},[recaptcha])
+
+	React.useEffect(()=>{
+		setReady(true);
+	},[])
+
 	return (
 		<>
 			<Layout navigation={navigation} whiteBg>
-				<ScrollView
-					contentContainerStyle={{
-						flexGrow: 1,
-					}}
-					keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
-				>
-					<View
-						style={{
-							flex: 1,
-							justifyContent: 'center',
-							alignItems: 'center',
+				{!ready ? null : (
+					<ScrollView
+						contentContainerStyle={{
+							flexGrow: 1,
 						}}
+						keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
 					>
-						<Image
-							resizeMode="contain"
-							style={{
-								height: 220,
-								width: 220,
-							}}
-							source={require('../../assets/login.png')}
-						/>
-					</View>
-					<View
-						style={{
-							flex: 3,
-							paddingHorizontal: 20,
-							paddingBottom: 20,
-						}}
-					>
-						<Text
-							style={{
-								fontSize: 24,
-								alignSelf: 'center',
-								padding: 20,
-								fontFamily:"Inter_Bold"
-							}}
-						>
-							Login
-						</Text>
-						<Text style={{ fontSize: 16 }}>{`${i18n.t('form.email')}/${i18n.t('form.username')}`}</Text>
-						<View>
-							<Input
-								style={styles.textInput}
-								placeholder="example@portalnesia.com"
-								placeholderStyle={{
-									fontFamily: 'Inter_Regular',
-								}}
-								value={email}
-								autoCapitalize="none"
-								autoCompleteType="off"
-								autoCorrect={false}
-								blurOnSubmit={false}
-								returnKeyType="next"
-								onChangeText={(text) => setEmail(text)}
-								disabled={loading!==null}
-								onSubmitEditing={()=>text2?.current?.focus()}
-							/>
-						</View>
-						<Text style={{ marginTop: 15, fontSize: 16 }}>
-							{i18n.t('form.password')}
-						</Text>
-						<View>
-							<Input
-								ref={text2}
-								style={styles.textInput}
-								placeholder="Enter your password"
-								placeholderStyle={{
-									fontFamily: 'Inter_Regular',
-								}}
-								value={password}
-								autoCapitalize="none"
-								autoCompleteType="off"
-								autoCorrect={false}
-								secureTextEntry={true}
-								returnKeyType="send"
-								textContentType="password"
-								onChangeText={(text) => setPassword(text)}
-								onSubmitEditing={handleLogin}
-								disabled={loading!==null}
-							/>
-						</View>
-						<Button size="medium" disabled={loading!==null} loading={loading==='login'} style={{marginTop:20}} onPress={handleLogin}>Continue</Button>
-						
-						<View style={{flexDirection:'row',marginTop:10}}>
-							<GoogleSignInButton disabled={loading!==null} size={GoogleSignInButton.SIZE.WIDE} style={{flex:1,width:'100%'}} color={selectedTheme==='dark' ? GoogleSignInButton.Color.DARK : GoogleSignInButton.Color.LIGHT} onPress={handleGoogleLogin} />
-						</View>
-
 						<View
 							style={{
-								flexDirection: 'row',
-								alignItems: 'center',
-								marginTop: 25,
+								flex: 1,
 								justifyContent: 'center',
+								alignItems: 'center',
 							}}
 						>
-							<Text style={{marginRight:5}}>
-								Don't have an account?
+							<Image
+								resizeMode="contain"
+								style={{
+									height: 220,
+									width: 220,
+								}}
+								source={require('../../assets/login.png')}
+							/>
+						</View>
+						<View
+							style={{
+								flex: 3,
+								paddingHorizontal: 20,
+								paddingBottom: 20,
+							}}
+						>
+							<Text
+								style={{
+									fontSize: 24,
+									alignSelf: 'center',
+									padding: 20,
+									fontFamily:"Inter_Bold"
+								}}
+							>
+								Login
 							</Text>
-							<TouchableOpacity
-								onPress={() => {
-									navigation.navigate('Register');
+							<Text style={{ fontSize: 16 }}>{`${i18n.t('form.email')}/${i18n.t('form.username')}`}</Text>
+							<View>
+								<Input
+									style={styles.textInput}
+									placeholder="example@portalnesia.com"
+									placeholderStyle={{
+										fontFamily: 'Inter_Regular',
+									}}
+									value={email}
+									autoCapitalize="none"
+									autoCompleteType="email"
+									autoCorrect={false}
+									blurOnSubmit={false}
+									returnKeyType="next"
+									textContentType="emailAddress"
+									importantForAutofill="yes"
+									onChangeText={(text) => setEmail(text)}
+									disabled={loading!==null}
+									onSubmitEditing={()=>text2?.current?.focus()}
+								/>
+							</View>
+							<Text style={{ marginTop: 15, fontSize: 16 }}>
+								{i18n.t('form.password')}
+							</Text>
+							<View>
+								<Input
+									ref={text2}
+									style={styles.textInput}
+									placeholder="Enter your password"
+									placeholderStyle={{
+										fontFamily: 'Inter_Regular',
+									}}
+									value={password}
+									autoCapitalize="none"
+									autoCompleteType="password"
+									autoCorrect={false}
+									secureTextEntry={true}
+									returnKeyType="send"
+									importantForAutofill="yes"
+									textContentType="password"
+									onChangeText={(text) => setPassword(text)}
+									onSubmitEditing={()=>handleLogin(email,password)}
+									disabled={loading!==null}
+								/>
+							</View>
+							<Button size="medium" disabled={loading!==null} loading={loading==='login'} style={{marginTop:20}} onPress={()=>handleLogin(email,password)}>Continue</Button>
+							
+							<View style={{flexDirection:'row',marginTop:10}}>
+								<GoogleSignInButton disabled={loading!==null} size={GoogleSignInButton.SIZE.WIDE} style={{flex:1,width:'100%'}} color={selectedTheme==='dark' ? GoogleSignInButton.Color.DARK : GoogleSignInButton.Color.LIGHT} onPress={handleGoogleLogin} />
+							</View>
+
+							<View
+								style={{
+									flexDirection: 'row',
+									alignItems: 'center',
+									marginTop: 25,
+									justifyContent: 'center',
 								}}
-								activeOpacity={0.7}
 							>
-								<Text {...(loading!==null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
-									Register here
+								<Text style={{marginRight:5}}>
+									Don't have an account?
 								</Text>
-							</TouchableOpacity>
-						</View>
-						<View
-							style={{
-								flexDirection: 'row',
-								alignItems: 'center',
-								marginTop: 15,
-								justifyContent: 'center',
-							}}
-						>
-							<TouchableOpacity
-								onPress={() => {
-									navigation.navigate('ForgetPassword');
+								<TouchableOpacity
+									onPress={() => {
+										navigation.navigate('Register');
+									}}
+									activeOpacity={0.7}
+								>
+									<Text {...(loading!==null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
+										Register here
+									</Text>
+								</TouchableOpacity>
+							</View>
+							<View
+								style={{
+									flexDirection: 'row',
+									alignItems: 'center',
+									marginTop: 15,
+									justifyContent: 'center',
 								}}
-								activeOpacity={0.7}
 							>
-								<Text {...(loading !== null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
-									Forget password
-								</Text>
-							</TouchableOpacity>
+								<TouchableOpacity
+									onPress={() => {
+										navigation.navigate('ForgetPassword');
+									}}
+									activeOpacity={0.7}
+								>
+									<Text {...(loading !== null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
+										Forget password
+									</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
-					</View>
-				</ScrollView>
+					</ScrollView>
+				)}
 			</Layout>
 			<Backdrop loading visible={loading==='google'} />
 			<Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} action="login" />

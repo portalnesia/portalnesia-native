@@ -1,126 +1,90 @@
 import React from 'react'
 import {View} from 'react-native'
 import Constants from 'expo-constants';
-import admob,{MaxAdContentRating,BannerAd,BannerAdSize,TestIds, InterstitialAd, AdsConsentStatus, AdEventType} from '@react-native-firebase/admob'
 import {ADS_BANNER,ADS_BANNER_2,ADS_INTERSTISIAL} from '@env'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import compareVersion from 'compare-versions'
+import {AdMobBanner,AdMobInterstitial} from 'expo-ads-admob'
 
-const BannerID_1 = Constants.isDevice && !__DEV__ ? ADS_BANNER : TestIds.BANNER;
-const BannerID_2 = Constants.isDevice && !__DEV__ ? ADS_BANNER_2 : TestIds.BANNER;
-const InterID = Constants.isDevice && !__DEV__ ? ADS_INTERSTISIAL : TestIds.INTERSTITIAL;
-
-const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.3.0",">=");
+const BannerID_1 = Constants.isDevice && !__DEV__ ? ADS_BANNER : "ca-app-pub-3940256099942544/6300978111";
+const BannerID_2 = Constants.isDevice && !__DEV__ ? ADS_BANNER_2 : "ca-app-pub-3940256099942544/6300978111";
+const InterID = Constants.isDevice && !__DEV__ ? ADS_INTERSTISIAL : "ca-app-pub-3940256099942544/1033173712";
 
 export const AdsBanner=React.memo(({size})=>{
-    const [sizeAds,setSize]=React.useState(()=>typeof size==='undefined' ? BannerAdSize.SMART_BANNER : size)
-    const [load,setLoad] = React.useState(false)
-    const [ads,setAds] = React.useState(false)
-    React.useEffect(()=>{
-        if(isUpdated) {
-            admob().setRequestConfiguration({
-                maxAdContentRating:MaxAdContentRating.G,
-                tagForChildDirectedTreatment:true,
-                tagForUnderAgeOfConsent:true
-            })
-            .then(()=>AsyncStorage.getItem('ads'))
-            .then((val)=>{
-                return new Promise(res=>{
-                    const personalizedAdsOnly = val === null || val != AdsConsentStatus.NON_PERSONALIZED ? false : true
-                    setAds(personalizedAdsOnly);
-                    res();
-                })
-            })
-            .then(()=>setLoad(true))
-            .catch(()=>{})
-        }
+    const siz=React.useMemo(()=>size==="MEDIUM_RECTANGLE" ? "mediumRectangle" : "smartBanner",[size])
+    const onError=React.useCallback((e)=>{
+        console.log("Banner1",e);
     },[])
-    const onError=React.useCallback((error)=>{
-        console.log(error)
-    },[])
+    const [personalized,setPersonalized]=React.useState(true);
     React.useEffect(()=>{
-        if(size) setSize(size)
-    },[size])
-    if(!load) return null;
+        (async function(){
+            try {
+                const ads = await AsyncStorage.getItem("ads");
+                if(ads==="false") setPersonalized(false);
+            } catch(e){
+
+            }
+        })()
+    },[])
     return (
         <View style={{justifyContent:'center',flexDirection:'row'}}>
-            <BannerAd
-                unitId={BannerID_1}
-                size={sizeAds}
-                requestOptions={{
-                    requestNonPersonalizedAdsOnly:ads
-                }}
-                onAdFailedToLoad={onError}
+            <AdMobBanner
+                bannerSize={siz}
+                adUnitID={BannerID_1}
+                servePersonalizedAds={personalized}
+                onDidFailToReceiveAdWithError={onError}
             />
         </View>
     )
 })
 
 export const AdsBanners=React.memo(({size})=>{
-    const [sizeAds,setSize]=React.useState(()=>typeof size==='undefined' ? BannerAdSize.SMART_BANNER : size)
-    const [load,setLoad] = React.useState(false)
-    const [ads,setAds] = React.useState(false)
-    const onError=React.useCallback((error)=>{
-        console.log(error)
+    const siz=React.useMemo(()=>size==="MEDIUM_RECTANGLE" ? "mediumRectangle" : "smartBanner",[size])
+    const onError=React.useCallback((e)=>{
+        console.log("Banner2",e);
     },[])
+    const [personalized,setPersonalized]=React.useState(true);
     React.useEffect(()=>{
-        if(isUpdated) {
-            admob().setRequestConfiguration({
-                maxAdContentRating:MaxAdContentRating.G,
-                tagForChildDirectedTreatment:true,
-                tagForUnderAgeOfConsent:true
-            })
-            .then(()=>AsyncStorage.getItem('ads'))
-            .then((val)=>{
-                return new Promise(res=>{
-                    const personalizedAdsOnly = val === null || val != AdsConsentStatus.NON_PERSONALIZED ? false : true
-                    setAds(personalizedAdsOnly);
-                    res();
-                })
-            })
-            .then(()=>setLoad(true))
-            .catch(()=>{})
-        }
+        (async function(){
+            try {
+                const ads = await AsyncStorage.getItem("ads");
+                if(ads==="false") setPersonalized(false);
+            } catch(e){
+
+            }
+        })()
     },[])
-    React.useEffect(()=>{
-        if(size) setSize(size)
-    },[size])
-    if(!load) return null;
     return (
         <View style={{justifyContent:'center',flexDirection:'row'}}>
-            <BannerAd
-                unitId={BannerID_2}
-                size={sizeAds}
-                requestOptions={{
-                    requestNonPersonalizedAdsOnly:ads
-                }}
-                onAdFailedToLoad={onError}
+            <AdMobBanner
+                bannerSize={siz}
+                adUnitID={BannerID_2}
+                servePersonalizedAds={personalized}
+                onDidFailToReceiveAdWithError={onError}
             />
         </View>
     )
 })
 
 export function showInterstisial(){
-    const [loaded,setLoaded]=React.useState(false)
-    const interstisial = InterstitialAd.createForAdRequest(InterID);
+    const [personalized,setPersonalized]=React.useState(true);
     React.useEffect(()=>{
-        const eventListener = interstisial.onAdEvent((type,error)=>{
-            if(type == AdEventType.LOADED) {
-                setLoaded(true)
+        (async function(){
+            try {
+                await AdMobInterstitial.setAdUnitID(InterID);
+                const ads = await AsyncStorage.getItem("ads");
+                if(ads==="false") setPersonalized(false);
+            } catch(e){
+            
             }
-            if(type == AdEventType.ERROR) {
-                console.log("Interstisial error",error);
-            }
-        })
-        interstisial.load();
-        return ()=>{
-            eventListener();
-        }
+        })()
     },[])
+    const showAds=async()=>{
+        try {
+            await AdMobInterstitial.requestAdAsync({servePersonalizedAds:personalized})
+            await AdMobInterstitial.showAdAsync();
+        } catch(e){
 
-    const showAds=()=>{
-        console.log(loaded)
-        if(loaded) interstisial.show();
+        }
     }
     return {showAds}
 }

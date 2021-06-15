@@ -59,49 +59,43 @@
         "licenseUrl": "https://github.com/react-native-community/react-native-slider",
         "parents": "portal-native"
     },
-    "@react-native-firebase/admob@11.3.3": {
-        "licenses": "Apache-2.0",
-        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/admob",
-        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/admob/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
-    "@react-native-firebase/analytics@11.3.3": {
+    "@react-native-firebase/analytics@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/analytics",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/analytics/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/app@12.0.0": {
+    "@react-native-firebase/app@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/app",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/app/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/auth@12.0.0": {
+    "@react-native-firebase/auth@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/auth",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/auth/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/crashlytics@11.3.3": {
+    "@react-native-firebase/crashlytics@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/crashlytics",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/crashlytics/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/in-app-messaging@11.3.3": {
+    "@react-native-firebase/in-app-messaging@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/in-app-messaging",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/in-app-messaging/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/messaging@12.0.0": {
+    "@react-native-firebase/messaging@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/messaging",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/messaging/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "@react-native-firebase/remote-config@11.3.3": {
+    "@react-native-firebase/remote-config@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config",
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config/raw/master/LICENSE",
@@ -171,6 +165,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/omichelsen/compare-versions",
         "licenseUrl": "https://github.com/omichelsen/compare-versions/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "expo-ads-admob@10.0.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
     "expo-app-loading@1.0.1": {
