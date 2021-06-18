@@ -247,11 +247,10 @@ function computeImageBoxDimensions(params) {
   return null;
 }
 
-const HTMLImageElement = class HTMLImageElement extends React.PureComponent {
+class HTMLImageElement extends React.PureComponent {
   __cachedFlattenStyles;
   __cachedRequirements;
   __cachedPhysicalDimensionsFromProps;
-  mounted = false;
 
   thumbnailAnimated = new Animated.Value(1)
   imageAnimated = new Animated.Value(0)
@@ -323,20 +322,7 @@ const HTMLImageElement = class HTMLImageElement extends React.PureComponent {
     return imageBoxDimensions;
   }
 
-  componentDidMount() {
-    this.mounted = true;
-    //this.fetchPhysicalImageDimensions();
-  }
-
-  componentWillUnmount() {
-    this.mounted = false;
-  }
-
   componentDidUpdate(prevProps, prevState) {
-    const sourceHasChanged = !sourcesAreEqual(
-      prevProps.source,
-      this.props.source
-    );
     const requirementsHaveChanged =
       prevProps.width !== this.props.width ||
       prevProps.height !== this.props.height ||
@@ -356,14 +342,6 @@ const HTMLImageElement = class HTMLImageElement extends React.PureComponent {
         requiredHeight: this.__cachedRequirements.height,
       });
     }
-    /*if (sourceHasChanged) {
-      if (
-        this.__cachedRequirements.width === null ||
-        this.__cachedRequirements.height === null
-      ) {
-        this.fetchPhysicalImageDimensions();
-      }
-    }*/
     if (shouldRecomputeImageBox) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState((state, props) => ({
@@ -379,73 +357,15 @@ const HTMLImageElement = class HTMLImageElement extends React.PureComponent {
     this.setState({imagePhysicalHeight,imagePhysicalWidth,error:false});
   }
 
-  fetchPhysicalImageDimensions(props = this.props) {
-    const { source } = props;
-    const shouldFetchFromImgAPI = !!source?.uri;
-    if (
-      this.__cachedPhysicalDimensionsFromProps.width != null &&
-      this.__cachedPhysicalDimensionsFromProps.height != null
-    ) {
-      this.setState({
-        imagePhysicalWidth: this.__cachedPhysicalDimensionsFromProps.width,
-        imagePhysicalHeight: this.__cachedPhysicalDimensionsFromProps.height,
-      });
-    } else if (shouldFetchFromImgAPI) {
-      Image.getSize(
-        source.uri,
-        (imagePhysicalWidth, imagePhysicalHeight) => {
-          this.mounted &&
-            this.setState({
-              imagePhysicalWidth,
-              imagePhysicalHeight,
-              error: false,
-            });
-        },
-        () => {
-          this.mounted && this.setState({ error: true });
-        }
-      );
-    } else {
-        const {height:imagePhysicalHeight,width:imagePhysicalWidth} = Image.resolveAssetSource(source)
-        if(this.mounted) {
-            this.setState({
-                imagePhysicalWidth,
-                imagePhysicalHeight,
-                error: false,
-              });
-        }
-    }
-  }
-
-  /*shouldComponentUpdate(nextProps,nextState) {
-    if(nextProps.source !== this.props.source) return true;
-    if(nextState.imageBoxDimensions !== this.state.imageBoxDimensions
-      || nextState.imagePhysicalWidth !== this.state.imagePhysicalWidth
-      || nextState.imagePhysicalHeight !== this.state.imagePhysicalHeight
-      || nextState.error !== this.state.error) return true;
-    return false;
-  }*/
-
-  /*thumbnailLoaded=()=>{
-    Animated.timing(this.thumbnailAnimated,{
+  imageLoaded=()=>{
+    Animated.timing(this.imageAnimated,{
       toValue:1,
       useNativeDriver:true
+    }).start();
+    Animated.timing(this.thumbnailAnimated,{
+      toValue:0,
+      useNativeDriver:true
     }).start()
-  }*/
-
-  imageLoaded=()=>{
-    const {imageBoxDimensions} = this.state
-    //if(imageBoxDimensions !== null) {
-      Animated.timing(this.thumbnailAnimated,{
-        toValue:0,
-        useNativeDriver:true
-      }).start(()=>{
-        Animated.timing(this.imageAnimated,{
-          toValue:1,
-          useNativeDriver:true
-        }).start()
-      })
-    //}
   }
 
   onPinchEvent = Animated.event(
@@ -480,7 +400,6 @@ const HTMLImageElement = class HTMLImageElement extends React.PureComponent {
             style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4}),opacity:animated ? this.thumbnailAnimated : 1,maxHeight:4*contentWidth/3}]}
             testID="image-layout-thumbnail"
             blurRadius={5}
-            //onLoadStart={animated ? this.thumbnailLoaded : undefined}
           />
           {zoomable ? (
               <PinchGestureHandler
@@ -566,15 +485,6 @@ const HTMLImageElement = class HTMLImageElement extends React.PureComponent {
       </View>
     );
   }
-
-  /*renderPlaceholder() {
-    return (
-      <View
-        style={this.props.imagesInitialDimensions}
-        testID="image-placeholder"
-      />
-    );
-  }*/
 
   renderContent(imgStyles) {
     const { error } = this.state;

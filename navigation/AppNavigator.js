@@ -4,7 +4,7 @@ import { createStackNavigator,TransitionPresets } from '@react-navigation/stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import {StatusBar} from 'expo-status-bar'
-import {BottomNavigation,BottomNavigationTab,Icon,useTheme,Text} from '@ui-kitten/components'
+import {Icon,useTheme,Text} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
 import useRootNavigation from '../navigation/useRootNavigation'
 import {showInterstisial} from '../components/global/Ads'
@@ -87,30 +87,6 @@ const SearchIcon=(props)=>{
 	return <Icon {...other} name="search" pack="material" />
 }
 
-const BottomTabBar = ({navigation,state})=>{
-	const onPress=(index)=>{
-		const route = state.routes[index];
-		const isFocus = state.index === index;
-		const event = navigation.emit({
-			type:"tabPress",
-			target:route.key,
-			canPreventDefault:true
-		})
-		if(!isFocus && !event.defaultPrevented) {
-			navigation.navigate(route.name)
-		}
-	}
-	return (
-		<BottomNavigation selectedIndex={state.index} onSelect={index=>onPress(index)}>
-			<BottomNavigationTab title="HOME" icon={(props)=><HomeIcon {...props} selected={state.index===0} />} />
-			<BottomNavigationTab title="NEWS" icon={(props)=><NewsIcon {...props} selected={state.index===1} />} />
-			<BottomNavigationTab title="SEARCH" icon={(props)=><SearchIcon {...props} selected={state.index===2} />} />
-			<BottomNavigationTab title="CHORD" icon={(props)=><MusicIcon {...props} selected={state.index===3} />} />
-			<BottomNavigationTab title="MENU" icon={(props)=><MenuIcon {...props} />} />
-		</BottomNavigation>
-	)
-}
-
 const tabBarIcon=(name)=>(prop)=>{
 	const {focused,color,size} = prop;
 	const props={
@@ -126,20 +102,7 @@ const tabBarIcon=(name)=>(prop)=>{
 	if(name==='menu') return <MenuIcon {...props} />
 	return null;
 }
-/* CREATE BOTTOM NAVIGATOR 
-
-
-const MainStack = createStackNavigator();
-
-const MainTabs=()=>(
-	<Tabs.Navigator initialRouteName="Home" tabBar={props=><BottomTabBar {...props} />}>
-		<Tabs.Screen name="Home" component={Home} />
-		<Tabs.Screen name="News" component={News} />
-		<Tabs.Screen name="Search" component={Search} />
-		<Tabs.Screen name="Chord" component={Chord} />
-		<Tabs.Screen name="Menu" component={Menu} />
-	</Tabs.Navigator>
-)*/
+/* CREATE BOTTOM NAVIGATOR */
 
 let screenChange=0;
 const disableAdsArr = ["Setting","Contact","Pages",'NotFound','ImageModal','Menu','AccountSettingScreen','EditUserScreen','ReportScreen','ReportModal','Comments'];

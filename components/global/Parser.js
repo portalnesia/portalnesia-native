@@ -284,7 +284,7 @@ const CodeRender=(attribs,children,style,props)=>{
 
 const BlockRender=(attribs,children,style,props)=>{
     const padding=props?.renderersProps?.padding;
-    const selectedTheme=props?.renderersProps?.selectedTheme;
+    //const selectedTheme=props?.renderersProps?.selectedTheme;
     const editor=props?.renderersProps?.editor;
     const widthh = editor ? screenWidth-40 : screenWidth-10;
     if(attribs?.class == "tiktok-embed") {
@@ -303,7 +303,7 @@ const BlockRender=(attribs,children,style,props)=>{
     }
     if(attribs?.class == "twitter-tweet") {
         let ht = domNodeToHTMLString(props?.domNode);
-        ht = ht.replace("<blockquote ",`<blockquote data-theme="${selectedTheme}"`)
+        ht = ht.replace("<blockquote ",`<blockquote data-theme="light"`)
         let html=`<script async src="https://platform.twitter.com/widgets.js"></script>${ht}`;
         //const customScript=``
         return (
@@ -358,33 +358,15 @@ const DelRender=(attribs,children,style,props)=>{
     return <Text key={props?.key} style={{marginVertical:10,flexWrap:'wrap',lineHeight:23,textDecorationLine:'line-through',textDecorationStyle:'solid'}}>{(props?.domNode?.data || props.data || children)}</Text>
 }
 
-export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yLayout=0,onReceiveId,padding=true,editor=false})=>{
+const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,onReceiveId,padding=true,editor=false})=>{
     const theme = useTheme()
-    const context = React.useContext(AuthContext);
-    const {theme:selectedTheme} = context
+    //const context = React.useContext(AuthContext);
+    //const {theme:selectedTheme} = context
     if(source.length === 0 ) return null;
     //const context = React.useContext(AuthContext)
     //const {setNotif} = context
-    //const [TableContent,setTableContent]=React.useState([]);
 
-    /*const onLayout=(evt,title)=>{
-        evt.persist()
-        if(title) {
-            setTableContent((prev)=>prev.concat([{...evt?.nativeEvent?.layout,title:title}]))
-        }
-    }*/
-
-    
-    
-    /*
-    <View key={props?.key} onLayout={(e)=>{
-        if(typeof onLayout === 'function') onLayout(e,props?.domNode?.children?.[0]?.data)
-    }}>
-        <Text category={heading} style={{marginTop:20,marginBottom:20}}>{props?.domNode?.children?.[0]?.data||children||props?.data}</Text>
-    </View>
-    */
-
-    const renderers={
+    const renderers=React.useMemo(()=>({
         table:{renderer:TableRender,wrapper:"Text"},
         p:{renderer:TextRender,wrapper:'View'},
         p:{renderer:TextRender,wrapper:'Text'},
@@ -410,18 +392,18 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
         figure:{renderer:FigureRender,wrapper:"View"},
         del:{renderer:DelRender,wrapper:"Text"},
         del:{renderer:DelRender,wrapper:"View"},
-    }
+    }),[])
 
-    const renderersProps={
+    const renderersProps=React.useMemo(()=>({
         theme,
         iklan,
-        selectedTheme,
+        //selectedTheme,
         scrollRef,
         yLayout,
         onReceiveId,
         padding,
         editor
-    }
+    }),[theme,iklan,onReceiveId,padding,editor])
 
     /*const alterData=(node)=>{
         const {parent,data} = node
@@ -430,67 +412,9 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
         }
     }*/
 
-    const onParsed=(dom,RNElement)=>{
+    const onParsed=React.useCallback((dom,RNElement)=>{
         return RNElement;
-    }
-    
-    const htmlProps={
-        source:{html:source},
-        renderers,
-        ignoredTags:[...IGNORED_TAGS,...TABLE_IGNORED_TAGS],
-        contentWidth:screenWidth,
-        WebView,
-        defaultTextProps:{selectable:selectable||false},
-        baseFontStyle:{flexWrap:'wrap',fontSize:15,color:theme['text-basic-color']},
-        onLinkPress,
-        defaultWebViewProps:{style:{opacity:0.99,overflow:'hidden'}},
-        onParsed,
-        tagsStyles:{
-            code:{
-                fontFamily:(Platform.OS ==  'ios' ? 'Menlo-Regular' : 'monospace'),
-                fontSize:14
-            },
-            p:{
-                fontSize:15,
-                color:theme['text-basic-color']
-            },
-            ul:{
-                fontSize:15,
-                color:theme['text-basic-color'],
-            },
-            li:{
-                fontSize:15,
-                color:theme['text-basic-color'],
-                lineHeight:23
-            },
-            a:{
-                color:theme['link-color'],
-                fontSize:15,
-            }
-        },
-        listsPrefixesRenderers:{
-            ul:()=>(
-                <View
-                    style={{
-                        marginRight: 10,
-                        width: 15 / 2.8,
-                        height: 15 / 2.8,
-                        marginTop: 15 / 1.5,
-                        borderRadius: 15 / 2.8,
-                        backgroundColor: theme['text-basic-color'],
-                    }}
-                />
-            ),
-            ol:(a,b,c,props)=>(
-                <Text
-                    style={{ marginRight: 5, fontSize:15,marginTop:1 }}
-                >
-                    {props?.index + 1})
-                </Text>
-            )
-        },
-        renderersProps,
-    }
+    },[])
 
     React.useEffect(()=>{
         return ()=>{
@@ -499,9 +423,66 @@ export const Parser=React.memo(({source,selectable=false,iklan=true,scrollRef,yL
     },[source])
 
     return (
-        <HTML {...htmlProps} />
+        <HTML
+            source={{html:source}}
+            renderers={renderers}
+            ignoredTags={[...IGNORED_TAGS,...TABLE_IGNORED_TAGS]}
+            contentWidth={screenWidth}
+            WebView={WebView}
+            defaultTextProps={{selectable:selectable||false}}
+            baseFontStyle={{flexWrap:'wrap',fontSize:15,color:theme['text-basic-color']}}
+            onLinkPress={onLinkPress}
+            defaultWebViewProps={{style:{opacity:0.99,overflow:'hidden'}}}
+            onParsed={onParsed}
+            tagsStyles={{
+                code:{
+                    fontFamily:(Platform.OS ==  'ios' ? 'Menlo-Regular' : 'monospace'),
+                    fontSize:14
+                },
+                p:{
+                    fontSize:15,
+                    color:theme['text-basic-color']
+                },
+                ul:{
+                    fontSize:15,
+                    color:theme['text-basic-color'],
+                },
+                li:{
+                    fontSize:15,
+                    color:theme['text-basic-color'],
+                    lineHeight:23
+                },
+                a:{
+                    color:theme['link-color'],
+                    fontSize:15,
+                }
+            }}
+            listsPrefixesRenderers={{
+                ul:()=>(
+                    <View
+                        style={{
+                            marginRight: 10,
+                            width: 15 / 2.8,
+                            height: 15 / 2.8,
+                            marginTop: 15 / 1.5,
+                            borderRadius: 15 / 2.8,
+                            backgroundColor: theme['text-basic-color'],
+                        }}
+                    />
+                ),
+                ol:(a,b,c,props)=>(
+                    <Text
+                        style={{ marginRight: 5, fontSize:15,marginTop:1 }}
+                    >
+                        {props?.index + 1})
+                    </Text>
+                )
+            }}
+            renderersProps={renderersProps}
+        />
     )
-})
+}
+export const Parser = React.memo(ParserComponent);
 
 const marked=require('marked');
 const sanitizeHtml = require('sanitize-html')

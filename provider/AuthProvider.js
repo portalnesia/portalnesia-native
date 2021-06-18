@@ -98,7 +98,8 @@ const AuthProviderFunc = (props) => {
 	const forceUpdate = useForceUpdate();
 	const {navigationRef} = useRootNavigation()
 	const {refreshToken} = useLogin({dispatch,setNotif})
-	const [appState,currentState] = useAppState();
+	const lastNotif = Notifications.useLastNotificationResponse();
+	//const [appState,currentState] = useAppState();
 	const isLogin=React.useMemo(()=>typeof state.user === 'object',[state.user]);
 	const stateUser = React.useMemo(()=>state.user,[state.user]);
 	const stateToken = React.useMemo(()=>state.token,[state.token]);
@@ -270,6 +271,7 @@ const AuthProviderFunc = (props) => {
 			}
 		}
 		function handleURL({url}){
+			console.log("URL",url);
 			if(url !== null) {
 				const parsed = urlParse(url,true);
 				if(parsed?.query?.msg) {
@@ -350,7 +352,7 @@ const AuthProviderFunc = (props) => {
 	},[stateToken])
 
 	/* HANDLE AUTHENTICATION TOKEN */
-	React.useEffect(()=>{
+	useEffect(()=>{
 		let interval=null;
 		async function handleRefreshToken(){
 			const token_string = await Secure.getItemAsync('token');
@@ -376,8 +378,8 @@ const AuthProviderFunc = (props) => {
 		function handleInterval(){
 			interval = setInterval(handleRefreshToken,295 * 1000)
 		}
-		if(isLogin && appState === 'active') {
-			if(currentState.match(/inactive|background/)) handleRefreshToken();
+		if(isLogin) {
+			//if(currentState.match(/inactive|background/)) handleRefreshToken();
 			handleInterval();
 		}
 
@@ -385,7 +387,27 @@ const AuthProviderFunc = (props) => {
 			if(interval !== null) clearInterval(interval)
 			interval=null;
 		}
-	},[isLogin,appState,currentState])
+	},[isLogin])
+
+	/* Local Notification */
+	React.useEffect(()=>{
+		async function checkNotification(){
+			if(lastNotif && lastNotif?.notification?.request?.content?.data?.url) {
+				const id = lastNotif?.notification?.request?.identifier;
+				const res = await AsyncStorage.getItem("last_notification");
+				if(res!==id){
+					const urls = lastNotif?.notification?.request?.content?.data?.url;
+					if(typeof urls === 'string'){
+						handleLinking(urls);
+					}
+					await AsyncStorage.setItem("last_notification",id);
+				}
+			}
+		}
+		if(stateUser !== null) {
+			setTimeout(checkNotification,200);
+		}
+	},[lastNotif,stateUser])
 
 	const onTap=React.useCallback((dt)=>{
 		const urls = dt?.payload?.link

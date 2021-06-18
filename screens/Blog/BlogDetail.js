@@ -22,7 +22,7 @@ import i18n from 'i18n-js'
 import usePost from '@pn/utils/API'
 import TableContent from '@pn/components/global/TableContent'
 
-export default function({navigation,route}){
+function BlogDetail({navigation,route}){
     const {slug} = route.params
     const [open,setOpen]=React.useState(false)
     const {data,error,mutate,isValidating}=useSWR(`/blog/${slug}`)
@@ -216,3 +216,5 @@ const RenderCaraousel = React.memo(({item, index:i}) => {
 		</Card>
 	);
 })
+
+export default React.memo(BlogDetail);
