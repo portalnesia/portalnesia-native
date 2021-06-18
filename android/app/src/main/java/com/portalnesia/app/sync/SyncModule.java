@@ -33,6 +33,10 @@ public class SyncModule extends ReactContextBaseJavaModule {
             }
             return;
         }
+        if(!HeadlessSyncService.isNetworkAvailable(reactContext)) {
+            promise.reject("ERROR","Network unavailable!");
+            return;
+        }
         SyncAdapter.syncImmediately(reactContext);
         promise.resolve(null);
     }
