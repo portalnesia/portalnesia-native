@@ -65,7 +65,7 @@ public class HeadlessSyncService extends HeadlessJsTaskService {
 
     private void createNotification(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_ID,NOTIFICATION_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_ID,NOTIFICATION_NAME, NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(NOTIFICATION_DESC);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);

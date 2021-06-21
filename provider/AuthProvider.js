@@ -28,7 +28,7 @@ import {IoniconsPack} from '../components/utils/IoniconsPack'
 import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
 import i18n from 'i18n-js'
 import {AuthContext} from './Context'
-import {API} from '@pn/utils/API'
+import API from '@pn/utils/axios'
 import {checkAndUpdateOTA} from '@pn/utils/Updates'
 import useLogin,{getProfile,refreshingToken} from '@pn/utils/Login'
 import Localization from '@pn/module/Localization'
@@ -286,7 +286,7 @@ const AuthProviderFunc = (props) => {
 		function registerNotificationToken(token){
 			if(!__DEV__) {
 				if(stateToken) {
-					API.post('/native_secure/send_notification_token',`token=${token?.data}`,{
+					API.post('/native_secure/send_notification_token',`token=${token}`,{
 						headers:{
 							'X-Session-Id':Applications.androidId,
 							'Authorization':`Bearer ${stateToken?.accessToken}`,
