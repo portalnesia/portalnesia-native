@@ -32,9 +32,10 @@ export const FeedbackToggle=React.memo(({link}: FeedbackToggleProps)=>{
 })
 
 export type MenuToggleProps = {
-    onPress:()=>void
+    onPress:()=>void,
+    tooltip?: string
 }
-export const MenuToggle=React.memo(({onPress}: MenuToggleProps)=><TopNavigationAction tooltip={i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />)
+export const MenuToggle=React.memo(({onPress,tooltip}: MenuToggleProps)=><TopNavigationAction tooltip={tooltip||i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />)
 
 export type MenuType = {
     title: string,
@@ -45,7 +46,8 @@ export type MenuType = {
 export type ShareType = {
     link: string,
     dialog?: string,
-    title?: string
+    title?: string,
+    fullUrl?:boolean
 }
 
 export interface MenuContainerProps {
@@ -80,8 +82,8 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
 
     const handleShare=async(text?: string,url?: string,dialog?: string)=>{
         Share.share({
-            message:`${text} ${url}`,
-            url:url
+            message:text ? `${text} ${url}` : url,
+            url:url||''
         },{
             dialogTitle:dialog||i18n.t('share')
         })
@@ -115,11 +117,11 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
             if(selectedMenu?.onPress) selectedMenu?.onPress();
             else if(share) {
                 if(selectedMenu?.action === "share") {
-                    handleShare(share?.title,`${URL}${share?.link}&utm_source=android&utm_medium=share`,share?.dialog);
+                    handleShare(share?.title,`${share?.fullUrl ? share?.link : `${URL}${share?.link}`}&utm_source=android&utm_medium=share`,share?.dialog);
                 } else if(selectedMenu?.action === "copy") {
-                    copyText(`${URL}${share?.link}&utm_source=android&utm_medium=copy+link`,i18n.t('url'));
+                    copyText(`${share?.fullUrl ? share?.link : `${URL}${share?.link}`}&utm_source=android&utm_medium=copy+link`,i18n.t('url'));
                 } else if(selectedMenu?.action === 'browser') {
-                    openBrowser(`${LINK_URL}${share?.link}&utm_source=android&utm_medium=browser`,false);
+                    openBrowser(`${share?.fullUrl ? share?.link : `${LINK_URL}${share?.link}`}&utm_source=android&utm_medium=browser`,false);
                 } else if(selectedMenu?.action === 'report') {
                     setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,...(share?.link ? {urlreported:`${URL}${share?.link}`} : {} )}))
                 } else if(selectedMenu?.action === 'feedback') {

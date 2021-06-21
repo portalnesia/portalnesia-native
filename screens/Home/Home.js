@@ -282,7 +282,11 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 	const renderFooter=()=>(
 		<React.Fragment>
 			<View style={{paddingVertical:30,marginBottom:15}}>
-				<Text category="h5" style={{paddingHorizontal:15}}>{i18n.t('recent_type',{type:i18n.t('news')})}</Text>
+				<View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal:15}}>
+					<Text category="h5">{i18n.t('recent_type',{type:i18n.t('news')})}</Text>
+					<Button size="small" text onPress={()=>linkTo("/news")}>{i18n.t('see_more')}</Button>
+				</View>
+				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
 				{loading ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' image height={300} /></View>
 				: error ? (
@@ -298,7 +302,11 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				)}
 			</View>
 			<View style={{paddingBottom:30,marginBottom:15}}>
-				<Text category="h5" style={{paddingHorizontal:15}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
+				<View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal:15}}>
+					<Text category="h5">{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
+					<Button size="small" text onPress={()=>linkTo("/chord")}>{i18n.t('see_more')}</Button>
+				</View>
+				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
 				{loading ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
 				: error ? (
@@ -314,7 +322,11 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				)}
 			</View>
 			<View style={{paddingBottom:30,marginBottom:15}}>
-				<Text category="h5" style={{paddingHorizontal:15}}>{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
+				<View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal:15}}>
+					<Text category="h5">{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
+					<Button size="small" text onPress={()=>linkTo("/twitter/thread")}>{i18n.t('see_more')}</Button>
+				</View>
+				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
 				{loading ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
 				: error ? (

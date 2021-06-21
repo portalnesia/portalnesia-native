@@ -12,6 +12,7 @@
       "target": "esnext",
       "noEmit": true,
       "baseUrl": ".",
+      "strictNullChecks": false,
       "paths": {
         "@pn/components/*": ["components/*"],
         "@pn/utils/*": ["utils/*"],

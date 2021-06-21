@@ -6,7 +6,7 @@ import * as Secure from 'expo-secure-store'
 import * as Application from 'expo-application'
 import * as Notifications from 'expo-notifications'
 
-import {API as APIaxios} from '@pn/utils/API'
+import APIaxios from './axios'
 import {CLIENT_ID,API} from '@env'
 import {DispatchArgument} from '@pn/provider/Context'
 import Authentication, { AccountManagerType } from '@pn/module/Authentication'

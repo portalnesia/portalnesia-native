@@ -24,7 +24,7 @@ const TableContentText=React.memo(({style={},sticky,scrollAnim,translateY,onPres
         const translateScroll = Animated.add(
             scrollAnim.interpolate({
                 inputRange:[0,120,220],
-                outputRange:[-58,0,58],
+                outputRange:[-57,0,57],
                 extrapolate:'clamp'
             }),
             translateY

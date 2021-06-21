@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.portalnesia.app.R;
@@ -25,7 +26,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
         Intent service = new Intent(ctx,HeadlessSyncService.class);
-        ctx.startService(service);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ctx.startForegroundService(service);
+        } else {
+            ctx.startService(service);
+        }
     }
 
     public static void syncImmediately(Context context) {

@@ -74,44 +74,26 @@ function Image({source,style,fullSize,alt,contentWidth,fancybox,dataSrc,forceFan
         typeof onClose === 'function' && onClose();
     },[theme,selectedTheme,onClose]);
 
-    const RenderDataSrc=React.useMemo(()=>{
-        return (
-            <ImageFull
-                contentWidth={screenWidth}
-                source={dataSrc||source}
-                alt={alt}
-                imagesInitialDimensions={{
-                    width:300,
-                    height:300
-                }}
-                zoomable
-                thumbnail={thumbnail}
-                animated={animated}
-            />
-        )
-    },[dataSrc,source])
-
-
-    let ImageComponent;
-    if(fullSize) {
-        ImageComponent=()=>(
-            <ImageFullComp
-                contentWidth={contentWidth||screenWidth}
-                source={source}
-                alt={alt}
-                imagesInitialDimensions={{
-                    width:300,
-                    height:300
-                }}
-                thumbnail={thumbnail}
-                zoomable={typeof zoomable==='boolean' ? zoomable : false}
-                animated={animated}
-            />
-        )
-    }
-    else {
-        ImageComponent=()=><Img ref={ref} {...other} source={source} style={style} />
-    }
+    const ImageComponent=React.useCallback(()=>{
+        if(fullSize) {
+            return (
+                <ImageFullComp
+                    contentWidth={contentWidth||screenWidth}
+                    source={source}
+                    alt={alt}
+                    imagesInitialDimensions={{
+                        width:300,
+                        height:300
+                    }}
+                    thumbnail={thumbnail}
+                    zoomable={typeof zoomable==='boolean' ? zoomable : false}
+                    animated={animated}
+                />
+            )
+        } else {
+            return <Img ref={ref} {...other} source={source} style={style} />
+        }
+    },[fullSize,contentWidth,source,style,thumbnail,animated,zoomable,alt,screenWidth])
 
     React.useEffect(()=>{
         if(dataSrc?.uri) {
