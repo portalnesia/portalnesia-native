@@ -37,6 +37,7 @@ import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
 import useAppState from '@pn/utils/useAppState';
 import handleFCMData from '@pn/services/FCMservices';
+import ShareModule from '@pn/module/Share';
 
 LogBox.ignoreLogs(['Setting a timer for a long period of time']);
 
@@ -182,7 +183,8 @@ const AuthProviderFunc = (props) => {
 				await refreshToken();
 				return Promise.resolve();
 			} catch(err){
-				console.log("Init Err",err);
+				log("asyncTask AuthProvider.js",{msg:e.message});
+        		logError(e,"asyncTask AuthProvider.js");
 				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
 				return;
 			}
@@ -222,11 +224,14 @@ const AuthProviderFunc = (props) => {
 		})
 
 		asyncTask().then(()=>{
-			checkAndUpdateOTA()
+			if(props?.main) checkAndUpdateOTA()
 		})
-		setNotificationChannel();
-		createFolder();
-
+		
+		if(props?.main) {
+			setNotificationChannel();
+			createFolder();
+		} 
+		
 		return ()=>{
 			netInfoListener();
 		}
@@ -316,40 +321,55 @@ const AuthProviderFunc = (props) => {
 				}
 			}
 		}
-		async function handleLNotification(url){
-			handleLinking(url);
-		}
-		/* HANDLE NOTIFICATION */
-
-		checkInitial();
-		const onNotificationOpenListener = messaging().onNotificationOpenedApp(remote=>{
-			if(remote?.data?.link) {
-				handleLNotification(remote.data.link);
+		
+		function shareListener(data){
+			console.log("PROVIDER",data);
+			if(data?.extraData?.url) {
+				handleLinking(data?.extraData?.url);
 			}
-		})
-		const onMessageListener = messaging().onMessage(remote=>{
-			if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
-			handleFCMData(remote);
-		})
-		ExpoAddListener('url',handleURL)
-		setTimeout(()=>{
-			messaging().getInitialNotification()
-			.then(remote=>{
-				if(remote) {
-					console.log("INITIAL_NOTIF",remote);
-					if(remote?.data?.link) {
-						handleLNotification(remote.data.link);
-					}
+		}
+
+		/* HANDLE NOTIFICATION */
+		let onNotificationOpenListener,onMessageListener;
+
+		if(stateUser !== null && props?.main) {
+			checkInitial();
+			onNotificationOpenListener = messaging().onNotificationOpenedApp(remote=>{
+				if(remote?.data?.link) {
+					handleLinking(url);
 				}
 			})
-			getInitialLink();
-		},200)
-		return ()=>{
-			onNotificationOpenListener();
-			onMessageListener();
-			ExpoRemoveListener('url',handleURL)
+			onMessageListener = messaging().onMessage(remote=>{
+				if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
+				handleFCMData(remote);
+			})
+			ExpoAddListener('url',handleURL)
+			setTimeout(()=>{
+				getInitialLink();
+				ShareModule.getSharedData(false).then(shareListener);
+				ShareModule.addListener(shareListener)
+			},100)
+
+			setTimeout(()=>{
+				messaging().getInitialNotification()
+				.then(remote=>{
+					if(remote) {
+						console.log("INITIAL_NOTIF",remote);
+						if(remote?.data?.link) {
+							handleLinking(url);
+						}
+					}
+				})
+				
+			},500)
 		}
-	},[stateToken])
+		return ()=>{
+			if(onNotificationOpenListener) onNotificationOpenListener();
+			if(onMessageListener) onMessageListener();
+			ExpoRemoveListener('url',handleURL);
+			ShareModule.removeListener(shareListener);
+		}
+	},[stateToken,stateUser])
 
 	/* HANDLE AUTHENTICATION TOKEN */
 	useEffect(()=>{
@@ -378,7 +398,7 @@ const AuthProviderFunc = (props) => {
 		function handleInterval(){
 			interval = setInterval(handleRefreshToken,295 * 1000)
 		}
-		if(isLogin) {
+		if(isLogin && props?.main) {
 			//if(currentState.match(/inactive|background/)) handleRefreshToken();
 			handleInterval();
 		}
@@ -404,7 +424,7 @@ const AuthProviderFunc = (props) => {
 				}
 			}
 		}
-		if(stateUser !== null) {
+		if(stateUser !== null && props?.main) {
 			setTimeout(checkNotification,200);
 		}
 	},[lastNotif,stateUser])

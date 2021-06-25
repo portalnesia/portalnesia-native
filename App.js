@@ -41,7 +41,7 @@ export default function App() {
 	if (!isLoadingComplete) {
 		return (
 			<>
-			<StatusBar style="light" translucent animated />
+			<StatusBar style="light" backgroundColor="#2f6f4e" translucent animated />
 			<AppLoading
 				startAsync={loadResourcesAsync}
 				onError={(err)=>handleLoadingError(err,setLoadingComplete)}
@@ -53,7 +53,7 @@ export default function App() {
 		return (
 			<SafeAreaView style={[styles.container]}>
 				<AppearanceProvider>
-					<AuthProvider>
+					<AuthProvider main>
 						<AppNavigator />
 					</AuthProvider>
 				</AppearanceProvider>
@@ -97,6 +97,7 @@ function handleLoadingError(error,setLoadingComplete) {
 
 function handleFinishLoading(setLoadingComplete) {
 	setLoadingComplete(true);
+
 }
 const styles = StyleSheet.create({
 	container: {

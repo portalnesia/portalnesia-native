@@ -116,7 +116,7 @@ const ShareImage=React.memo(({data,user,token,menu,onCloseMenu})=>{
             text:"Images Checker",
             url:"pn://images-checker"
         }]
-        if(token===null) {
+        if(token!==null) {
             dt.push({text:"Change Profile Picture",key:'profile'});
         }
         return dt;

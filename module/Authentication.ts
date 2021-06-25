@@ -1,5 +1,5 @@
 import {NativeModules,NativeModulesStatic} from 'react-native'
-import {AuthenticationInterface,AccountManagerType} from './types'
+import {AuthenticationInterface} from './types'
 
 export type {AccountManagerType} from './types'
 
