@@ -15,8 +15,10 @@
 -keep public class com.horcrux.svg.** { *; }
 -keep class com.facebook.hermes.unicode.** { *; }
 -keep class com.facebook.jni.** { *; }
--keep public class com.dylanvann.fastimage.* {*;}
--keep public class com.dylanvann.fastimage.** {*;}
+-keep public class com.portalnesia.app.fastimage.* {*;}
+-keep public class com.portalnesia.app.fastimage.** {*;}
+#-keep public class com.dylanvann.fastimage.* {*;}
+#-keep public class com.dylanvann.fastimage.** {*;}
 -keep public class com.asterinet.react.bgactions.* {*;}
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep public class * extends com.bumptech.glide.module.AppGlideModule

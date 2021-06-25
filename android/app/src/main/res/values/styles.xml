@@ -4,15 +4,25 @@
   standalone="yes"
 ?>
 <resources>
-  <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-    <item name="android:textColor">#000000</item>
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="android:windowTranslucentStatus">true</item>
+  <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <item name="android:textColor">@color/text_color</item>
+    <item name="android:colorPrimaryDark">@color/backgroundColor</item>
+    <item name="android:editTextBackground">@android:color/transparent</item>
+    <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+    <item name="android:windowBackground">@drawable/splashscreen</item>
+    <item name="android:statusBarColor">@color/colorPrimary</item>
+  </style>
+  <style name="ActivityTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <item name="android:textColor">@color/text_color</item>
+    <item name="android:colorPrimaryDark">@color/backgroundColor</item>
+    <item name="android:editTextBackground">@android:color/transparent</item>
+    <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
     <item name="android:windowBackground">@color/backgroundColor</item>
   </style>
-  <style name="Theme.App.SplashScreen" parent="Theme.AppCompat.Light.NoActionBar">
-    <!-- Below line is handled by '@expo/configure-splash-screen' command and it's discouraged to modify it manually -->
-    <!-- Customize your splash screen theme here -->
-    <item name="android:windowBackground">@drawable/splashscreen</item>
+  <style name="AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <item name="android:background">@color/backgroundColor</item>
+    <item name="android:textColor">@color/text_color</item>
+    <item name="android:textColorPrimary">@color/text_color</item>
+    <item name="android:colorAccent">@color/textColorPrimary</item>
   </style>
 </resources>
