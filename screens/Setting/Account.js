@@ -2,7 +2,7 @@ import React from 'react'
 import {ScrollView,View,Dimensions, Alert,RefreshControl} from 'react-native'
 import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Spinner,Divider, Icon,Toggle} from '@ui-kitten/components'
 import i18n from 'i18n-js'
-import FastImage from 'react-native-fast-image'
+import FastImage from '@pn/module/FastImage'
 import Modal from 'react-native-modal'
 import * as GoogleAuth from 'expo-google-sign-in';
 

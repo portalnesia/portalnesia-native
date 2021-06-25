@@ -2,7 +2,7 @@ import React from 'react'
 import {  View,ScrollView,Dimensions,RefreshControl } from 'react-native';
 import {Layout as Lay,Text,Divider,useTheme, Icon} from '@ui-kitten/components'
 import {MediaTypeOptions} from 'expo-image-picker'
-import FastImage from 'react-native-fast-image'
+import FastImage from '@pn/module/FastImage'
 import Skltn from 'react-native-skeleton-placeholder'
 import RNFS from 'react-native-fs'
 import {Modalize} from 'react-native-modalize'

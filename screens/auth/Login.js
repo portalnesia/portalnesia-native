@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import {Alert,ScrollView,TouchableOpacity,View,StyleSheet,Dimensions} from 'react-native'
-import Image from 'react-native-fast-image'
+import {Alert,ScrollView,TouchableOpacity,View,StyleSheet,Dimensions, BackHandler} from 'react-native'
+import Image from '@pn/module/FastImage'
 import {useTheme,Layout as Lay, Text,Input,Icon, Divider} from '@ui-kitten/components'
 import {loadAsync} from 'expo-auth-session'
 import Modal from 'react-native-modal'
+import analytics from '@react-native-firebase/analytics'
 import * as GoogleAuth from 'expo-google-sign-in';
 
 import {Markdown} from '@pn/components/global/Parser'
@@ -22,6 +23,8 @@ import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
 import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
 import Backdrop from '@pn/components/global/Backdrop';
 import getInfo from '@pn/utils/Info';
+import { useNavigationState } from '@react-navigation/native';
+import { log, logError } from '@pn/utils/log';
 
 const {width} = Dimensions.get('window')
 
@@ -57,7 +60,7 @@ export default function LoginScreen({ navigation,route }) {
 		if(email.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.email`)}/${i18n.t(`form.username`)}`}))
 		if(password.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.password`)}`}))
 		if(error.length > 0) return setNotif(true,"Error",error.join("\n"));
-
+		await analytics().logLogin({method:"portalnesia.com"});
 		setLoading('login');
 		try {
 			const {location,request}=await getLoginLocation();
@@ -85,6 +88,8 @@ export default function LoginScreen({ navigation,route }) {
 				}
 			}
 		} catch(e) {
+			logError(e,"handleLogin Login.js");
+			log("handleLogin Login.js")
 			if(e?.message) setNotif(true,"Error",e?.message);
 		} finally {
 			setLoading(null);
@@ -95,6 +100,7 @@ export default function LoginScreen({ navigation,route }) {
 	const handleGoogleLogin=React.useCallback(async()=>{
 		setLoading('google')
 		try {
+			await analytics().logLogin({method:"google.com"});
 			await GoogleAuth.initAsync({
 				clientId:FIREBASE_CLIENT_ID,
 				webClientId:FIREBASE_WEB_CLIENT_ID,
@@ -145,6 +151,8 @@ export default function LoginScreen({ navigation,route }) {
 				}
 			}
 		} catch(e){
+			logError(e,"handleGoogleLogin Login.js");
+			log("handleGoogleLogin Login.js")
 			setNotif(true,"Error",e?.message||i18n.t('errors.general'))
 		} finally {
 			setLoading(null)

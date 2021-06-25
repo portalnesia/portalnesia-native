@@ -1,7 +1,7 @@
 import React from 'react';
 import { Animated,RefreshControl,View,useWindowDimensions,FlatList } from 'react-native';
 import {Layout as Lay,Text,Card,Tab,useTheme,Divider} from '@ui-kitten/components'
-import {useScrollToTop} from '@react-navigation/native'
+import {useIsFocused, useScrollToTop} from '@react-navigation/native'
 import {TabView,TabBar} from 'react-native-tab-view'
 
 import {linkTo} from '@pn/navigation/useRootNavigation'
@@ -24,10 +24,8 @@ const RenderCaraousel = React.memo(({item, index:i}) => {
 	);
 })
 
-const useRecommend=()=>useSWR('/chord/recommend')
-
-const RenderRecommend=React.memo(({swr})=>{
-	const {data,error,mutate} = useRecommend();
+const RenderRecommend=React.memo(({url})=>{
+	const {data,error,mutate} = useSWR(url.recommend);
 	const theme = useTheme();
 	
 	React.useEffect(()=>{
@@ -53,7 +51,7 @@ const RenderRecommend=React.memo(({swr})=>{
 	)
 })
 
-const Recent=({headerHeight,navigation,...other})=>{
+const Recent=({headerHeight,navigation,url,...other})=>{
 	const {
 		data,
 		error,
@@ -62,7 +60,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 		setSize,
 		isReachingEnd,
 		mutate,isValidating
-	} = usePagination("/chord?type=recent","chord",20,false)
+	} = usePagination(url.recent,"chord",20,false)
 	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
@@ -125,7 +123,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 			data={data}
 			ref={ref}
 			renderItem={_renderItem}
-			ListHeaderComponent={()=><RenderRecommend />}
+			ListHeaderComponent={()=><RenderRecommend url={url} />}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.01}
@@ -149,7 +147,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 	)
 }
 
-const Popular=({headerHeight,navigation,...other})=>{
+const Popular=({headerHeight,navigation,url,...other})=>{
 	const {
 		data,
 		error,
@@ -158,7 +156,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 		setSize,
 		isReachingEnd,
 		mutate,isValidating
-	} = usePagination("/chord?type=popular","chord",20,false)
+	} = usePagination(url.popular,"chord",20,false)
 	const {width}=useWindowDimensions()
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
@@ -221,7 +219,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 			data={data}
 			ref={ref}
 			renderItem={_renderItem}
-			ListHeaderComponent={()=><RenderRecommend />}
+			ListHeaderComponent={()=><RenderRecommend url={url} />}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.02}
@@ -258,6 +256,19 @@ export default function ({ navigation,route }) {
 	const {width}=useWindowDimensions()
 	const headerHeight={...headerHeightt,sub:46}
 	const heightHeader = headerHeight?.main + headerHeight?.sub
+	const [url,setUrl] = React.useState({recent:null,popular:null,recommend:null});
+	
+	React.useEffect(()=>{
+		const unsubcribe = navigation?.addListener("focus",()=>{
+			if(url.recent===null) {
+				setUrl({recent:"/chord?type=recent",popular:"/chord?type=popular",recommend:"/chord/recommend"})
+			}
+		})
+
+		return ()=>{
+			if(unsubcribe) unsubcribe();
+		}
+	},[navigation])
 
 	const renderTabBar=(props)=>{
 		
@@ -280,8 +291,8 @@ export default function ({ navigation,route }) {
 	}
 
 	const renderScene=({route})=>{
-        if(route.key == 'recent') return <Recent headerHeight={heightHeader} {...other} navigation={navigation} />
-        if(route.key == 'popular') return <Popular headerHeight={heightHeader} {...other} navigation={navigation} />
+        if(route.key == 'recent') return <Recent url={url} headerHeight={heightHeader} {...other} navigation={navigation} />
+        if(route.key == 'popular') return <Popular url={url} headerHeight={heightHeader} {...other} navigation={navigation} />
         return null;
     }
 

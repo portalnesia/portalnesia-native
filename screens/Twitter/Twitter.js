@@ -87,8 +87,7 @@ const RenderInput=React.memo(({onClose,initialData=""})=>{
 				return PNpost(`/twitter/thread`,{url:input,recaptcha})
 			})
 			.then((res)=>{
-				if(res?.error) setNotif(true,"Error",res?.msg);
-				else {
+				if(!res?.error) {
 					setInput("");
 					setResult(res?.data);
 				}

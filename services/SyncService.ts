@@ -2,6 +2,7 @@ import * as Secure from 'expo-secure-store'
 import {TokenResponse} from 'expo-auth-session'
 import {refreshingToken,getProfile} from '@pn/utils/Login'
 import Authentication from '@pn/module/Authentication'
+import { log, logError } from '@pn/utils/log';
 
 async function getToken(){
     const token_string = await Secure.getItemAsync('token');
@@ -18,6 +19,8 @@ async function getToken(){
             return token;
         }
     } catch(e) {
+        log("getToken SyncService.ts",{msg:e.message});
+        logError(e,"getToken SyncService.ts");
         return token;
     }
 }
@@ -36,6 +39,8 @@ async function SyncAdapter(){
             }
             return Promise.resolve();
         } catch(e) {
+            log("syncAdapter SyncService.ts",{msg:e.message});
+            logError(e,"syncAdapter SyncService.ts");
             return Promise.resolve();
         }
     } else return Promise.resolve();

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {Alert,ScrollView,TouchableOpacity,View,StyleSheet} from 'react-native'
 import {useTheme,Layout as Lay, Text,Input} from '@ui-kitten/components'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
+import analytics from '@react-native-firebase/analytics'
 
 import Layout from '@pn/components/global/Layout';
 import Button from '@pn/components/global/Button'
@@ -29,7 +30,7 @@ export default function RegisterScreen({ navigation,route }) {
 		if(username.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.username`)}`}))
 		if(email.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.email`)}`}))
 		if(error.length > 0) return setNotif(true,"Error",error.join("\n"));
-
+		
 		setLoading(true);
 		PNpost('/auth/register',{email,username,recaptcha})
 		.then(res=>{
@@ -49,6 +50,7 @@ export default function RegisterScreen({ navigation,route }) {
 			}
 		})
 		.finally(()=>{
+			analytics().logSignUp({method:'portalnesia.com'})
 			setLoading(false);
             captchaRef.current?.refreshToken();
 		})

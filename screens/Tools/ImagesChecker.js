@@ -92,7 +92,6 @@ export default function({navigation}){
                 return PNpost(`/backend/nsfw_check`,form,opt)
             })
             .then((res)=>{
-                setNotif(Boolean(res.error),res.msg)
                 if(!res.error) {
                     if(randomInt(3) == 0) showAds();
                     setResult(res.result)

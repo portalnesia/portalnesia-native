@@ -2,7 +2,7 @@ import React from 'react';
 import {  View,FlatList,RefreshControl,Dimensions } from 'react-native';
 import {Layout as Lay,Text,Card, Divider, useTheme} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
 import i18n from 'i18n-js'
 
 import {linkTo} from '@pn/navigation/useRootNavigation'
@@ -29,14 +29,15 @@ const RenderRecommend=(({item,index:i})=>{
 					source={{uri:item?.image}}
 				/>
 			</View>
-			<Text category="p1" style={{marginTop:10,fontWeight:"600"}}>{item.title}</Text>
-            <Text category="label" appearance="hint" style={{marginTop:10}}>{item.source}</Text>
-            <Text category="label" appearance="hint" style={{fontSize:10}}>{item.date_string}</Text>
+			<Text category="p1" style={{marginTop:10,fontWeight:"600"}}>{item?.title}</Text>
+            <Text category="label" appearance="hint" style={{marginTop:10}}>{item?.source}</Text>
+            <Text category="label" appearance="hint" style={{fontSize:10}}>{item?.date_string}</Text>
 		</Card>
 	);
 })
 
 export default function ({ navigation }) {
+	const [url,setUrl] = React.useState({pagination:null,recommend:null});
 	const {
 		data,
 		error,
@@ -45,13 +46,27 @@ export default function ({ navigation }) {
 		setSize,
 		isReachingEnd,
 		mutate,isValidating
-	} = usePagination("/news","data",24,true,false)
-	const {data:dataRecom,error:errorRecom,mutate: mutateRecom} = useSWR("/news/recommend");
+	} = usePagination(url.pagination,"data",24,true,false)
+
+	const {data:dataRecom,error:errorRecom,mutate: mutateRecom} = useSWR(url.recommend);
 	const ref = React.useRef(null)
 	useScrollToTop(ref)
 	const theme=useTheme();
 
 	const [refreshing,setRefreshing]=React.useState(false)
+
+	React.useEffect(()=>{
+		const unsubcribe = navigation?.addListener("focus",()=>{
+			if(url.pagination===null) {
+				setUrl({pagination:"/news",recommend:"/news/recommend"})
+				console.log({pagination:"/news",recommend:"/news/recommend"})
+			}
+		})
+
+		return ()=>{
+			if(unsubcribe) unsubcribe();
+		}
+	},[navigation])
 
 	React.useEffect(()=>{
 		if(!isValidating) setRefreshing(false);

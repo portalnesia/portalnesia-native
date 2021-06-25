@@ -1,7 +1,7 @@
 import React from 'react';
 import {  View,FlatList,useWindowDimensions,RefreshControl } from 'react-native';
 import {Layout as Lay,Text,Card} from '@ui-kitten/components'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
 import i18n from 'i18n-js'
 
 import Layout from '@pn/components/global/Layout';
