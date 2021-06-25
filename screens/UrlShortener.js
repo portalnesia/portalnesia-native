@@ -26,6 +26,7 @@ import ListItem from '@pn/components/global/ListItem';
 import Recaptcha from '@pn/components/global/Recaptcha'
 import Backdrop from '@pn/components/global/Backdrop';
 import {Portal} from '@gorhom/portal'
+import ShareModule from '@pn/module/Share';
 
 const {width,height} = Dimensions.get('window')
 
@@ -49,10 +50,10 @@ const RenderModal=React.memo(({onClose,menu,handleDownload})=>{
     )
 })
 
-const URLshortenerForm=React.memo(({setNotif,user,ads,handleOpenQR,handleCloseQR,onSubmit,handleDownload})=>{
+const URLshortenerForm=React.memo(({initialData="",setNotif,user,ads,handleOpenQR,handleCloseQR,onSubmit,handleDownload})=>{
     const {PNpost} = useAPI()
     const {copyText} = useClipboard()
-    const [input,setInput] = React.useState({url:'',custom:''})
+    const [input,setInput] = React.useState({url:initialData,custom:''})
     const [result,setResult]=React.useState(null)
     const customRef=React.useRef(null)
     const [loading,setLoading] = React.useState(false)
@@ -103,6 +104,10 @@ const URLshortenerForm=React.memo(({setNotif,user,ads,handleOpenQR,handleCloseQR
             dialogTitle:"Share URL"
         })
     }
+
+    React.useEffect(()=>{
+        if(initialData?.length > 0) setInput({...input,url:initialData})
+    },[initialData]);
 
     return (
         <Lay>
@@ -197,6 +202,7 @@ function URLshortener({navigation}){
     const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [loading,setLoading] = React.useState(false)
+    const [input,setInput]=React.useState("");
     const {PNpost} = useAPI(false)
 
     const {data,error,mutate,isReachingEnd,isLoadingMore,size,setSize,isValidating} = usePagination(user===false ? null : "/url/get","urls",10);
@@ -223,13 +229,13 @@ function URLshortener({navigation}){
 
     const RenderHeader=React.useCallback(()=>(
         <>
-            <URLshortenerForm setNotif={setNotif} user={user} handleOpenQR={handleOpenQR} handleCloseQR={handleCloseQR} onSubmit={onSubmit} handleDownload={handleDownload} />
+            <URLshortenerForm initialData={input} setNotif={setNotif} user={user} handleOpenQR={handleOpenQR} handleCloseQR={handleCloseQR} onSubmit={onSubmit} handleDownload={handleDownload} />
             <View style={{marginVertical:25}} />
             <View>
             <Text category="h5" style={{paddingHorizontal:15,paddingBottom:5,borderBottomColor:theme['border-text-color'],borderBottomWidth:2,marginBottom:10,fontFamily:"Inter_Bold"}}>My Urls</Text>
             </View>
         </>
-    ),[setNotif,user])
+    ),[setNotif,user,input])
 
     const RenderEmpty=React.useCallback(()=>{
         if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
@@ -302,7 +308,16 @@ function URLshortener({navigation}){
         })
     }
 
-
+    React.useEffect(()=>{
+        const dataListener = (data)=>{
+            if(typeof data?.data === 'string' && typeof data?.mimeType === 'string') {
+                if(data?.mimeType==='text/plain') {
+                    setInput(data?.data);
+                }
+            }
+        }
+        ShareModule.getSharedData().then(dataListener).catch(console.log)
+    },[])
     
     return (
         <>
@@ -340,7 +355,7 @@ function URLshortener({navigation}){
                             backgroundColor:theme['background-basic-color-1']
                         }}
                     >
-                        <URLshortenerForm setNotif={setNotif} user={user} ads handleOpenQR={handleOpenQR} handleCloseQR={handleCloseQR} onSubmit={onSubmit} handleDownload={handleDownload} />
+                        <URLshortenerForm initialData={input} setNotif={setNotif} user={user} ads handleOpenQR={handleOpenQR} handleCloseQR={handleCloseQR} onSubmit={onSubmit} handleDownload={handleDownload} />
                     </ScrollView>
                 )}
             </Layout>
@@ -369,7 +384,7 @@ function URLshortener({navigation}){
             />
             <MenuContainer
                 visible={menuOpen}
-                onClose={()=>{console.log(menu),setMenuOpen(false)}}
+                onClose={()=>{setMenuOpen(false)}}
                 share={{
                     link:menu?.short_url ? `${menu?.short_url}?utm_campaign=url+shortener` : '',
                     fullUrl:true
