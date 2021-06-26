@@ -317,7 +317,6 @@ public class AuthModule extends ReactContextBaseJavaModule {
         final Intent intent = new Intent(reactContext, AuthActivity.class);
         intent.putExtra(AuthModule.RESTART_APP,true);
         intent.putExtra(AuthModule.ADD_ACCOUNT,true);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Objects.requireNonNull(getCurrentActivity()).startActivity(intent);
     }
 

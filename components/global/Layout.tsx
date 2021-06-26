@@ -20,7 +20,6 @@ export interface LayoutProps extends TopNavigationProps {
     }
 
     static defaultProps={
-        title:undefined,
         withBack:true,
         align:'center',
         canBack:true

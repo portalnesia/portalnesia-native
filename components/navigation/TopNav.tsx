@@ -20,7 +20,7 @@ export interface TopNavigationProps {
      * Render close icon if left header
      */
     withClose?: boolean;
-    navigation: any;
+    navigation?: any;
     /**
      * Title of header
      */
@@ -37,6 +37,7 @@ export interface TopNavigationProps {
     align?: 'center'|'start'
     withDivider?: boolean;
     style?: Record<string,any>
+	accessoryLeft?():JSX.Element;
 }
 
 type StyleIcon = {
@@ -53,11 +54,13 @@ const CloseIcon=(props?: StyleIcon)=>(
 const RenderBackBtn=React.memo(({withClose,withBack,navigation}: Pick<TopNavigationProps,'withBack'|'withClose'|'navigation'>)=>{
 	const index = useNavigationState(state=>state.index)
 	const handleBack=React.useCallback(()=>{
+		if(navigation) {
 			if(navigation?.canGoBack() && index > 0) {
 				navigation.goBack();
 			} else {
 				resetRoot();
 			}
+		}
 	},[navigation,index])
 
 	if(withClose) {
@@ -73,7 +76,7 @@ const RenderBackBtn=React.memo(({withClose,withBack,navigation}: Pick<TopNavigat
 })
 
 function TopNav(props: TopNavigationProps){
-    const {withBack,title,menu,navigation,align,subtitle,withClose,whiteBg,margin,withDivider,style}=props;
+    const {accessoryLeft,withBack,title,menu,navigation,align,subtitle,withClose,whiteBg,margin,withDivider,style}=props;
 	const theme = useTheme()
 
 	return(
@@ -83,7 +86,7 @@ function TopNav(props: TopNavigationProps){
 				title={(evaProps) => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
 				{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
 				alignment={align}
-				{...(withBack || withClose ? {accessoryLeft:()=><RenderBackBtn withBack={withBack} withClose={withClose} navigation={navigation} /> } : {})}
+				{...(accessoryLeft ? {accessoryLeft} : withBack || withClose ? {accessoryLeft:()=><RenderBackBtn withBack={withBack} withClose={withClose} navigation={navigation} /> } : {})}
 				{...(menu ? {accessoryRight:menu} : {})}
 			/>
 			{(withClose && whiteBg) || withDivider===false ? null : <Divider />}

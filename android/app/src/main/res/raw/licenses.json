@@ -458,12 +458,6 @@
         "licenseUrl": "https://github.com/testshallpass/react-native-dropdownalert/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react-native-fast-image@8.3.4": {
-        "licenses": "(MIT AND Apache-2.0)",
-        "repository": "https://github.com/DylanVann/react-native-fast-image",
-        "licenseUrl": "https://github.com/DylanVann/react-native-fast-image/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
     "react-native-fs@2.16.6": {
         "licenses": "MIT",
         "repository": "https://github.com/itinance/react-native-fs",
@@ -534,12 +528,6 @@
         "licenses": "MIT",
         "repository": "https://github.com/kmagiera/react-native-screens",
         "licenseUrl": "https://github.com/kmagiera/react-native-screens/raw/master/LICENSE",
-        "parents": "portal-native"
-    },
-    "react-native-share-menu@5.0.3": {
-        "licenses": "MIT",
-        "repository": "https://github.com/meedan/react-native-share-menu",
-        "licenseUrl": "https://github.com/meedan/react-native-share-menu/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-skeleton-placeholder@3.0.4": {

@@ -2,7 +2,7 @@ import React from 'react'
 import {View,Dimensions,TouchableOpacity,RefreshControl, Animated} from 'react-native'
 import {Layout as Lay,Text,useTheme,Card} from '@ui-kitten/components'
 import {useNavigation} from '@react-navigation/native'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
 
 //import Image from '@pn/components/global/Image'
 import usePagination from '@pn/utils/usePagination'

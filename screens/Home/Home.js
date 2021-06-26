@@ -3,10 +3,10 @@ import {ScrollView,View,Dimensions,FlatList,RefreshControl,AppState } from 'reac
 import {Layout as Lay, Text,Card,Spinner,useTheme,Icon, Divider} from '@ui-kitten/components'
 import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
-import {CONTENT_URL,API_URL} from '@env'
+import {CONTENT_URL} from '@env'
 import i18n from 'i18n-js'
 import {useScrollToTop} from '@react-navigation/native'
-import FastImage from 'react-native-fast-image'
+import FastImage from '@pn/module/FastImage'
 
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 import {linkTo} from '@pn/navigation/useRootNavigation'
@@ -21,6 +21,8 @@ import CountUp from '@pn/components/global/Countup'
 import Skeleton from '@pn/components/global/Skeleton';
 import { getLocation, reverseGeocode } from '@pn/utils/Location';
 import { LocationAccuracy } from 'expo-location';
+import useSWR from '@pn/utils/swr';
+import { log, logError } from '@pn/utils/log';
 
 const {width} = Dimensions.get('window')
 
@@ -269,9 +271,9 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 			const i = Number(k)
 			const item = array[i]
 			if(item.key === 'weather') item.data=cuaca;
-			else if(loading) item.data=null;
+			else if(loading || typeof data?.data?.count?.[item.key] === 'undefined') item.data=null;
 			else if(error) item.data=false;
-			else if(data?.data?.count?.[item.key]) {
+			else if(typeof data?.data?.count?.[item.key] !== 'undefined') {
 				item.data = Number(data?.data?.count?.[item.key]);
 			}
 			return item;
@@ -288,7 +290,7 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				</View>
 				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
-				{loading ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' image height={300} /></View>
+				{loading || (data && data?.data?.news?.length === 0) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' image height={300} /></View>
 				: error ? (
 					<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
 				) : data?.data?.news?.length > 0 ? (
@@ -308,7 +310,7 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				</View>
 				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
-				{loading ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
+				{loading || (data && data?.data?.chord?.length === 0) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
 				: error ? (
 					<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
 				) : data?.data?.chord?.length > 0 ? (
@@ -328,7 +330,7 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				</View>
 				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
-				{loading ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
+				{loading || (data && data?.data?.thread?.length === 0 ) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
 				: error ? (
 					<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
 				) : data?.data?.thread?.length > 0 ? (
@@ -363,8 +365,10 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				setCuaca(res);
 			})
 			.catch(e=>{
-				console.log(e);
-				if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
+				logError(e,"getCuaca Home.js");
+				log("getCuaca Home.js error");
+				setCuaca({error:1,title:"Errors",text:"Under maintenance",icon:null,temperature:0})
+				//if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
 			})
 		}
 	},[])
@@ -377,8 +381,14 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 	}
 
 	React.useEffect(()=>{
+		let tim=null;
 		if(cuaca===null) {
-			getCuaca();
+			tim = setTimeout(()=>{
+				getCuaca();
+			},700)
+		}
+		return ()=>{
+			if(tim!=null) clearTimeout(tim);
 		}
 	},[])
 
@@ -459,7 +469,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 				</Lay>
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
-					{(loading || !data?.chord) && !error ? (
+					{(loading || (data && !data?.chord)) ? (
 						<View style={{marginBottom:15}}>
 							<Spinner size='giant' />
 						</View>
@@ -475,7 +485,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 				</Lay>
 				<Lay style={{marginTop:30,alignItems:'center'}} level="2">
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:"Twibbon"})}</Text>
-					{(!data?.twibbon || loading) && !error ? (
+					{(!data?.twibbon || loading) ? (
 						<View style={{marginBottom:15}}>
 							<Spinner size='giant' />
 						</View>
@@ -491,7 +501,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 				</Lay>
 				<Lay style={{paddingTop:30,alignItems:'center'}}>
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
-					{(loading || !data?.thread) && !error ? (
+					{(loading || !data?.thread) ? (
 						<View style={{marginBottom:15}}>
 							<Spinner size='giant' />
 						</View>
@@ -512,48 +522,20 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 
 export default function HomeScreen({ navigation }) {
 	const context = React.useContext(AuthContext);
-	const {isLogin,state} = context;
-	const {user} = state
-	const [loading,setLoading] = React.useState(true)
-	const [data,setData]=React.useState()
-	const [error,setError] = React.useState(false)
-	const {PNget} = useAPI();
-	//const state = useNavigationState(state=>({index:state.index,routes:state.routes}));
+	const {isLogin} = context;
+	const {data,error,isValidating,mutate} = useSWR("/home");
 	
-	React.useEffect(()=>{
-		setTimeout(()=>{
-			PNget('/home')
-			.then(res=>{
-				setError(Boolean(res?.error))
-				if(!res?.error) {
-					setData(res);
-				}
-			})
-			.catch(()=>setError(true))
-			.finally(()=>setLoading(false));
-		},200)
-
-		return ()=>{
-			setLoading(true);
-			setError(false)
-		}
-	},[isLogin])
+	const loading=React.useMemo(()=>{
+		return ((!data&&!error)||isValidating)
+	},[data,error,isValidating])
 
 	const onMutate=React.useCallback(()=>{
-		setLoading(true);
-		setError(false)
-		setTimeout(()=>{
-			PNget('/home')
-			.then(res=>{
-				setError(Boolean(res?.error))
-				if(!res?.error) {
-					setData(res);
-				}
-			})
-			.catch(()=>setError(true))
-			.finally(()=>setLoading(false));
-		},200)
-	},[user])
+		if(!isValidating) mutate();
+	},[isValidating,mutate])
+
+	React.useEffect(()=>{
+		mutate();
+	},[isLogin])
 
 	if(isLogin) return <Dashboard onMutate={onMutate} loading={loading} data={data} error={error} navigation={navigation} />
 	else return <NotLogin loading={loading} data={data} error={error} navigation={navigation} />

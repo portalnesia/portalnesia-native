@@ -2,7 +2,7 @@ import React from 'react'
 import { View,Dimensions,FlatList, Pressable } from 'react-native';
 import {Layout as Lay,Text,Card,useTheme,Input, Icon,Divider,Autocomplete,AutocompleteItem} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
 import {linkTo} from '@pn/navigation/useRootNavigation'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import analytics from '@react-native-firebase/analytics'
@@ -202,7 +202,7 @@ export default function Search({navigation,route}){
         try {
             if(index === -1) {
                 his.unshift(text);
-                his.splice(9,1)
+                if(his.length > 8) his.splice(9,1)
                 setHistory(his)
                 await AsyncStorage.setItem("search_history",JSON.stringify(his));
             } else {

@@ -4,14 +4,15 @@ import {
   View,
   StyleSheet,
   TouchableHighlight,
-  Animated
+  Animated,
+  Dimensions
 } from "react-native";
 import {Text,useTheme} from '@ui-kitten/components'
 import {PinchGestureHandler,State} from 'react-native-gesture-handler'
-import FastImage from 'react-native-fast-image'
+import FastImage from '@pn/module/FastImage'
 
 const AnimImage = Animated.createAnimatedComponent(FastImage)
-
+const {width:screenWidth}=Dimensions.get('window')
 const defaultImageStyle = { resizeMode: "cover" };
 const emptyObject = {};
 
@@ -389,9 +390,10 @@ class HTMLImageElement extends React.PureComponent {
   }
 
   renderImage(imageStyles) {
-    const { source,thumbnail,contentWidth,theme,zoomable,animated } = this.props;
+    const { source,thumbnail,contentWidth,zoomable,animated,dataSrc,onOpen,onClose } = this.props;
     const {imageBoxDimensions} = this.state
     const withThumbnail=thumbnail && (imageBoxDimensions === null || (imageBoxDimensions !== null && imageBoxDimensions?.width >= contentWidth))
+    
     if(withThumbnail) {
       return (
         <>
@@ -413,6 +415,9 @@ class HTMLImageElement extends React.PureComponent {
                   testID="image-layout"
                   onLoadEnd={()=>animated && this.imageLoaded()}
                   onLoad={(e)=>this.onFastImageLoad(e)}
+                  dataSrc={dataSrc}
+                  onDismiss={onClose}
+                  onOpen={onOpen}
                 />
               </PinchGestureHandler>
             ) : (
@@ -423,6 +428,9 @@ class HTMLImageElement extends React.PureComponent {
                 testID="image-layout"
                 onLoadEnd={()=>animated && this.imageLoaded()}
                 onLoad={(e)=>this.onFastImageLoad(e)}
+                dataSrc={dataSrc}
+                onDismiss={onClose}
+                onOpen={onOpen}
               />
             )}
         </>
@@ -433,21 +441,27 @@ class HTMLImageElement extends React.PureComponent {
             <AnimImage
               source={source}
               onError={() => this.setState({ error: true })}
-              style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1,maxHeight:4*contentWidth/3}]}
+              style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4}),opacity:animated ? this.imageAnimated : 1,maxHeight:4*contentWidth/3}]}
               testID="image-layout"
               onLoadEnd={()=>animated && this.imageLoaded()}
               onLoad={(e)=>this.onFastImageLoad(e)}
+              dataSrc={dataSrc}
+              onDismiss={onClose}
+              onOpen={onOpen}
             />
         )
       } else {
         return (
-          <AnimImage
+          <FastImage
             source={source}
             onError={() => this.setState({ error: true })}
-            style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4,backgroundColor:theme['background-basic-color-2']}),opacity:animated ? this.imageAnimated : 1,maxHeight:4*contentWidth/3}]}
+            style={[defaultImageStyle, imageStyles,{...(imageBoxDimensions !== null ? {...imageBoxDimensions} : {width:contentWidth,height:3*contentWidth/4}),maxHeight:4*contentWidth/3,maxWidth:screenWidth}]}
             testID="image-layout"
             onLoadEnd={()=>animated && this.imageLoaded()}
             onLoad={(e)=>this.onFastImageLoad(e)}
+            dataSrc={dataSrc}
+            onDismiss={onClose}
+            onOpen={onOpen}
           />
         );
       }

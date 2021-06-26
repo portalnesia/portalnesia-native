@@ -1,4 +1,4 @@
-import axios,{AxiosRequestConfig,AxiosInstance} from 'axios'
+import axios,{AxiosRequestConfig} from 'axios'
 import React from 'react'
 import {API as APII,CLIENT_ID} from '@env'
 import { AuthContext } from '@pn/provider/Context';
@@ -11,7 +11,8 @@ import {refreshingToken} from '@pn/utils/Login'
 import API from './axios'
 import {TokenType} from '@pn/types/TokenTypes'
 import {UserType} from '@pn/types/UserTypes'
-import {AuthRequest,AccessTokenRequestConfig,AuthRequestConfig, exchangeCodeAsync,RefreshTokenRequestConfig,refreshAsync, TokenResponse,revokeAsync,RevokeTokenRequestConfig,TokenTypeHint} from 'expo-auth-session'
+import {TokenResponse} from 'expo-auth-session'
+import { log, logError } from './log';
 
 type ApiResponse<D> = {
     error:number,
@@ -29,7 +30,7 @@ export async function fetcher<D = any>(url: string,option?:AxiosRequestConfig): 
 async function getToken(){
     const token_string = await Secure.getItemAsync('token');
     const user_string = await Secure.getItemAsync('user');
-    const result: {token?: TokenResponse|null,session?:string} = {};
+    const result: {token: TokenResponse|null,session:string} = {token:null,session:(Application.androidId||"")};
     const token: TokenResponse|null = token_string===null ? null : JSON.parse(token_string);
     const user: UserType|null = user_string===null ? null : JSON.parse(user_string);
     result.session = user && user?.session_id ? user?.session_id : (Application.androidId||'');
@@ -43,7 +44,10 @@ async function getToken(){
                 await Secure.setItemAsync('token',JSON.stringify(new_token));
                 result.token = new_token;
             }
-        } catch(e) {}
+        } catch(e) {
+            log("refreshToken API error",{msg:e.message});
+            logError(e,"refreshToken API");
+        }
     }
     
     return result;
@@ -60,7 +64,17 @@ export default function useAPI(){
     const {setNotif,sendReport} = context
 
     const PNpost=React.useCallback(async<D = any>(url: string,data?:{[key: string]: any},formdata?: AxiosRequestConfig,catchError=true): Promise<ApiResponse<D>>=>{
-        const {token,session}=await getToken();
+        let token: TokenResponse|null=null,session:string="";
+        try {
+            const result = await getToken();
+            token = result.token;
+            session = result.session;
+        } catch(e) {
+            log("getToken error",{msg:e.message});
+            logError(e,"getToken");
+            setNotif(true,"Error",e.message);
+            throw e;
+        }
         const baseURL =  (token===undefined||token === null) ?  `/native${url}` :  `/native_secure${url}`
         const qs=require('qs');
         const dt=data===null ? "" : (formdata ? data : qs.stringify(data));
@@ -102,16 +116,28 @@ export default function useAPI(){
                 else if(err?.response?.status===503||err?.response?.status===500) {
                     sendReport('url',{force:false,endpoint:baseURL})
                 } else {
-                    setNotif("error","Error",i18n.t('errors.general'))
+                    setNotif("error","Error",err?.message||i18n.t('errors.general'))
                 }
             }
-            console.log(err?.response)
+            log("PNpost error",{msg:err.message});
+            logError(err,"PNpost");
+            console.log("API_ERROR",err?.response||err)
             throw err;
         }
     },[sendReport])
 
     const PNget=React.useCallback(async<D = any>(url: string,catchError=true): Promise<ApiResponse<D>>=>{
-        const {token,session}=await getToken();
+        let token: TokenResponse|null=null,session:string="";
+        try {
+            const result = await getToken();
+            token = result.token;
+            session = result.session;
+        } catch(e) {
+            log("getToken error",{msg:e.message});
+            logError(e,"getToken");
+            setNotif(true,"Error",e.message);
+            throw e;
+        }
         const baseURL = (token===undefined||token === null) ?  `/native${url}` :  `/native_secure${url}`
         const opt={
             headers:{
@@ -140,12 +166,23 @@ export default function useAPI(){
                     setNotif("error","Error",i18n.t('errors.general'))
                 }
             }
+            log("PNget error",{msg:err.message});
+            logError(err,"PNget");
             throw err;
         }
     },[])
 
     const fetcher=React.useCallback(async<D = any>(url: string): Promise<ApiResponse<D>>=>{
-        const {token,session}=await getToken();
+        let token: TokenResponse|null=null,session:string="";
+        try {
+            const result = await getToken();
+            token = result.token;
+            session = result.session;
+        } catch(e) {
+            log("getToken error",{msg:e.message});
+            logError(e,"getToken");
+            throw e;
+        }
         const baseURL = (token===undefined||token === null) ?  `/native${url}` :  `/native_secure${url}`
         const opt={
             headers:{
@@ -162,13 +199,24 @@ export default function useAPI(){
                 if(token!==undefined && token!==null) refreshToken(token);
                 setNotif("error","Token expired","Please try again!");
             }
+            log("fetcher error",{msg:err.message});
+            logError(err,"fetcher");
             if(err?.response?.data) return err?.response?.data
             else throw err;
         }
     },[])
 
     const PNgraph=React.useCallback(async<D = any>(url:string,query:string): Promise<ApiResponse<D>>=>{
-        const {token,session}=await getToken();
+        let token: TokenResponse|null=null,session:string="";
+        try {
+            const result = await getToken();
+            token = result.token;
+            session = result.session;
+        } catch(e) {
+            log("getToken error",{msg:e.message});
+            logError(e,"getToken");
+            throw e;
+        }
         const baseURL = (token===undefined||token === null) ?  `${APII}/native${url}` :  `${APII}/native_secure${url}`
         const headers={
             'X-Application-Version': Constants.nativeAppVersion||'',
@@ -189,12 +237,24 @@ export default function useAPI(){
             }
             return res;
         } catch(err){
+            log("PNgraph error",{msg:err.message});
+            logError(err,"PNgraph");
             throw err;
         }
     },[])
 
     const PNgetPkey=React.useCallback(async()=>{
-        const {token,session}=await getToken();
+        let token: TokenResponse|null=null,session:string="";
+        try {
+            const result = await getToken();
+            token = result.token;
+            session = result.session;
+        } catch(e) {
+            setNotif(true,"Error",e.message);
+            log("getToken error",{msg:e.message});
+            logError(e,"getToken");
+            throw e;
+        }
         const opt={
             headers:{
                 'X-Session-Id':session,
@@ -209,6 +269,8 @@ export default function useAPI(){
                 throw {message:result?.data?.error_description||i18n.t('errors.general')}
             }
         } catch(err){
+            log("PNgetPkey error",{msg:err.message});
+            logError(err,"PNgetPkey");
             if(err?.response?.status==440) {
                 if(token!==undefined && token!==null) refreshToken(token);
                 setNotif("error","Token expired","Please try again!");

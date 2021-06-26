@@ -222,7 +222,7 @@ export const addslashes=(str:string)=>{
 export const adddesc=(str:string)=>str.replace(/\s+/,' ').replace('"','\"')
 
 export function listToMatrix(list: never[], elementsPerSubArray: number) {
-    var matrix = [], i, k;
+    var matrix: any[] = [], i, k;
 
     for (i = 0, k = -1; i < list.length; i++) {
         if (i % elementsPerSubArray === 0) {
@@ -273,3 +273,11 @@ export const openBrowser=(url: string,alert=true)=>{
 }
 
 export const randomInt=(total=2)=>Math.floor(Math.random() * total);
+
+export const isURL=(url:string)=>{
+    const exp = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/ig
+    return (url.match(exp) !== null);
+}
+export const isTwitterURL=(url:string)=>{
+    return (url.trim().match(/twitter\.com/)!==null);
+}

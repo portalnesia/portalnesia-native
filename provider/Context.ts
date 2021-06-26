@@ -1,5 +1,5 @@
 import {createContext,Dispatch} from 'react'
-import {UserType,TokenType} from '@pn/types/index'
+import {UserType} from '@pn/types/index'
 
 export type StateType = {
     user: UserType | null,

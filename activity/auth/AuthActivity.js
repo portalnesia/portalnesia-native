@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import AppLoading from 'expo-app-loading';
+import React from 'react';
 import { Asset } from 'expo-asset';
 import { StyleSheet,LogBox,useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Font from 'expo-font';
 import 'moment/locale/id';
-import {StatusBar} from 'expo-status-bar'
 import {
 	Inter_300Light,
 	Inter_400Regular,
@@ -14,7 +12,7 @@ import {
 	Inter_700Bold,
 } from '@expo-google-fonts/inter';
 import AppNavigator from './AppNavigator';
-import { AuthProvider } from '../../provider/AuthProvider';
+import { AuthProvider } from './AuthProvider';
 import {AppearanceProvider} from 'react-native-appearance'
 import remoteConfig from '@react-native-firebase/remote-config'
 

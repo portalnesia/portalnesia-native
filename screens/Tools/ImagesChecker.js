@@ -16,7 +16,9 @@ import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
 import verifyRecaptcha from '@pn/module/Recaptcha'
-import { pickImage } from '@pn/utils/PickLibrary';
+import { convertFile, pickImage } from '@pn/utils/PickLibrary';
+import ShareModule from '@pn/module/Share';
+import Portalnesia from '@pn/module/Portalnesia';
 
 const {width:screenWidth} = Dimensions.get("window")
 
@@ -56,7 +58,7 @@ export default function({navigation}){
         setYOffset(e?.nativeEvent?.layout?.y)
     }
 
-    const uploadImage=()=>{
+    const uploadImage=(file=null,url="")=>()=>{
         setResult([])
         if(file===null && url.trim().match(/^https?\:\/\//i) === null) setNotif(true,"Error",i18n.t('errors.image'));
         else {
@@ -90,7 +92,6 @@ export default function({navigation}){
                 return PNpost(`/backend/nsfw_check`,form,opt)
             })
             .then((res)=>{
-                setNotif(Boolean(res.error),res.msg)
                 if(!res.error) {
                     if(randomInt(3) == 0) showAds();
                     setResult(res.result)
@@ -100,7 +101,9 @@ export default function({navigation}){
                         }
                     },500)
                 }
-            }).finally(()=>{
+            })
+            .catch(console.log)
+            .finally(()=>{
                 setBackdrop(false);
                 setLoading(false)
             })
@@ -111,18 +114,39 @@ export default function({navigation}){
         if(!backdrop) setTimeout(()=>setProgress(0),500)
     },[backdrop])
 
+    const setOpenImage=React.useCallback((result)=>{
+        if(!result.exists) return setNotif(true,"Error",i18n.t('errors.no_image'));
+        if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('errors.size_image'));
+        setFile(result?.uri)
+        setDataFile(result?.uri)
+    },[])
+
     const openImage=React.useCallback(()=>{
         pickImage({mediaTypes:MediaTypeOptions.Images})
-        .then((result)=>{
-            if(!result.exists) return setNotif(true,"Error",i18n.t('errors.no_image'));
-            if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('errors.size_image'));
-            setFile(result?.uri)
-            setDataFile(result?.uri)
-        })
+        .then(setOpenImage)
         .catch(err=>{
+            console.log(err);
             if(err?.type === 0) return;
             if(err?.message) setNotif(true,"Error",err.message);
         })
+    },[])
+
+    React.useEffect(()=>{
+        const dataListener = (data)=>{
+            console.log(data);
+            if(typeof data?.data === 'string' && typeof data?.mimeType === 'string') {
+                if(data?.mimeType==='text/plain') {
+                    setUrl(data?.data);
+                    uploadImage(null,data?.data)();
+                    
+                } else {
+                    setFile(data?.data)
+                    setDataFile(data?.data)
+                    uploadImage(data?.data,"")();
+                }
+            }
+        }
+        ShareModule.getSharedData().then(dataListener).catch(console.log)
     },[])
 
     return (
@@ -179,7 +203,7 @@ export default function({navigation}){
                                 <Button disabled={loading} status="danger" onPress={inputRemove}>Reset</Button>
                             </Lay>
                             <Lay style={[style.container,{paddingVertical:5}]}>
-                                <Button loading={loading} disabled={loading} onPress={uploadImage} >Analysis</Button>
+                                <Button loading={loading} disabled={loading} onPress={uploadImage(file,url)} >Analysis</Button>
                             </Lay>
                         </Lay>
                     </Lay>

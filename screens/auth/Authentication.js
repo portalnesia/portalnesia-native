@@ -1,6 +1,6 @@
 import React from 'react';
 import {Alert,ScrollView,TouchableOpacity,View,StyleSheet} from 'react-native'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
 import {useTheme,Layout as Lay, Text,Input} from '@ui-kitten/components'
 import phoneAuth from '@react-native-firebase/auth' 
 

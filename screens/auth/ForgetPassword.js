@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {Alert,ScrollView,TouchableOpacity,View,StyleSheet} from 'react-native'
 import {useTheme,Layout as Lay, Text,Input} from '@ui-kitten/components'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
 
 import Layout from '@pn/components/global/Layout';
 import Button from '@pn/components/global/Button'

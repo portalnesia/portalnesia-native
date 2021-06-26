@@ -1,17 +1,21 @@
 package com.portalnesia.app;
 
+import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageInstaller;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.LocaleList;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -33,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -136,18 +141,18 @@ public class PNModules extends ReactContextBaseJavaModule {
         return TextUtils.isEmpty(script) ? "" : script;
     }
 
-    private @NonNull String getSystemProperty(String key) {
+    private @NonNull String getSystemProperty() {
         try {
-            Class<?> systemProperties = Class.forName("android.os.SystemProperties");
+            @SuppressLint("PrivateApi") Class<?> systemProperties = Class.forName("android.os.SystemProperties");
             Method get = systemProperties.getMethod("get",String.class);
-            return (String) Objects.requireNonNull(get.invoke(systemProperties, key));
+            return (String) Objects.requireNonNull(get.invoke(systemProperties, "ro.miui.region"));
         } catch (Exception ignored) {
             return "";
         }
     }
 
     private @NonNull String getRegionCode(@NonNull Locale locale){
-        String miuiRegion = getSystemProperty("ro.miui.region");
+        String miuiRegion = getSystemProperty();
         if(!TextUtils.isEmpty(miuiRegion)) {
             return miuiRegion;
         }
@@ -302,6 +307,17 @@ public class PNModules extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void fileProviderToUri(String pathname,Promise promise) {
+        try {
+            Uri uri = Uri.parse(pathname);
+            String fileUri = getFileUri(uri);
+            promise.resolve(fileUri);
+        } catch(Throwable e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void isAppInstalled(String packageName, final Promise promise){
         Intent appIntent = reactContext.getPackageManager().getLaunchIntentForPackage(packageName);
         if(appIntent == null) {
@@ -359,5 +375,86 @@ public class PNModules extends ReactContextBaseJavaModule {
                 }
             }
         );
+    }
+
+    private String getFileUri(Uri uri) {
+        if(uri==null) {
+            return null;
+        }
+        if(uri.getScheme().equals("content")) {
+            File file = getFileFromContentUri(uri);
+            return Uri.fromFile(file).toString();
+        } else if(uri.getScheme().equals("file")) {
+            return uri.toString();
+        }
+        return null;
+    }
+
+    private File getFileFromContentUri(Uri uri) {
+        File file = null;
+        String filePath;
+        String fileName;
+        String[] filePathColumn = {MediaStore.MediaColumns.DATA,MediaStore.MediaColumns.DISPLAY_NAME};
+        ContentResolver contentResolver = reactContext.getContentResolver();
+        Cursor cursor = contentResolver.query(uri,filePathColumn,null,null,null);
+        if(cursor != null) {
+            cursor.moveToFirst();
+            filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
+            fileName = cursor.getString(cursor.getColumnIndex(filePathColumn[1]));
+            cursor.close();
+
+            if(!TextUtils.isEmpty(filePath)) {
+                file = new File(filePath);
+            }
+
+            if((file != null && (!file.exists() || file.length() <= 0)) || TextUtils.isEmpty(filePath)) {
+                filePath = getPathFromInputStream(uri,fileName);
+            }
+            if(!TextUtils.isEmpty(filePath)) {
+                file = new File(filePath);
+            }
+        }
+        return file;
+    }
+
+    private String getPathFromInputStream(Uri uri,String fileName) {
+        InputStream is = null;
+        String filePath = null;
+        if(uri.getAuthority() != null) {
+            try {
+                is = reactContext.getContentResolver().openInputStream(uri);
+                File file = createTemporaryFile(is,fileName);
+                filePath = file.getPath();
+            } catch (IOException ignored) {
+
+            } finally {
+                try {
+                    if(is != null) {
+                        is.close();
+                    }
+                } catch (Exception ignored) {
+
+                }
+            }
+        }
+        return filePath;
+    }
+
+    private File createTemporaryFile(InputStream is, String fileName) throws IOException {
+        File targetFile = null;
+        if(is != null) {
+            int read;
+            byte[] buffer = new byte[8*1024];
+            targetFile = new File(reactContext.getCacheDir(),fileName);
+            if(targetFile.exists()) targetFile.delete();
+            OutputStream os = new FileOutputStream(targetFile);
+
+            while((read = is.read(buffer)) != -1) {
+                os.write(buffer,0,read);
+            }
+            os.flush();
+            os.close();
+        }
+        return targetFile;
     }
 }

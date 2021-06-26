@@ -4,6 +4,7 @@ import * as Notifications from 'expo-notifications'
 import BackgroundService,{BackgroundTaskOptions} from 'react-native-background-actions'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
+import { log, logError } from './log';
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -110,7 +111,11 @@ const downloadTask = (argument?: ArgumentType) =>{
             .then(()=>{
               resolve();  
             })
-            .catch(()=>resolve());
+            .catch((e)=>{
+                log("download Download.ts",{msg:e.message});
+        		logError(e,"download Download.ts");
+                resolve()
+            });
         } else {
             resolve();
         }

@@ -10,6 +10,7 @@ import APIaxios from './axios'
 import {CLIENT_ID,API} from '@env'
 import {DispatchArgument} from '@pn/provider/Context'
 import Authentication, { AccountManagerType } from '@pn/module/Authentication'
+import { log, logError } from './log'
 
 maybeCompleteAuthSession();
 
@@ -44,7 +45,8 @@ export async function getProfile(token: ResponseToken){
             data = result?.data?.error_description||"Something went wrong"
         }
     } catch(e){
-        //console.log(e?.request)
+        log("getProfile Login.ts error",{msg:e.message});
+        logError(e,"getProfile Login.ts");
         data = "Something went wrong";
     }
     return data;
@@ -96,7 +98,10 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
         try {
             const accounts = await Authentication.getAccounts();
             account = accounts[0];
-        } catch(e){}
+        } catch(e){
+            log("logout getAccounts Login.ts error",{msg:e.message});
+            logError(e,"logout getAccounts Login.ts");
+        }
         if(token) {
             try {
                 await Promise.all([
@@ -109,6 +114,8 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                 if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
                 if(typeof setNotif==='function') setNotif(notify?.type||false,notify?.title||"Sucess",notify?.msg||"You've successfully logged out.")
             } catch(e) {
+                log("logout Login.ts error",{msg:e.message});
+                logError(e,"logout Login.ts");
                 await Promise.all([
                     logoutInit(),
                     Secure.deleteItemAsync("token"),
@@ -187,6 +194,8 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                 }
             }
         } catch(e) {
+            log("refreshToken Login.ts error",{msg:e.message});
+            logError(e,"refreshToken Login.ts");
             if(account?.name) await Authentication.removeAccount(account);
             if(token !== null) {
                 await Promise.all([

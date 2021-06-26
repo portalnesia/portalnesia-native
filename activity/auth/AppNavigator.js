@@ -4,7 +4,7 @@ import { createStackNavigator,TransitionPresets } from '@react-navigation/stack'
 import {useTheme} from '@ui-kitten/components'
 import {StatusBar} from 'expo-status-bar'
 import analytics from '@react-native-firebase/analytics'
-import useRootNavigation from '../../navigation/useRootNavigation'
+import useRootNavigation from './useRootNavigation'
 
 import Login from '../../screens/auth/Login'
 import Register from '../../screens/auth/Register'

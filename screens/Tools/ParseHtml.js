@@ -13,6 +13,7 @@ import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/AuthProvider';
 import {randomInt} from '@pn/utils/Main'
 import verifyRecaptcha from '@pn/module/Recaptcha'
+import ShareModule from '@pn/module/Share';
 
 export default function({navigation}){
     const {PNpost} = useAPI(false)
@@ -27,7 +28,7 @@ export default function({navigation}){
 
     const handleReset=()=>setInput("")
 
-    const handleParse=()=>{
+    const handleParse=(input)=>()=>{
         if(input.match(/\S+/) === null) return setNotif(true,"Error","HTML cannot be empty");
         setLoading(true);
         verifyRecaptcha(setNotif)
@@ -44,6 +45,15 @@ export default function({navigation}){
             setLoading(false)
         })
     }
+
+    React.useEffect(()=>{
+        const dataListener = (data)=>{
+            if(typeof data?.data === 'string') {
+                handleParse(data?.data)();
+            }
+        }
+        ShareModule.getSharedData().then(dataListener).catch(console.log)
+    },[])
 
     return (
         <>
@@ -81,7 +91,7 @@ export default function({navigation}){
                                 <Button disabled={loading} status="danger" onPress={handleReset}>Reset</Button>
                             </Lay>
                             <Lay style={[style.container,{paddingVertical:5}]}>
-                                <Button loading={loading} disabled={loading} onPress={handleParse} >Parse</Button>
+                                <Button loading={loading} disabled={loading} onPress={handleParse(input)} >Parse</Button>
                             </Lay>
                         </Lay>
                     </Lay>

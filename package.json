@@ -87,7 +87,6 @@
     "react-native-biometrics": "^2.1.4",
     "react-native-chart-kit": "^6.11.0",
     "react-native-dropdownalert": "^4.3.0",
-    "react-native-fast-image": "^8.3.4",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "~1.8.0",
     "react-native-modal": "^11.7.0",
@@ -100,7 +99,6 @@
     "react-native-render-html": "^5.1.0",
     "react-native-safe-area-context": "3.1.9",
     "react-native-screens": "^3.1.1",
-    "react-native-share-menu": "^5.0.3",
     "react-native-skeleton-placeholder": "^3.0.4",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^12.1.0",
@@ -138,7 +136,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }

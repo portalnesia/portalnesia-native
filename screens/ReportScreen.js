@@ -3,7 +3,7 @@ import {ScrollView,RefreshControl,View,Dimensions,TextInput,FlatList} from 'reac
 import {Layout as Lay, Text,useTheme,Divider,Icon,CheckBox,ListItem} from '@ui-kitten/components'
 //import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
-import Image from 'react-native-fast-image'
+import Image from '@pn/module/FastImage'
 import Modal from 'react-native-modal'
 import {Constants} from 'react-native-unimodules'
 import * as Device from 'expo-device'

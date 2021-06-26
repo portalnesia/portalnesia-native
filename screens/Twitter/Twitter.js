@@ -12,7 +12,7 @@ import Pressable from '@pn/components/global/Pressable'
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
-import {specialHTML} from '@pn/utils/Main'
+import {isTwitterURL, isURL, specialHTML} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import useAPI from '@pn/utils/API'
 import verifyRecaptcha from '@pn/module/Recaptcha'
@@ -20,6 +20,7 @@ import { AuthContext } from '@pn/provider/Context';
 import Carousel from '@pn/components/global/Carousel';
 import useSWR from '@pn/utils/swr';
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
+import ShareModule from '@pn/module/Share';
 
 const {width} = Dimensions.get('window')
 const InputIcon = (props)=><Icon {...props} name="plus-circle-outline" />
@@ -62,7 +63,7 @@ const RenderRecommend=React.memo(({swr})=>{
 	)
 })
 
-const RenderInput=React.memo(({onClose})=>{
+const RenderInput=React.memo(({onClose,initialData=""})=>{
 	const [input,setInput]=React.useState("")
     const [loading,setLoading]=React.useState(false);
     const [result,setResult]=React.useState(null)
@@ -71,16 +72,22 @@ const RenderInput=React.memo(({onClose})=>{
 	const {setNotif} = context;
 	const {PNpost} = useAPI();
 
-	const handleSubmit=()=>{
-		if(input.trim().match(/twitter\.com/)) {
+	React.useEffect(()=>{
+		if(initialData?.length > 0) {
+			setInput(initialData);
+			handleSubmit(initialData);
+		}
+	},[initialData])
+
+	const handleSubmit=(input)=>{
+		if(isURL(input) && isTwitterURL(input)) {
 			setLoading(true)
 			verifyRecaptcha(setNotif)
 			.then(recaptcha=>{
 				return PNpost(`/twitter/thread`,{url:input,recaptcha})
 			})
 			.then((res)=>{
-				if(res?.error) setNotif(true,"Error",res?.msg);
-				else {
+				if(!res?.error) {
 					setInput("");
 					setResult(res?.data);
 				}
@@ -116,10 +123,10 @@ const RenderInput=React.memo(({onClose})=>{
 				returnKeyType="send"
 				disabled={loading}
 				autoCapitalize="none"
-				onSubmitEditing={handleSubmit}
+				onSubmitEditing={()=>handleSubmit(input)}
 			/>
 			<View style={{marginTop:10}}>
-				<Button disabled={loading} loading={loading} onPress={handleSubmit}>Submit</Button>
+				<Button disabled={loading} loading={loading} onPress={()=>handleSubmit(input)}>Submit</Button>
 			</View>
 			{result !== null && (
 				<View>
@@ -328,6 +335,7 @@ export default function ({ navigation,route }) {
 	const heightHeader = headerHeight?.main + headerHeight?.sub
 	const [open,setOpen]=React.useState(false);
 	const [menu,setMenu]=React.useState(false)
+	const [input,setInput] = React.useState("");
 
 	const renderTabBar=(props)=>{
 		
@@ -367,6 +375,18 @@ export default function ({ navigation,route }) {
             />
         )
     }
+	
+	React.useEffect(()=>{
+        const dataListener = (data)=>{
+            if(typeof data?.data === 'string' && typeof data?.mimeType === 'string') {
+                if(data?.mimeType==='text/plain') {
+                    setInput(data?.data);
+					setOpen(true)
+                }
+            }
+        }
+        ShareModule.getSharedData().then(dataListener).catch(console.log)
+    },[])
 
 	return (
 		<Layout navigation={navigation}>
@@ -392,7 +412,7 @@ export default function ({ navigation,route }) {
                 animationOut="fadeOut"
 				coverScreen={false}
             >
-				<RenderInput onClose={()=>setOpen(false)} />
+				<RenderInput onClose={()=>setOpen(false)} initialData={input} />
 			</Modal>
 		</Layout>
 	);

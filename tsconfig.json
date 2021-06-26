@@ -13,6 +13,7 @@
       "noEmit": true,
       "baseUrl": ".",
       "strictNullChecks": false,
+      "resolveJsonModule": true,
       "paths": {
         "@pn/components/*": ["components/*"],
         "@pn/utils/*": ["utils/*"],

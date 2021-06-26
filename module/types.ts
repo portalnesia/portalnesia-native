@@ -30,6 +30,7 @@ export interface PortalnesiaInterface {
      * path: filepath without file://
      */
     uriToFileProvider:(path: string) => Promise<string>;
+    fileProviderToUri(path:string): Promise<string>;
     verifyWithRecaptcha:()=>Promise<string>;
     getAction(): Promise<string>;
 }
@@ -77,4 +78,31 @@ export interface AuthenticationInterface {
 }
 export interface SyncModuleInterface {
     sync(): Promise<void>
+}
+
+export type ShareData = {
+    data: string,
+    mimeType:string
+}
+type ShareDataListener = (ShareData & {
+    extraData?: string;
+}) | null;
+
+export type ContinueInAppInterface = {
+    continueInApp(type: string,data: string,extraData?: string): Promise<void>;
+}
+export type ShareCropOptions = {
+    aspect:[number,number],
+    quality: number,
+}
+export type ShareCropResult = {
+    uri:string
+} | {
+    cancelled:boolean
+}
+
+export interface ShareModuleInterfaceNative {
+    getSharedData(clear: boolean): Promise<ShareDataListener>;
+    dismiss():void;
+    startCropActivity?(type: 'png'|'jpg'|'jpeg',uri: string,options?:ShareCropOptions): Promise<ShareCropResult>
 }

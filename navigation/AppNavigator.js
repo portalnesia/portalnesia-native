@@ -241,7 +241,7 @@ const MainTabNavigator=()=>{
 				activeTintColor:theme['color-indicator-bar'],
 				allowFontScaling:true
 			}}
-
+			lazy={false}
 		>
 			<Tabs.Screen options={{tabBarLabel:tabLabel("Home"),tabBarIcon:tabBarIcon('home')}} name="HomeStack" component={HomeScreenStack} />
 			<Tabs.Screen options={{tabBarLabel:tabLabel("News"),tabBarIcon:tabBarIcon('news')}} name="NewsStack" component={NewsScreenStack} />
