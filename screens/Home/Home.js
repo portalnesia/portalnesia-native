@@ -22,6 +22,7 @@ import Skeleton from '@pn/components/global/Skeleton';
 import { getLocation, reverseGeocode } from '@pn/utils/Location';
 import { LocationAccuracy } from 'expo-location';
 import useSWR from '@pn/utils/swr';
+import { log, logError } from '@pn/utils/log';
 
 const {width} = Dimensions.get('window')
 
@@ -364,8 +365,10 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				setCuaca(res);
 			})
 			.catch(e=>{
-				console.log(e);
-				if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
+				logError(e,"getCuaca Home.js");
+				log("getCuaca Home.js error");
+				setCuaca({error:1,title:"Errors",text:"Under maintenance",icon:null,temperature:0})
+				//if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
 			})
 		}
 	},[])
@@ -378,8 +381,14 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 	}
 
 	React.useEffect(()=>{
+		let tim=null;
 		if(cuaca===null) {
-			getCuaca();
+			tim = setTimeout(()=>{
+				getCuaca();
+			},700)
+		}
+		return ()=>{
+			if(tim!=null) clearTimeout(tim);
 		}
 	},[])
 

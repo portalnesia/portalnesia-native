@@ -330,15 +330,10 @@ const AuthProviderFunc = (props) => {
 		}
 
 		/* HANDLE NOTIFICATION */
-		let onNotificationOpenListener,onMessageListener;
+		let onNotificationOpenListener=null,onMessageListener=null;
 
 		if(stateUser !== null && props?.main) {
 			checkInitial();
-			onNotificationOpenListener = messaging().onNotificationOpenedApp(remote=>{
-				if(remote?.data?.link) {
-					handleLinking(url);
-				}
-			})
 			onMessageListener = messaging().onMessage(remote=>{
 				if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
 				handleFCMData(remote);
@@ -349,23 +344,21 @@ const AuthProviderFunc = (props) => {
 				ShareModule.getSharedData(false).then(shareListener);
 				ShareModule.addListener(shareListener)
 			},100)
-
-			setTimeout(()=>{
-				messaging().getInitialNotification()
-				.then(remote=>{
-					if(remote) {
-						console.log("INITIAL_NOTIF",remote);
-						if(remote?.data?.link) {
-							handleLinking(url);
-						}
-					}
-				})
-				
-			},500)
+			onNotificationOpenListener = messaging().onNotificationOpenedApp(remote=>{
+				if(remote?.data?.link) {
+					handleLinking(remote?.data?.link);
+				}
+			})
+			messaging().getInitialNotification()
+			.then(remote=>{
+				if(remote?.data?.link) {
+					handleLinking(remote?.data?.link);
+				}
+			})
 		}
 		return ()=>{
-			if(onNotificationOpenListener) onNotificationOpenListener();
-			if(onMessageListener) onMessageListener();
+			if(onNotificationOpenListener !== null) onNotificationOpenListener();
+			if(onMessageListener !== null) onMessageListener();
 			ExpoRemoveListener('url',handleURL);
 			ShareModule.removeListener(shareListener);
 		}

@@ -59,7 +59,7 @@ export default function ({ navigation }) {
 		const unsubcribe = navigation?.addListener("focus",()=>{
 			if(url.pagination===null) {
 				setUrl({pagination:"/news",recommend:"/news/recommend"})
-				console.log({pagination:"/news",recommend:"/news/recommend"})
+				setTimeout(mutateRecom,200);
 			}
 		})
 
@@ -161,10 +161,6 @@ export default function ({ navigation }) {
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
 	}
-
-	React.useEffect(()=>{
-		mutateRecom()
-	},[])
 
 	return (
 		<Layout navigation={navigation} title="News" withBack={false} menu={()=><FeedbackToggle link="/news" />}>

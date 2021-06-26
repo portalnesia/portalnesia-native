@@ -29,8 +29,9 @@ const RenderRecommend=React.memo(({url})=>{
 	const theme = useTheme();
 	
 	React.useEffect(()=>{
-		mutate();
-	},[])
+		if(url.recommend !== null && (!data||!error)) mutate();
+	},[url.recommend,data,error])
+	
 	return (
 		<Lay level="2" style={{paddingTop:15}}>
 			<Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>

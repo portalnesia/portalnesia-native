@@ -62,7 +62,7 @@
         <data android:scheme="https" android:host="portalnesia.com"/>
       </intent-filter>
     </activity>
-    <activity android:name=".ShareActivity" android:exported="true" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" android:windowSoftInputMode="adjustResize|stateVisible" android:theme="@style/ActivityTheme" android:screenOrientation="portrait">
+    <activity android:name=".ShareActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" android:windowSoftInputMode="adjustResize|stateVisible" android:theme="@style/ActivityTheme" android:screenOrientation="portrait">
       <intent-filter>
         <action android:name="android.intent.action.SEND" />
         <category android:name="android.intent.category.DEFAULT" />
