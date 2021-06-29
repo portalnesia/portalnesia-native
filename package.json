@@ -5,7 +5,9 @@
     "ios": "react-native run-ios",
     "bundle": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "export": "expo export -p https://datas.portalnesia.com/updates -t bare",
-    "licenses": "npm-license-crawler -onlyDirectDependencies -json licenses.json"
+    "licenses": "npm-license-crawler -onlyDirectDependencies -json licenses.json",
+    "build-release":"cd android && gradlew assembleRelease -x bundleReleaseJsAndAssets",
+    "build-debug":"cd android && gradlew assembleDebug"
   },
   "dependencies": {
     "@eva-design/eva": "^2.0.0",
@@ -136,7 +138,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }
