@@ -56,15 +56,18 @@ export default function ({ navigation }) {
 	const [refreshing,setRefreshing]=React.useState(false)
 
 	React.useEffect(()=>{
-		const unsubcribe = navigation?.addListener("focus",()=>{
-			if(url.pagination===null) {
-				setUrl({pagination:"/news",recommend:"/news/recommend"})
-				setTimeout(mutateRecom,200);
-			}
-		})
+		let unsubcribe;
+		if(navigation && typeof navigation.addListener === 'function') {
+			unsubcribe = navigation?.addListener("focus",()=>{
+				if(url.pagination===null) {
+					setUrl({pagination:"/news",recommend:"/news/recommend"})
+					setTimeout(mutateRecom,200);
+				}
+			})
+		}
 
 		return ()=>{
-			if(unsubcribe) unsubcribe();
+			if(typeof unsubcribe === 'function') unsubcribe();
 		}
 	},[navigation])
 

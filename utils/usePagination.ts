@@ -39,7 +39,7 @@ export default function usePagination<D extends PaginationDataTypes,E=any>(path:
     )
 
     const posts: []|any[] =useMemo(()=>{
-        if(data) {
+        if(Array.isArray(data)) {
             const arr = data.map(dt=>dt[data_name])
             return [].concat(...arr)
         }
