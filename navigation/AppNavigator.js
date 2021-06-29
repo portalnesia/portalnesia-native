@@ -3,12 +3,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
-import {StatusBar} from 'expo-status-bar'
+import {StatusBar,setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
 import {Icon,useTheme,Text} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
-import useRootNavigation from '../navigation/useRootNavigation'
+import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
 import {showInterstisial} from '../components/global/Ads'
+import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
+import * as Notifications from 'expo-notifications'
+import messaging from '@react-native-firebase/messaging'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
+import handleFCMData from '@pn/services/FCMservices';
 import {linking} from './Linking'
 import NotFound from '../screens/NotFound'
 import Home from '../screens/Home/Home';
@@ -57,7 +62,11 @@ import Authentication from '../screens/auth/Authentication'
 import ForgetPassword from '../screens/auth/ForgetPassword'
 import ForgetPasswordForm from '../screens/auth/ForgetPasswordForm'
 import { AuthContext } from '../provider/Context';
+import useAPI from '@pn/utils/API';
+import { logError } from '@pn/utils/log';
+import ShareModule from '@pn/module/Share';
 
+const urlParse = require('url-parse')
 
 /* CREATE BOTTOM NAVIGATOR */
 const Tabs = createBottomTabNavigator();
@@ -273,13 +282,19 @@ export default React.memo(() => {
 	const {navigationRef} = useRootNavigation();
 	const routeNameRef = React.useRef(null)
 	const auth = useContext(AuthContext);
-	const {state,theme:selectedTheme} = auth;
+	const {state,theme:selectedTheme,setNotif} = auth;
 	const {user,session} = state
 	const theme=useTheme()
+	const {PNpost} = useAPI();
 	const {showAds} = showInterstisial();
+	const [ready,setReady]=React.useState(false);
+	const lastNotif = Notifications.useLastNotificationResponse();
 
 	function onReady(){
 		routeNameRef.current = navigationRef.current.getCurrentRoute().name
+		setStatusBarStyle(selectedTheme==='light' ? "dark" : "light");
+		setStatusBarBackgroundColor(theme['background-basic-color-1']);
+		setReady(true);
 	}
 
 	async function onStateChange(){
@@ -299,10 +314,115 @@ export default React.memo(() => {
 			screenChange += 1;
 		}
 	}
+
+	React.useEffect(()=>{
+		let onNotificationOpenListener=null,onMessageListener=null;
+
+		/* HANDLE DEEP LINK */
+		async function getInitialLink() {
+			const url = await getInitialURL();
+			if(typeof url === 'string') {
+				const parsed = urlParse(url,true);
+				if(parsed?.query?.msg) {
+					setTimeout(()=>setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg),1000)
+				}
+				handleLinking(url);
+			}
+		}
+		function handleURL({url}){
+			console.log("URL",url);
+			if(url !== null) {
+				const parsed = urlParse(url,true);
+				if(parsed?.query?.msg) {
+					setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg)
+				}
+				handleLinking(url)
+			}
+		}
+		/* HANDLE DEEP LINK */
+
+		/* HANDLE NOTIFICATION */
+		async function checkInitial(){
+			//Init Notification
+			const {status:existingStatus} = await Notifications.getPermissionsAsync();
+			let finalStatus = existingStatus;
+			if(finalStatus !== 'granted') {
+				const {status} = await Notifications.requestPermissionsAsync();
+				finalStatus = status;
+			}
+			if(finalStatus === 'granted') {
+				try {
+					const notif_token = await messaging().getToken();
+					console.log("Notification token",notif_token);
+					if(!__DEV__) {
+						PNpost('/send_notification_token',{token: notif_token},undefined,false);
+					}
+				} catch(err) {
+					logError(err,"Get notification token AppNavigator.js");
+				}
+			}
+		}
+		
+		function shareListener(data){
+			console.log("PROVIDER",data);
+			if(data?.extraData?.url) {
+				handleLinking(data?.extraData?.url);
+			}
+		}
+		/* HANDLE NOTIFICATION */
+
+		if(ready) {
+			checkInitial();
+			onMessageListener = messaging().onMessage(remote=>{
+				if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
+				handleFCMData(remote);
+			})
+			ExpoAddListener('url',handleURL)
+			getInitialLink();
+			ShareModule.getSharedData(false).then(shareListener);
+			ShareModule.addListener(shareListener)
+			onNotificationOpenListener = messaging().onNotificationOpenedApp(remote=>{
+				if(remote?.data?.link) {
+					handleLinking(remote?.data?.link);
+				}
+			})
+			messaging().getInitialNotification()
+			.then(remote=>{
+				if(remote?.data?.link) {
+					handleLinking(remote?.data?.link);
+				}
+			})
+		}
+		return ()=>{
+			if(typeof onNotificationOpenListener === 'function') onNotificationOpenListener();
+			if(typeof onMessageListener === 'function') onMessageListener();
+			ExpoRemoveListener('url',handleURL);
+			ShareModule.removeListener(shareListener);
+		}
+	},[ready,PNpost])
+
+	/* Local Notification */
+	React.useEffect(()=>{
+		async function checkNotification(){
+			if(lastNotif && lastNotif?.notification?.request?.content?.data?.url) {
+				const id = lastNotif?.notification?.request?.identifier;
+				const res = await AsyncStorage.getItem("last_notification");
+				if(res!==id){
+					const urls = lastNotif?.notification?.request?.content?.data?.url;
+					await AsyncStorage.setItem("last_notification",id);
+					if(typeof urls === 'string'){
+						handleLinking(urls);
+					}
+				}
+			}
+		}
+		if(ready) {
+			checkNotification();
+		}
+	},[lastNotif,ready])
 	
 	return (
 		<>
-			<StatusBar animated style={user === null || session == null ? 'light' : (selectedTheme==='light' ? "dark" : "light")} translucent animated backgroundColor={user === null || session == null ? theme['color-primary-500'] : theme['background-basic-color-1']} />
 			{user == null || session == null ? <Loading /> : (
 				<NavigationContainer
 					ref={navigationRef}
