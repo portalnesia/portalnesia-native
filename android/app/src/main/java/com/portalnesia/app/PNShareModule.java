@@ -286,7 +286,6 @@ public class PNShareModule extends ReactContextBaseJavaModule {
             return;
         }
         Intent i = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         i.setAction(INTENT_ACTION);
         i.setType(type);
         if("text/plain".equals(type)) {
