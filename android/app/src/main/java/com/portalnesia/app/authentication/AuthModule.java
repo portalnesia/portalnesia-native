@@ -345,7 +345,7 @@ public class AuthModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void addAccount(String userName,String password,String authToken) {
+    public void addAccount(String userName,String password,String authToken,Boolean restart) {
         String type = reactContext.getResources().getString(R.string.account_type);
         final Activity activity = getCurrentActivity();
         assert activity != null;
@@ -370,8 +370,12 @@ public class AuthModule extends ReactContextBaseJavaModule {
             if(response != null) response.onError(AccountManager.ERROR_CODE_CANCELED,"Canceled");
         }
         Intent i = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        if(restart) {
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        }
         activity.startActivity(i);
+        activity.setResult(Activity.RESULT_OK);
+        activity.finish();
     }
 
     @ReactMethod

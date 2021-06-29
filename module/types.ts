@@ -71,7 +71,7 @@ export interface AuthenticationInterface {
     setAuthToken(account: AccountManagerType,authToken:string): Promise<void>;
     startAuthActivity(): void;
     restartApps(): void;
-    addAccount(username: string,refresh_token: string,authToken: string): void;
+    addAccount(username: string,refresh_token: string,authToken: string,restart?:boolean): void;
     getIntentExtra(): Promise<{name:string|null,type:string|null,restart:boolean}>;
     prompOneTapSignIn(): Promise<{email: string,password: string}>;
     oneTapSignOut(): Promise<void>;
