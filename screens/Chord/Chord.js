@@ -260,14 +260,17 @@ export default function ({ navigation,route }) {
 	const [url,setUrl] = React.useState({recent:null,popular:null,recommend:null});
 	
 	React.useEffect(()=>{
-		const unsubcribe = navigation?.addListener("focus",()=>{
-			if(url.recent===null) {
-				setUrl({recent:"/chord?type=recent",popular:"/chord?type=popular",recommend:"/chord/recommend"})
-			}
-		})
+		let unsubcribe;
+		if(navigation && typeof navigation.addListener === 'function') {
+			unsubcribe = navigation?.addListener("focus",()=>{
+				if(url.recent===null) {
+					setUrl({recent:"/chord?type=recent",popular:"/chord?type=popular",recommend:"/chord/recommend"})
+				}
+			})
+		}
 
 		return ()=>{
-			if(unsubcribe) unsubcribe();
+			if(typeof unsubcribe === 'function') unsubcribe();
 		}
 	},[navigation])
 
