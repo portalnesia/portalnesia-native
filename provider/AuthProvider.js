@@ -17,31 +17,22 @@ import RNFS from 'react-native-fs'
 import {captureScreen} from 'react-native-view-shot'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
-import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
-import messaging from '@react-native-firebase/messaging'
 import {requestPermissionsAsync as AdsRequest} from 'expo-ads-admob'
 
-import {URL,ADS_PUBLISHER_ID,CLIENT_ID} from '@env'
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../components/utils/IoniconsPack'
 import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
 import i18n from 'i18n-js'
 import {AuthContext} from './Context'
-import API from '@pn/utils/axios'
 import {checkAndUpdateOTA} from '@pn/utils/Updates'
-import useLogin,{getProfile,refreshingToken} from '@pn/utils/Login'
+import useLogin,{refreshingToken} from '@pn/utils/Login'
 import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
-import useAppState from '@pn/utils/useAppState';
-import handleFCMData from '@pn/services/FCMservices';
-import ShareModule from '@pn/module/Share';
 
 LogBox.ignoreLogs(['Setting a timer for a long period of time']);
-
-const urlParse = require('url-parse')
 
 Notifications.setNotificationHandler({
     handleNotification: async()=>({
@@ -262,108 +253,6 @@ const AuthProviderFunc = (props) => {
 		}
 	},[lang])
 
-	/* NOTIFICATION & DEEP LINK */
-	useEffect(()=>{
-		/* HANDLE DEEP LINK */
-		async function getInitialLink() {
-			const url = await getInitialURL();
-			if(typeof url === 'string') {
-				const parsed = urlParse(url,true);
-				if(parsed?.query?.msg) {
-					setTimeout(()=>setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg),1000)
-				}
-				handleLinking(url);
-			}
-		}
-		function handleURL({url}){
-			console.log("URL",url);
-			if(url !== null) {
-				const parsed = urlParse(url,true);
-				if(parsed?.query?.msg) {
-					setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg)
-				}
-				handleLinking(url)
-			}
-		}
-		/* HANDLE DEEP LINK */
-
-		/* HANDLE NOTIFICATION */
-		function registerNotificationToken(token){
-			if(!__DEV__) {
-				if(stateToken) {
-					API.post('/native_secure/send_notification_token',`token=${token}`,{
-						headers:{
-							'X-Session-Id':Applications.androidId,
-							'Authorization':`Bearer ${stateToken?.accessToken}`,
-							'PN-Client-Id':CLIENT_ID
-						}
-					});
-				} else {
-					API.post('/native/send_notification_token',`token=${token}`)
-				}
-			}
-		}
-		async function checkInitial(){
-			//Init Notification
-			const {status:existingStatus} = await Notifications.getPermissionsAsync();
-			let finalStatus = existingStatus;
-			if(finalStatus !== 'granted') {
-				const {status} = await Notifications.requestPermissionsAsync();
-				finalStatus = status;
-			}
-			if(finalStatus === 'granted') {
-				try {
-					const notif_token = await messaging().getToken();
-					console.log("Notification token",notif_token);
-					registerNotificationToken(notif_token);
-				} catch(err) {
-					console.log("Notification token error",err.message);
-				}
-			}
-		}
-		
-		function shareListener(data){
-			console.log("PROVIDER",data);
-			if(data?.extraData?.url) {
-				handleLinking(data?.extraData?.url);
-			}
-		}
-
-		/* HANDLE NOTIFICATION */
-		let onNotificationOpenListener=null,onMessageListener=null;
-
-		if(stateUser !== null && props?.main) {
-			checkInitial();
-			onMessageListener = messaging().onMessage(remote=>{
-				if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
-				handleFCMData(remote);
-			})
-			ExpoAddListener('url',handleURL)
-			setTimeout(()=>{
-				getInitialLink();
-				ShareModule.getSharedData(false).then(shareListener);
-				ShareModule.addListener(shareListener)
-			},100)
-			onNotificationOpenListener = messaging().onNotificationOpenedApp(remote=>{
-				if(remote?.data?.link) {
-					handleLinking(remote?.data?.link);
-				}
-			})
-			messaging().getInitialNotification()
-			.then(remote=>{
-				if(remote?.data?.link) {
-					handleLinking(remote?.data?.link);
-				}
-			})
-		}
-		return ()=>{
-			if(onNotificationOpenListener !== null) onNotificationOpenListener();
-			if(onMessageListener !== null) onMessageListener();
-			ExpoRemoveListener('url',handleURL);
-			ShareModule.removeListener(shareListener);
-		}
-	},[stateToken,stateUser])
-
 	/* HANDLE AUTHENTICATION TOKEN */
 	useEffect(()=>{
 		let interval=null;
@@ -401,26 +290,6 @@ const AuthProviderFunc = (props) => {
 			interval=null;
 		}
 	},[isLogin])
-
-	/* Local Notification */
-	React.useEffect(()=>{
-		async function checkNotification(){
-			if(lastNotif && lastNotif?.notification?.request?.content?.data?.url) {
-				const id = lastNotif?.notification?.request?.identifier;
-				const res = await AsyncStorage.getItem("last_notification");
-				if(res!==id){
-					const urls = lastNotif?.notification?.request?.content?.data?.url;
-					if(typeof urls === 'string'){
-						handleLinking(urls);
-					}
-					await AsyncStorage.setItem("last_notification",id);
-				}
-			}
-		}
-		if(stateUser !== null && props?.main) {
-			setTimeout(checkNotification,200);
-		}
-	},[lastNotif,stateUser])
 
 	const onTap=React.useCallback((dt)=>{
 		const urls = dt?.payload?.link
