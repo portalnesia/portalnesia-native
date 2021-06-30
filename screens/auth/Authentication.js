@@ -149,7 +149,7 @@ export default function AuthenticationScreen({ navigation,route }) {
 							const profile = await getProfile(token);
 							if(typeof profile !== 'string') {
 								await loginInit(token,profile);
-								Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken);
+								Authentication.addAccount(profile?.email,token?.refreshToken,token?.accessToken,true);
 							} else {
 								setNotif(true,"Error",profile);
 							}
