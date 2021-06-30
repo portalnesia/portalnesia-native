@@ -19,7 +19,7 @@ import useUnsaved from '@pn/utils/useUnsaved'
 import Tooltip from '@pn/components/global/Tooltip'
 import Recaptcha from '@pn/components/global/Recaptcha'
 import Password from '@pn/components/global/Password'
-import { useBiometrics,createKeys,verifyAuthentication,promptAuthentication,deleteKeys } from '@pn/utils/Biometrics';
+import { useBiometrics } from '@pn/utils/Biometrics';
 import useAPI from '@pn/utils/API'
 import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
 import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
