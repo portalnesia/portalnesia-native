@@ -316,6 +316,33 @@ export default React.memo(() => {
 	}
 
 	React.useEffect(()=>{
+		async function checkInitial(){
+			//Init Notification
+			const {status:existingStatus} = await Notifications.getPermissionsAsync();
+			let finalStatus = existingStatus;
+			if(finalStatus !== 'granted') {
+				const {status} = await Notifications.requestPermissionsAsync();
+				finalStatus = status;
+			}
+			if(finalStatus === 'granted') {
+				try {
+					const notif_token = await messaging().getToken();
+					console.log("Notification token",notif_token);
+					if(!__DEV__) {
+						PNpost('/send_notification_token',{token: notif_token},undefined,false);
+					}
+				} catch(err) {
+					logError(err,"Get notification token AppNavigator.js");
+				}
+			}
+		}
+
+		if(ready) {
+			checkInitial();
+		}
+	},[ready,PNpost])
+
+	React.useEffect(()=>{
 		let onNotificationOpenListener=null,onMessageListener=null;
 
 		/* HANDLE DEEP LINK */
@@ -342,26 +369,6 @@ export default React.memo(() => {
 		/* HANDLE DEEP LINK */
 
 		/* HANDLE NOTIFICATION */
-		async function checkInitial(){
-			//Init Notification
-			const {status:existingStatus} = await Notifications.getPermissionsAsync();
-			let finalStatus = existingStatus;
-			if(finalStatus !== 'granted') {
-				const {status} = await Notifications.requestPermissionsAsync();
-				finalStatus = status;
-			}
-			if(finalStatus === 'granted') {
-				try {
-					const notif_token = await messaging().getToken();
-					console.log("Notification token",notif_token);
-					if(!__DEV__) {
-						PNpost('/send_notification_token',{token: notif_token},undefined,false);
-					}
-				} catch(err) {
-					logError(err,"Get notification token AppNavigator.js");
-				}
-			}
-		}
 		
 		function shareListener(data){
 			console.log("PROVIDER",data);
@@ -372,7 +379,6 @@ export default React.memo(() => {
 		/* HANDLE NOTIFICATION */
 
 		if(ready) {
-			checkInitial();
 			onMessageListener = messaging().onMessage(remote=>{
 				if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
 				handleFCMData(remote);
@@ -399,7 +405,7 @@ export default React.memo(() => {
 			ExpoRemoveListener('url',handleURL);
 			ShareModule.removeListener(shareListener);
 		}
-	},[ready,PNpost])
+	},[ready])
 
 	/* Local Notification */
 	React.useEffect(()=>{
