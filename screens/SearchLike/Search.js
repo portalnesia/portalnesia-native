@@ -1,6 +1,6 @@
 import React from 'react'
-import { View,Dimensions,FlatList, Pressable } from 'react-native';
-import {Layout as Lay,Text,Card,useTheme,Input, Icon,Divider,Autocomplete,AutocompleteItem} from '@ui-kitten/components'
+import { View,Dimensions,FlatList} from 'react-native';
+import {Layout as Lay,Text,Card,useTheme,Input, Icon,Divider} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from '@pn/module/FastImage'
 import {linkTo} from '@pn/navigation/useRootNavigation'
@@ -9,19 +9,23 @@ import analytics from '@react-native-firebase/analytics'
 
 import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
+import Pressable from '@pn/components/global/Pressable'
 import {AuthContext} from '@pn/provider/AuthProvider'
 import useAPI from '@pn/utils/API';
 import NotFound from '@pn/components/global/NotFound'
 import {ucwords,specialHTML} from '@pn/utils/Main'
 import Button from '@pn/components/global/Button';
+import ListItem from '@pn/components/global/ListItem';
+import { ScrollView } from 'react-native-gesture-handler';
+import i18n from 'i18n-js';
 
 const arrayMove = require('array-move')
 
 const CloseIcon=(props)=>{
-    return <Icon {...props} name="close-circle-outline" style={{...props?.style,marginHorizontal:0,marginLeft:8}} />
+    return <Icon {...props} name="close-circle-outline" style={{...props?.style,marginHorizontal:0,width:24,height:24}} />
 }
 
-const DeleteIcon=(props) => <Icon {...props} name="close" style={{...props?.style,marginHorizontal:0,marginLeft:8}} />
+const DeleteIcon=(props) => <Icon {...props} name="close" style={{...props?.style,marginHorizontal:0,width:24,height:24}} />
 
 const {width:winWidth,height:winHeight} = Dimensions.get('window')
 
@@ -250,6 +254,13 @@ export default function Search({navigation,route}){
         inputRef?.current?.blur();
     }
 
+    const onRemoveSearch=()=>{
+        setSearch("")
+        setError(false);
+        setEmpty(false)
+        setData([])
+    }
+
     const deleteHistory=async(i)=>{
         const his = [...history]
         his.splice(i,1)
@@ -270,6 +281,18 @@ export default function Search({navigation,route}){
         if(loading) {
             return <Skeleton type="grid" image number={12} />
         }
+        if(history?.length > 0) {
+            return (
+                <ScrollView
+                    contentContainerStyle={{paddingVertical:15}}
+                >
+                    <Text appearance="hint" style={{fontSize:13,paddingHorizontal:15,marginBottom:5}}>Recent</Text>
+                    {history?.map((dt,i)=>(
+                        <ListItem rootStyle={{paddingVertical:7}} onPress={()=>onSelect(i)} key={i} title={()=><Text category="h6" style={{marginLeft:8}}>{dt}</Text>} accessoryRight={DeleteButton(i)} style={{paddingRight:10}} />
+                    ))}
+                </ScrollView>
+            ) 
+        }
         return (
             <Lay style={{flex:1,flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
                 <Text appearance="hint">{isEmpty ? "No data" : "Search..."}</Text>
@@ -277,9 +300,22 @@ export default function Search({navigation,route}){
         )
     }
 
-    const CloseButton=(props)=><Pressable onPress={()=>(setSearch(""))}><CloseIcon {...props} /></Pressable>
+    const CloseButton=(props)=>{
+        if(search?.match(/\S+/) !== null) {
+            return (
+                <View style={{borderRadius:22,overflow:'hidden'}}>
+                    <Pressable onPress={onRemoveSearch}><CloseIcon {...props} /></Pressable>
+                </View>
+            )
+        }
+        return null;
+    }
     
-    const DeleteButton=(i)=>(props)=><Pressable onPress={()=>deleteHistory(i)}><DeleteIcon {...props} /></Pressable>
+    const DeleteButton=(i)=>(props)=>(
+        <View style={{borderRadius:22,overflow:'hidden'}}>
+            <Pressable onPress={()=>deleteHistory(i)} style={{padding:5}} tooltip={i18n.t("remove")}><DeleteIcon {...props} /></Pressable>
+        </View>
+    )
 
 
     React.useEffect(()=>{
@@ -361,31 +397,21 @@ export default function Search({navigation,route}){
         <Layout navigation={navigation} withBack={false}>
             <Lay style={{paddingHorizontal:15,justifyContent:'flex-start',alignItems:'center',paddingBottom:5,paddingTop:10,borderBottomColor:theme['border-basic-color'],borderBottomWidth:2}}>
                 <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                    <View style={{flexGrow:1,marginRight:10,flexShrink:1}}>
-                        <Autocomplete
+                    <View style={{flexGrow:1,marginRight:5,flexShrink:1}}>
+                        <Input
                             ref={inputRef}
                             value={search}
-                            onChangeText={(t)=>setSearch(t)}
+                            onChangeText={setSearch}
                             textStyle={{marginHorizontal:0}}
-                            size="small"
                             placeholder="Search something..."
                             onSubmitEditing={()=>getData()}
                             returnKeyType="search"
-                            //onFocus={()=>setFocus(true)}
-                            //onBlur={()=>setFocus(false)}
-                            onSelect={onSelect}
-                            //{...(focus ? {accessoryRight:CloseButton} : {})}
-                        >
-                            {history?.map((dt,i)=>(
-                                <AutocompleteItem key={i} title={dt} accessoryRight={DeleteButton(i)} style={{paddingVertical:8}} />
-                            ))}
-                        </Autocomplete>
+                            accessoryRight={CloseButton}
+                        />
                     </View>
-                    <Pressable onPress={()=>getData()}>
-                        <View style={{marginBottom:5}}>
-                            <Icon name="search" width="25" height="25" fill={theme['text-basic-color']} />
-                        </View>
-                    </Pressable>
+                    <View style={{borderRadius:22,overflow:'hidden',marginBottom:5}}>
+                        <Pressable onPress={()=>getData()} style={{padding:5}}><Icon name="search" width="25" height="25" fill={theme['text-basic-color']} /></Pressable>
+                    </View>
                 </View>
             </Lay>
             <FlatList
