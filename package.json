@@ -6,8 +6,8 @@
     "bundle": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "export": "expo export -p https://datas.portalnesia.com/updates -t bare",
     "licenses": "npm-license-crawler -onlyDirectDependencies -json licenses.json",
-    "build-release":"cd android && gradlew assembleRelease -x bundleReleaseJsAndAssets",
-    "build-debug":"cd android && gradlew assembleDebug"
+    "build-release": "cd android && gradlew assembleRelease -x bundleReleaseJsAndAssets",
+    "build-debug": "cd android && gradlew assembleDebug"
   },
   "dependencies": {
     "@eva-design/eva": "^2.0.0",
@@ -26,6 +26,7 @@
     "@react-native-firebase/crashlytics": "^12.1.0",
     "@react-native-firebase/in-app-messaging": "^12.1.0",
     "@react-native-firebase/messaging": "^12.1.0",
+    "@react-native-firebase/perf": "^12.1.0",
     "@react-native-firebase/remote-config": "^12.1.0",
     "@react-navigation/bottom-tabs": "^5.11.11",
     "@react-navigation/native": "^5.7.6",
@@ -54,7 +55,7 @@
     "expo-file-system": "~9.3.0",
     "expo-font": "~8.4.0",
     "expo-google-sign-in": "^9.1.0",
-    "expo-image-picker": "~9.2.0",
+    "expo-image-picker": "^10.0.0",
     "expo-intent-launcher": "^9.0.0",
     "expo-linking": "~2.0.1",
     "expo-location": "~10.0.0",
@@ -107,7 +108,7 @@
     "react-native-syntax-highlighter": "^2.1.0",
     "react-native-tab-view": "^3.0.0",
     "react-native-track-player": "^1.2.7",
-    "react-native-unimodules": "~0.12.0",
+    "react-native-unimodules": "^0.12.0",
     "react-native-view-shot": "3.1.2",
     "react-native-web": "~0.13.12",
     "react-native-webview": "^11.4.3",
