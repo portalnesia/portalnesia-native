@@ -43,15 +43,16 @@ export interface ListItemProps extends PressableProps {
     style?:ViewStyle;
     title: string | ((props?: PropsType)=>JSX.Element);
     description?: string | ((props?: PropsType)=>JSX.Element);
+    rootStyle?:ViewStyle
 }
 
 function ListItem(props: ListItemProps){
-    const {accessoryLeft,accessoryRight,title,description,...other} = props
+    const {accessoryLeft,accessoryRight,title,description,rootStyle,...other} = props
     const theme=useTheme();
 
     return (
         <Pressable {...other}>
-            <View style={{paddingVertical:12,paddingHorizontal:8,flexDirection:'row',alignItems:'center'}}>
+            <View style={[{paddingVertical:12,paddingHorizontal:8,flexDirection:'row',alignItems:'center'},rootStyle]}>
                 {accessoryLeft && accessoryLeft({style: accessoryStyle(theme)})}
                 <View style={{flex:1,flexShrink:1,flexBasis:0}}>
                     {typeof title === 'string' ? (
