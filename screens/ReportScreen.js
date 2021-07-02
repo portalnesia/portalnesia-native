@@ -109,7 +109,7 @@ export default function ReportScreen({navigation,route}){
                 const res = await PNpost(`/backend/report`,data);
                 if(!res.error) {
                     navigation?.goBack();
-                    setNotif(false,"Success");
+                    setNotif(false,res?.msg||"Success");
                 }
             } 
             finally {
