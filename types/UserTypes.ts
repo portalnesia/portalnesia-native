@@ -5,4 +5,5 @@ export type UserType={
     name: string,
     username: string,
     email: string,
+    admin:boolean
 } | null | false
