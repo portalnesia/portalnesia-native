@@ -385,6 +385,7 @@ export default function ({ navigation,route }) {
             }
         }
         ShareModule.getSharedData().then(dataListener).catch(console.log)
+		ShareModule.addListener(dataListener)
     },[])
 
 	return (

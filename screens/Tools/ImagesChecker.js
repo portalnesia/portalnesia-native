@@ -147,6 +147,7 @@ export default function({navigation}){
             }
         }
         ShareModule.getSharedData().then(dataListener).catch(console.log)
+        ShareModule.addListener(dataListener)
     },[])
 
     return (
