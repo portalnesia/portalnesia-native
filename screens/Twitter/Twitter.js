@@ -23,7 +23,6 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import ShareModule from '@pn/module/Share';
 
 const {width} = Dimensions.get('window')
-const InputIcon = (props)=><Icon {...props} name="plus-circle-outline" />
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
 	return (

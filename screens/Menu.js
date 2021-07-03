@@ -6,6 +6,7 @@ import {linkTo} from '@pn/navigation/useRootNavigation'
 import compareVersion from 'compare-versions'
 import {useScrollToTop} from '@react-navigation/native'
 
+import {DATAS_URL} from '@env'
 import Button from '@pn/components/global/Button'
 import Backdrop from '@pn/components/global/Backdrop';
 import Layout from '@pn/components/global/Layout'
@@ -90,6 +91,10 @@ export default function({navigation}){
                     const url = res?.data?.url || false;
                     let btn=[
                         {
+                            text:"Changelog",
+                            onPress:()=>openBrowser(`${DATAS_URL}/native/v${res?.data?.version}`,false)
+                        },
+                        {
                             text:"Later",
                             onPress:()=>{}
                         }
@@ -110,6 +115,10 @@ export default function({navigation}){
                         "Your version is up to date",
                         `v${res?.data?.version}`,
                         [
+                            {
+                                text:"Changelog",
+                                onPress:()=>openBrowser(`${DATAS_URL}/native/v${res?.data?.version}`,false)
+                            },
                             {
                                 text:"OK",
                                 onPress:()=>{}
