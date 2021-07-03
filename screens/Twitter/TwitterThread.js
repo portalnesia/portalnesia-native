@@ -1,12 +1,14 @@
 import React from 'react';
 import { Animated,RefreshControl,useWindowDimensions,View,LogBox } from 'react-native';
-import {Layout as Lay,Text,useTheme,Divider,Icon,Card} from '@ui-kitten/components'
+import {Layout as Lay,Text,useTheme,Divider,Icon,Card,Spinner} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
 import {pushTo} from '@pn/navigation/useRootNavigation'
 import Carousel from '@pn/components/global/Carousel';
 
+import Pressable from '@pn/components/global/Pressable'
+import Recaptcha from '@pn/components/global/Recaptcha'
 import Comment from '@pn/components/global/Comment'
 import CountUp from '@pn/components/global/Countup'
 import Layout from '@pn/components/global/Layout';
@@ -129,19 +131,22 @@ export default function TwitterThread({navigation,route}){
         navigation.replace("Twitter",{slug:'popular'})
         return null;
     }
-    //const context = React.useContext(AuthContext);
-    //const {state} = context
+    const context = React.useContext(AuthContext);
+    const {state:{user},setNotif} = context
     const theme=useTheme()
     const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/twitter/${slug}` : null)
-    const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id ? `/twitter/others/${data?.id}` : null)
+    const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id && !__DEV__ ? `/twitter/others/${data?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
-    const heightt = {...headerHeight,sub:0}	
+    const [loading,setLoading]=React.useState(false)
+    const heightt = {...headerHeight,sub:0}
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
     const [menu,setMenu]=React.useState(null)
     const {copyText} = useClipboard()
-    const {PNget} = usePost();
+    const {PNget,PNpost} = usePost();
+    const [recaptcha,setRecaptcha] = React.useState("");
+    const captchaRef = React.useRef(null)
 
     React.useEffect(()=>{
         let timeout = null;
@@ -191,7 +196,29 @@ export default function TwitterThread({navigation,route}){
         if(data && data?.id){
             return (
                 <>
-                    <Lay style={{paddingTop:20,paddingBottom:20}}>
+                    <Lay style={{paddingHorizontal:15,paddingTop:20,paddingBottom:20}}>
+                        {loading ? (
+                            <Lay style={{flex:1,justifyContent:'center',alignItems:'center',paddingVertical:15}}>
+                                <Spinner size="large" />
+                            </Lay>
+                        ) : (
+                            <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                <Text>
+                                    <Text>Missing tweets? </Text>
+                                    <Text onPress={handleReload} style={{textDecorationLine:"underline",fontFamily:"Inter_Medium"}} status="info">Click here</Text>
+                                    <Text> to reload.</Text>
+                                </Text>
+                                {user?.admin && (
+                                    <View style={{borderRadius:22,overflow:'hidden'}}>
+                                        <Pressable onPress={handleDelete} style={{padding:5}}><Icon name="trash-2-outline" width="20" height="20" fill={theme['color-danger-500']} /></Pressable>
+                                    </View>
+                                )}
+                            </View>
+                        )}
+                        
+                    </Lay>
+                    <Divider style={{backgroundColor:theme['border-text-color']}} />
+                    <Lay style={{paddingTop:20,paddingBottom:10}}>
                         <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>
                         {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
                         : errorOthers || dataOthers?.error==1 ? (
@@ -218,8 +245,61 @@ export default function TwitterThread({navigation,route}){
 
     const renderEmpty=()=>{
 		if(error || Boolean(data?.error)) return <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-		return <View style={{height:'100%'}}><Skeleton type="article" /></View>
+		return <View style={{height:'100%',paddingVertical:10}}><Skeleton type="article" /></View>
 	}
+
+    const handleReload=React.useCallback(()=>{
+        setLoading(true);
+        PNpost(`/twitter/reload`,{id:slug,recaptcha}).then(res=>{
+            if(!res.error) {
+                const aa = data.tweets
+                const b = aa.concat(res.data)
+                mutate({
+                    ...data,
+                    tweets:b
+                })
+            }
+        }).finally(()=>{
+            setLoading(false)
+            captchaRef.current?.refreshToken();
+        })
+    },[PNpost,recaptcha,slug])
+
+    const handleDelete=React.useCallback(()=>{
+        if(user?.admin===true) {
+            setLoading(true)
+            PNpost(`/twitter/delete`,{id:slug,recaptcha}).then(res=>{
+                console.log(res);
+                if(!res.error) {
+                    setNotif(false,"Success",res?.msg);
+                    navigation?.goBack();
+                }
+            }).finally(()=>{
+                setLoading(false)
+                captchaRef.current?.refreshToken();
+            })
+        }
+    },[user,PNpost,recaptcha,slug,navigation])
+
+    const handleDeleteTweet=React.useCallback((index)=>{
+        if(user?.admin===true) {
+            setLoading(true)
+            PNpost(`/twitter/delete_tweet`,{id:slug,index,recaptcha}).then(res=>{
+                if(!res.error) {
+                    setNotif(false,"Success",res?.msg);
+                    const aa = data?.tweets
+                    aa.splice(index,1)
+                    mutate({
+                        ...data,
+                        tweets:aa
+                    })
+                }
+            }).finally(()=>{
+                setLoading(false)
+                captchaRef.current?.refreshToken();
+            })
+        }
+    },[user,PNpost,recaptcha,slug])
 
     return (
         <>
@@ -246,6 +326,7 @@ export default function TwitterThread({navigation,route}){
                 {...other}
             />
         </Layout>
+        <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
         {data && !data?.error && (
                 <>
                     <MenuContainer
@@ -276,17 +357,23 @@ export default function TwitterThread({navigation,route}){
                         }]}
                     />
                     <MenuContainer
-                        visible={menu!==null}
+                        visible={menu!==null && !loading}
                         handleOpen={()=>setMenu(menu)}
                         handleClose={()=>setMenu(null)}
                         onClose={()=>setMenu(null)}
-                        menu={[{
-                            title:`${i18n.t('copy')} ${i18n.t('text').toLowerCase()}`,
-                            onPress:()=>{
-                                copyText(specialHTML(data?.tweets?.[menu]?.tweet),"Text")
-                                setMenu(null)
+                        menu={[
+                            {
+                                title:`${i18n.t('copy')} ${i18n.t('text').toLowerCase()}`,
+                                onPress:()=>{
+                                    copyText(specialHTML(data?.tweets?.[menu]?.tweet),"Text")
+                                    setMenu(null)
+                                }
                             }
-                        }]}
+                            ,...(user?.admin ? [{
+                                title:`${i18n.t('remove_type',{type:"tweet"})}`,
+                                onPress:()=>handleDeleteTweet(menu)
+                            }] : [])
+                        ]}
                     />
                 </>
             )}
