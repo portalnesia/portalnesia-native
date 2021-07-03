@@ -95,6 +95,12 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/messaging/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@react-native-firebase/perf@12.1.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/perf",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/perf/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@react-native-firebase/remote-config@12.1.0": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config",
@@ -257,7 +263,7 @@
         "licenseUrl": "https://github.com/expo/expo/raw/master/LICENSE-react-native-google-signin.md",
         "parents": "portal-native"
     },
-    "expo-image-picker@9.2.1": {
+    "expo-image-picker@10.0.0": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
