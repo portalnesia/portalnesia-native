@@ -19,8 +19,9 @@ type ResponseToken = {
     refreshToken?: string
 }
 
-const getNotifOption=(id: string): Notifications.NotificationChannelInput=>({
+const getNotifOption=(id: string,desc?:string): Notifications.NotificationChannelInput=>({
 	name:id,
+    description:desc,
 	importance:Notifications.AndroidImportance.HIGH,
 	lockscreenVisibility:Notifications.AndroidNotificationVisibility.PUBLIC,
 	sound:'default',
@@ -57,15 +58,29 @@ type UseLoginOptions = {
     setNotif?:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any} | undefined) => void
 }
 
+export async function notificationInit(type:'login'|'logout') {
+    if(type==='login') {
+        await Promise.all([
+            Notifications.setNotificationChannelAsync("Security", getNotifOption("Security","Notifications about security updates for your account or your application")),
+            Notifications.setNotificationChannelAsync("Birthday", getNotifOption("Birthday","Notifications for the birthdays of someone you are following")),
+            Notifications.setNotificationChannelAsync("Comments", getNotifOption("Comments","Notifications for comments, including someone commenting on your content or someone replying to your comment")),
+            Notifications.setNotificationChannelAsync("Messages", getNotifOption("Messages","Notifications for the new messages for you"))
+        ])
+    } else {
+        await Promise.all([
+            Notifications.deleteNotificationChannelAsync("Security"),
+            Notifications.deleteNotificationChannelAsync("Birthday"),
+            Notifications.deleteNotificationChannelAsync("Comments"),
+            Notifications.deleteNotificationChannelAsync("Messages")
+        ])
+    }
+}
+
 export async function loginInit(data: TokenResponse,profile: any) {
     await Promise.all([
         Secure.setItemAsync('token',JSON.stringify(data)),
         Secure.setItemAsync('user',JSON.stringify(profile)),
-        Notifications.setNotificationChannelAsync("Security", getNotifOption("Security")),
-        Notifications.setNotificationChannelAsync("Birthday", getNotifOption("Birthday")),
-        Notifications.setNotificationChannelAsync("Comments", getNotifOption("Comments")),
-        Notifications.setNotificationChannelAsync("Messages", getNotifOption("Messages")),
-        Notifications.setNotificationChannelAsync("Features & Promotion", getNotifOption("Features & Promotion")),
+        notificationInit('login')
     ])
     return;
 }
@@ -74,11 +89,7 @@ export async function logoutInit() {
     await Promise.all([
         Secure.deleteItemAsync('user'),
         Secure.deleteItemAsync('token'),
-        Notifications.deleteNotificationChannelAsync("Security"),
-        Notifications.deleteNotificationChannelAsync("Birthday"),
-        Notifications.deleteNotificationChannelAsync("Comments"),
-        Notifications.deleteNotificationChannelAsync("Messages"),
-        Notifications.deleteNotificationChannelAsync("Features & Promotion")
+        notificationInit('logout')
     ])
     return;
 }

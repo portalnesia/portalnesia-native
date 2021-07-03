@@ -42,8 +42,9 @@ Notifications.setNotificationHandler({
     })
 })
 
-const getNotifOption=(id)=>({
+const getNotifOption=(id,desc)=>({
 	name:id,
+	description:desc,
 	importance:Notifications.AndroidImportance.HIGH,
 	lockscreenVisibility:Notifications.AndroidNotificationVisibility.PUBLIC,
 	sound:'default',
@@ -184,9 +185,11 @@ const AuthProviderFunc = (props) => {
 		async function setNotificationChannel(){
 			try {
 				await Promise.all([
-					Notifications.setNotificationChannelAsync("Download", getNotifOption("Download")),
-					Notifications.setNotificationChannelAsync("General", getNotifOption("General")),
-					Notifications.setNotificationChannelAsync("News", getNotifOption("News")),
+					Notifications.setNotificationChannelAsync("Download", getNotifOption("Download","Notifications for background download services")),
+					Notifications.setNotificationChannelAsync("General", getNotifOption("General","General notifications")),
+					Notifications.setNotificationChannelAsync("News", getNotifOption("News","Notifications for the latest news every day")),
+					Notifications.setNotificationChannelAsync("Features", getNotifOption("Features","New features and promotion on Portalnesia")),
+					Notifications.deleteNotificationChannelAsync("Features & Promotion")
 				])
 			} catch(e){
 				console.log("Notification channel error",e);
