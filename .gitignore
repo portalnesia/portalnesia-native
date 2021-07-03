@@ -88,6 +88,5 @@ metro.config.backup-hahahaha.js
 # Expo
 .vscode/*
 web-build/
-dist/**/*
 
 # @end expo-cli

@@ -1,0 +1,228 @@
+{
+    "net_online":"You are online!",
+    "net_offline":"You are offline!",
+    "clipboard":"%{type} copied",
+    "download_complete":"Download completed!",
+    "download_failed":"Failed to download!",
+    "title_external_link":"Open external link?",
+    "desc_external_link":"We are not responsible for the content of that link",
+    "terms_of_service":"Terms of Services",
+    "privacy_policy":"Privacy Policy",
+    "donate":"Donate",
+    "check_update":"Check Update",
+    "contact":"Contact Us",
+    "share":"Share",
+    "reach_end":"You have reach the bottom of the page",
+    "share_type":"Share %{type}",
+    "copy_link":"Copy link",
+    "copy":"Copy",
+    "open_in_browser":"Open in browser",
+    "cancel":"Cancel",
+    "back":"Back",
+    "close":"Close",
+    "more_option":"More Option",
+    "open":"Open",
+    "recent":"Recent",
+    "recent_type":"Recent %{type}",
+    "popular":"Popular",
+    "popular_type":"Popular %{type}",
+    "change":"Change",
+    "change_type":"Change %{type}",
+    "twitter_thread":"Twitter Thread",
+    "news":"News",
+    "chord":"Chord",
+    "url":"URL",
+    "new_type":"New %{type}",
+    "text":"Text",
+    "setting":"Setting",
+    "setting_type":"%{type} setting",
+    "without_type":"without %{type}",
+    "appearance":"Appearance",
+    "clear":"Clear %{type}",
+    "deleted":"%{type} deleted",
+    "light":"light",
+    "dark":"dark",
+    "device":"device",
+    "profile":"profile",
+    "profile_type":"profile %{type}",
+    "theme":"theme",
+    "theme_type":"%{type} theme",
+    "image":"Image",
+    "picture": {
+        "one":"picture",
+        "other":"pictures"
+    },
+    "photo": {
+        "one":"photo",
+        "other":"photos"
+    },
+    "select":"Select %{type}",
+    "load_more":"Load more",
+    "see_more":"See more",
+    "notification":{
+        "one":"notification",
+        "other":"notifications"
+    },
+    "notification_type":"%{type} notification",
+    "account":{
+        "one":"account",
+        "other":"accounts"
+    },
+    "security":"security",
+    "comment":{
+        "one":"comment",
+        "other":"comments"
+    },
+    "content":{
+        "one":"content",
+        "other":"contents"
+    },
+    "session":{
+        "one":"session",
+        "other":"sessions"
+    },
+    "feature":{
+        "one":"feature",
+        "other":"features"
+    },
+    "reply":"Reply",
+    "delete":"Delete",
+    "remove":"Remove",
+    "remove_type":"Remove %{type}",
+    "add_type":"Add %{type}",
+    "no_comment":"There are no comments yet.",
+    "no_reply":"There are no reply yet.",
+    "language":"Language",
+    "usage_guide":" %{type} Usage Guide",
+    "button":"button",
+    "button_type":"%{type} button",
+    "save":"save",
+    "show_type":"Show %{type}",
+    "hide_type":"Hide %{type}",
+    "table_of_content":"Table of Contents",
+    "post":"Post",
+    "others_type":"Others %{type}",
+    "recommended":"Recommended",
+    "recommended_type":"Recommended %{type}",
+    "report":"Report",
+    "feedback":"Feedback",
+    "send_type":"Send %{type}",
+    "send":"Send",
+    "open_source_libraries":"Open Source Libraries",
+    "authentication":"authentication",
+    "auth_type":"%{type} authentication",
+    "fingerprint":"fingerprint",
+    "privacy":"privacy",
+    "social_media":"social media",
+    "errors":{
+        "general":"Something went wrong",
+        "server":"Internal server error",
+        "permission_storage":"Sorry, we need storage permissions",
+        "permission_location":"Sorry, we need location permissions",
+        "form_validation":"%{type} cannot be empty",
+        "image":"Please select image first",
+        "no_image":"Cannot find image",
+        "upload":"Sorry, error while uploading your image",
+        "size_image":"Sorry, your file is too large. Maximum images size is 5 MB",
+        "youtube_service":"You have to install the official youtube apps to be able to watch videos.\n\nClick here to watch in fullscreen mode.",
+        "invalid":"Invalid %{type}",
+        "sure":"Are you sure?",
+        "location_disabled":"Your location services is not active"
+    },
+    "report_placeholder":{
+        "placeholder_url":"We are sorry for the inconvenience, it seems that there is a problem with our internal server service. Can you tell us how this happened?",
+        "placeholder":"Have feedback? We'd love to hear it, but please don't share sensitive information. Have questions? try support.",
+        "placeholder_content":"Tell us why are you reporting this %{type}? Or if you have any feedback, We'd love to hear it, but please don't share sensitive information. Have questions? try support."
+    },
+    "form":{
+        "name":"Name",
+        "email":"Email",
+        "subject":"Subject",
+        "message":"Message",
+        "username":"Username",
+        "gender":"Gender",
+        "birthday":"Birthday",
+        "about":"About",
+        "password":"Password",
+        "verification_code":"Verification Code"
+    },
+    "home_not_login":{
+        "news":"A collection of news that is updated every day.",
+        "chord":"A collection of guitar chords with transpose tools, auto scroll, font sizer, and print features that make it easy to learn guitar.",
+        "url":"Shorten your long URLs so that it's easy to share with others.",
+        "twibbon":"Create your own twibbon or edit your photo to twibbon that is already available and share it easily.",
+        "twitter":"Read threads from Twitter easily.",
+        "transform":"Insert value pairs of geographic coordinates and transform them to different coordinate system or cartographic projection.",
+        "html":"Parse your HTML code into XML code compatible with all the Blogger templates or other blogs systems.",
+        "blog":"Turn your thoughts into writing and share it easily.",
+        "images_checker":"Online tools to help you quickly identify unseemly images.",
+        "others":"And some other services that are definitely useful."
+    },
+    "transform":{
+        "search_epsg":"Type EPSG or name or area to search...",
+        "transform_desc_1":"This on-line tool allows you to insert value pairs of geographic coordinates and transform them to different coordinate system or cartographic projection. You can insert value pairs to the text area labeled as \"Input coordinate pairs\" - also by using copy/paste even from MS Excel or similar programs. This tool accepts various input formats of value pairs - only what you need is to have one pair by a row. Please see examples in the input text area window.",
+        "transform_desc_2":"It is necessary to set appropriate input coordinate system and to set desired output coordinate system to which you want to transform the input coordinate pairs.",
+        "transform_input_label":"Input Coordinate System / Projection",
+        "transform_input_label_2":"Input Coordinate Pairs",
+        "transform_output_label":"Output Coordinate System / Projection",
+        "transform_output_label_2":"Output Coordinate Pairs",
+        "beware_1":"Beware!",
+        "beware_2":"Inserted values pairs needs to be in order X-coordinate and then Y-coordinate. If you are inserting latitude/longitude values in decimal format, then the longitude should be first value of the pair (X-coordinate) and latitude the second value (Y-coordinate). Otherwise you can use choice \"Switch XY\" bellow the input text area window."
+    },
+    "twibbon":{
+        "usage":{
+            "first":"Click the",
+            "second":"Choose the photo.",
+            "third":"Edit your photo by drag and pinch gesture.",
+            "fourth":"When you have finished editing, click the",
+            "fifth":"Done."
+        }
+    },
+    "media":{
+        "video_player":"video player",
+        "music_player":"music_player"
+    },
+    "gender":{
+        "male":"Male",
+        "female":"Female"
+    },
+    "follow":"follow",
+    "follower":"follower",
+    "following":"following",
+    "unfollow":"unfollow",
+    "settings":{
+        "account":{
+            "private":"Set profile to private",
+            "media_private":"Set media profile to private",
+            "private_tip":"Only your followers can see your profile",
+            "media_private_tip":"Only your followers can see your media",
+            "change_password":"Change Password",
+            "deactivate":"Deactivate Account",
+            "unlink":"Unlink connection to your %{type} account?",
+            "delete":{
+                "one":"Please make sure that you will make a request to deactivate your account.",
+                "two":"You can reactivate your account at any time. We will give instructions via email. Please check your inbox or spam folder.",
+                "three":"You will not be able to access your account until you reactivate it."
+            }
+        },
+        "security":{
+            "logout":"You must \"LOGOUT\" to remove this device session",
+            "auth_help":"Instead of using a password, you can use your fingerprint to authenticate your account"
+        },
+        "notification":{
+            "title_feature":"Features & Promotion",
+            "notif_news":"Receive push notifications for the latest news every day",
+            "notif_comment":"Receive push notifications for comments, including someone commenting on your content or someone replying to your comment",
+            "notif_birthday":"Receive push notifications for the birthdays of someone you are following",
+            "notif_message":"Receive push notifications for the new messages",
+            "notif_feature":"Receive push notifications about new features and promotion on Portalnesia",
+            "email_birthday":"Receive email notifications for the birthdays of someone you are following",
+            "email_komentar":"Receive email notifications for comments, including someone commenting on your content or someone replying to your comment",
+            "email_feature":"Receive email notifications about the new features and promotion on Portalnesia"
+        }
+    },
+    "auth":{
+        "new_password":"Password Again",
+        "match":"Passwords do not match"
+    }
+}
