@@ -2,14 +2,14 @@ package com.portalnesia.app.fastimage;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+
 import com.bumptech.glide.Glide;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-
-import org.jetbrains.annotations.NotNull;
 
 public class PNImageViewModule extends ReactContextBaseJavaModule {
     static final String REACT_CLASS = "PNImageView";
@@ -18,7 +18,7 @@ public class PNImageViewModule extends ReactContextBaseJavaModule {
         super(reactContext);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return REACT_CLASS;

@@ -297,6 +297,11 @@ export default React.memo(() => {
 		setReady(true);
 	}
 
+	React.useEffect(()=>{
+		setStatusBarStyle(selectedTheme==='light' ? "dark" : "light");
+		setStatusBarBackgroundColor(theme['background-basic-color-1']);
+	},[selectedTheme])
+
 	async function onStateChange(){
 		const prevRouteName = routeNameRef.current;
 		const currentRouteName = navigationRef.current.getCurrentRoute().name

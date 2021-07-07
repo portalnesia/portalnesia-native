@@ -3,6 +3,7 @@ package com.portalnesia.app;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.facebook.react.bridge.Promise;
@@ -10,8 +11,6 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableNativeMap;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -24,7 +23,7 @@ public class PNPipModule extends ReactContextBaseJavaModule {
         reactContext=context;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName(){return REACT_CLASS;}
 

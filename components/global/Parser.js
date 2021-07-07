@@ -8,7 +8,7 @@ import {ImageFull as Image} from '@pn/components/global/Image'
 import {Buffer} from 'buffer'
 import TableRenderer,{IGNORED_TAGS as TABLE_IGNORED_TAGS} from '@native-html/table-plugin'
 import Syntax from 'react-native-syntax-highlighter'
-import {androidstudio} from 'react-syntax-highlighter/styles/hljs'
+import {androidstudio} from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import {openURL} from 'expo-linking'
 
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'

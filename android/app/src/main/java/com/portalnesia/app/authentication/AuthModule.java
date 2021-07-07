@@ -14,6 +14,8 @@ import android.content.IntentSender;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
@@ -34,8 +36,6 @@ import com.portalnesia.app.AuthActivity;
 import com.portalnesia.app.R;
 import com.portalnesia.app.sync.SyncAdapter;
 import com.portalnesia.app.sync.SyncModule;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -105,7 +105,7 @@ public class AuthModule extends ReactContextBaseJavaModule {
         context.addActivityEventListener(mActivityEventListener);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {return REACT_CLASS;}
 

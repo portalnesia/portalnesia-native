@@ -24,7 +24,8 @@
                     "@pn/services":"./services"
                 }
             }
-        ]
+        ],
+        "react-native-reanimated/plugin"
     ],
     "env": {
         "production":{

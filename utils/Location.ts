@@ -5,7 +5,7 @@ async function initRequest(){
     const hasService = await ExLocation.hasServicesEnabledAsync();
     if(!hasService) return {message:i18n.t('errors.location_disabled')}
 
-    const permission = await ExLocation.requestPermissionsAsync();
+    const permission = await ExLocation.requestForegroundPermissionsAsync();
     if(permission.status === 'denied') return {message:i18n.t('errors.permission_location')}
     return true;
 }

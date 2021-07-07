@@ -141,8 +141,8 @@ android {
         applicationId "com.portalnesia.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "2.6.0"
+        versionCode 16
+        versionName "2.7.0"
     }
     splits {
         abi {

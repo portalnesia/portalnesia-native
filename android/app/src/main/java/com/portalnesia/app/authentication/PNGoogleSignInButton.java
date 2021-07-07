@@ -1,13 +1,13 @@
 package com.portalnesia.app.authentication;
 
+import androidx.annotation.NonNull;
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.google.android.gms.common.SignInButton;
-
-import org.jetbrains.annotations.NotNull;
 
 public class PNGoogleSignInButton extends SimpleViewManager<SignInButton> {
     private ReactApplicationContext ctx;
@@ -16,13 +16,13 @@ public class PNGoogleSignInButton extends SimpleViewManager<SignInButton> {
         ctx=context;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {return "PNGoogleSignInButton";}
 
-    @NotNull
+    @NonNull
     @Override
-    protected SignInButton createViewInstance(@NotNull final ThemedReactContext reactContext) {
+    protected SignInButton createViewInstance(@NonNull final ThemedReactContext reactContext) {
         SignInButton button = new SignInButton(reactContext);
         button.setSize(SignInButton.SIZE_STANDARD);
         button.setColorScheme(SignInButton.COLOR_AUTO);
