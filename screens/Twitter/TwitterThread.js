@@ -220,7 +220,7 @@ export default function TwitterThread({navigation,route}){
                     <Divider style={{backgroundColor:theme['border-text-color']}} />
                     <Lay style={{paddingTop:20,paddingBottom:10}}>
                         <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('recommended')}</Text>
-                        {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{paddingHorizontal:15}}><Skeleton type='caraousel' height={100} /></Lay>
+                        {(!dataOthers && !errorOthers) || isValidatingOthers ? <Lay style={{padding:15}}><Skeleton type='caraousel' height={100} /></Lay>
                         : errorOthers || dataOthers?.error==1 ? (
                             <Text style={{paddingHorizontal:15}}>Failed to load data</Text>
                         ) : dataOthers?.data?.popular?.length > 0 ? (

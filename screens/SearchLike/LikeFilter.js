@@ -6,27 +6,38 @@ import {linkTo} from '@pn/navigation/useRootNavigation'
 import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
 import usePagination from '@pn/utils/usePagination';
+import {AuthContext} from '@pn/provider/Context'
 import {ucwords} from '@pn/utils/Main'
+import NotFoundScreen from '../NotFound'
 import i18n from 'i18n-js';
-import {RenderNoImage,RenderWithImage} from './Search'
+import {RenderNoImage,RenderWithImage} from './Like'
 
 export default function SearchFilter({navigation,route}){
-    const {filter,q} = route?.params
-    const theme = useTheme();
+    const {filter} = route?.params
+    const context = React.useContext(AuthContext)
+    const {state:{user}}=context;
+    if(!user) return <NotFoundScreen navigation={navigation} route={route} />
     const [refreshing,setRefreshing] = React.useState(false)
+    const theme = useTheme();
     const {
-		data,
+		data:dataa,
 		error,
 		isLoadingMore,
 		size,
 		setSize,
 		isReachingEnd,
 		mutate,isValidating,isLoadingInitialData,originalData
-	} = usePagination( filter && q ? `/search?q=${q}&filter=${filter}` : null,"data",18)
+	} = usePagination( filter && user ? `/like/${filter}` : null,"data",18)
+    const [data,setData] = React.useState([]);
 
     React.useEffect(()=>{
         if(!isValidating) setRefreshing(false)
     },[isValidating])
+
+    React.useEffect(()=>{
+        if(dataa?.length > 0) setData(dataa?.[0]?.data);
+        else setData(dataa)
+    },[dataa])
 
     const renderItem=(prop)=>{
         if(['news','blog','users','media','twibbon'].indexOf(filter) !== -1) return <RenderWithImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} withType={false} navigation={navigation} data={data} />
@@ -55,7 +66,7 @@ export default function SearchFilter({navigation,route}){
     }
 
     return (
-        <Layout navigation={navigation} withBack title="Search" subtitle={ucwords(filter)}>
+        <Layout navigation={navigation} withBack title="Likes" subtitle={ucwords(filter)}>
             <FlatList
                 data={data}
                 columnWrapperStyle={{flexWrap:'wrap',flex:1}}
@@ -80,4 +91,5 @@ export default function SearchFilter({navigation,route}){
             />
         </Layout>
     )
+
 }

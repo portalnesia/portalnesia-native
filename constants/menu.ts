@@ -1,4 +1,21 @@
-export const menu=(i18n)=>([
+import i18nn from 'i18n-js'
+import {UserType} from '@pn/types/UserTypes'
+
+const userMenu=(i18n: typeof i18nn,user: UserType)=>([
+    {
+        title: "Accounts",
+        menu:[
+            {
+                title:"Likes",
+                to:"/like",
+                icon:['heart']
+            },
+        ]
+    }
+])
+
+export const menu=(i18n: typeof i18nn,user: UserType)=>([
+    ...(user ? userMenu(i18n,user) : []),
     {
         title:"Menu",
         menu:[
@@ -82,25 +99,11 @@ export const menu=(i18n)=>([
     {
         title:"Others",
         menu:[
-            /*{
-                title:i18n.t("contact"),
-                to:"/contact",
-                //icon:['contact-support','material'],
-            },*/
             {
                 title:i18n.t("check_update"),
                 to:"CheckUpdate",
                 //icon:['update','material'],
             },
-            /*{
-                title:i18n.t("terms_of_service"),
-                to:"/pages/terms-of-service?navbar=Terms of Service"
-            },
-            {
-                title:i18n.t("privacy_policy"),
-                to:"/pages/privacy-policy?navbar=Privacy Policy",
-                //icon:['privacy-tip','material'],
-            },*/
             {
                 title:i18n.t("feedback"),
                 to:"SendFeedback",
@@ -110,10 +113,6 @@ export const menu=(i18n)=>([
                 link:"https://paypal.me/adityatranasuta",
                 //icon:['donate','font_awesome'],
             },
-            /*{
-                title:"Open Source Libraries",
-                to:"/opensource",
-            }*/
         ]
     },
 ])
