@@ -27,8 +27,6 @@ import com.portalnesia.app.share.ImageExporter;
 import com.portalnesia.app.share.ImageResult;
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import org.jetbrains.annotations.NotNull;
-
 public class PNShareModule extends ReactContextBaseJavaModule {
     public static final String REACT_CLASS="PNShare";
     public static final String MIME_TYPE_KEY="mimeType";
@@ -128,7 +126,7 @@ public class PNShareModule extends ReactContextBaseJavaModule {
         }
         Promise promise = new Promise() {
             @Override
-            public void resolve(@Nullable @org.jetbrains.annotations.Nullable Object value) {
+            public void resolve(@Nullable Object value) {
                 reactContext
                         .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                         .emit(REACT_CLASS,value);
@@ -160,7 +158,7 @@ public class PNShareModule extends ReactContextBaseJavaModule {
             }
 
             @Override
-            public void reject(String code, @NonNull @NotNull WritableMap userInfo) {
+            public void reject(String code, @NonNull WritableMap userInfo) {
 
             }
 
@@ -170,7 +168,7 @@ public class PNShareModule extends ReactContextBaseJavaModule {
             }
 
             @Override
-            public void reject(String code, String message, @NonNull @NotNull WritableMap userInfo) {
+            public void reject(String code, String message, @NonNull WritableMap userInfo) {
 
             }
 

@@ -5,21 +5,22 @@ import compareVersion from 'compare-versions'
 
 async function isGetUpdate(update: Updates.UpdateCheckResult){
     if(update.isAvailable && update?.manifest) {
-        if(typeof update?.manifest?.extra?.minimumVersion === 'string' && typeof Constants.manifest.version === 'string') {
-            const isUpdated = compareVersion.compare(Constants.manifest.version,update?.manifest?.extra?.minimumVersion,">=");
+        const manifest = (update?.manifest as Updates.ClassicManifest);
+        if(typeof manifest?.extra?.minimumVersion === 'string' && typeof Constants.manifest.version === 'string') {
+            const isUpdated = compareVersion.compare(Constants.manifest.version,manifest?.extra?.minimumVersion,">=");
             if(isUpdated) return true;
             else return false;
         } else return true;
     } else return false;
 }
 
-/*async function restartApplication() {
+async function restartApplication() {
     try {
         await Updates.reloadAsync();
     } catch(e){
 
     }
-}*/
+}
 
 export async function checkAndUpdateOTA(){
     try {
@@ -28,12 +29,13 @@ export async function checkAndUpdateOTA(){
         if(getUpdates) {
             const newUpdate = await Updates.fetchUpdateAsync();
             if(newUpdate.isNew && newUpdate?.manifest) {
+                const version = (newUpdate?.manifest as Updates.ClassicManifest);
                 Alert.alert(
 					"New Bundle Version Updates",
-					`A new bundle version has been downloaded.\nRestart the application to apply changes!\nv${newUpdate.manifest?.version}`,
+					`A new bundle version has been downloaded.\nRestart the application to apply changes!\nv${version?.version}`,
 					[{
 						text:"OK",
-						onPress:()=>{}
+						onPress:restartApplication
 					}]
 				)
             }

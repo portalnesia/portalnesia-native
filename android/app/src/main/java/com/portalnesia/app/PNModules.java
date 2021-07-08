@@ -33,8 +33,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.safetynet.SafetyNet;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,7 +59,7 @@ public class PNModules extends ReactContextBaseJavaModule {
         this.reactContext = context;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return REACT_CLASS;

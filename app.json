@@ -1,41 +1,44 @@
 {
-	"expo": {
-		"name": "Portalnesia",
-		"slug": "portalnesia",
-		"scheme": "pn",
-		"version": "2.6.1",
-		"sdkVersion": "40.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/icon.png",
-		"backgroundColor":"#ffffff",
-		"userInterfaceStyle":"automatic",
-		"privacy":"hidden",
-		"platforms":["android"],
-		"developmentClient":{
-			"silentLaunch":true
-		},
-		"extra": {
-			"minimumVersion":"2.6.0"
-		},
-		"splash": {
-			"image": "./assets/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#2f6f4e"
-		},
-		"updates": {
-			"fallbackToCacheTimeout": 0
-		},
-		"assetBundlePatterns": ["**/*"],
-		"android":{
-			"config": {
-				"googleMobileAdsAppId": "ca-app-pub-5345145600516995~7540046866"
-			},
-			"adaptiveIcon":{
-				"foregroundImage":"./assets/adaptive-icon.png",
-				"backgroundColor":"#2f6f4e"
-			},
-			"useNextNotificationsApi":true,
-			"googleServicesFile": "./android/app/google-services.json"
-		}
-	}
+  "expo": {
+    "name": "Portalnesia",
+    "slug": "portalnesia",
+    "scheme": "pn",
+    "version": "2.7.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "backgroundColor": "#ffffff",
+    "userInterfaceStyle": "automatic",
+    "privacy": "hidden",
+    "platforms": [
+      "android"
+    ],
+    "developmentClient": {
+      "silentLaunch": true
+    },
+    "extra": {
+      "minimumVersion": "2.7.0"
+    },
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2f6f4e"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5345145600516995~7540046866"
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2f6f4e"
+      },
+      "useNextNotificationsApi": true,
+      "googleServicesFile": "./android/app/google-services.json"
+    }
+  }
 }

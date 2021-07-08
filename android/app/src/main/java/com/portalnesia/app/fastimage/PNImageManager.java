@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
@@ -26,8 +27,6 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.loader.ImageLoader;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,13 +51,13 @@ public class PNImageManager extends SimpleViewManager<PNImageView> implements PN
     RequestManager requestManager=null;
     private ThemedReactContext reactContext;
 
-    @NotNull
+    @NonNull
     @Override
     public String getName(){return REACT_CLASS;}
 
-    @NotNull
+    @NonNull
     @Override
-    protected PNImageView createViewInstance(@NotNull ThemedReactContext context){
+    protected PNImageView createViewInstance(@NonNull ThemedReactContext context){
         reactContext=context;
         if(isValidContextForGlide(context)) {
             requestManager = Glide.with(context);
@@ -86,7 +85,7 @@ public class PNImageManager extends SimpleViewManager<PNImageView> implements PN
     }
 
     @Override
-    public void onDropViewInstance(@NotNull PNImageView view) {
+    public void onDropViewInstance(@NonNull PNImageView view) {
         // This will cancel existing requests.
         if (requestManager != null) {
             requestManager.clear(view);
