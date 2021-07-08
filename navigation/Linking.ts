@@ -83,6 +83,9 @@ const getScreen={
     NotificationEvent:{
         path:'notification/events/:slug',
     },
+    Like:{
+        path:'like/:filter?',
+    },
     NotFound: '*',
 }
 

@@ -47,6 +47,8 @@ import SecuritySettingScreen from '../screens/Setting/Security'
 import NotificationSettingScreen from '../screens/Setting/Notification'
 import Search from '../screens/SearchLike/Search'
 import SearchFilter from '../screens/SearchLike/SearchFilter'
+import Like from '../screens/SearchLike/Like'
+import LikeFilter from '../screens/SearchLike/LikeFilter'
 import Twibbon from '../screens/Twibbon/Twibbon'
 import TwibbonDetail from '../screens/Twibbon/TwibbonDetail'
 import OpenSource from '../screens/OpenSource/OpenSource'
@@ -150,6 +152,8 @@ const getScreen=()=>{
 		{name:"AccountSettingScreen",component:AccountSettingScreen},
 		{name:"SecuritySettingScreen",component:SecuritySettingScreen},
 		{name:"NotificationSettingScreen",component:NotificationSettingScreen},
+		{name:"LikeFilter",component:LikeFilter},
+		{name:"Like",component:Like},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }

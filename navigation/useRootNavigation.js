@@ -164,7 +164,7 @@ export const getLink=(link,a=true)=>{
         if(split[0] === 'news') firstPath='NewsStack';
         else if(split[0]==='chord') firstPath='ChordStack';
         else if(split[0]==='search') firstPath='SearchPath';
-        else if(['pages','setting','contact','url','blog','twibbon','login-callback','twitter'].indexOf(split[0]) !== -1) firstPath='MenuStack';
+        else if(['pages','setting','contact','url','blog','twibbon','login-callback','twitter','like'].indexOf(split[0]) !== -1) firstPath='MenuStack';
         else firstPath="HomeStack";
         finalPath = a ? `${URL}/MainStack/MainTab/${firstPath}/${url}` : `/MainStack/MainTab/${firstPath}/${url}`
     }

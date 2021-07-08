@@ -79,7 +79,7 @@ export default function({navigation,route}){
                 {...other}
             >
                 {!data && !error ? (
-                    <View style={{height:'100%',paddingTop:heightHeader+2}}>
+                    <View style={{height:'100%',paddingTop:15}}>
                         <Skeleton type="article" />
                     </View>
                 ) : error || data?.error ? (
