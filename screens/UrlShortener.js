@@ -13,7 +13,7 @@ import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import Pressable from '@pn/components/global/Pressable'
 import useClipboard from '@pn/utils/clipboard'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 import {CONTENT_URL} from '@env'
 import downloadFile from '@pn/utils/Download'
 import verifyRecaptcha from '@pn/module/Recaptcha'

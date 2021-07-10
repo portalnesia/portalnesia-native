@@ -16,7 +16,7 @@ import global_style from '@pn/components/global/style'
 import AutoHeightWebView from 'react-native-autoheight-webview'
 import {jsStyles, openBrowser, stripHTML} from '@pn/utils/Main'
 
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 import {pushTo} from '../../navigation/useRootNavigation'
 
 let Hid = [];
