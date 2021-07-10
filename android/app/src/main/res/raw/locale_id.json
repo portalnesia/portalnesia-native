@@ -48,6 +48,8 @@
     "theme":"tema",
     "theme_type":"Tema %{type}",
     "image":"gambar",
+    "like":"Suka",
+    "unlike":"Batalkan suka",
     "picture": {
         "one":"gambar",
         "other":"gambar"
