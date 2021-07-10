@@ -31,6 +31,7 @@ export default function({navigation,route}){
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id ? `/news/others/${data.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
+    const [liked,setLiked] = React.useState(false)
     const heightt = {...headerHeight,sub:0}	
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
@@ -62,11 +63,24 @@ export default function({navigation,route}){
         }
     },[data,ready,title])
 
+    const handleOnSuccess=React.useCallback((val)=>{
+        mutate({
+            ...data,
+            liked:val
+        })
+    },[data,mutate])
+
+    React.useEffect(()=>{
+        if(data) {
+            setLiked(data?.liked);
+        }
+    },[data])
+
     return (
         <>
         <Layout navigation={navigation}>
             <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title={"News"} subtitle={data?.title||""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />} />
+				<Header title={"News"} subtitle={data?.title||""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />} />
 			</Animated.View>
             <Animated.ScrollView
                 contentContainerStyle={{
@@ -142,6 +156,13 @@ export default function({navigation,route}){
                     dialog:i18n.t('share_type',{type:i18n.t('news')})
                 }}
                 menu={[{
+                    action:"like",
+                    title:i18n.t(liked ? "unlike" : "like"),
+                    like:{
+                        value:liked,
+                        onSuccess:handleOnSuccess
+                    }
+                },{
                     action:"share",
                     title:i18n.t('share'),
                 },{

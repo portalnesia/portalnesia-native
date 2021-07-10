@@ -147,6 +147,7 @@ export default function TwitterThread({navigation,route}){
     const {PNget,PNpost} = usePost();
     const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
+    const [liked,setLiked] = React.useState(false);
 
     React.useEffect(()=>{
         let timeout = null;
@@ -154,7 +155,7 @@ export default function TwitterThread({navigation,route}){
             if(!__DEV__) {
                 await analytics().logSelectContent({
                     content_type:'twitter_thread',
-                    item_id:String(data?.id)
+                    item_id:String(data?.tweet_id)
                 })
                 await PNget(`/twitter/${slug}/update`);
             }
@@ -174,7 +175,20 @@ export default function TwitterThread({navigation,route}){
         }
     },[data,ready,route])
 
-    const HeaderComp = ()=>{
+    const handleOnSuccess=React.useCallback((val)=>{
+        mutate({
+            ...data,
+            liked:val
+        })
+    },[data,mutate])
+
+    React.useEffect(()=>{
+        if(data) {
+            setLiked(data?.liked);
+        }
+    },[data])
+
+    const HeaderComp = React.useCallback(()=>{
         if(data && data?.id){
             return (
                 <Lay style={{flex:1}}>
@@ -190,7 +204,7 @@ export default function TwitterThread({navigation,route}){
             )
         }
         return null;
-    }
+    },[data,theme])
 
     const RenderFooter=()=>{
         if(data && data?.id){
@@ -305,7 +319,7 @@ export default function TwitterThread({navigation,route}){
         <>
         <Layout navigation={navigation}>
             <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title={"Twitter Thread Reader"} subtitle={data?.screen_name ? `Thread by @${data?.screen_name}` : ""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />} />
+				<Header title={"Twitter Thread Reader"} subtitle={data?.screen_name ? `Thread by @${data?.screen_name}` : ""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />} />
             </Animated.View>
             <Animated.FlatList
                 ListEmptyComponent={renderEmpty}
@@ -336,13 +350,20 @@ export default function TwitterThread({navigation,route}){
                         handleClose={()=>setOpen(false)}
                         onClose={()=>setOpen(false)}
                         type="twitter_thread"
-                        item_id={data?.id}
+                        item_id={data?.tweet_id}
                         share={{
                             link:`/twitter/thread/${data?.id}?utm_campaign=twitter_thread`,
                             title:`${Ktruncate(specialHTML(data?.tweets?.[0]?.tweet),150)} - Portalnesia`,
                             dialog:i18n.t('share_type',{type:i18n.t('twitter_thread')})
                         }}
                         menu={[{
+                            action:"like",
+                            title:i18n.t(liked ? "unlike" : "like"),
+                            like:{
+                                value:liked,
+                                onSuccess:handleOnSuccess
+                            }
+                        },{
                             action:"share",
                             title:i18n.t('share'),
                         },{
@@ -367,11 +388,14 @@ export default function TwitterThread({navigation,route}){
                                 onPress:()=>{
                                     copyText(specialHTML(data?.tweets?.[menu]?.tweet),"Text")
                                     setMenu(null)
-                                }
+                                },
+                                icon:"copy"
                             }
                             ,...(user?.admin ? [{
                                 title:`${i18n.t('remove_type',{type:"tweet"})}`,
-                                onPress:()=>handleDeleteTweet(menu)
+                                onPress:()=>handleDeleteTweet(menu),
+                                icon:"trash",
+                                color:theme['color-danger-500']
                             }] : [])
                         ]}
                     />

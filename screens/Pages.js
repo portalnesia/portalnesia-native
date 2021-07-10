@@ -85,7 +85,7 @@ export default function({navigation,route}){
         <>
             <Layout navigation={navigation}>
                 <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 2,transform: [{translateY}]}}>
-                    <Header title={navbar||"Pages"} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />} />
+                    <Header title={navbar||"Pages"} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />} />
                 </Animated.View>
                 {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
                 

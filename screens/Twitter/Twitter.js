@@ -399,7 +399,8 @@ export default function ({ navigation,route }) {
 				}}
 				menu={[{
 					title:`${i18n.t("new_type",{type:i18n.t('twitter_thread')})}`,
-					onPress:()=>setOpen(true)
+					onPress:()=>setOpen(true),
+					icon:"plus-square"
 				},{
 					title:i18n.t('feedback'),
 					action:'feedback'

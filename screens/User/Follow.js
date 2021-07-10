@@ -17,8 +17,6 @@ import Backdrop from '@pn/components/global/Backdrop'
 import { AuthContext } from '@pn/provider/Context'
 import useAPI from '@pn/utils/API'
 
-const user=false;
-
 const winHeight = Dimensions.get('window').height;
 const OptionIcon=React.memo((props)=><Icon {...props} name="more-vertical" />)
 const MemoAvatar=React.memo(({name,image})=>(
@@ -63,12 +61,12 @@ const SkeletonFollow=()=>{
 
 const RenderFollow=React.forwardRef((props,ref)=>{
     const context = React.useContext(AuthContext);
-    const {setNotif} = context;
+    const {setNotif,state:{user}} = context;
     const {PNpost} = useAPI()
     const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/${props.type}` : null,props.type,20,false)
     const theme=useTheme()
     const navigation=useNavigation();
-    return <RenderFollowClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} setNotif={setNotif} PNpost={PNpost} />
+    return <RenderFollowClass user={user} ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} setNotif={setNotif} PNpost={PNpost} />
 })
 
 class RenderFollowClass extends React.PureComponent{
@@ -134,7 +132,7 @@ class RenderFollowClass extends React.PureComponent{
 
     render(){
         const {menu,loading}=this.state;
-        const {navigation,data,error,theme,dt,isValidating,isLoadingInitialData,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}=this.props
+        const {navigation,user,data,error,theme,dt,isValidating,isLoadingInitialData,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}=this.props
 
         if(isLoadingInitialData || (!data && !error) || (data?.error || error) || data?.users?.private===true || data?.users?.suspend===true) {
             return (
@@ -225,14 +223,20 @@ class RenderFollowClass extends React.PureComponent{
                         }}
                         menu={[{
                             title:ucwords(`${i18n.t('open')} ${i18n.t('profile')}`),
-                            onPress:()=>navigation.push("User",{username:menu?.username})
-                        },{
-                            title:ucwords(i18n.t(menu?.isFollowing ? 'unfollow' : 'follow')),
-                            onPress:()=>this.handleFollow(menu)
-                        },{
-                            title:i18n.t('report'),
-                            action:'report'
-                        }]}
+                            onPress:()=>navigation.push("User",{username:menu?.username}),
+                            icon:"person"
+                        },...(!user || user && user?.id != menu?.id ? [
+                            {
+                                title:ucwords(i18n.t(menu?.isFollowing ? 'unfollow' : 'follow')),
+                                onPress:()=>this.handleFollow(menu),
+                                icon:menu?.isFollowing ? "minus-circle" : "plus-circle",
+                                ...(menu?.isFollowing ? {color:theme['color-danger-500']} : {})
+                            },{
+                                title:i18n.t('report'),
+                                action:'report'
+                            }
+                        ] : [])
+                        ]}
                     />
                 </Portal>
             </>

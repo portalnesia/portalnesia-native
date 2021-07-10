@@ -193,7 +193,9 @@ export default function SecuritySettingScreen({navigation,route}){
                 menu={[
                     {
                         title:i18n.t('remove'),
-                        onPress:handleRemoveMenuClick
+                        onPress:handleRemoveMenuClick,
+                        icon:"trash",
+                        color:theme['color-danger-500']
                     }
                 ]}
             />

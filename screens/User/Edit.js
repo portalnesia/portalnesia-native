@@ -279,10 +279,13 @@ export default function EditUserScreen({navigation,route}){
             onClose={()=>setPhotoMenu(false)}
             menu={[{
                 title:i18n.t('change_type',{type:i18n.t('profile_type',{type:i18n.t('picture',{count:1})})}),
-                onPress:handleChangeImage
+                onPress:handleChangeImage,
+                icon:"image"
             },{
                 title:i18n.t('remove_type',{type:i18n.t('profile_type',{type:i18n.t('picture',{count:1})})}),
-                onPress:alertRemoveImage
+                onPress:alertRemoveImage,
+                icon:"trash",
+                color:theme['color-danger-500']
             }]}
         />
         <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />

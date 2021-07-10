@@ -48,6 +48,8 @@
     "theme":"theme",
     "theme_type":"%{type} theme",
     "image":"Image",
+    "like":"Like",
+    "unlike":"Unlike",
     "picture": {
         "one":"picture",
         "other":"pictures"

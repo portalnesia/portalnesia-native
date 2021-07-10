@@ -392,7 +392,11 @@ function URLshortener({navigation}){
                 }}
                 menu={[{
                     title:"QR Code",
-                    onPress:openModal
+                    onPress:openModal,
+                    icon:{
+                        name:"qr-code",
+                        pack:"material"
+                    }
                 },{
                     action:"share",
                     title:i18n.t('share'),
@@ -404,7 +408,9 @@ function URLshortener({navigation}){
                     action:'browser'
                 },{
                     title:i18n.t('remove'),
-                    onPress:confirmDelete
+                    onPress:confirmDelete,
+                    icon:"trash",
+                    color:theme['color-danger-500']
                 }]}
             />
             <Modal

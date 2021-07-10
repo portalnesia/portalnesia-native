@@ -98,7 +98,7 @@ export default function TwibbonDetail({navigation,route}){
     const Menu = ()=>(
         <>
             <TopNavigationAction tooltip={i18n.t('usage_guide',{type:"Twibbon"})} icon={SupportIcon} onPress={()=>modalRef.current?.open()} />
-            <MenuToggle onPress={()=>setOpen(true)} />
+            <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />
         </>
     )
 
