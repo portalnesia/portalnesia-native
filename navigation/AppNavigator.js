@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
-import {StatusBar,setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
+import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
 import {Icon,useTheme,Text} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
 import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
@@ -12,6 +12,7 @@ import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveLis
 import * as Notifications from 'expo-notifications'
 import messaging from '@react-native-firebase/messaging'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import {checkAndUpdateOTA} from '@pn/utils/Updates'
 
 import handleFCMData from '@pn/services/FCMservices';
 import {linking} from './Linking'
@@ -348,6 +349,7 @@ export default React.memo(() => {
 
 		if(ready) {
 			checkInitial();
+			checkAndUpdateOTA()
 		}
 	},[ready,PNpost])
 

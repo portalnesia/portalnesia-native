@@ -1,7 +1,7 @@
 import React,{useMemo} from 'react'
 import { useSWRInfinite } from "swr"
 import useAPI from './API'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 
 type PaginationDataTypes={
     page: number,

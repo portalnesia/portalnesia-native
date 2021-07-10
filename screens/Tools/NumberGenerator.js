@@ -11,7 +11,7 @@ import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import Pagination from '@pn/components/global/Pagination'
 import useClipboard from '@pn/utils/clipboard'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 
 
 export default function({navigation}){

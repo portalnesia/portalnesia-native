@@ -11,7 +11,7 @@ import {RenderMediaPrivate,RenderSuspend} from './PrivateUser'
 import { ucwords } from '@pn/utils/Main'
 import {GridSkeleton} from '@pn/components/global/Skeleton'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 

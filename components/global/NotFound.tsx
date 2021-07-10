@@ -1,6 +1,6 @@
 import React from 'react'
 import {View} from 'react-native'
-import {AuthContext} from '@pn/provider/AuthProvider'
+import {AuthContext} from '@pn/provider/Context'
 import LottieView from 'lottie-react-native'
 
 export interface NotFoundProps {

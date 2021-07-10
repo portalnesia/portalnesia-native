@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
 import {useTheme} from '@ui-kitten/components'
-import {StatusBar} from 'expo-status-bar'
+import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
 import analytics from '@react-native-firebase/analytics'
 import useRootNavigation from './useRootNavigation'
 
@@ -28,6 +28,8 @@ export default function(){
 
     function onReady(){
 		routeNameRef.current = navigationRef.current.getCurrentRoute().name
+        setStatusBarStyle(selectedTheme==='light' ? "dark" : "light");
+        setStatusBarBackgroundColor(theme['background-basic-color-1']);
 	}
 
 	async function onStateChange(){
@@ -42,27 +44,24 @@ export default function(){
 	}
 
     return (
-        <>
-            <StatusBar animated style={(selectedTheme==='light' ? "dark" : "light")} translucent animated backgroundColor={theme['background-basic-color-1']} />
-            <NavigationContainer
-                ref={navigationRef}
-                onReady={onReady}
-                onStateChange={onStateChange}
-            >
-                <MainStack.Navigator initialRouteName="Login" screenOptions={{
-                    headerShown:false,
-                    gestureEnabled:true,
-                    ...TransitionPresets.SlideFromRightIOS
-                }}>
-                    <MainStack.Screen name="Login" component={Login} />
-                    <MainStack.Screen name="Register" component={Register} />
-                    <MainStack.Screen name="Authentication" component={Authentication} />
-                    <MainStack.Screen name="ForgetPassword" component={ForgetPassword} />
-                    <MainStack.Screen name="ForgetPasswordForm" component={ForgetPasswordForm} />
-                    <MainStack.Screen name="ReportModal" component={ReportModal} />
-                    <MainStack.Screen name="ReportScreen" component={ReportScreen} />
-                </MainStack.Navigator>
-            </NavigationContainer>
-        </>
+        <NavigationContainer
+            ref={navigationRef}
+            onReady={onReady}
+            onStateChange={onStateChange}
+        >
+            <MainStack.Navigator initialRouteName="Login" screenOptions={{
+                headerShown:false,
+                gestureEnabled:true,
+                ...TransitionPresets.SlideFromRightIOS
+            }}>
+                <MainStack.Screen name="Login" component={Login} />
+                <MainStack.Screen name="Register" component={Register} />
+                <MainStack.Screen name="Authentication" component={Authentication} />
+                <MainStack.Screen name="ForgetPassword" component={ForgetPassword} />
+                <MainStack.Screen name="ForgetPasswordForm" component={ForgetPasswordForm} />
+                <MainStack.Screen name="ReportModal" component={ReportModal} />
+                <MainStack.Screen name="ReportScreen" component={ReportScreen} />
+            </MainStack.Navigator>
+        </NavigationContainer>
     )
 }

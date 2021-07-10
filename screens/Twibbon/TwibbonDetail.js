@@ -16,7 +16,7 @@ import Button from '@pn/components/global/Button'
 import ImageCropper from '@pn/components/global/ImageCropper/ImageCropper'
 import {CONTENT_URL} from '@env'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
-import {AuthContext} from '@pn/provider/AuthProvider'
+import {AuthContext} from '@pn/provider/Context'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import i18n from 'i18n-js'
 import { ucwords } from '@pn/utils/Main';

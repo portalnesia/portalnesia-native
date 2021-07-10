@@ -9,8 +9,6 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import style from '@pn/components/global/style'
-//import Button from '@pn/components/global/Button'
-//import { AuthContext } from '@pn/provider/AuthProvider';
 import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
 import Button from '@pn/components/global/Button';
 

@@ -15,7 +15,7 @@ import {AdsBanner,AdsBanners,showInterstisial} from '@pn/components/global/Ads'
 import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 import { ucwords,extractMeta } from '@pn/utils/Main';
 import {saveBase64} from '@pn/utils/Download'
 import {randomInt} from '@pn/utils/Main'

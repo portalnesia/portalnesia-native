@@ -23,7 +23,7 @@ import Image from '@pn/components/global/Image'
 import NotFoundScreen from '../NotFound'
 import {CONTENT_URL} from '@env'
 import WebView from 'react-native-autoheight-webview'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
 import {specialHTML,listToMatrix,openBrowser,Ktruncate} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'

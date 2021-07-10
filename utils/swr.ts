@@ -1,7 +1,7 @@
 import React from 'react'
 import useSWRR,{SWRConfiguration} from "swr"
 import useAPI from './API'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 
 export default function useSWR<D=any,F=any>(path: string|null,config:SWRConfiguration={},autoValidate=false){
     const context = React.useContext(AuthContext)

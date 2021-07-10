@@ -8,8 +8,7 @@ import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
 import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
-//import {useColorScheme} from 'react-native-appearance'
-import {useColorScheme,PermissionsAndroid,LogBox} from 'react-native'
+import {useColorScheme,PermissionsAndroid,LogBox,StyleSheet} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
@@ -18,6 +17,11 @@ import {captureScreen} from 'react-native-view-shot'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
 import {requestPermissionsAsync as AdsRequest} from 'expo-ads-admob'
+import remoteConfig from '@react-native-firebase/remote-config'
+import 'moment/locale/id';
+import AppLoading from 'expo-app-loading';
+import AppNavigator from '../navigation/AppNavigator';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
@@ -25,12 +29,13 @@ import {IoniconsPack} from '../components/utils/IoniconsPack'
 import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
 import i18n from 'i18n-js'
 import {AuthContext} from './Context'
-import {checkAndUpdateOTA} from '@pn/utils/Updates'
 import useLogin,{refreshingToken} from '@pn/utils/Login'
 import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
+import loadResources from '@pn/utils/Assets'
+import { logError } from '@pn/utils/log';
 
 LogBox.ignoreLogs(['Setting a timer for a long period of time']);
 
@@ -81,7 +86,7 @@ const initialState={
 	session:null
 }
 
-const AuthProviderFunc = (props) => {
+const AuthProviderFunc = () => {
 	const dropdownRef=useRef(null)
 	const currentInternet=useRef(true);
 	const [state,dispatch]=useReducer(reducer,initialState)
@@ -91,7 +96,7 @@ const AuthProviderFunc = (props) => {
 	const forceUpdate = useForceUpdate();
 	const {navigationRef} = useRootNavigation()
 	const {refreshToken} = useLogin({dispatch,setNotif})
-	const lastNotif = Notifications.useLastNotificationResponse();
+	const [isLoadingComplete, setLoadingComplete] = React.useState(false);
 	//const [appState,currentState] = useAppState();
 	const isLogin=React.useMemo(()=>typeof state.user === 'object',[state.user]);
 	const stateUser = React.useMemo(()=>state.user,[state.user]);
@@ -155,7 +160,7 @@ const AuthProviderFunc = (props) => {
 		}
 	},[navigationRef])
 
-	useEffect(()=>{
+	const loadResourcesAsync=React.useCallback(async()=>{
 		async function asyncTask(){
 			try {
 				let [res,lang,ads] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang"),AsyncStorage.getItem("ads")])
@@ -171,17 +176,22 @@ const AuthProviderFunc = (props) => {
 						}
 					}
 				} catch(e){}
-
+				
 				await refreshToken();
 				return Promise.resolve();
 			} catch(err){
 				log("asyncTask AuthProvider.js",{msg:e.message});
         		logError(e,"asyncTask AuthProvider.js");
 				dispatch({ type:"MANUAL",payload:{user:false,token:null,session:Applications.androidId}})
-				return;
+				return Promise.resolve();
 			}
 		};
+		await loadResources();
+		await asyncTask();
+		return Promise.resolve();
+	},[])
 
+	useEffect(()=>{
 		async function setNotificationChannel(){
 			try {
 				await Promise.all([
@@ -216,20 +226,17 @@ const AuthProviderFunc = (props) => {
 				currentInternet.current=false;
 			}
 		})
-
-		asyncTask().then(()=>{
-			if(props?.main) checkAndUpdateOTA()
-		})
 		
-		if(props?.main) {
+		if(stateUser !== null) {
 			setNotificationChannel();
 			createFolder();
-		} 
+		}
+		
 		
 		return ()=>{
 			netInfoListener();
 		}
-	},[])
+	},[stateUser])
 
 	/* LOCALIZATION */
 	useEffect(()=>{
@@ -283,7 +290,7 @@ const AuthProviderFunc = (props) => {
 		function handleInterval(){
 			interval = setInterval(handleRefreshToken,295 * 1000)
 		}
-		if(isLogin && props?.main) {
+		if(isLogin) {
 			//if(currentState.match(/inactive|background/)) handleRefreshToken();
 			handleInterval();
 		}
@@ -301,43 +308,75 @@ const AuthProviderFunc = (props) => {
 		}
 	},[])
 
+	if (!isLoadingComplete) {
+		return (
+			<>
+				<AppLoading
+					startAsync={loadResourcesAsync}
+					onError={(err)=>handleLoadingError(err,setLoadingComplete)}
+					onFinish={() => handleFinishLoading(setLoadingComplete)}
+				/>
+			</>
+		);
+	}
+
 	return (
-		<AuthContext.Provider
-			value={{
-				state:{
-					user:stateUser,
-					token:stateToken,
-					session:stateSession
-				},
-				dispatch,
-				setNotif,
-				setTheme,
-				theme:selectedTheme,
-				userTheme:tema,
-				lang,
-				setLang,
-				sendReport,
-				isLogin
-			}}
-		>
-			<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />
-			<ApplicationProvider {...eva} theme={{...eva[selectedTheme],...theme[selectedTheme]}} customMapping={mapping}>
-				<PortalProvider>
-					{props.children}
-				</PortalProvider>
-				<DropdownAlert
-					successColor='#2f6f4e'
-					activeStatusBarStyle='light-content'
-					inactiveStatusBarStyle={selectedTheme==='light' ? "dark-content" : "light-content"}
-					inactiveStatusBarBackgroundColor={selectedTheme==='light' ? "#FFFFFF" : "#222B45"}
-					onTap={onTap}
-					renderImage={()=>null}
-					ref={dropdownRef} />
-			</ApplicationProvider>
-		</AuthContext.Provider>
+		<SafeAreaView style={[styles.container]}>
+			<AuthContext.Provider
+				value={{
+					state:{
+						user:stateUser,
+						token:stateToken,
+						session:stateSession
+					},
+					dispatch,
+					setNotif,
+					setTheme,
+					theme:selectedTheme,
+					userTheme:tema,
+					lang,
+					setLang,
+					sendReport,
+					isLogin
+				}}
+			>
+				<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />
+				<ApplicationProvider {...eva} theme={{...eva[selectedTheme],...theme[selectedTheme]}} customMapping={mapping}>
+					<PortalProvider>
+						<AppNavigator />
+					</PortalProvider>
+					<DropdownAlert
+						successColor='#2f6f4e'
+						activeStatusBarStyle='light-content'
+						inactiveStatusBarStyle={selectedTheme==='light' ? "dark-content" : "light-content"}
+						inactiveStatusBarBackgroundColor={selectedTheme==='light' ? "#FFFFFF" : "#222B45"}
+						onTap={onTap}
+						renderImage={()=>null}
+						ref={dropdownRef} />
+				</ApplicationProvider>
+			</AuthContext.Provider>
+		</SafeAreaView>
 	);
 };
 
+function handleLoadingError(error,setLoadingComplete) {
+	// In this case, you might want to report the error to your error reporting
+	// service, for example Sentry
+	logError(error,"Splashscreen error")
+	setLoadingComplete(true);
+}
+
+function handleFinishLoading(setLoadingComplete) {
+	setLoadingComplete(true);
+}
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+});
+
 const AuthProvider = React.memo(AuthProviderFunc)
 
-export { AuthContext, AuthProvider };
+export { AuthProvider };
+export default AuthProviderFunc

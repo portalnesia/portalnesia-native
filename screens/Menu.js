@@ -11,7 +11,7 @@ import Button from '@pn/components/global/Button'
 import Backdrop from '@pn/components/global/Backdrop';
 import Layout from '@pn/components/global/Layout'
 import Avatar from '@pn/components/global/Avatar'
-import {AuthContext} from '@pn/provider/AuthProvider'
+import {AuthContext} from '@pn/provider/Context'
 import {menu as getMenu} from '../constants/menu'
 import Header,{useHeader,headerHeight,TopAction} from '@pn/components/navigation/Header'
 import {Constants} from 'react-native-unimodules'
@@ -91,7 +91,7 @@ export default function({navigation}){
                     let btn=[
                         {
                             text:"Changelog",
-                            onPress:()=>openBrowser(`${DATAS_URL}/native/v${res?.data?.version}`,false)
+                            onPress:()=>openBrowser(`${DATAS_URL}/native/v${Constants.manifest.version}`,false)
                         },
                         {
                             text:"Later",
@@ -112,11 +112,11 @@ export default function({navigation}){
                 } else {
                     Alert.alert(
                         "Your version is up to date",
-                        `v${res?.data?.version}`,
+                        `${res?.data?.version == Constants.manifest.version ? `v${res?.data?.version}` : `Native version ${res?.data?.version}\nBundle version ${Constants.manifest.version}`}`,
                         [
                             {
                                 text:"Changelog",
-                                onPress:()=>openBrowser(`${DATAS_URL}/native/v${res?.data?.version}`,false)
+                                onPress:()=>openBrowser(`${DATAS_URL}/native/v${Constants.manifest.version}`,false)
                             },
                             {
                                 text:"OK",

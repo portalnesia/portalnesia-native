@@ -10,7 +10,7 @@ import {AdsBanner,AdsBanners,showInterstisial} from '@pn/components/global/Ads'
 import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
-import { AuthContext } from '@pn/provider/AuthProvider';
+import { AuthContext } from '@pn/provider/Context';
 import {randomInt} from '@pn/utils/Main'
 import verifyRecaptcha from '@pn/module/Recaptcha'
 import ShareModule from '@pn/module/Share';
