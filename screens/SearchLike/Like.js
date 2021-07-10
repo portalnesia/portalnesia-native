@@ -175,7 +175,7 @@ export default function Like({navigation,route}){
     const {state:{user}}=context;
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
     const theme = useTheme();
-    const {data,error,mutate,isValidating} = useSWR("/like");
+    const {data,error,mutate,isValidating} = useSWR("/like",{},true);
     const [refreshing,setRefreshing] = React.useState(false);
 
     React.useEffect(()=>{
@@ -185,11 +185,11 @@ export default function Like({navigation,route}){
     const ref = React.useRef(null)
 	useScrollToTop(ref)
 
-    const renderItem=(prop)=>{
+    const renderItem=React.useCallback((prop)=>{
         if(['news','blog','users','media','twibbon'].indexOf(prop?.item?.type) !== -1) return <RenderWithImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} navigation={navigation} />
         if(['chord','thread'].indexOf(prop?.item?.type) !== -1) return <RenderNoImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} navigation={navigation} />
         return null;
-    }
+    },[theme,navigation])
 
     const RenderEmpty=()=>{
         if(error) {
@@ -220,7 +220,7 @@ export default function Like({navigation,route}){
                 data={data ? data?.data : []}
                 renderItem={renderItem}
                 ListEmptyComponent={RenderEmpty}
-                contentContainerStyle={{...(data?.length > 0 ? {} : {flex:1})}}
+                contentContainerStyle={{...(data && data?.data?.length > 0 ? {} : {flex:1})}}
                 keyExtractor={(item,index)=>`${item?.type}-${index}`}
                 refreshControl={
                     <RefreshControl

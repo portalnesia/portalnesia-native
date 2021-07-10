@@ -1,5 +1,5 @@
 import React from 'react'
-import {useWindowDimensions,View,Share} from 'react-native'
+import {View,Share,ImageProps,ColorValue} from 'react-native'
 import {Icon,Layout,Text,useTheme,Menu,MenuItem} from '@ui-kitten/components'
 import {Modalize} from 'react-native-modalize'
 import analytics from '@react-native-firebase/analytics'
@@ -12,9 +12,32 @@ import {openBrowser} from '@pn/utils/Main'
 import i18n from 'i18n-js'
 import useAPI from '@pn/utils/API'
 import {Portal} from '@gorhom/portal'
+import {sentLike} from '@pn/components/global/Like'
+import Backdrop from './Backdrop'
 
-const MoreIcon=(props?: {style: Record<string,any>})=><Icon {...props} name="more-vertical" />
-const FeedbackIcon=(props?: {style: Record<string,any>})=><Icon {...props} name="feedback" pack="material" />
+const MoreIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="more-vertical" />
+const FeedbackIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="feedback" pack="material" />
+const FeedbackMenuIcon=(props?: Partial<ImageProps>)=><View style={{marginRight:15}}><Icon {...props} name="feedback" pack="material" /></View>
+const ShareIcon=(props?: Partial<ImageProps>)=><Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15}]} name="share" />
+const BrowserIcon=(props?: Partial<ImageProps>)=><Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15}]} name="browser" />
+const LinkIcon=(props?: Partial<ImageProps>)=><Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15}]} name="link-2" />
+const LikeIcon=(value: boolean)=>(props?: Partial<ImageProps>)=>{
+    const theme = useTheme();
+    const name = value ? "heart" : "heart-outline";
+    return <Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15,tintColor:theme['color-danger-500']}]} name={name} />
+}
+const CustomIcon=(prop: {name:string,pack?:string}|string,color?:ColorValue)=>(props?: Partial<ImageProps>)=>{
+    const name = typeof prop === 'string' ? prop : prop?.name;
+    const pack = typeof prop === 'object' && prop?.pack ? prop?.pack : undefined;
+    if(pack) {
+        return (
+            <View style={{marginRight:15}}>
+                <Icon {...props} style={[props?.style,{...(color ? {tintColor:color} : {})}]} name={name} pack={pack} />
+            </View>
+        )
+    }
+    return <Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15,...(color ? {tintColor:color} : {})}]} name={name} />
+}
 
 export type FeedbackToggleProps = {
     link?: string
@@ -37,11 +60,19 @@ export type MenuToggleProps = {
 }
 export const MenuToggle=React.memo(({onPress,tooltip}: MenuToggleProps)=><TopNavigationAction tooltip={tooltip||i18n.t('more_option')} icon={MoreIcon} onPress={onPress} />)
 
+type LikeMenuType = {
+    value: boolean,
+    onSuccess?(result: boolean): void
+}
+
 export type MenuType = {
     title: string,
     onPress?:()=>void,
     action?:string,
-    beforeAction?:()=>void
+    beforeAction?:()=>void,
+    icon?:{name:string,pack?:string}|string,
+    color?:ColorValue,
+    like?:LikeMenuType
 }
 export type ShareType = {
     link: string,
@@ -59,12 +90,23 @@ export interface MenuContainerProps {
     type?: string,
     item_id?: string|number
 }
+
+function getIcon(action?: string,value?: any) {
+    if(action === 'share') return ShareIcon;
+    if(action === 'feedback' || action === 'report') return FeedbackMenuIcon;
+    if(action === 'copy') return LinkIcon;
+    if(action === 'browser') return BrowserIcon;
+    if(action === 'like') return LikeIcon(value??false);
+    return undefined;
+}
+
 const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContainerProps)=>{
     const context = React.useContext(AuthContext)
-    const {sendReport} = context
+    const {sendReport,setNotif,state:{user}} = context
     const {copyText} = useClipboard()
     const {PNpost} = useAPI();
     const [selectedMenu,setSelectedMenu]=React.useState<MenuType|null>(null)
+    const [loading,setLoading] = React.useState(false);
     //const {width}=useWindowDimensions()
     const theme=useTheme()
     const ref = React.useRef<Modalize>();
@@ -80,7 +122,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
         }
     },[visible])
 
-    const handleShare=async(text?: string,url?: string,dialog?: string)=>{
+    const handleShare=React.useCallback(async(text?: string,url?: string,dialog?: string)=>{
         Share.share({
             message:text ? `${text} ${url}` : url,
             url:url||''
@@ -99,11 +141,27 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
                 ])
             } catch(e) {}
         }
-    }
+    },[type,item_id,PNpost])
 
-    const handleOnPress=(dt: MenuType)=>{
+    const handleLike=React.useCallback(async(like: LikeMenuType)=>{
+        if(!user) return setNotif(true,"Error","Login to continue!");
+        setLoading(true)
+        try {
+            const res = await sentLike(PNpost,type,item_id);
+            if(typeof res?.liked !== 'undefined') {
+                if(like.onSuccess) like.onSuccess(res.liked);
+                setNotif(false,"Success");
+            }
+        } catch(e){
+            
+        } finally {
+            setLoading(false);
+        }
+    },[type,item_id,PNpost,user])
+
+    const handleOnPress=React.useCallback((dt: MenuType)=>{
         setSelectedMenu(dt);
-    }
+    },[])
 
     React.useEffect(()=>{
         if(selectedMenu !== null) {
@@ -126,6 +184,8 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
                     setTimeout(()=>sendReport('konten',{contentType:type,contentTitle:share?.title,contentId:item_id,...(share?.link ? {urlreported:`${URL}${share?.link}`} : {} )}))
                 } else if(selectedMenu?.action === 'feedback') {
                     setTimeout(()=>sendReport('feedback',{...(share?.link ? {urlreported:`${URL}${share?.link}`} : {} )}))
+                } else if(selectedMenu?.action === 'like' && typeof selectedMenu?.like !== 'undefined') {
+                    handleLike(selectedMenu?.like)
                 }
             }
             setSelectedMenu(null)
@@ -151,13 +211,15 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
                     <Layout style={{marginBottom:15,paddingTop:10}}>
                         <Menu appearance="noDivider">
                             {menu?.map((dt,i)=>{
-                                return <MenuItem style={{paddingHorizontal:15,paddingVertical:12}} key={`${i}`} title={()=><Text>{dt.title||""}</Text>} onPress={()=>handleOnPress(dt)} />
-                                
+                                const color = dt?.color;
+                                const icon = dt?.icon ? CustomIcon(dt?.icon,color) : getIcon(dt?.action,(dt?.action==='like' ? dt?.like?.value : undefined));
+                                return <MenuItem accessoryLeft={icon} style={{paddingHorizontal:15,paddingVertical:12,justifyContent:'flex-start'}} key={`${i}`} title={()=><Text>{dt.title||""}</Text>} onPress={()=>handleOnPress(dt)} />
                             })}
                         </Menu>
                     </Layout>
                 </Layout>
             </Modalize>
+            <Backdrop loading visible={loading} />
         </Portal>
     )
 }

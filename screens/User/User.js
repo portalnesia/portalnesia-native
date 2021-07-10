@@ -236,7 +236,7 @@ export default function UserScreen({navigation,route}){
                     title={(evaProps) => <AnimText {...evaProps}  category="h1" style={{...evaProps?.style,marginHorizontal:50,opacity}} numberOfLines={1}>{data?.users?.username||""}</AnimText>}
                     accessoryLeft={()=><RenderBackButton navigation={navigation} />}
                     alignment="center"
-                    accessoryRight={()=><MenuToggle onPress={()=>{setOpenMenu(true)}} />}
+                    accessoryRight={()=><MenuToggle onPress={()=>{data && !data?.error && setOpenMenu(true)}} />}
                 />
             </View>
         )

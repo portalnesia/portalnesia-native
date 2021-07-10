@@ -55,6 +55,7 @@ function ChordDetailScreen({navigation,route}){
     const {PNget} = usePost();
     const [backdrop,setBackdrop] = React.useState(false);
     const [viewVideo,setViewVideo] = React.useState(false)
+    const [liked,setLiked] = React.useState(false)
 
     const heightHeader = React.useMemo(()=>{
         return heightt?.main + heightt?.sub;
@@ -168,15 +169,27 @@ function ChordDetailScreen({navigation,route}){
         }
     },[data,ready,route])
 
-    /*React.useEffect(()=>{
-        if (slug === 'popular') return navigation.replace("Chord",{slug:'popular'})
-    },[route])*/
+    const handleOnSuccess=React.useCallback((val)=>{
+        mutate({
+            ...data,
+            chord:{
+                ...data?.chord,
+                liked:val
+            }
+        })
+    },[data,mutate])
+
+    React.useEffect(()=>{
+        if(data) {
+            setLiked(data?.chord?.liked);
+        }
+    },[data])
 
     return (
         <>
         <Layout navigation={navigation}>
             <AnimLay style={{left: 0,right: 0,width: '100%',zIndex: 1,...(!viewVideo ? {position:'absolute',transform: [{translateY}]} : {})}}>
-                <Header title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : ``} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
+                <Header title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : ``} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
                     <Lay style={{height:heightt?.sub,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly'}}>
                         <Lay>
                             <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('transpose')}}>Transpose</Button>
@@ -364,6 +377,14 @@ function ChordDetailScreen({navigation,route}){
                         title:viewVideo ? i18n.t('hide_type',{type:i18n.t('media.video_player')}) : i18n.t('show_type',{type:i18n.t('media.video_player')}),
                         onPress:()=>{
                             setViewVideo(p=>!p);
+                        },
+                        icon:"play-circle"
+                    },{
+                        action:"like",
+                        title:i18n.t(liked ? "unlike" : "like"),
+                        like:{
+                            value:liked,
+                            onSuccess:handleOnSuccess
                         }
                     },{
                         action:"share",

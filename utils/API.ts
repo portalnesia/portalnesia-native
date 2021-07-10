@@ -14,7 +14,7 @@ import {UserType} from '@pn/types/UserTypes'
 import {TokenResponse} from 'expo-auth-session'
 import { log, logError } from './log';
 
-type ApiResponse<D> = {
+export type ApiResponse<D> = {
     error:number,
     msg: string,
     [key: string]: any

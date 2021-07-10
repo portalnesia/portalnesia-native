@@ -318,7 +318,7 @@ export default React.memo(() => {
 		if(screenChange === 7) {
 			const random = Math.floor(Math.random() * 2);
 			screenChange = 0;
-			if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1) showAds();
+			if(random === 0 && disableAdsArr.indexOf(currentRouteName) === -1 && !__DEV__) showAds();
 		} else {
 			screenChange += 1;
 		}

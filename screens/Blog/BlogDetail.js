@@ -37,6 +37,8 @@ function BlogDetail({navigation,route}){
     const [content,setContent] = React.useState([]);
     const [tableShow,setTableShow] = React.useState(false)
 
+    const [liked,setLiked] = React.useState(false);
+
     const scrollAnim = new Animated.Value(0);
     const onScroll = (e)=>{
         scrollAnim.setValue(e?.nativeEvent?.contentOffset?.y);
@@ -82,11 +84,27 @@ function BlogDetail({navigation,route}){
         setTableShow(false)
     },[])
 
+    const handleOnSuccess=React.useCallback((val)=>{
+        mutate({
+            ...data,
+            blog:{
+                ...data?.blog,
+                liked:val
+            }
+        })
+    },[data,mutate])
+
+    React.useEffect(()=>{
+        if(data) {
+            setLiked(data?.blog?.liked);
+        }
+    },[data])
+
     return (
         <>
         <Layout navigation={navigation}>
             <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 2,transform: [{translateY}]}}>
-				<Header title='Blog' subtitle={data?.blog?.title||""} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />} />
+				<Header title='Blog' subtitle={data?.blog?.title||""} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{data && !data?.error &&setOpen(true)}} />} />
 			</Animated.View>
             {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
             <Animated.ScrollView
@@ -178,6 +196,13 @@ function BlogDetail({navigation,route}){
                    dialog:i18n.t('share_type',{type:"blog"})
                }}
                menu={[{
+                    action:"like",
+                    title:i18n.t(liked ? "unlike" : "like"),
+                    like:{
+                        value:liked,
+                        onSuccess:handleOnSuccess
+                    }
+                },{
                     action:"share",
                     title:i18n.t('share'),
                 },{
