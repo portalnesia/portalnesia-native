@@ -20,7 +20,6 @@ import Skeleton from '@pn/components/global/Skeleton'
 import Comment from '@pn/components/global/Comment'
 import usePost from '@pn/utils/API'
 import {pushTo} from '@pn/navigation/useRootNavigation'
-//import {CONTENT_URL} from '@env'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
@@ -36,6 +35,18 @@ export default function({navigation,route}){
     const {translateY,...other} = useHeader()
 	const heightHeader = heightt?.main + heightt?.sub
     const {PNget} = usePost();
+    const [refreshing,setRefreshing] = React.useState(false);
+
+    const onRefresh=React.useCallback(()=>{
+        if(!isValidating) {
+            setRefreshing(true);
+            mutate();
+        }
+    },[isValidating])
+
+    React.useEffect(()=>{
+        if(!isValidating) setRefreshing(false)
+    },[isValidating])
 
     React.useEffect(()=>{
         let timeout = null;
@@ -88,7 +99,7 @@ export default function({navigation,route}){
                     paddingTop:heightHeader+2
                 }}
                 refreshControl={
-                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
                 {...other}
             >
