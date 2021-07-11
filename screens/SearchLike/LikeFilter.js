@@ -52,6 +52,7 @@ export default function SearchFilter({navigation,route}){
     }
 
     const RenderEmpty=()=>{
+        if(isLoadingInitialData) return <Skeleton type="grid" image number={12} />
         if(error || originalData?.error) {
             return <NotFound status={originalData?.code||503}><Text>{originalData?.msg ?? i18n.t("errors.general")}</Text></NotFound>
         }

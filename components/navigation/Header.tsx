@@ -3,7 +3,6 @@ import {Divider} from '@ui-kitten/components'
 import {Animated,NativeScrollEvent,NativeSyntheticEvent} from 'react-native'
 import {useNavigationState} from '@react-navigation/native'
 import {AuthContext} from '@pn/provider/Context'
-import LottieView,{AnimatedLottieViewProps} from 'lottie-react-native'
 import TopNavigationAction from './TopAction'
 import TopNav,{TopNavigationProps} from './TopNav';
 
@@ -19,16 +18,6 @@ export const headerHeight = {
 }
 
 export const TopAction = TopNavigationAction;
-
-const RefreshingHeight = 100;
-
-export const Lottie=React.memo((props: AnimatedLottieViewProps)=>{
-    const {style,...other} = props
-	const context = React.useContext(AuthContext)
-	const {theme} = context
-
-	return <LottieView style={[{height:RefreshingHeight,position:'absolute',top:5,left:0,right:0},style]} autoPlay {...other} source={theme==='dark' ? require('@pn/assets/animation/loading-dark.json') : require('@pn/assets/animation/loading-dark.json')} />
-})
 
 export const useHeader=(height=58,onScrollProps?: (event: NativeSyntheticEvent<NativeScrollEvent>)=>void)=>{
 	const index = useNavigationState(state=>state.index);

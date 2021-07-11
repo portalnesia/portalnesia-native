@@ -91,7 +91,7 @@ export default function({navigation}){
                     let btn=[
                         {
                             text:"Changelog",
-                            onPress:()=>openBrowser(`${DATAS_URL}/native/v${Constants.manifest.version}`,false)
+                            onPress:()=>openBrowser(`${DATAS_URL}/native/v${res?.data?.bundle}`,false)
                         },
                         {
                             text:"Later",
@@ -112,11 +112,11 @@ export default function({navigation}){
                 } else {
                     Alert.alert(
                         "Your version is up to date",
-                        `${res?.data?.version == Constants.manifest.version ? `v${res?.data?.version}` : `Native version ${res?.data?.version}\nBundle version ${Constants.manifest.version}`}`,
+                        `${res?.data?.version == res?.data?.bundle ? `v${res?.data?.version}` : `Native version ${res?.data?.version}\nBundle version ${res?.data?.bundle}`}`,
                         [
                             {
                                 text:"Changelog",
-                                onPress:()=>openBrowser(`${DATAS_URL}/native/v${Constants.manifest.version}`,false)
+                                onPress:()=>openBrowser(`${DATAS_URL}/native/v${res?.data?.bundle}`,false)
                             },
                             {
                                 text:"OK",

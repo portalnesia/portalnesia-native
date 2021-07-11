@@ -206,7 +206,7 @@ export default function Like({navigation,route}){
     }
 
     React.useEffect(()=>{
-        if (filter) return navigation.replace("LikeFilter",{...route.params})
+        if (filter) return navigation.navigate("LikeFilter",{...route.params})
     },[route])
 
     React.useEffect(()=>{
