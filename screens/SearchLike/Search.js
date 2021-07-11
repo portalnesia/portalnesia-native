@@ -389,7 +389,7 @@ export default function Search({navigation,route}){
     },[])
 
     React.useEffect(()=>{
-        if (filter) return navigation.replace("SearchFilter",{...route.params})
+        if (filter) return navigation.navigate("SearchFilter",{...route.params})
     },[route])
 
     return (
