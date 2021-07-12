@@ -100,7 +100,7 @@ export default function({navigation,route}){
             <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
 				<Header title={"News"} subtitle={data?.title||""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />} />
 			</Animated.View>
-            <PullRefresh ref={pullRefreshRef} onRefresh={onRefresh} refreshing={refreshing} headerHeight={heightHeader+2}>
+            <PullRefresh ref={pullRefreshRef} onRefresh={onRefresh} refreshing={refreshing} headerHeight={heightHeader}>
                 <Animated.ScrollView
                     contentContainerStyle={{
                         flexGrow: 1,
