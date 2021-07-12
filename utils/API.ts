@@ -62,6 +62,7 @@ async function refreshToken(token: TokenResponse){
 export default function useAPI(){
     const context = React.useContext(AuthContext)
     const {setNotif,sendReport} = context
+    const cancelToken = axios.CancelToken.source();
 
     const PNpost=React.useCallback(async<D = any>(url: string,data?:{[key: string]: any},formdata?: AxiosRequestConfig,catchError=true): Promise<ApiResponse<D>>=>{
         let token: TokenResponse|null=null,session:string="";
@@ -87,6 +88,7 @@ export default function useAPI(){
                     ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                     ...otherHeader
                 },
+                cancelToken: cancelToken.token,
                 ...other
             }
             //opt.headers['Content-Type']="multipart/form-data";
@@ -96,6 +98,7 @@ export default function useAPI(){
                     'X-Session-Id':session,
                     ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                 },
+                cancelToken: cancelToken.token
             }
         }
         try {
@@ -144,6 +147,7 @@ export default function useAPI(){
                 'X-Session-Id':session,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
+            cancelToken: cancelToken.token
         }
         try {
             const response = await API.get<ApiResponse<D>>(baseURL,opt);
@@ -189,6 +193,7 @@ export default function useAPI(){
                 'X-Session-Id':session,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
+            cancelToken: cancelToken.token
         }
         try {
             const response = await API.get<ApiResponse<D>>(baseURL,opt);
@@ -260,6 +265,7 @@ export default function useAPI(){
                 'X-Session-Id':session,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
+            cancelToken: cancelToken.token
         }
         try {
             const result=await API.get<ApiResponse<{}>>(`${APII}/v2/pkey`,opt);
@@ -280,5 +286,5 @@ export default function useAPI(){
         }
     },[])
 
-    return {PNpost,PNget,fetcher,PNgraph,PNgetPkey}
+    return {PNpost,PNget,fetcher,PNgraph,PNgetPkey,cancelToken}
 }

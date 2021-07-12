@@ -1,6 +1,6 @@
 import React from 'react'
 import {ScrollView,View,Dimensions, Alert,RefreshControl,FlatList} from 'react-native'
-import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Spinner,Divider, Icon,Toggle} from '@ui-kitten/components'
+import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Divider, Icon,Toggle} from '@ui-kitten/components'
 import i18n from 'i18n-js'
 
 import Layout from "@pn/components/global/Layout";
@@ -19,6 +19,7 @@ import useAPI from '@pn/utils/API';
 import ListItem from '@pn/components/global/ListItem'
 import Password from '@pn/components/global/Password'
 import { MenuContainer } from '@pn/components/global/MoreMenu';
+import Spinner from '@pn/components/global/Spinner'
 
 const OptionIcon=React.memo((props)=><Icon {...props} name="more-vertical" />)
 

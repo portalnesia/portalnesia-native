@@ -9,4 +9,5 @@ export interface ButtonProps extends BtnProps {
 }
 
 declare const Button: React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<Btn>>
+export const LoadingComponent: React.NamedExoticComponent<object>
 export default Button

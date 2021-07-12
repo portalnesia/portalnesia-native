@@ -1,6 +1,6 @@
 import React from 'react';
 import { Animated,RefreshControl,useWindowDimensions,View,LogBox } from 'react-native';
-import {Layout as Lay,Text,useTheme,Divider,Icon,Card,Spinner} from '@ui-kitten/components'
+import {Layout as Lay,Text,useTheme,Divider,Icon,Card} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
@@ -28,6 +28,8 @@ import Button from '@pn/components/global/Button'
 import {specialHTML,listToMatrix,openBrowser,Ktruncate} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'
 import usePost from '@pn/utils/API'
+import Spinner from '@pn/components/global/Spinner'
+import LikeButton from '@pn/components/global/Like'
 
 LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
 
@@ -148,6 +150,18 @@ export default function TwitterThread({navigation,route}){
     const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [liked,setLiked] = React.useState(false);
+    const [refreshing,setRefreshing] = React.useState(false);
+
+    React.useEffect(()=>{
+        if(!isValidating) setRefreshing(false)
+    },[isValidating])
+
+    const onRefresh=React.useCallback(()=>{
+        if(!isValidating) {
+            setRefreshing(true);
+            mutate();
+        }
+    },[isValidating])
 
     React.useEffect(()=>{
         let timeout = null;
@@ -198,13 +212,16 @@ export default function TwitterThread({navigation,route}){
                             <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13,textDecorationLine:"underline"}} status="info" onPress={()=>openBrowser(`https://twitter.com/${data?.screen_name}/status/${data?.id}`) }>Original Thread</Text>
                             <Text style={{fontSize:13}}><Text><CountUp data={data?.seen} /></Text> <Text>views</Text></Text>
                         </Lay>
+                        <Lay key="lay-1" style={{flexDirection:'row',alignItems:"flex-start",justifyContent:"flex-end"}}>
+                            <LikeButton value={liked} onSuccess={handleOnSuccess} type="twitter_thread" item_id={data?.tweet_id} />
+                        </Lay>
                     </Lay>
                     <Divider style={{marginVertical:20,marginBottom:0,backgroundColor:theme['border-text-color']}} />
                 </Lay>
             )
         }
         return null;
-    },[data,theme])
+    },[data,theme,liked,handleOnSuccess])
 
     const RenderFooter=()=>{
         if(data && data?.id){
@@ -328,7 +345,7 @@ export default function TwitterThread({navigation,route}){
                     paddingTop:heightHeader + 2,
                 }}
                 refreshControl={
-                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
                 data={data ? data?.tweets : []}
                 ListHeaderComponent={HeaderComp}

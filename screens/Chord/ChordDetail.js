@@ -26,6 +26,7 @@ import usePost from '@pn/utils/API'
 import {AdsBanner, AdsBanners} from '@pn/components/global/Ads'
 import Player from '@pn/components/global/VideoPlayer'
 import Backdrop from '@pn/components/global/Backdrop';
+import LikeButton from '@pn/components/global/Like'
 
 LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
 
@@ -56,6 +57,18 @@ function ChordDetailScreen({navigation,route}){
     const [backdrop,setBackdrop] = React.useState(false);
     const [viewVideo,setViewVideo] = React.useState(false)
     const [liked,setLiked] = React.useState(false)
+    const [refreshing,setRefreshing] = React.useState(false);
+
+    React.useEffect(()=>{
+        if(!isValidating) setRefreshing(false)
+    },[isValidating])
+    
+    const onRefresh=React.useCallback(()=>{
+        if(!isValidating) {
+            setRefreshing(true);
+            mutate();
+        }
+    },[isValidating])
 
     const heightHeader = React.useMemo(()=>{
         return heightt?.main + heightt?.sub;
@@ -217,7 +230,7 @@ function ChordDetailScreen({navigation,route}){
                 }}
                 onScroll={onScroll}
                 refreshControl={
-                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
                 {...other}
             >
@@ -243,6 +256,9 @@ function ChordDetailScreen({navigation,route}){
                                     <Text style={{fontSize:13}}>Author: </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.chord?.users?.username}`)}>{data?.chord?.users?.name||"Portalnesia"}</Text>
                                 </Text>
                                 <Text style={{fontSize:13}}>{`${data?.chord?.date}`}</Text>
+                            </Lay>
+                            <Lay key="lay-3" style={{flexDirection:'row',alignItems:'center',justifyContent:"flex-end"}}>
+                                <LikeButton value={liked} onSuccess={handleOnSuccess} type="chord" item_id={data?.chord?.id} />
                             </Lay>
                         </Lay>
 

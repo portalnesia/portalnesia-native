@@ -7,10 +7,16 @@ export default function useSWR<D=any,F=any>(path: string|null,config:SWRConfigur
     const context = React.useContext(AuthContext)
     const {state:{user,session}}=context
     const {fetcher}=useAPI();
-    return useSWRR<D,F>(user===null || session === null ? null : path,{
+    const swr = useSWRR<D,F>(user===null || session === null ? null : path,{
         fetcher,
         revalidateOnReconnect:true,
         ...(autoValidate ? {revalidateOnMount:true,revalidateOnFocus:true} : {revalidateOnMount:false,revalidateOnFocus:false}),
         ...config
     })
+
+    React.useEffect(()=>{
+        swr.mutate();
+    },[user])
+
+    return swr;
 }

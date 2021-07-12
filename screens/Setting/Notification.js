@@ -1,6 +1,6 @@
 import React from 'react'
 import {View,Dimensions, Alert,RefreshControl,FlatList} from 'react-native'
-import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Spinner,Divider, Icon,Toggle} from '@ui-kitten/components'
+import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Divider, Icon,Toggle} from '@ui-kitten/components'
 import i18n from 'i18n-js'
 import {startActivityAsync,ACTION_APP_NOTIFICATION_SETTINGS} from 'expo-intent-launcher'
 
@@ -16,6 +16,7 @@ import Tooltip from '@pn/components/global/Tooltip'
 import { ucwords } from '@pn/utils/Main';
 import ListItem from '@pn/components/global/ListItem'
 import Button from '@pn/components/global/Button'
+import Spinner from '@pn/components/global/Spinner'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 

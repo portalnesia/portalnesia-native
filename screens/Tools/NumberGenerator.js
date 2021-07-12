@@ -1,6 +1,6 @@
 import React from 'react';
 import {  View,ScrollView,useWindowDimensions } from 'react-native';
-import {Layout as Lay,Text,Spinner,Input,useTheme} from '@ui-kitten/components'
+import {Layout as Lay,Text,Input,useTheme} from '@ui-kitten/components'
 import i18n from 'i18n-js'
 
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
@@ -12,7 +12,6 @@ import Button from '@pn/components/global/Button'
 import Pagination from '@pn/components/global/Pagination'
 import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
-
 
 export default function({navigation}){
     const context = React.useContext(AuthContext)

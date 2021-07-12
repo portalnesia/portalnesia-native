@@ -1,11 +1,12 @@
 import React from 'react'
-import {Spinner,Button as Btn,useTheme} from '@ui-kitten/components'
+import {Button as Btn,useTheme} from '@ui-kitten/components'
 import {View,Pressable} from 'react-native'
 import withTooltip from '../HOC/withTooltip'
+import Spinner from '@pn/components/global/Spinner'
 
-const LoadingComponent=React.memo((props)=>(
+export const LoadingComponent=React.memo((props)=>(
     <View style={[props.style,{justifyContent:'center',alignItems:'center'}]}>
-        <Spinner size='small' />
+        <Spinner />
     </View>
 ))
 
