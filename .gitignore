@@ -89,4 +89,6 @@ metro.config.backup-hahahaha.js
 .vscode/*
 web-build/
 
+hermesc.exe
+*.dll
 # @end expo-cli

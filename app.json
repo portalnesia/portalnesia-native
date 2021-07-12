@@ -3,7 +3,7 @@
     "name": "Portalnesia",
     "slug": "portalnesia",
     "scheme": "pn",
-    "version": "2.7.0",
+    "version": "2.7.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "backgroundColor": "#ffffff",
@@ -30,6 +30,7 @@
       "**/*"
     ],
     "android": {
+      "jsEngine":"hermes",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-5345145600516995~7540046866"
       },
