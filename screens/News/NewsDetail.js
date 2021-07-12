@@ -19,6 +19,7 @@ import {ucwords,openBrowser} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import Comment from '@pn/components/global/Comment'
 import usePost from '@pn/utils/API'
+import LikeButton from '@pn/components/global/Like'
 import {pushTo} from '@pn/navigation/useRootNavigation'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
@@ -113,9 +114,12 @@ export default function({navigation,route}){
                     <>
                         <Lay style={[style.container]}>
                             <Text category="h2" style={{paddingVertical:10}}>{data?.title}</Text>
-                            <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                                <Text numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.date_string}`}</Text>
+                            <Lay key="lay-1" style={{paddingTop:5,flexDirection:'row',alignItems:"flex-end",justifyContent:'space-between'}}>
+                                <LikeButton value={liked} onSuccess={handleOnSuccess} type="news" item_id={data?.id} />
                                 <Text style={{fontSize:13}}><Text><CountUp data={data?.seen} /></Text> <Text>views</Text></Text>
+                            </Lay>
+                            <Lay key="lay-2" style={{flexDirection:'row',alignItems:"flex-start",justifyContent:"flex-end"}}>
+                                <Text numberOfLines={1} style={{fontSize:13}}>{`Modified ${data?.date_string}`}</Text>
                             </Lay>
                         </Lay>
                         <Lay style={{paddingVertical:20}}><Divider style={{backgroundColor:theme['border-text-color']}} /></Lay>

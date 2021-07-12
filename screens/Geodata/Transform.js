@@ -1,6 +1,6 @@
 import React from 'react';
 import {  View,ScrollView,useWindowDimensions,KeyboardAvoidingView } from 'react-native';
-import {Layout as Lay,Text,Card,Spinner,Input,Divider,useTheme,Toggle} from '@ui-kitten/components'
+import {Layout as Lay,Text,Input,Divider,useTheme,Toggle} from '@ui-kitten/components'
 import useSWR from '@pn/utils/swr'
 import {Modalize} from 'react-native-modalize'
 import i18n from 'i18n-js'
@@ -19,6 +19,7 @@ import { AuthContext } from '@pn/provider/Context';
 import {randomInt} from '@pn/utils/Main'
 import ListItem from '@pn/components/global/ListItem'
 import verifyRecaptcha from '@pn/module/Recaptcha'
+import Spinner from '@pn/components/global/Spinner'
 
 const HeaderModal=React.memo(({search,setSearch,setPage})=>{
     return (
@@ -71,7 +72,7 @@ export default function({navigation}){
     const footerModal=()=>(
         <>
         {!data && !error && (
-            <Lay style={{flex:1,alignItems:'center',justifyContent:'center',paddingVertical:70}}><Spinner size="giant" /></Lay>
+            <Lay style={{flex:1,alignItems:'center',justifyContent:'center',paddingVertical:70}}><Spinner size="large" /></Lay>
         )}
         <Lay style={{flexDirection:'row',justifyContent:'center',alignItems:'center',paddingBottom:20,paddingTop:10,paddingHorizontal:15}}>
             <Pagination page={page} total={total} onChange={(pg)=>setPage(pg)} />

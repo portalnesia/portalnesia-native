@@ -1,6 +1,6 @@
 import React from 'react';
 import { View,useWindowDimensions,FlatList,RefreshControl } from 'react-native';
-import {Layout as Lay,Text,Card,Spinner,useTheme} from '@ui-kitten/components'
+import {Layout as Lay,Text,Card} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 
 import {linkTo} from '@pn/navigation/useRootNavigation'

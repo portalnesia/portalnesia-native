@@ -1,6 +1,6 @@
 import React from 'react';
 import {ScrollView,View,Dimensions,FlatList,RefreshControl,AppState } from 'react-native';
-import {Layout as Lay, Text,Card,Spinner,useTheme,Icon, Divider} from '@ui-kitten/components'
+import {Layout as Lay, Text,Card,useTheme,Icon, Divider} from '@ui-kitten/components'
 import Carousel from '@pn/components/global/Carousel';
 import useAPI from '@pn/utils/API'
 import {CONTENT_URL} from '@env'
@@ -23,6 +23,7 @@ import { getLocation, reverseGeocode } from '@pn/utils/Location';
 import { LocationAccuracy } from 'expo-location';
 import useSWR from '@pn/utils/swr';
 import { log, logError } from '@pn/utils/log';
+import Spinner from '@pn/components/global/Spinner'
 
 const {width} = Dimensions.get('window')
 
@@ -455,7 +456,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('news')})}</Text>
 					{(loading || !data?.news) && !error ? (
 						<View style={{marginBottom:15}}>
-							<Spinner size='giant' />
+							<Spinner size='large' />
 						</View>
 					) : error ? (
 						<Text>{i18n.t('errors.general')}</Text>
@@ -471,7 +472,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('chord')})}</Text>
 					{(loading || (data && !data?.chord)) ? (
 						<View style={{marginBottom:15}}>
-							<Spinner size='giant' />
+							<Spinner size='large' />
 						</View>
 					) : error ? (
 						<Text>{i18n.t('errors.general')}</Text>
@@ -487,7 +488,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:"Twibbon"})}</Text>
 					{(!data?.twibbon || loading) ? (
 						<View style={{marginBottom:15}}>
-							<Spinner size='giant' />
+							<Spinner size='large' />
 						</View>
 					) : error || data?.error == 1 ? (
 						<Text>{i18n.t('errors.general')}</Text>
@@ -503,7 +504,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					<Text category="h2" style={{textAlign:'center',marginBottom:30}}>{i18n.t('recent_type',{type:i18n.t('twitter_thread')})}</Text>
 					{(loading || !data?.thread) ? (
 						<View style={{marginBottom:15}}>
-							<Spinner size='giant' />
+							<Spinner size='large' />
 						</View>
 					) : error ? (
 						<Text>{i18n.t('errors.general')}</Text>

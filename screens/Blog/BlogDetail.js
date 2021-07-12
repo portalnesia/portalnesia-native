@@ -1,6 +1,6 @@
 import React from 'react'
-import {ScrollView,RefreshControl,View,Animated} from 'react-native'
-import {Layout as Lay, Text,Spinner,Divider,useTheme,Card} from '@ui-kitten/components'
+import {RefreshControl,View,Animated} from 'react-native'
+import {Layout as Lay, Text,Divider,useTheme,Card} from '@ui-kitten/components'
 import Skeleton from '@pn/components/global/Skeleton'
 import analytics from '@react-native-firebase/analytics'
 import Carousel from '@pn/components/global/Carousel';
@@ -21,6 +21,7 @@ import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import i18n from 'i18n-js'
 import usePost from '@pn/utils/API'
 import TableContent from '@pn/components/global/TableContent'
+import LikeButton from '@pn/components/global/Like'
 
 function BlogDetail({navigation,route}){
     const {slug} = route.params
@@ -38,6 +39,19 @@ function BlogDetail({navigation,route}){
     const [tableShow,setTableShow] = React.useState(false)
 
     const [liked,setLiked] = React.useState(false);
+
+    const [refreshing,setRefreshing] = React.useState(false);
+
+    React.useEffect(()=>{
+        if(!isValidating) setRefreshing(false)
+    },[isValidating])
+    
+    const onRefresh=React.useCallback(()=>{
+        if(!isValidating) {
+            setRefreshing(true);
+            mutate();
+        }
+    },[isValidating])
 
     const scrollAnim = new Animated.Value(0);
     const onScroll = (e)=>{
@@ -114,7 +128,7 @@ function BlogDetail({navigation,route}){
                     paddingTop:heightHeader+2
                 }}
                 refreshControl={
-                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
                 {...other}
             >
@@ -128,13 +142,16 @@ function BlogDetail({navigation,route}){
                     <>
                         <Lay style={[style.container,{paddingVertical:20}]}>
                             <Text category="h2" style={{paddingVertical:10}}>{data?.blog?.title}</Text>
-                            <Lay style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                            <Lay key="lay-1" style={{paddingTop:5,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                                 <Text  numberOfLines={1} style={{flex:1,marginRight:20,fontSize:13}}>{`Last modified ${data?.blog?.date}`}</Text>
                                 <Text style={{fontSize:13}}><Text><CountUp data={data?.blog?.seen} /></Text> <Text>views</Text></Text>
                             </Lay>
-                            <Text>
-                                <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.blog?.users?.username}`)}>{data?.blog?.users?.name||"Portalnesia"}</Text>
-                            </Text>
+                            <Lay key="lay-2" style={{flexDirection:'row',alignItems:"flex-start",justifyContent:'space-between'}}>
+                                <Text>
+                                    <Text style={{fontSize:13}}>By </Text><Text status="info" style={{fontSize:13,textDecorationLine:"underline"}} onPress={()=>linkTo(`/user/${data?.blog?.users?.username}`)}>{data?.blog?.users?.name||"Portalnesia"}</Text>
+                                </Text>
+                                <LikeButton value={liked} onSuccess={handleOnSuccess} type="blog" item_id={data?.blog?.id} />
+                            </Lay>
                         </Lay>
                         {content?.length > 0 && (
                             <>

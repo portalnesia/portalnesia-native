@@ -32,7 +32,7 @@ function CountUp(props:CountUpProps){
         if(prevStart.current !== start.current) {
             start.current = prevStart.current;
         }
-    },[data])
+    },[data?.number])
 
     return (
         <Countt

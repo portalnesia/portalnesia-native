@@ -13,7 +13,7 @@ import i18n from 'i18n-js'
 import useAPI from '@pn/utils/API'
 import {Portal} from '@gorhom/portal'
 import {sentLike} from '@pn/components/global/Like'
-import Backdrop from './Backdrop'
+import Spinner from './Spinner'
 
 const MoreIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="more-vertical" />
 const FeedbackIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="feedback" pack="material" />
@@ -38,6 +38,7 @@ const CustomIcon=(prop: {name:string,pack?:string}|string,color?:ColorValue)=>(p
     }
     return <Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15,...(color ? {tintColor:color} : {})}]} name={name} />
 }
+const LoadingComp=()=> <Spinner style={{marginLeft:5}} />
 
 export type FeedbackToggleProps = {
     link?: string
@@ -211,15 +212,16 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
                     <Layout style={{marginBottom:15,paddingTop:10}}>
                         <Menu appearance="noDivider">
                             {menu?.map((dt,i)=>{
+                                const disabled = dt?.action==='like' && loading;
+                                const accessRight = (dt?.action==='like' && loading) ? LoadingComp : undefined;
                                 const color = dt?.color;
                                 const icon = dt?.icon ? CustomIcon(dt?.icon,color) : getIcon(dt?.action,(dt?.action==='like' ? dt?.like?.value : undefined));
-                                return <MenuItem accessoryLeft={icon} style={{paddingHorizontal:15,paddingVertical:12,justifyContent:'flex-start'}} key={`${i}`} title={()=><Text>{dt.title||""}</Text>} onPress={()=>handleOnPress(dt)} />
+                                return <MenuItem disabled={disabled} accessoryLeft={icon} accessoryRight={accessRight} style={{paddingHorizontal:15,paddingVertical:12,justifyContent:'flex-start'}} key={`${i}`} title={()=><Text>{dt.title||""}</Text>} onPress={()=>handleOnPress(dt)} />
                             })}
                         </Menu>
                     </Layout>
                 </Layout>
             </Modalize>
-            <Backdrop loading visible={loading} />
         </Portal>
     )
 }

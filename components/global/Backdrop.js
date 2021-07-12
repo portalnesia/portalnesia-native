@@ -1,7 +1,8 @@
 import React from 'react';
 import {  View,Animated,StyleSheet,Easing,useWindowDimensions } from 'react-native';
-import {useTheme,Text,Spinner} from '@ui-kitten/components'
+import {useTheme,Text} from '@ui-kitten/components'
 import Modal from 'react-native-modal'
+import Spinner from '@pn/components/global/Spinner'
 
 const LoadingBackdrop=({visible,onClose,text,theme,width})=>(
     <Modal
@@ -13,7 +14,7 @@ const LoadingBackdrop=({visible,onClose,text,theme,width})=>(
     >
         <View style={{maxWidth:width-20,flexDirection:'column',justifyContent:'center',alignItems:'center',margin:10,paddingVertical:20,paddingHorizontal:10,backgroundColor:theme['background-basic-color-1'],borderRadius:10}}>
             <Text style={{marginBottom:30}}>{text}</Text>
-            <Spinner size="giant" />
+            <Spinner size="large" />
         </View>
     </Modal>
 )

@@ -1,6 +1,6 @@
 import React from 'react'
 import {ScrollView,View,Dimensions, Alert,RefreshControl} from 'react-native'
-import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Spinner,Divider, Icon,Toggle} from '@ui-kitten/components'
+import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Divider, Icon,Toggle} from '@ui-kitten/components'
 import i18n from 'i18n-js'
 import FastImage from '@pn/module/FastImage'
 import Modal from 'react-native-modal'
@@ -24,6 +24,7 @@ import useAPI from '@pn/utils/API'
 import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
 import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
 import Backdrop from '@pn/components/global/Backdrop'
+import Spinner from '@pn/components/global/Spinner'
 
 const {width} = Dimensions.get('window')
 
