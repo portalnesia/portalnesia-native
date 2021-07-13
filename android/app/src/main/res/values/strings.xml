@@ -33,7 +33,7 @@
   <string name="sync_provider">com.portalnesia.app.syncprovider</string>
   <string name="account_type_sync">Account</string>
   <string name="news">News</string>
-  <string name="twitter_thread">Twitter</string>
+  <string name="twitter_thread">Twitter Thread</string>
   <string name="twitter_thread_long">Twitter Thread Reader</string>
   <string name="chord">Chord</string>
 </resources>
