@@ -9,7 +9,7 @@
         android:shortcutLongLabel="@string/news"
         tools:targetApi="n_mr1">
         <intent
-            android:targetPackage="com.portalnesia.app"
+            android:targetPackage="com.portalnesia.app.beta"
             android:action="android.intent.action.VIEW"
             android:data="pn://news"/>
     </shortcut>
@@ -21,7 +21,7 @@
         android:shortcutLongLabel="@string/chord"
         tools:targetApi="n_mr1">
         <intent
-            android:targetPackage="com.portalnesia.app"
+            android:targetPackage="com.portalnesia.app.beta"
             android:action="android.intent.action.VIEW"
             android:data="pn://chord"/>
     </shortcut>
@@ -33,7 +33,7 @@
         android:shortcutLongLabel="@string/twitter_thread_long"
         tools:targetApi="n_mr1">
         <intent
-            android:targetPackage="com.portalnesia.app"
+            android:targetPackage="com.portalnesia.app.beta"
             android:action="android.intent.action.VIEW"
             android:data="pn://twitter/thread"/>
     </shortcut>
