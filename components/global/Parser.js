@@ -16,7 +16,6 @@ import global_style from '@pn/components/global/style'
 import AutoHeightWebView from 'react-native-autoheight-webview'
 import {jsStyles, openBrowser, stripHTML} from '@pn/utils/Main'
 
-import { AuthContext } from '@pn/provider/Context';
 import {pushTo} from '../../navigation/useRootNavigation'
 
 let Hid = [];
@@ -273,7 +272,7 @@ const CodeRender=(attribs,children,style,props)=>{
         )
     } else {
         return (
-            <Text key={props?.key} style={{fontSize:14,lineHeight:14+10,borderRadius:5,backgroundColor:'rgba(0,0,0,0.04)'}}>
+            <Text key={props?.key} style={[{fontSize:14,lineHeight:14+10,borderRadius:5,backgroundColor:'rgba(0,0,0,0.04)'}]}>
                 {props?.domNode?.children?.[0]?.data||props?.data ? (
                     <Text style={{color:'#e83e8c',fontFamily:(Platform.OS ==  'ios' ? 'Menlo-Regular' : 'monospace'),fontSize:14}}>{` ${(props?.domNode?.children?.[0]?.data||props?.data)} `}</Text>
                 ) : children}
@@ -360,11 +359,7 @@ const DelRender=(attribs,children,style,props)=>{
 
 const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,onReceiveId,padding=true,editor=false})=>{
     const theme = useTheme()
-    //const context = React.useContext(AuthContext);
-    //const {theme:selectedTheme} = context
     if(source.length === 0 ) return null;
-    //const context = React.useContext(AuthContext)
-    //const {setNotif} = context
 
     const renderers=React.useMemo(()=>({
         table:{renderer:TableRender,wrapper:"Text"},
@@ -474,7 +469,7 @@ const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,o
                     <Text
                         style={{ marginRight: 5, fontSize:15,marginTop:1 }}
                     >
-                        {props?.index + 1})
+                        {`${props?.nodeIndex + 1})`}
                     </Text>
                 )
             }}

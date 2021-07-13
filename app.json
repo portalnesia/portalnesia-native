@@ -3,7 +3,7 @@
     "name": "Portalnesia",
     "slug": "portalnesia",
     "scheme": "pn",
-    "version": "2.7.1",
+    "version": "2.7.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "backgroundColor": "#ffffff",
