@@ -5,6 +5,7 @@ import {createURL} from 'expo-linking'
 import * as Secure from 'expo-secure-store'
 import * as Application from 'expo-application'
 import * as Notifications from 'expo-notifications'
+import {useDispatch,logout as actionLogout,login as actionLogin} from '@pn/provider/actions'
 
 import APIaxios from './axios'
 import {CLIENT_ID,API} from '@env'
@@ -54,8 +55,7 @@ export async function getProfile(token: ResponseToken){
 }
 
 type UseLoginOptions = {
-    dispatch: React.Dispatch<DispatchArgument>,
-    setNotif?:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any} | undefined) => void
+    setNotif?:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any}) => void
 }
 
 export async function notificationInit(type:'login'|'logout') {
@@ -94,7 +94,8 @@ export async function logoutInit() {
     return;
 }
 
-export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
+export default function useLogin({setNotif}: UseLoginOptions) {
+    const dispatch=useDispatch();
     const logout=React.useCallback(async(tkn?: ResponseToken,notify?:{type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined})=>{
         let token: ResponseToken|undefined;
         if(!tkn) {
@@ -122,7 +123,7 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                     Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
-                if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
+                dispatch(actionLogout())
                 if(typeof setNotif==='function') setNotif(notify?.type||false,notify?.title||"Sucess",notify?.msg||"You've successfully logged out.")
             } catch(e) {
                 log("logout Login.ts error",{msg:e.message});
@@ -133,7 +134,7 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                     Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
-                if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
+                dispatch(actionLogout())
             }
         } else {
             await Promise.all([
@@ -142,7 +143,7 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                 Secure.deleteItemAsync("token"),
                 [...(account?.name ? [Authentication.removeAccount(account)] : [])]
             ])
-            if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
+            dispatch(actionLogout())
         }
         return Promise.resolve();
     },[dispatch,setNotif])
@@ -158,10 +159,12 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
         const user_string = await Secure.getItemAsync('user');
         if(user_string !== null) {
             const old_user = JSON.parse(user_string);
-            if(typeof dispatch === 'function') dispatch({type:"MANUAL",payload:{token:new_token,user:old_user,session:old_user?.session_id}})
+            dispatch(actionLogin({token:(new_token as TokenResponse),user:old_user,session:old_user?.session_id}))
+            //dispatch({type:"MANUAL",payload:{token:new_token,user:old_user,session:old_user?.session_id}})
         } else {
             throw Error("Internal server error. Please login again")
         }
+        
         return Promise.resolve();
     },[dispatch,logout])
 
@@ -170,7 +173,6 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
         const token: TokenResponse|null = token_string===null ? null : JSON.parse(token_string);
         const accounts = await Authentication.getAccounts();
         let account = accounts[0];
-        // Check account manager
         try {
             if(account?.name) {
                 //const refresh_token = await Authentication.getPassword(account);
@@ -189,7 +191,7 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                 // JS token != native token;
                 else {
                     await Authentication.removeAccount(account);
-                    if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
+                    dispatch(actionLogout())
                 }
             } 
             // Account manager empty
@@ -201,7 +203,7 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                         Secure.deleteItemAsync("user")
                     ])
                 } else {
-                    if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
+                    dispatch(actionLogout())
                 }
             }
         } catch(e) {
@@ -215,7 +217,7 @@ export default function useLogin({dispatch,setNotif}: UseLoginOptions) {
                     Secure.deleteItemAsync("user")
                 ])
             } else {
-                if(typeof dispatch === 'function') dispatch({type:"LOGOUT"})
+                dispatch(actionLogout())
             }
         }
         return Promise.resolve();

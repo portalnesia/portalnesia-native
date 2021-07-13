@@ -1,7 +1,7 @@
 import React from 'react'
 import {NavigationContainerRef, NavigationAction} from '@react-navigation/native'
 
-export const navigationRef: React.Ref<NavigationContainerRef>
+export const navigationRef: React.RefObject<NavigationContainerRef>
 
 export function getPath(): string;
 
@@ -18,6 +18,6 @@ export function handleLinking(url: string): void;
 export function getLink(link: string,a?:boolean): string;
 
 export default function useRootNavigation(): {
-    navigationRef: React.Ref<NavigationContainerRef>,
+    navigationRef: React.RefObject<NavigationContainerRef>,
     linkTo:(path: string,parseLink?: boolean)=>void
 }

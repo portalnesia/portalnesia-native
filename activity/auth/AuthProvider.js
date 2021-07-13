@@ -27,6 +27,7 @@ import Localization from '@pn/module/Localization'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
+import {useSelector,changeLang,changeTheme,useDispatch} from '@pn/provider/actions'
 
 LogBox.ignoreLogs(['Setting a timer for a long period of time']);
 
@@ -49,61 +50,22 @@ const getNotifOption=(id)=>({
 	enableVibrate:true
 })
 
-const reducer=(prevState,action)=>{
-	switch(action?.type){
-		case "LOGIN":
-			return {
-				...prevState,
-				user:action.payload.user,
-				token:action.payload.token,
-				session:action.payload.session
-			}
-		case "LOGOUT":
-			return {...prevState,user:false,token:null,session:Applications.androidId}
-		case "SESSION":
-			return {...prevState,session:action.payload}
-		case "MANUAL":
-			return {
-				...prevState,
-				...action.payload
-			}
-		default:
-			return {...prevState}
-	}
-}
-
-const initialState={
-	user:null,
-	token:null,
-	session:null
-}
-
 const AuthProviderFunc = (props) => {
 	const dropdownRef=useRef(null)
 	const currentInternet=useRef(true);
-	const [state,dispatch]=useReducer(reducer,initialState)
 	const colorScheme = useColorScheme()
-	const [tema,setTema]=React.useState('auto')
-	const [lang,changeLang]=React.useState("auto");
 	const forceUpdate = useForceUpdate();
 	const {navigationRef} = useRootNavigation()
-	const {refreshToken} = useLogin({dispatch,setNotif})
 	const lastNotif = Notifications.useLastNotificationResponse();
-	const isLogin=React.useMemo(()=>typeof state.user === 'object',[state.user]);
-	const stateUser = React.useMemo(()=>state.user,[state.user]);
-	const stateToken = React.useMemo(()=>state.token,[state.token]);
-	const stateSession = React.useMemo(()=>state.session,[state.session])
-
-	const selectedTheme = React.useMemo(()=>{
-		if(colorScheme==='dark' && tema === 'auto' || tema === 'dark') return 'dark';
-		return 'light'
-	},[colorScheme,tema])
+	const dispatch = useDispatch();
+	const context = useSelector(type=>({theme:type.theme,userTheme:type.userTheme,lang:type.lang,user:type.user}));
 
 	const setTheme=React.useCallback(async(val)=>{
 		if(['light','auto','dark'].indexOf(val) !== -1) {
 			try {
 				await AsyncStorage.setItem("theme",val)
-				setTema(val)
+				const theme=(colorScheme==='dark' && val === 'auto' || val === 'dark') ? "dark" : "light";
+				dispatch(changeTheme(theme,val));
 			} catch(e) {
 				setNotif(true,"Error",i18n.t('errors.general'))
 			}
@@ -114,7 +76,7 @@ const AuthProviderFunc = (props) => {
 		if(['id','auto','en'].indexOf(val) !== -1) {
 			try {
 				await AsyncStorage.setItem("lang",val)
-				changeLang(val)
+				dispatch(changeLang(val));
 			} catch(e) {
 				setNotif(true,"Error",i18n.t('errors.general'))
 			}
@@ -134,13 +96,18 @@ const AuthProviderFunc = (props) => {
 		
 	},[navigationRef])
 
+	const {refreshToken} = useLogin({setNotif})
+
 	useEffect(()=>{
 		async function asyncTask(){
 			try {
 				let [res,lang,ads] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang"),AsyncStorage.getItem("ads")])
 
-				if(res !== null) setTema(res);
-				if(lang !== null) changeLang(lang);
+				if(res !== null) {
+					const theme=(colorScheme==='dark' && context.userTheme === 'auto' || context.userTheme === 'dark') ? "dark" : "light";
+					dispatch(changeTheme(theme,res));
+				}
+				if(lang !== null) dispatch(changeLang(lang));
 
 				try {
 					if(ads==null) {
@@ -215,8 +182,8 @@ const AuthProviderFunc = (props) => {
 				id:id_locale
 			};
 			i18n.fallbacks = true;
-			if(['id','en'].indexOf(lang) !== -1) {
-				const lng = lang === 'id' ? "id-ID" : "en-US";
+			if(['id','en'].indexOf(context.lang) !== -1) {
+				const lng = context.lang === 'id' ? "id-ID" : "en-US";
 				i18n.locale =lng;
 			} else {
 				i18n.locale = Localization.getLocales()[0].languageTag;
@@ -230,7 +197,7 @@ const AuthProviderFunc = (props) => {
 		return ()=>{
 			Localization.removeEventListener('localizationChange',onLocalizationChange)
 		}
-	},[lang])
+	},[context.lang])
 
 	/* NOTIFICATION & DEEP LINK */
 	useEffect(()=>{
@@ -257,7 +224,7 @@ const AuthProviderFunc = (props) => {
 		}
 		/* HANDLE DEEP LINK */
 
-		if(stateUser !== null && props?.main) {
+		if(context.user !== null && props?.main) {
 			ExpoAddListener('url',handleURL)
 			setTimeout(()=>{
 				getInitialLink();
@@ -266,7 +233,7 @@ const AuthProviderFunc = (props) => {
 		return ()=>{
 			ExpoRemoveListener('url',handleURL);
 		}
-	},[stateToken,stateUser])
+	},[context.user])
 
 	/* Local Notification */
 	React.useEffect(()=>{
@@ -283,10 +250,10 @@ const AuthProviderFunc = (props) => {
 				}
 			}
 		}
-		if(stateUser !== null && props?.main) {
+		if(context.user !== null && props?.main) {
 			setTimeout(checkNotification,200);
 		}
-	},[lastNotif,stateUser])
+	},[lastNotif,context.user])
 
 	const onTap=React.useCallback((dt)=>{
 		const urls = dt?.payload?.link
@@ -298,32 +265,22 @@ const AuthProviderFunc = (props) => {
 	return (
 		<AuthContext.Provider
 			value={{
-				state:{
-					user:stateUser,
-					token:stateToken,
-					session:stateSession
-				},
-				dispatch,
 				setNotif,
 				setTheme,
-				theme:selectedTheme,
-				userTheme:tema,
-				lang,
 				setLang,
 				sendReport,
-				isLogin
 			}}
 		>
 			<IconRegistry icons={[EvaIconsPack,FontAwesomeIconsPack,IoniconsPack,MaterialIconsPack]} />
-			<ApplicationProvider {...eva} theme={{...eva[selectedTheme],...theme[selectedTheme]}} customMapping={mapping}>
+			<ApplicationProvider {...eva} theme={{...eva[context.theme],...theme[context.theme]}} customMapping={mapping}>
 				<PortalProvider>
 					{props.children}
 				</PortalProvider>
 				<DropdownAlert
 					successColor='#2f6f4e'
 					activeStatusBarStyle='light-content'
-					inactiveStatusBarStyle={selectedTheme==='light' ? "dark-content" : "light-content"}
-					inactiveStatusBarBackgroundColor={selectedTheme==='light' ? "#FFFFFF" : "#222B45"}
+					inactiveStatusBarStyle={context.theme==='light' ? "dark-content" : "light-content"}
+					inactiveStatusBarBackgroundColor={context.theme==='light' ? "#FFFFFF" : "#222B45"}
 					onTap={onTap}
 					renderImage={()=>null}
 					ref={dropdownRef} />

@@ -10,7 +10,6 @@ import analytics from '@react-native-firebase/analytics'
 import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
 import Pressable from '@pn/components/global/Pressable'
-import {AuthContext} from '@pn/provider/Context'
 import useAPI from '@pn/utils/API';
 import NotFound from '@pn/components/global/NotFound'
 import {ucwords,specialHTML} from '@pn/utils/Main'
@@ -183,8 +182,6 @@ export const RenderNoImage=React.memo(({data,item,index,theme,linkTo,navigation,
 export default function Search({navigation,route}){
     const q = route?.params?.q;
     const filter = route?.params?.filter;
-    const context = React.useContext(AuthContext)
-    const {setNotif}=context;
     const {PNget}=useAPI();
     const theme = useTheme();
     const [search,setSearch] = React.useState(q ? decodeURIComponent(q) : "");

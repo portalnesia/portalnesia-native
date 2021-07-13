@@ -12,14 +12,16 @@ import useAPI from '@pn/utils/API';
 import Recaptcha from '@pn/components/global/Recaptcha'
 import { getLocation, reverseGeocode } from '@pn/utils/Location';
 import getInfo from '@pn/utils/Info';
+import useSelector from '@pn/provider/actions'
 
 const info = getInfo();
 export default function ForgetPasswordFormScreen({ navigation,route }) {
-	const context = React.useContext(AuthContext)
-	const {state:{user},setNotif} = context;
     const token = route?.params?.token;
+	const user = useSelector(state=>state.user);
 	if(user || !token) return <NotFoundScreen navigation={navigation} route={route} />
 
+	const context = React.useContext(AuthContext)
+	const {setNotif} = context;
 	const {PNpost} = useAPI();
 	const [password, setPassword] = useState('');
     const [cpassword,setCpassword] = useState("")

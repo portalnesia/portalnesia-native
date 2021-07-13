@@ -16,6 +16,7 @@ import {CONTENT_URL,URL} from '@env'
 import { openBrowser, ucwords } from '@pn/utils/Main';
 import verifyRecaptcha from '@pn/module/Recaptcha'
 import i18n from 'i18n-js';
+import useSelector from '@pn/provider/actions'
 
 const user=null;
 
@@ -53,8 +54,9 @@ const dataContact=[
 export default function Contact({navigation,route}){
     const subject = route.params?.subject
     const {PNpost} = useAPI(false)
+    const user = useSelector(state=>state.user);
     const context = React.useContext(AuthContext)
-    const {setNotif,state:{user}} = context
+    const {setNotif} = context
     const {copyText} = useClipboard()
     const [input,setInput] = React.useState({name:user===false ?'':user?.name,email:user===false ? '' : user.email,subject:'',message:''})
     const [loading,setLoading] = React.useState(false)

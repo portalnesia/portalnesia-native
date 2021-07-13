@@ -1,11 +1,10 @@
 import React from 'react'
 import useSWRR,{SWRConfiguration} from "swr"
 import useAPI from './API'
-import { AuthContext } from '@pn/provider/Context';
+import useSelector from '@pn/provider/actions'
 
 export default function useSWR<D=any,F=any>(path: string|null,config:SWRConfiguration={},autoValidate=false){
-    const context = React.useContext(AuthContext)
-    const {state:{user,session}}=context
+    const {user,session} = useSelector(state=>({user:state.user,session:state.session}))
     const {fetcher}=useAPI();
     const swr = useSWRR<D,F>(user===null || session === null ? null : path,{
         fetcher,

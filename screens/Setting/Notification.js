@@ -17,6 +17,7 @@ import { ucwords } from '@pn/utils/Main';
 import ListItem from '@pn/components/global/ListItem'
 import Button from '@pn/components/global/Button'
 import Spinner from '@pn/components/global/Spinner'
+import useSelector from '@pn/provider/actions'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
@@ -43,9 +44,11 @@ const notifHelp=()=>({
 })
 
 export default function NotificationSettingScreen({navigation,route}){
-    const context = React.useContext(AuthContext);
-    const {setNotif,state:{user}} = context;
+    const user = useSelector(state=>state.user);
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
+
+    const context = React.useContext(AuthContext);
+    const {setNotif} = context;
     const {data,error,mutate,isValidating} = useSWR('/setting/notification',{},true);
     const [input,setInput] = React.useState({notif_news:true,notif_comment:true,notif_birthday:true,notif_message:true,notif_feature:true,email_birthday:true,email_komentar:true,email_feature:true});
     const setCanBack = useUnsaved(true);

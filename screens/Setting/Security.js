@@ -20,13 +20,16 @@ import ListItem from '@pn/components/global/ListItem'
 import Password from '@pn/components/global/Password'
 import { MenuContainer } from '@pn/components/global/MoreMenu';
 import Spinner from '@pn/components/global/Spinner'
+import useSelector from '@pn/provider/actions'
 
 const OptionIcon=React.memo((props)=><Icon {...props} name="more-vertical" />)
 
 export default function SecuritySettingScreen({navigation,route}){
-    const context = React.useContext(AuthContext);
-    const {setNotif,state:{user}} = context;
+    const user = useSelector(state=>state.user);
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
+
+    const context = React.useContext(AuthContext);
+    const {setNotif} = context;
     const theme=useTheme();
     const {PNpost} = useAPI();
     const {data,error,mutate,isValidating} = useSWR('/setting/security',{},true);

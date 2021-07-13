@@ -10,7 +10,6 @@ import FastImage from '@pn/module/FastImage'
 
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 import {linkTo} from '@pn/navigation/useRootNavigation'
-import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
 import Image from '@pn/components/global/Image'
 import style from '@pn/components/global/style'
@@ -24,6 +23,7 @@ import { LocationAccuracy } from 'expo-location';
 import useSWR from '@pn/utils/swr';
 import { log, logError } from '@pn/utils/log';
 import Spinner from '@pn/components/global/Spinner'
+import useSelector from '@pn/provider/actions'
 
 const {width} = Dimensions.get('window')
 
@@ -113,7 +113,7 @@ const RenderThread = React.memo(({item:dt, index:i,navigation}) => {
 })
 
 const About=React.memo(({title,txt,right,last,screen})=>{
-	const context = React.useContext(AuthContext)
+	useSelector(state=>state.lang)
 	
 	if(last) {
 		return (
@@ -257,13 +257,12 @@ const RenderInformation=React.memo(({data,item,index})=>{
 })
 
 const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
-	const context = React.useContext(AuthContext)
-	const {setNotif} = context
+	useSelector(state=>state.lang)
 	const ref=React.useRef(null)
 	const theme=useTheme();
 	const {PNpost} = useAPI();
 	const [cuaca,setCuaca]=React.useState(null);
-	const [sudahCuaca,setSudahCuaca]=React.useState(false)
+	//const [sudahCuaca,setSudahCuaca]=React.useState(false)
 
 	useScrollToTop(ref)
 	const dt = React.useMemo(()=>{
@@ -280,7 +279,7 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 			return item;
 		})
 		return obj;
-	},[data,context,loading,error,cuaca])
+	},[data,loading,error,cuaca])
 
 	const renderFooter=()=>(
 		<React.Fragment>
@@ -369,7 +368,6 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				logError(e,"getCuaca Home.js");
 				log("getCuaca Home.js error");
 				setCuaca({error:1,title:"Errors",text:"Under maintenance",icon:null,temperature:0})
-				//if(e?.message) setNotif(true,"Error",e?.message||i18n.t('errors.general'))
 			})
 		}
 	},[])
@@ -416,7 +414,7 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 })
 
 const NotLogin=React.memo(({loading,data,error,navigation})=>{
-	const context = React.useContext(AuthContext)
+	useSelector(state=>state.lang)
 	const ref=React.useRef(null)
 	useScrollToTop(ref)
 	return (
@@ -522,8 +520,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 })
 
 export default function HomeScreen({ navigation }) {
-	const context = React.useContext(AuthContext);
-	const {isLogin} = context;
+	const isLogin = useSelector(state=>state.isLogin)
 	const {data,error,isValidating,mutate} = useSWR("/home");
 	
 	const loading=React.useMemo(()=>{

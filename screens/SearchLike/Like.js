@@ -7,7 +7,7 @@ import {linkTo} from '@pn/navigation/useRootNavigation'
 
 import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
-import {AuthContext} from '@pn/provider/Context'
+import useSelector from '@pn/provider/actions'
 import useSWR from '@pn/utils/swr';
 import NotFound from '@pn/components/global/NotFound'
 import {ucwords,specialHTML} from '@pn/utils/Main'
@@ -171,8 +171,7 @@ export const RenderNoImage=React.memo(({data,item,index,theme,linkTo,navigation,
 
 export default function Like({navigation,route}){
     const filter = route?.params?.filter;
-    const context = React.useContext(AuthContext)
-    const {state:{user}}=context;
+    const user = useSelector(state=>state.user);
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
     const theme = useTheme();
     const {data,error,mutate,isValidating} = useSWR("/like",{},true);

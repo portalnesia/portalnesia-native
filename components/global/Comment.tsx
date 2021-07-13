@@ -23,6 +23,7 @@ import {Ktruncate, ucwords} from '@pn/utils/Main'
 import { FlatList } from 'react-native-gesture-handler'
 import {ListSkeleton as Skeleton} from './Skeleton'
 import Recaptcha from '@pn/components/global/Recaptcha'
+import useSelector from '@pn/provider/actions'
 
 const CloseIcon=(props?:Partial<ImageProps>)=><Icon {...props} name='close' />
 const OptionIcon=(props: Partial<ImageProps> | undefined)=> <Icon {...props} name="more-vertical" />
@@ -137,11 +138,11 @@ export function Comments(props: CommentsProps){
     const {type,posId,comment_id,posUrl} = props
     const {PNgraph,PNpost} = useAPI();
     const context = React.useContext(AuthContext);
-    const {setNotif,sendReport,state} = context;
+    const user = useSelector(state=>state.user)
+    const {setNotif,sendReport} = context;
     const theme = useTheme();
     const {copyText} = useClipboard();
     const com_id=comment_id||0;
-    const {user} = state;
     const [reachEnd,setReachEnd]=React.useState<boolean>(false)
     const [loading,setLoading]=React.useState<string|number|null>('global')
     const [data,setData]=React.useState<Array<DataResult>>([]);
@@ -576,10 +577,7 @@ type HeaderProps = {
 }
 const RenderHeader=React.memo((props: HeaderProps)=>{
     const {value,setValue,unLogin,setUnlogin,loading,textRef,textEmailRef,textNameRef,reply,setReply,modalRef,onSubmit} = props;
-    const context = React.useContext(AuthContext);
-    const {state} = context;
-    const {user} = state;
-    const theme = useTheme();
+    const user = useSelector(state=>state.user)
 
     return (
         <Lay style={{borderTopLeftRadius:15,borderTopRightRadius:15}}>

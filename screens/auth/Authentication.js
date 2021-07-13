@@ -14,15 +14,17 @@ import useAPI from '@pn/utils/API';
 import i18n from 'i18n-js';
 import Authentication from '@pn/module/Authentication';
 import { MenuContainer } from '@pn/components/global/MoreMenu';
+import useSelector from '@pn/provider/actions'
 
 let mWait=30,interval=null;
 
 export default function AuthenticationScreen({ navigation,route }) {
-	const context = React.useContext(AuthContext)
-	const {state,setNotif,dispatch} = context;
-	const {user} = state;
 	const {token,codeVerifier,telegram,userid,sms} = route?.params;
+	const user = useSelector(state=>state.user);
 	if(user || !token || !codeVerifier) return <NotFoundScreen navigation={navigation} route={route} />
+
+	const context = React.useContext(AuthContext)
+	const {setNotif} = context;
 	const {PNpost} = useAPI();
 	const [wait,setWait] = React.useState(mWait)
 	const [code, setCode] = React.useState("");

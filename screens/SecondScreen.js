@@ -8,12 +8,11 @@ import * as IntentLauncher from 'expo-intent-launcher'
 
 import Loading from './utils/Loading'
 import Portalnesia from '@pn/module/Portalnesia'
-import {AuthContext} from '@pn/provider/Context'
+import useSelector from '@pn/provider/actions'
 
 export default function ({ navigation,route }) {
 	const index = useNavigationState(state=>state.index);
-	const auth = React.useContext(AuthContext);
-	const {theme:selectedTheme} = auth;
+	const selectedTheme = useSelector(state=>state.theme);
 	const theme=useTheme()
 
 	React.useEffect(()=>{

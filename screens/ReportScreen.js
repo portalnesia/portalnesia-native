@@ -20,6 +20,7 @@ import Localization from '@pn/module/Localization'
 import { AuthContext } from '@pn/provider/Context'
 import Backdrop from '@pn/components/global/Backdrop';
 import verifyRecaptcha from '@pn/module/Recaptcha'
+import useSelector from '@pn/provider/actions'
 
 const SendIcon = (props)=><Icon {...props} name="send" pack="material" />
 const {width,height} = Dimensions.get('window')
@@ -33,8 +34,9 @@ const {width,height} = Dimensions.get('window')
 
 export default function ReportScreen({navigation,route}){
     const {title,uri,force,endpoint,type,urlreported,contentTitle,contentId,contentType} = route?.params
+    const user = useSelector(state=>state.user);
     const context = React.useContext(AuthContext)
-    const {setNotif,state:{user}}=context;
+    const {setNotif}=context;
     const [input,setInput]=React.useState("");
     const [loading,setLoading]=React.useState(false);
     const [check,setCheck]=React.useState(true);

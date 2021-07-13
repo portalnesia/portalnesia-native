@@ -22,6 +22,7 @@ import Portalnesia from '@pn/module/Portalnesia'
 import downloadFile from '@pn/utils/Download'
 import { openBrowser } from '@pn/utils/Main'
 import Authentication from '@pn/module/Authentication'
+import useSelector from '@pn/provider/actions'
 
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
@@ -31,7 +32,8 @@ const supportedAbi = ['arm64-v8a','armeabi-v7a','x86','x86_64']
 
 export default function({navigation}){
     const auth = React.useContext(AuthContext)
-    const {setNotif,sendReport,state:{user}} = auth;
+    const user = useSelector(state=>state.user);
+    const {setNotif,sendReport} = auth;
     const {PNget} = useAPI(false)
     const theme = useTheme()
     const heightt = {...headerHeight,sub:100}

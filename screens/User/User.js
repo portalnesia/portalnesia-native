@@ -30,9 +30,10 @@ import { ucwords } from '@pn/utils/Main'
 import useAPI from '@pn/utils/API'
 import downloadFile from '@pn/utils/Download'
 import { Portal } from '@gorhom/portal'
+import useSelector from '@pn/provider/actions'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
-const {event,Value,createAnimatedComponent} = Animated
+const {Value,createAnimatedComponent} = Animated
 
 const AnimText = createAnimatedComponent(Text);
 const AnimImage = createAnimatedComponent(Image)
@@ -85,8 +86,9 @@ const SkeletonHeader=()=>{
 
 const tabIndexArray=['about','follower','following','media'];
 export default function UserScreen({navigation,route}){
+    const {user,lang} = useSelector(state=>({user:state.user,lang:state.lang}))
     const context = React.useContext(AuthContext)
-    const {state:{user},setNotif,lang}=context
+    const {setNotif}=context
     const {PNpost} = useAPI()
     const [ready,setReady]=React.useState(false)
     const scrollY = React.useRef(new Value(0)).current;

@@ -16,6 +16,7 @@ import useLogin from '@pn/utils/Login'
 import ListItem from '@pn/components/global/ListItem'
 import { linkTo } from '@pn/navigation/useRootNavigation'
 import Authentication from '@pn/module/Authentication';
+import useSelector from '@pn/provider/actions'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
@@ -35,14 +36,14 @@ const langTitle=['System language','Bahasa Indonesia','English'];
 
 export default function Setting({navigation}){
     const context = React.useContext(AuthContext)
-    const {setTheme,userTheme,setNotif,state,lang,setLang,dispatch} = context;
-    const {user} = state;
+    const {setTheme,setNotif,setLang} = context;
+    const {user,userTheme,lang} = useSelector(state=>({user:state.user,userTheme:state.userTheme,lang:state.lang}))
     const [open,setOpen]=React.useState(null)
     const [loading,setLoading] = React.useState(false)
     const {width} = useWindowDimensions()
     const theme = useTheme()
     const [cacheSize,setCacheSize]=React.useState("Calculating...")
-    const {logout} = useLogin({dispatch,setNotif});
+    const {logout} = useLogin({setNotif});
 
     const indexTheme = React.useMemo(()=>{
         return themeArr.indexOf(userTheme)

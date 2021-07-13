@@ -27,6 +27,7 @@ import Recaptcha from '@pn/components/global/Recaptcha'
 import Backdrop from '@pn/components/global/Backdrop';
 import {Portal} from '@gorhom/portal'
 import ShareModule from '@pn/module/Share';
+import useSelector from '@pn/provider/actions'
 
 const {width,height} = Dimensions.get('window')
 
@@ -192,8 +193,9 @@ const RenderURL=React.memo(({index,item,onMenu})=>{
 })
 
 function URLshortener({navigation}){
+    const user = useSelector(state=>state.user);
     const context = React.useContext(AuthContext)
-    const {setNotif,state:{user}} = context
+    const {setNotif} = context
     const [open,setOpen]=React.useState(false)
     const [menu,setMenu]=React.useState(null)
     const [menuOpen,setMenuOpen]=React.useState(false)
