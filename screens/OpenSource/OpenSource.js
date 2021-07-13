@@ -23,7 +23,7 @@ const getURL=(urls,title)=>{
         url = url?.replace(/\.md$/,'')
     } else if(title.match(/^(firebase$|hermes\-engine|react\-native\-syntax\-highlighter|use\-count\-up|react\-native\-web$|\@native\-html\/table\-plugin)/)) {
         url = `${url}/raw/master/LICENSE`
-    } else if(title.match(/^(expo\-)/)) {
+    } else if(title.match(/^(expo)/)) {
         url = `${urls?.repository}/raw/master/LICENSE`;
     } else if(title.match(/^(react\-native\-dotenv|react\-native\-print)/)) {
         url = url?.replace(/github\:/,"https://github.com/")
@@ -65,12 +65,14 @@ const RenderItem=React.memo(({item,index,navigation})=>{
     )
 })
 
+const isHermes = !!global.HermesInternal
 const RenderHeader=React.memo(()=>{
     return (
         <Lay level="2" style={{paddingVertical:50,alignItems:'center'}}>
             <Text category="h5">Portalnesia on Android</Text>
             <Text appearance="hint">{`Native version v${Constants.nativeAppVersion}`}</Text>
             <Text appearance="hint">{`Bundle version v${Constants.manifest.version}`}</Text>
+            <Text appearance="hint">{`Hermes ${isHermes ? 'enabled' : 'disabled'}`}</Text>
         </Lay>
     )
 })
