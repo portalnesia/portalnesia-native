@@ -23,15 +23,18 @@ import { pickImage } from '@pn/utils/PickLibrary';
 import Recaptcha from '@pn/components/global/Recaptcha'
 import useAPI from '@pn/utils/API'
 import useUnsaved from '@pn/utils/useUnsaved'
+import useSelector from '@pn/provider/actions'
 
 const {width}=Dimensions.get('window')
 const dateService = new MomentDateService();
 
 const getGenderArr=()=>([i18n.t('gender.male'),i18n.t('gender.female')]);
 export default function EditUserScreen({navigation,route}){
-    const context = React.useContext(AuthContext);
-    const {setNotif,state:{user},lang} = context;
+    const {user,lang} = useSelector(state=>({user:state.user,lang:state.lang}))
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
+
+    const context = React.useContext(AuthContext);
+    const {setNotif} = context;
     const {PNpost} = useAPI();
     const theme = useTheme();
     const {data,error,mutate,isValidating}=useSWR(`/user/${user?.username}/edit`,{},true)

@@ -6,7 +6,7 @@ import {linkTo} from '@pn/navigation/useRootNavigation'
 import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
 import usePagination from '@pn/utils/usePagination';
-import {AuthContext} from '@pn/provider/Context'
+import useSelector from '@pn/provider/actions'
 import {ucwords} from '@pn/utils/Main'
 import NotFoundScreen from '../NotFound'
 import i18n from 'i18n-js';
@@ -14,8 +14,7 @@ import {RenderNoImage,RenderWithImage} from './Like'
 
 export default function SearchFilter({navigation,route}){
     const {filter} = route?.params
-    const context = React.useContext(AuthContext)
-    const {state:{user}}=context;
+    const user = useSelector(state=>state.user);
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
     const [refreshing,setRefreshing] = React.useState(false)
     const theme = useTheme();

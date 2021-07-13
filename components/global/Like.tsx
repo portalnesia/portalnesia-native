@@ -4,7 +4,7 @@ import {AxiosRequestConfig} from 'axios'
 import useAPI, {ApiResponse} from '@pn/utils/API'
 import {Icon,useTheme,Text} from '@ui-kitten/components'
 import i18n from 'i18n-js'
-
+import useSelector from '@pn/provider/actions'
 import Pressable from './Pressable'
 import { AuthContext } from '@pn/provider/Context'
 import Spinner from './Spinner'
@@ -27,7 +27,8 @@ export interface LikeProps {
 
 function LikeButton({value,onSuccess,type,item_id}: LikeProps) {
     const context = React.useContext(AuthContext);
-    const {state:{user},setNotif} = context;
+    const {setNotif} = context;
+    const user = useSelector(state=>state.user)
     if(!user) return null;
     const theme = useTheme();
     const [loading,setLoading] = React.useState(false);

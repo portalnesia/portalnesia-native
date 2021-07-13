@@ -13,17 +13,14 @@ import ForgetPassword from '../../screens/auth/ForgetPassword'
 import ForgetPasswordForm from '../../screens/auth/ForgetPasswordForm'
 import ReportScreen from '../../screens/ReportScreen'
 import ReportModal from '../../screens/Modal/ReportModal'
-import { AuthContext } from '../../provider/Context';
+import useSelector from '@pn/provider/actions'
 
 const MainStack = createStackNavigator();
-
-
 
 export default function(){
     const {navigationRef} = useRootNavigation();
     const routeNameRef = React.useRef(null)
-    const auth = useContext(AuthContext);
-	const {theme:selectedTheme} = auth;
+    const selectedTheme = useSelector(state=>state.theme);
 	const theme=useTheme()
 
     function onReady(){

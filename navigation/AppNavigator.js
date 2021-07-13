@@ -13,6 +13,7 @@ import * as Notifications from 'expo-notifications'
 import messaging from '@react-native-firebase/messaging'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {checkAndUpdateOTA} from '@pn/utils/Updates'
+import useSelector from '@pn/provider/actions'
 
 import handleFCMData from '@pn/services/FCMservices';
 import {linking} from './Linking'
@@ -287,8 +288,8 @@ export default React.memo(() => {
 	const {navigationRef} = useRootNavigation();
 	const routeNameRef = React.useRef(null)
 	const auth = useContext(AuthContext);
-	const {state,theme:selectedTheme,setNotif} = auth;
-	const {user,session} = state
+	const {setNotif} = auth;
+	const {user,session,selectedTheme} = useSelector(state=>({user:state.user,session:state.session,selectedTheme:state.theme}))
 	const theme=useTheme()
 	const {PNpost} = useAPI();
 	const {showAds} = showInterstisial();

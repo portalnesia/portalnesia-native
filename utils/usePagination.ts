@@ -1,7 +1,7 @@
 import React,{useMemo} from 'react'
 import { useSWRInfinite } from "swr"
 import useAPI from './API'
-import { AuthContext } from '@pn/provider/Context';
+import useSelector from '@pn/provider/actions'
 
 type PaginationDataTypes={
     page: number,
@@ -13,9 +13,7 @@ type PaginationDataTypes={
 
 export default function usePagination<D extends PaginationDataTypes,E=any>(path: string,data_name: string,limit?: number,news?: boolean){
     const {fetcher}=useAPI()
-    const context = React.useContext(AuthContext)
-    const {state}=context
-    const {user:stateUser,session}=state;
+    const {stateUser,session} = useSelector(state=>({stateUser:state.user,session:state.session}))
     const PAGE_LIMIT = limit||10
 
     const { data, error, size, setSize,mutate,isValidating } = useSWRInfinite<D,E>(

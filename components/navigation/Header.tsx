@@ -2,7 +2,6 @@ import React from 'react';
 import {Divider} from '@ui-kitten/components'
 import {Animated,NativeScrollEvent,NativeSyntheticEvent} from 'react-native'
 import {useNavigationState} from '@react-navigation/native'
-import {AuthContext} from '@pn/provider/Context'
 import TopNavigationAction from './TopAction'
 import TopNav,{TopNavigationProps} from './TopNav';
 

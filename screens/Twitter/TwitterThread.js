@@ -30,6 +30,7 @@ import useClipboard from '@pn/utils/clipboard'
 import usePost from '@pn/utils/API'
 import Spinner from '@pn/components/global/Spinner'
 import LikeButton from '@pn/components/global/Like'
+import useSelector from '@pn/provider/actions'
 
 LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
 
@@ -37,8 +38,7 @@ const MoreIcon=(props)=><Icon {...props} style={{...props?.style,marginHorizonta
 
 const RenderTwitter=React.memo(({item,index,setMenu})=>{
     const {width} = useWindowDimensions()
-    const context = React.useContext(AuthContext);
-    const {theme:contextTheme} = context
+    const contextTheme = useSelector(state=>state.theme);
     const theme=useTheme()
     const {copyText} = useClipboard()
     const ads = index % 20;
@@ -133,8 +133,9 @@ export default function TwitterThread({navigation,route}){
         navigation.replace("Twitter",{slug:'popular'})
         return null;
     }
+    const user = useSelector(state=>state.user);
     const context = React.useContext(AuthContext);
-    const {state:{user},setNotif} = context
+    const {setNotif} = context
     const theme=useTheme()
     const {data,error,mutate,isValidating}=useSWR(slug !== 'popular' ? `/twitter/${slug}` : null)
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.id && !__DEV__ ? `/twitter/others/${data?.id}` : null)

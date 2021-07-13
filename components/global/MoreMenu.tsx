@@ -14,6 +14,7 @@ import useAPI from '@pn/utils/API'
 import {Portal} from '@gorhom/portal'
 import {sentLike} from '@pn/components/global/Like'
 import Spinner from './Spinner'
+import useSelector from '@pn/provider/actions'
 
 const MoreIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="more-vertical" />
 const FeedbackIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="feedback" pack="material" />
@@ -103,7 +104,8 @@ function getIcon(action?: string,value?: any) {
 
 const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContainerProps)=>{
     const context = React.useContext(AuthContext)
-    const {sendReport,setNotif,state:{user}} = context
+    const {sendReport,setNotif} = context
+    const user = useSelector(state=>state.user)
     const {copyText} = useClipboard()
     const {PNpost} = useAPI();
     const [selectedMenu,setSelectedMenu]=React.useState<MenuType|null>(null)

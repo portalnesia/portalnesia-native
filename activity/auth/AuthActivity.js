@@ -6,6 +6,8 @@ import 'moment/locale/id';
 import AppNavigator from './AppNavigator';
 import { AuthProvider } from './AuthProvider';
 import loadResources from '@pn/utils/Assets'
+import store from '@pn/provider/store'
+import {Provider} from 'react-redux'
 
 LogBox.ignoreLogs(['Possible Unhandled Promise Rejection']);
 
@@ -35,9 +37,11 @@ export default function Auth() {
 
 	return (
         <SafeAreaView style={[styles.container]}>
-			<AuthProvider>
-				<AppNavigator />
-			</AuthProvider>
+			<Provider store={store}>
+				<AuthProvider>
+					<AppNavigator />
+				</AuthProvider>
+			</Provider>
         </SafeAreaView>
     );
 }

@@ -25,17 +25,18 @@ import Backdrop from '@pn/components/global/Backdrop';
 import getInfo from '@pn/utils/Info';
 import { useNavigationState } from '@react-navigation/native';
 import { log, logError } from '@pn/utils/log';
+import useSelector from '@pn/provider/actions'
 
 const {width} = Dimensions.get('window')
 
 const info = getInfo();
 
 export default function LoginScreen({ navigation,route }) {
-	const context = React.useContext(AuthContext)
-	const {state,setNotif,theme:selectedTheme} = context;
-	const {user} = state;
+	const {user,selectedTheme} = useSelector(state=>({user:state.user,selectedTheme:state.theme}));
 	if(user) return <NotFoundScreen navigation={navigation} route={route} />
 
+	const context = React.useContext(AuthContext)
+	const {setNotif} = context;
 	const {PNpost} = useAPI();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');

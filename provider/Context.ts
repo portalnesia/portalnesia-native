@@ -25,32 +25,16 @@ export interface ParamsReportType {
 export type SendReportType = 'komentar'|'url'|'konten'|'feedback'
 
 export type ContextType = {
-    state: StateType,
-    dispatch: Dispatch<DispatchArgument>,
     setNotif:(type: boolean | 'error' | 'success' | 'info',title: string,msg?: string,data?: {[key: string]: any})=>void,
     setTheme:(value: 'light' | 'auto' | 'dark')=>Promise<void>,
-    theme: 'light' | 'dark' | string,
-    userTheme: 'light' | 'auto' | 'dark' | string,
-    setLang:(value: 'light' | 'auto' | 'dark')=>Promise<void>,
-    lang: string,
-    isLogin:boolean,
+    setLang:(value: 'auto'|'en'|'id')=>Promise<void>,
     sendReport:(type: SendReportType,params?: ParamsReportType)=>void
 }
 
 const defaultValue = {
-    state:{
-        user:null,
-        token:null,
-        session:null
-    },
-    dispatch:()=>{},
     setNotif:()=>{},
     setTheme:async()=>{},
-    theme:'light',
-    userTheme:'auto',
     setLang:async()=>{},
-    lang:'auto',
-    isLogin:false,
     sendReport:()=>{}
 }
 

@@ -25,14 +25,17 @@ import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
 import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
 import Backdrop from '@pn/components/global/Backdrop'
 import Spinner from '@pn/components/global/Spinner'
+import useSelector from '@pn/provider/actions'
 
 const {width} = Dimensions.get('window')
 
 export default function AccountSettingScreen({navigation,route}){
     const msg = route?.params?.msg;
-    const context = React.useContext(AuthContext);
-    const {setNotif,state:{user},theme:selectedTheme} = context;
+    const {user} = useSelector(state=>({user:state.user,selectedTheme:state.theme}));
     if(!user) return <NotFoundScreen navigation={navigation} route={route} />
+
+    const context = React.useContext(AuthContext);
+    const {setNotif} = context;
     const theme=useTheme();
     const {data,error,mutate,isValidating} = useSWR('/setting/account',{},true);
     const [input,setInput]=React.useState({email:'',google:'',instagram:'',line:'',media_private:false,private:false,telegram:'',twitter:'',username:''})

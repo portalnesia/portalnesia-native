@@ -9,7 +9,6 @@ import {GraphQLClient} from 'graphql-request'
 import * as Secure from 'expo-secure-store'
 import {refreshingToken} from '@pn/utils/Login'
 import API from './axios'
-import {TokenType} from '@pn/types/TokenTypes'
 import {UserType} from '@pn/types/UserTypes'
 import {TokenResponse} from 'expo-auth-session'
 import { log, logError } from './log';

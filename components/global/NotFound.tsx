@@ -1,6 +1,6 @@
 import React from 'react'
 import {View} from 'react-native'
-import {AuthContext} from '@pn/provider/Context'
+import useSelector from '@pn/provider/actions'
 import LottieView from 'lottie-react-native'
 
 export interface NotFoundProps {
@@ -9,8 +9,7 @@ export interface NotFoundProps {
 }
 
 function NotFound({children,status=404}: NotFoundProps){
-    const auth = React.useContext(AuthContext);
-	const {theme:selectedTheme} = auth;
+    const selectedTheme = useSelector(state=>state.theme)
 
     const animSource=React.useMemo(()=>{
         if(status!==404) {

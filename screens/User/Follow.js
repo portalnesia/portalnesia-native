@@ -16,6 +16,7 @@ import { MenuContainer } from '@pn/components/global/MoreMenu'
 import Backdrop from '@pn/components/global/Backdrop'
 import { AuthContext } from '@pn/provider/Context'
 import useAPI from '@pn/utils/API'
+import useSelector from '@pn/provider/actions'
 
 const winHeight = Dimensions.get('window').height;
 const OptionIcon=React.memo((props)=><Icon {...props} name="more-vertical" />)
@@ -60,8 +61,9 @@ const SkeletonFollow=()=>{
 }
 
 const RenderFollow=React.forwardRef((props,ref)=>{
+    const user = useSelector(state=>state.user);
     const context = React.useContext(AuthContext);
-    const {setNotif,state:{user}} = context;
+    const {setNotif} = context;
     const {PNpost} = useAPI()
     const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/${props.type}` : null,props.type,20,false)
     const theme=useTheme()

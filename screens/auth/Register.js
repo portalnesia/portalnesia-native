@@ -11,12 +11,14 @@ import NotFoundScreen from '../NotFound'
 import i18n from 'i18n-js';
 import useAPI from '@pn/utils/API';
 import Recaptcha from '@pn/components/global/Recaptcha'
+import useSelector from '@pn/provider/actions'
 
 export default function RegisterScreen({ navigation,route }) {
-	const context = React.useContext(AuthContext)
-	const {state:{user},setNotif} = context;
+	const user = useSelector(state=>state.user);
 	if(user) return <NotFoundScreen navigation={navigation} route={route} />
 
+	const context = React.useContext(AuthContext)
+	const {setNotif} = context;
 	const {PNpost} = useAPI();
 	const [email, setEmail] = useState('');
 	const [username, setUsername] = useState('');
