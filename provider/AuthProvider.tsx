@@ -69,7 +69,16 @@ const AuthProviderFunc = () => {
 	const {navigationRef} = useRootNavigation()
 	const [isLoadingComplete, setLoadingComplete] = React.useState(false);
 	const dispatch = useDispatch();
+	const {refreshToken} = useLogin()
 	const context = useSelector(type=>({theme:type.theme,userTheme:type.userTheme,lang:type.lang,user:type.user,isLogin:type.isLogin}));
+	
+	const setNotif=React.useCallback((type: boolean | 'error' | 'success' | 'info',title: string,msg?: string,data: {[key: string]: any} = {})=>{
+		let tipe=type;
+		if(typeof type === 'boolean') {
+			tipe = type===true ? 'error' : 'success'
+		}
+		dropdownRef.current?.alertWithType(tipe||'success',title||"Title",msg,{type:'alert',...data});
+	},[])
 
 	const setTheme=React.useCallback(async(val: 'auto'|'dark'|'light')=>{
 		if(['light','auto','dark'].indexOf(val) !== -1) {
@@ -94,14 +103,6 @@ const AuthProviderFunc = () => {
 		}
 	},[dispatch])
 
-	const setNotif=React.useCallback((type: boolean | 'error' | 'success' | 'info',title: string,msg?: string,data: {[key: string]: any} = {})=>{
-		let tipe=type;
-		if(typeof type === 'boolean') {
-			tipe = type===true ? 'error' : 'success'
-		}
-		dropdownRef.current.alertWithType(tipe||'success',title||"Title",msg,{type:'alert',...data});
-	},[])
-
 	const sendReport=React.useCallback((type,params={})=>{
 		const isUpdated = compareVersion.compare(Constants.nativeAppVersion,"1.5.0",">=");
 		if(isUpdated) {
@@ -123,18 +124,23 @@ const AuthProviderFunc = () => {
 		}
 	},[navigationRef])
 
-	const {refreshToken} = useLogin({setNotif})
-
 	const loadResourcesAsync=React.useCallback(async()=>{
 		async function asyncTask(){
 			try {
 				let [res,lang,ads] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang"),AsyncStorage.getItem("ads")])
 
 				if(res !== null) {
-					const theme=(colorScheme==='dark' && context.userTheme === 'auto' || context.userTheme === 'dark') ? "dark" : "light";
+					const theme=(colorScheme==='dark' && res === 'auto' || res === 'dark') ? "dark" : "light";
+					dispatch(changeTheme(theme,(res as 'dark'|'light'|'auto')));
+				} else {
+					const theme=(colorScheme==='dark') ? "dark" : "light";
 					dispatch(changeTheme(theme,(res as 'dark'|'light'|'auto')));
 				}
-				if(lang !== null) dispatch(changeLang((lang as 'auto'|'en'|'id')));
+				if(lang !== null) {
+					dispatch(changeLang((lang as 'auto'|'en'|'id')));
+				} else {
+					dispatch(changeLang('auto'));
+				}
 				try {
 					if(ads==null) {
 						const permiss = await AdsRequest();

@@ -2,4 +2,5 @@
 <resources>
   <string name="app_name">Portalnesia Beta</string>
   <string name="account_type">com.portalnesia.beta</string>
+  <string name="package_name">com.portalnesia.app.beta</string>
 </resources>

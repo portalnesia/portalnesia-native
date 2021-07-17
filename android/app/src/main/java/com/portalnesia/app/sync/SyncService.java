@@ -8,17 +8,17 @@ import android.os.IBinder;
 import javax.annotation.Nullable;
 
 public class SyncService extends Service {
-    private static final Object syncLock = new Object();
-    @SuppressLint("StaticFieldLeak")
     private static SyncAdapter sync = null;
+
+    public SyncService() {
+        super();
+    }
 
     @Override
     public void onCreate(){
         super.onCreate();
-        synchronized (syncLock) {
-            if(sync == null) {
-                sync = new SyncAdapter(getApplicationContext(),true);
-            }
+        if(sync == null) {
+            sync = new SyncAdapter(getApplicationContext(),true);
         }
     }
 

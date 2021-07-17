@@ -62,6 +62,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="https" android:host="portalnesia.com"/>
       </intent-filter>
+      <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts"/>
     </activity>
     <activity android:name=".ShareActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode" android:windowSoftInputMode="adjustResize|stateVisible" android:theme="@style/ActivityTheme" android:screenOrientation="portrait">
       <intent-filter>
