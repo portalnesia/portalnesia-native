@@ -43,7 +43,7 @@ export default function Setting({navigation}){
     const {width} = useWindowDimensions()
     const theme = useTheme()
     const [cacheSize,setCacheSize]=React.useState("Calculating...")
-    const {logout} = useLogin({setNotif});
+    const {logout} = useLogin(setNotif);
 
     const indexTheme = React.useMemo(()=>{
         return themeArr.indexOf(userTheme)

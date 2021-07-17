@@ -107,6 +107,12 @@
         "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/remote-config/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "@react-native-firebase/storage@12.1.0": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/invertase/react-native-firebase/tree/master/packages/storage",
+        "licenseUrl": "https://github.com/invertase/react-native-firebase/tree/master/packages/storage/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
     "@react-navigation/bottom-tabs@5.11.11": {
         "licenses": "MIT",
         "repository": "https://github.com/react-navigation/react-navigation",
@@ -614,6 +620,12 @@
         "licenseUrl": "https://github.com/facebook/react-native/raw/master/LICENSE",
         "parents": "portal-native"
     },
+    "react-redux@7.2.4": {
+        "licenses": "MIT",
+        "repository": "github:reduxjs/react-redux",
+        "licenseUrl": "github:reduxjs/react-redux",
+        "parents": "portal-native"
+    },
     "react-syntax-highlighter@15.4.3": {
         "licenses": "MIT",
         "repository": "https://github.com/react-syntax-highlighter/react-syntax-highlighter",
@@ -624,6 +636,18 @@
         "licenses": "MIT",
         "repository": "https://github.com/facebook/react",
         "licenseUrl": "https://github.com/facebook/react/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "redux-thunk@2.3.0": {
+        "licenses": "MIT",
+        "repository": "github:reduxjs/redux-thunk",
+        "licenseUrl": "github:reduxjs/redux-thunk",
+        "parents": "portal-native"
+    },
+    "redux@4.1.0": {
+        "licenses": "MIT",
+        "repository": "github:reduxjs/redux",
+        "licenseUrl": "github:reduxjs/redux",
         "parents": "portal-native"
     },
     "sanitize-html@2.4.0": {

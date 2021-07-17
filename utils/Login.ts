@@ -54,9 +54,7 @@ export async function getProfile(token: ResponseToken){
     return data;
 }
 
-type UseLoginOptions = {
-    setNotif?:(type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any}) => void
-}
+type UseLoginOptions = (type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined, data?: {[key: string]: any}) => void
 
 export async function notificationInit(type:'login'|'logout') {
     if(type==='login') {
@@ -94,7 +92,7 @@ export async function logoutInit() {
     return;
 }
 
-export default function useLogin({setNotif}: UseLoginOptions) {
+export default function useLogin(setNotif?: UseLoginOptions) {
     const dispatch=useDispatch();
     const logout=React.useCallback(async(tkn?: ResponseToken,notify?:{type: boolean | "error" | "success" | "info", title: string, msg?: string | undefined})=>{
         let token: ResponseToken|undefined;
@@ -179,13 +177,17 @@ export default function useLogin({setNotif}: UseLoginOptions) {
                 // If js token == native token;  && token?.refreshToken == refresh_token
                 if(token!==null) {
                     const date_now = Number((new Date().getTime()/1000).toFixed(0));
-                    // Check if token expired;
-                    if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
-                        await refreshTokenUtils(token,account);
-                    }
-                    // Token not expired
-                    else {
-                        await refreshTokenUtils(token,account,false);
+                    try {
+                        // Check if token expired;
+                        if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
+                            await refreshTokenUtils(token,account);
+                        }
+                        // Token not expired
+                        else {
+                            await refreshTokenUtils(token,account,false);
+                        }
+                    } catch(e) {
+                        logError(e,"refreshToken Login.ts");
                     }
                 }
                 // JS token != native token;
