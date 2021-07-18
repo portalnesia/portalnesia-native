@@ -134,7 +134,7 @@ const AuthProviderFunc = () => {
 					dispatch(changeTheme(theme,(res as 'dark'|'light'|'auto')));
 				} else {
 					const theme=(colorScheme==='dark') ? "dark" : "light";
-					dispatch(changeTheme(theme,(res as 'dark'|'light'|'auto')));
+					dispatch(changeTheme(theme,'auto'));
 				}
 				if(lang !== null) {
 					dispatch(changeLang((lang as 'auto'|'en'|'id')));

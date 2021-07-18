@@ -398,7 +398,7 @@ const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,o
         onReceiveId,
         padding,
         editor
-    }),[theme,iklan,onReceiveId,padding,editor])
+    }),[theme,iklan,onReceiveId,padding,editor,yLayout,scrollRef])
 
     /*const alterData=(node)=>{
         const {parent,data} = node
