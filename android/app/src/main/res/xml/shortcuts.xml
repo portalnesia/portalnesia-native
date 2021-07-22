@@ -10,6 +10,7 @@
         tools:targetApi="n_mr1">
         <intent
             android:targetPackage="com.portalnesia.app"
+            android:targetClass="com.portalnesia.app.MainActivity"
             android:action="android.intent.action.VIEW"
             android:data="pn://news"/>
     </shortcut>
@@ -22,6 +23,7 @@
         tools:targetApi="n_mr1">
         <intent
             android:targetPackage="com.portalnesia.app"
+            android:targetClass="com.portalnesia.app.MainActivity"
             android:action="android.intent.action.VIEW"
             android:data="pn://chord"/>
     </shortcut>
@@ -34,6 +36,7 @@
         tools:targetApi="n_mr1">
         <intent
             android:targetPackage="com.portalnesia.app"
+            android:targetClass="com.portalnesia.app.MainActivity"
             android:action="android.intent.action.VIEW"
             android:data="pn://twitter/thread"/>
     </shortcut>

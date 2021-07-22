@@ -31,8 +31,8 @@ export interface PortalnesiaInterface {
      */
     uriToFileProvider:(path: string) => Promise<string>;
     fileProviderToUri(path:string): Promise<string>;
-    verifyWithRecaptcha:()=>Promise<string>;
     getAction(): Promise<string>;
+    exitApp(): void;
 }
 
 export interface BrighnessInterface {
@@ -105,4 +105,10 @@ export interface ShareModuleInterfaceNative {
     getSharedData(clear: boolean): Promise<ShareDataListener>;
     dismiss():void;
     startCropActivity?(type: 'png'|'jpg'|'jpeg',uri: string,options?:ShareCropOptions): Promise<ShareCropResult>
+}
+
+export interface SafetyInterface {
+    isGooglePlayServicesAvailable(): Promise<boolean>;
+    getVerification(nonce: string): Promise<string>;
+    verifyWithRecaptcha(): Promise<string>;
 }

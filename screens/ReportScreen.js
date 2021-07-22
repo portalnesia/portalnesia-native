@@ -19,7 +19,7 @@ import { jsStyles, ucwords } from '@pn/utils/Main'
 import Localization from '@pn/module/Localization'
 import { AuthContext } from '@pn/provider/Context'
 import Backdrop from '@pn/components/global/Backdrop';
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import useSelector from '@pn/provider/actions'
 
 const SendIcon = (props)=><Icon {...props} name="send" pack="material" />
@@ -94,7 +94,7 @@ export default function ReportScreen({navigation,route}){
                 accu[val]=array.value;
                 return accu;
             },{})
-            const recaptcha = await verifyRecaptcha(setNotif);
+            const recaptcha = await PNSafety.verifyWithRecaptcha()
             const data={
                 type,
                 text:input,

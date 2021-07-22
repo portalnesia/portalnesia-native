@@ -369,7 +369,7 @@ export default React.memo(() => {
 			}
 		}
 		function handleURL({url}){
-			console.log("URL",url);
+			//console.log("URL",url);
 			if(url !== null) {
 				const parsed = urlParse(url,true);
 				if(parsed?.query?.msg) {
@@ -383,7 +383,7 @@ export default React.memo(() => {
 		/* HANDLE NOTIFICATION */
 		
 		function shareListener(data){
-			console.log("PROVIDER",data);
+			//console.log("PROVIDER",data);
 			if(data?.extraData?.url) {
 				handleLinking(data?.extraData?.url);
 			}

@@ -23,6 +23,7 @@ import AppLoading from 'expo-app-loading';
 import AppNavigator from '../navigation/AppNavigator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import verifyApps from '@pn/utils/VerifyApps'
 import {useSelector,changeLang,changeTheme,useDispatch} from '@pn/provider/actions'
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../components/utils/FontAwesomeIconsPack'
@@ -127,6 +128,7 @@ const AuthProviderFunc = () => {
 	const loadResourcesAsync=React.useCallback(async()=>{
 		async function asyncTask(){
 			try {
+				await verifyApps();
 				let [res,lang,ads] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang"),AsyncStorage.getItem("ads")])
 
 				if(res !== null) {
@@ -244,20 +246,12 @@ const AuthProviderFunc = () => {
 			if(token_string!==null) {
 				const token = JSON.parse(token_string);
 				const date_now = Number((new Date().getTime()/1000).toFixed(0));
-				const user_string = await Secure.getItemAsync('user');
-				if(user_string !== null) {
-					console.log("Refresh Token",date_now - token.issuedAt,(token.expiresIn||3600) - 300)
-					const user: UserType = JSON.parse(user_string);
-					if(typeof user === 'object') {
-						let new_dispatch: {user:UserType,session:string,token?:TokenResponse}={user,session:user?.session_id};
-						if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
-							const new_token = await refreshingToken(token);
-							if(new_token) {
-								new_dispatch.token = new_token;
-								await Secure.setItemAsync('token',JSON.stringify(new_token));
-							}
-						}
-						dispatch({type:"MANUAL",payload:{...new_dispatch}})
+				console.log("Refresh Token",date_now - token.issuedAt,(token.expiresIn||3600) - 300)
+				if((date_now - token.issuedAt) > ((token.expiresIn||3600) - 300)) {
+					const new_token = await refreshingToken(token);
+					if(new_token) {
+						await Secure.setItemAsync('token',JSON.stringify(new_token));
+						dispatch({type:"MANUAL",payload:{token:new_token}})
 					}
 				}
 			}

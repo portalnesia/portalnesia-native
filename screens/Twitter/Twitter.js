@@ -15,7 +15,7 @@ import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {isTwitterURL, isURL, specialHTML} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
 import useAPI from '@pn/utils/API'
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import { AuthContext } from '@pn/provider/Context';
 import Carousel from '@pn/components/global/Carousel';
 import useSWR from '@pn/utils/swr';
@@ -81,7 +81,7 @@ const RenderInput=React.memo(({onClose,initialData=""})=>{
 	const handleSubmit=(input)=>{
 		if(isURL(input) && isTwitterURL(input)) {
 			setLoading(true)
-			verifyRecaptcha(setNotif)
+			PNSafety.verifyWithRecaptcha()
 			.then(recaptcha=>{
 				return PNpost(`/twitter/thread`,{url:input,recaptcha})
 			})

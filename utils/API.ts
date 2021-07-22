@@ -26,14 +26,18 @@ export async function fetcher<D = any>(url: string,option?:AxiosRequestConfig): 
     else return data;
 }
 
+type SignatureType = {signature:string,date:string}
 async function getToken(){
     const token_string = await Secure.getItemAsync('token');
     const user_string = await Secure.getItemAsync('user');
-    const result: {token: TokenResponse|null,session:string} = {token:null,session:(Application.androidId||"")};
+    const sig_string = await Secure.getItemAsync('signature');
+    const result: {token: TokenResponse|null,session:string,signature: string} = {token:null,session:(Application.androidId||""),signature:""};
     const token: TokenResponse|null = token_string===null ? null : JSON.parse(token_string);
     const user: UserType|null = user_string===null ? null : JSON.parse(user_string);
+    const signature: SignatureType|null = sig_string===null ? null : JSON.parse(sig_string);
     result.session = user && user?.session_id ? user?.session_id : (Application.androidId||'');
     result.token = token;
+    result.signature=signature === null ? "" : signature.signature;
 
     if(token!==null) {
         try {
@@ -64,11 +68,12 @@ export default function useAPI(){
     const cancelToken = axios.CancelToken.source();
 
     const PNpost=React.useCallback(async<D = any>(url: string,data?:{[key: string]: any},formdata?: AxiosRequestConfig,catchError=true): Promise<ApiResponse<D>>=>{
-        let token: TokenResponse|null=null,session:string="";
+        let token: TokenResponse|null=null,session:string="",signature:string="";
         try {
             const result = await getToken();
             token = result.token;
             session = result.session;
+            signature = result.signature;
         } catch(e) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
@@ -84,6 +89,7 @@ export default function useAPI(){
             opt={
                 headers:{
                     'X-Session-Id':session,
+                    'X-Signature-Id':signature,
                     ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                     ...otherHeader
                 },
@@ -95,6 +101,7 @@ export default function useAPI(){
             opt={
                 headers:{
                     'X-Session-Id':session,
+                    'X-Signature-Id':signature,
                     ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                 },
                 cancelToken: cancelToken.token
@@ -129,11 +136,12 @@ export default function useAPI(){
     },[sendReport])
 
     const PNget=React.useCallback(async<D = any>(url: string,catchError=true): Promise<ApiResponse<D>>=>{
-        let token: TokenResponse|null=null,session:string="";
+        let token: TokenResponse|null=null,session:string="",signature:string="";;
         try {
             const result = await getToken();
             token = result.token;
             session = result.session;
+            signature = result.signature;
         } catch(e) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
@@ -144,6 +152,7 @@ export default function useAPI(){
         const opt={
             headers:{
                 'X-Session-Id':session,
+                'X-Signature-Id':signature,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
             cancelToken: cancelToken.token
@@ -176,11 +185,12 @@ export default function useAPI(){
     },[])
 
     const fetcher=React.useCallback(async<D = any>(url: string): Promise<ApiResponse<D>>=>{
-        let token: TokenResponse|null=null,session:string="";
+        let token: TokenResponse|null=null,session:string="",signature:string="";;
         try {
             const result = await getToken();
             token = result.token;
             session = result.session;
+            signature = result.signature;
         } catch(e) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
@@ -190,6 +200,7 @@ export default function useAPI(){
         const opt={
             headers:{
                 'X-Session-Id':session,
+                'X-Signature-Id':signature,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
             cancelToken: cancelToken.token
@@ -211,11 +222,12 @@ export default function useAPI(){
     },[])
 
     const PNgraph=React.useCallback(async<D = any>(url:string,query:string): Promise<ApiResponse<D>>=>{
-        let token: TokenResponse|null=null,session:string="";
+        let token: TokenResponse|null=null,session:string="",signature:string="";;
         try {
             const result = await getToken();
             token = result.token;
             session = result.session;
+            signature = result.signature;
         } catch(e) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
@@ -226,6 +238,7 @@ export default function useAPI(){
             'X-Application-Version': Constants.nativeAppVersion||'',
             'X-Device-Id': Application.androidId||'',
             'X-Session-Id': session||'',
+            'X-Signature-Id':signature,
             ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
         };
         try {
@@ -248,11 +261,12 @@ export default function useAPI(){
     },[])
 
     const PNgetPkey=React.useCallback(async()=>{
-        let token: TokenResponse|null=null,session:string="";
+        let token: TokenResponse|null=null,session:string="",signature:string="";;
         try {
             const result = await getToken();
             token = result.token;
             session = result.session;
+            signature = result.signature;
         } catch(e) {
             setNotif(true,"Error",e.message);
             log("getToken error",{msg:e.message});
@@ -262,6 +276,7 @@ export default function useAPI(){
         const opt={
             headers:{
                 'X-Session-Id':session,
+                'X-Signature-Id':signature,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
             cancelToken: cancelToken.token

@@ -9,6 +9,7 @@ const initialState: ReduxState={
     userTheme:'auto',
     lang:'auto',
     isLogin:false,
+    signature:null
 }
 
 const reducer=(state=initialState,action: ReduxAction): ReduxState=>{
@@ -47,6 +48,11 @@ const reducer=(state=initialState,action: ReduxAction): ReduxState=>{
             return {
                 ...state,
                 lang:(action.payload as 'id'|'en'|'auto')
+            }
+        case "SESSION":
+            return {
+                ...state,
+                signature:(action.payload as string)
             }
 		case "MANUAL":
             payload = (action.payload as Partial<ReduxState>)
