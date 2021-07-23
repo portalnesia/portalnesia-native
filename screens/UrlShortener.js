@@ -16,7 +16,7 @@ import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
 import {CONTENT_URL} from '@env'
 import downloadFile from '@pn/utils/Download'
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import { Ktruncate, openBrowser } from '@pn/utils/Main';
 import i18n from 'i18n-js'
 import Brightness from '@pn/module/Brightness';
@@ -81,7 +81,7 @@ const URLshortenerForm=React.memo(({initialData="",setNotif,user,ads,handleOpenQ
         if(input.url.match(/\S+/) === null) return setNotif(true,"Error","URL cannot be empty");
         setResult(null);
         setLoading(true);
-        verifyRecaptcha(setNotif)
+        PNSafety.verifyWithRecaptcha()
         .then(recaptcha=>{
             return PNpost('/url/short',{...input,recaptcha})
         })

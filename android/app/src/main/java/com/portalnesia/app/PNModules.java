@@ -1,6 +1,7 @@
 package com.portalnesia.app;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -20,18 +21,16 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
+
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.safetynet.SafetyNet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -295,6 +294,20 @@ public class PNModules extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void exitApp() {
+        Activity activity = getCurrentActivity();
+        if(activity == null) {
+            return;
+        }
+        activity.finishAndRemoveTask();
+        try {
+            System.exit(0);
+        } catch(Throwable ignored) {
+
+        }
+    }
+
     private Uri getApkUri(String pathname) {
         File file = new File(pathname);
         Uri uri = Uri.fromFile(file);
@@ -350,29 +363,6 @@ public class PNModules extends ReactContextBaseJavaModule {
     public void getAction(Promise promise) {
         Intent intent = Objects.requireNonNull(getCurrentActivity()).getIntent();
         promise.resolve(intent.getAction());
-    }
-
-    @ReactMethod
-    public void verifyWithRecaptcha(Promise promise) {
-        String apiKey = reactContext.getString(R.string.recaptcha_apikey);
-        SafetyNet.getClient(reactContext).verifyWithRecaptcha(apiKey)
-        .addOnSuccessListener(
-                response -> {
-                    String token = response.getTokenResult();
-                    promise.resolve(token);
-                }
-        )
-        .addOnFailureListener(
-            e -> {
-                if(e instanceof ApiException) {
-                    ApiException apiException = (ApiException) e;
-                    int statusCode = apiException.getStatusCode();
-                    promise.reject(Integer.toString(statusCode),CommonStatusCodes.getStatusCodeString(statusCode),e);
-                } else {
-                    promise.reject(e);
-                }
-            }
-        );
     }
 
     private String getFileUri(Uri uri) {

@@ -18,7 +18,7 @@ import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
 import {randomInt} from '@pn/utils/Main'
 import ListItem from '@pn/components/global/ListItem'
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import Spinner from '@pn/components/global/Spinner'
 
 const HeaderModal=React.memo(({search,setSearch,setPage})=>{
@@ -83,7 +83,7 @@ export default function({navigation}){
     const onSubmit=()=>{
         if(input?.match(/\S+/g) === null) return  setNotif("error",i18n.t('errors.form_validation',{type:"Input"}))
         setLoading(true)
-        verifyRecaptcha(setNotif)
+        PNSafety.verifyWithRecaptcha()
         .then(recaptcha=>{
             return PNpost(`/geodata/transform`,{
                 ...switchVal,

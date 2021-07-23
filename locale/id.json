@@ -83,6 +83,7 @@
         "one":"fitur",
         "other":"fitur"
     },
+    "warning":"Peringatan",
     "reply":"Balas",
     "delete":"Hapus",
     "remove":"Hapus",
@@ -124,7 +125,9 @@
         "youtube_service":"Anda harus menginstal aplikasi youtube resmi untuk dapat menonton video.\n\nKlik di sini untuk menonton dalam mode layar penuh.",
         "invalid":"%{type} tidak valid",
         "sure":"Apakah Anda yakin?",
-        "location_disabled":"Layanan lokasi Anda tidak aktif"
+        "location_disabled":"Layanan lokasi Anda tidak aktif",
+        "google_play_available":"Harap perbarui Google Play Services Anda untuk menggunakan aplikasi ini.",
+        "verify_failed":"Kami gagal memverifikasi aplikasi yang sedang Anda gunakan. Pastikan Anda menggunakan aplikasi resmi Portalnesia.\n\nJika Anda merasa kami melakukan kesalahan, silahkan hubungi kami di support@portalnesia.com"
     },
     "report_placeholder":{
         "placeholder_url":"Mohon maaf atas ketidaknyamanannya, sepertinya ada masalah dengan layanan server internal kami. Bisakah Anda memberi tahu kami bagaimana ini bisa terjadi?",

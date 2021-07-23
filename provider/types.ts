@@ -8,6 +8,7 @@ export interface ReduxState {
     userTheme:'light'|'dark'|'auto';
     lang:'id'|'en'|'auto';
     isLogin:boolean;
+    signature:null|string
 }
 
 export interface ReduxAction {

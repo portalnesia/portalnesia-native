@@ -15,7 +15,7 @@ import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/Context';
 import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import { convertFile, pickImage } from '@pn/utils/PickLibrary';
 import ShareModule from '@pn/module/Share';
 import Portalnesia from '@pn/module/Portalnesia';
@@ -74,7 +74,7 @@ export default function({navigation}){
                     setProgress(complete);
                 }
             }
-            verifyRecaptcha(setNotif)
+            PNSafety.verifyWithRecaptcha()
             .then(token=>{
                 return new Promise(res=>{
                     const form=new FormData();

@@ -6,7 +6,7 @@ import Modal from 'react-native-modal'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -531,7 +531,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight})=>{
             })
         })
         .then(()=>{
-            return verifyRecaptcha(setNotif)
+            return PNSafety.verifyWithRecaptcha()
         })
         .then(recaptcha=>{
             return PNpost(`/qrcode`,{...input,recaptcha})

@@ -14,7 +14,7 @@ import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
 import {CONTENT_URL,URL} from '@env'
 import { openBrowser, ucwords } from '@pn/utils/Main';
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import i18n from 'i18n-js';
 import useSelector from '@pn/provider/actions'
 
@@ -79,7 +79,7 @@ export default function Contact({navigation,route}){
         if(checkError.length > 0) return setNotif(true,"Error",checkError.join("\n"));
         
         setLoading(true);
-        verifyRecaptcha(setNotif)
+        PNSafety.verifyWithRecaptcha()
         .then(grecaptcha=>{
             return PNpost('/messages/add',{...input,grecaptcha})
         })

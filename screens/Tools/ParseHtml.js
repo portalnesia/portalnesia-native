@@ -12,7 +12,7 @@ import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/Context';
 import {randomInt} from '@pn/utils/Main'
-import verifyRecaptcha from '@pn/module/Recaptcha'
+import PNSafety from '@pn/module/Safety'
 import ShareModule from '@pn/module/Share';
 
 export default function({navigation}){
@@ -31,7 +31,7 @@ export default function({navigation}){
     const handleParse=(input)=>()=>{
         if(input.match(/\S+/) === null) return setNotif(true,"Error","HTML cannot be empty");
         setLoading(true);
-        verifyRecaptcha(setNotif)
+        PNSafety.verifyWithRecaptcha()
         .then(recaptcha=>{
             return PNpost(`/parse_html`,{html:input,recaptcha})
         })
