@@ -98,6 +98,14 @@ class RenderMediaClass extends React.PureComponent{
         if(!isLoadingMore && !isReachingEnd && !isLoadingInitialData) setSize(size+1);
     }
 
+    renderEmpty() {
+        return (
+            <View style={{justifyContent:"center",alignItems:"center",flexDirection:"row",height:56}}>
+                <Text>No Data</Text>
+            </View>
+        )
+    }
+
     componentDidUpdate(prevProps){
         const {isValidating,onValidatingChange,dt,isLoadingMore}=this.props
         if(prevProps.isValidating != isValidating && dt?.length > 0 && !isLoadingMore) {
@@ -116,7 +124,8 @@ class RenderMediaClass extends React.PureComponent{
     }
 
     renderFooter(){
-        const {isReachingEnd,isLoadingMore}=this.props;
+        const {isReachingEnd,isLoadingMore,dt}=this.props;
+        if(dt?.length == 0) return null;
         if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:10,textAlign:'center'}}>You have reach the bottom of the page</Text>
         if(isLoadingMore) return <View paddingTop={20}><GridSkeleton height={300} number={2} image /></View>
         return null
@@ -166,6 +175,7 @@ class RenderMediaClass extends React.PureComponent{
                 renderItem={props=> <RenderNews {...props} data={dt} onOpen={this.handleOpenMenu} />}
                 keyExtractor={(item)=>item?.title}
                 ListFooterComponent={this.renderFooter()}
+                ListEmptyComponent={this.renderEmpty()}
                 scrollToOverflowEnabled
                 ref={(ref)=>onGetRef(ref)}
                 onScroll={Animated.event(

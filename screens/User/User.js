@@ -1,6 +1,6 @@
 import React from 'react'
-import {View,Dimensions,Animated,RefreshControl,Alert} from 'react-native'
-import {Layout as Lay,Text,useTheme,TopNavigation,Icon,Divider,Menu,MenuItem} from '@ui-kitten/components'
+import {View,Dimensions,Animated} from 'react-native'
+import {Layout as Lay,Text,useTheme,TopNavigation,Icon} from '@ui-kitten/components'
 import {TabView,TabBar} from 'react-native-tab-view'
 import {useNavigationState} from '@react-navigation/native'
 import {Modalize} from 'react-native-modalize'
@@ -20,6 +20,7 @@ import Avatar from '@pn/components/global/Avatar'
 import {TabBarHeight,HeaderHeight} from './utils'
 import Brightness from '@pn/module/Brightness'
 import TopNavigationAction from '@pn/components/navigation/TopAction'
+import Authentication from '@pn/module/Authentication'
 
 import RenderFollow from './Follow'
 import RenderAbout from './About'
@@ -193,24 +194,28 @@ export default function UserScreen({navigation,route}){
 
     const handleFollow=()=>{
         if(!loading) {
-            setLoading(true);
-            PNpost(`/backend/follow`,{token:data?.users?.token_follow}).then((res)=>{
-                if(!res.error){
-                    setNotif(false,"Success!",res?.msg);
-                    mutate({
-                        ...data,
-                        users:{
-                            ...data.users,
-                            isFollowing:res.follow,
-                            isPending:res.pending,
-                            token_follow:res.new_token
-                        }
-                    })
-                }
-            })
-            .finally(()=>{
-                setLoading(false)
-            })
+            if(user) {
+                setLoading(true);
+                PNpost(`/backend/follow`,{token:data?.users?.token_follow}).then((res)=>{
+                    if(!res.error){
+                        setNotif(false,"Success!",res?.msg);
+                        mutate({
+                            ...data,
+                            users:{
+                                ...data.users,
+                                isFollowing:res.follow,
+                                isPending:res.pending,
+                                token_follow:res.new_token
+                            }
+                        })
+                    }
+                })
+                .finally(()=>{
+                    setLoading(false)
+                })
+            } else {
+                Authentication.startAuthActivity();
+            }
         }
     }
 
@@ -235,7 +240,12 @@ export default function UserScreen({navigation,route}){
         return (
             <View style={{position:'absolute',top:0,width:'100%',zIndex:1}}>
                 <TopNavigation
-                    title={(evaProps) => <AnimText {...evaProps}  category="h1" style={{...evaProps?.style,marginHorizontal:50,opacity}} numberOfLines={1}>{data?.users?.username||""}</AnimText>}
+                    title={(evaProps) => (
+                        <Animated.View style={{opacity,flexDirection:'row',alignItems:"center",marginHorizontal:50}}>
+                            <Text {...evaProps}  category="h1" style={{...evaProps?.style,...(data?.users?.verify ? {marginRight:5} : {})}} numberOfLines={1}>{data?.users?.username||""}</Text>
+                            {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
+                        </Animated.View>
+                    )}
                     accessoryLeft={()=><RenderBackButton navigation={navigation} />}
                     alignment="center"
                     accessoryRight={()=><MenuToggle onPress={()=>{data && !data?.error && setOpenMenu(true)}} />}
@@ -297,7 +307,11 @@ export default function UserScreen({navigation,route}){
                             </View>
                         </View>
                         <Text style={{fontSize:30,marginTop:10,fontFamily:"Inter_Bold"}}>{data?.users?.name||""}</Text>
-                        <Text style={{fontSize:15}}>{`@${data?.users?.username}`}</Text>
+                        <View style={{flexDirection:"row",alignItems:"center"}}>
+                            <Text style={{fontSize:15,...(data?.users?.verify ? {marginRight:5} : {})}}>{`@${data?.users?.username}`}</Text>
+                            {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
+                        </View>
+                        
                     </Lay>
                 )}
                 <TabBar

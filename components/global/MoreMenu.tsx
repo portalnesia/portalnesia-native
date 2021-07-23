@@ -15,6 +15,7 @@ import {Portal} from '@gorhom/portal'
 import {sentLike} from '@pn/components/global/Like'
 import Spinner from './Spinner'
 import useSelector from '@pn/provider/actions'
+import Authentication from '@pn/module/Authentication'
 
 const MoreIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="more-vertical" />
 const FeedbackIcon=(props?: Partial<ImageProps>)=><Icon {...props} name="feedback" pack="material" />
@@ -147,7 +148,7 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
     },[type,item_id,PNpost])
 
     const handleLike=React.useCallback(async(like: LikeMenuType)=>{
-        if(!user) return setNotif(true,"Error","Login to continue!");
+        if(!user) return Authentication.startAuthActivity();
         setLoading(true)
         try {
             const res = await sentLike(PNpost,type,item_id);

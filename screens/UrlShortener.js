@@ -28,6 +28,7 @@ import Backdrop from '@pn/components/global/Backdrop';
 import {Portal} from '@gorhom/portal'
 import ShareModule from '@pn/module/Share';
 import useSelector from '@pn/provider/actions'
+import Authentication from '@pn/module/Authentication'
 
 const {width,height} = Dimensions.get('window')
 
@@ -71,8 +72,8 @@ const URLshortenerForm=React.memo(({initialData="",setNotif,user,ads,handleOpenQ
     }
 
     const handleCustomFocus=()=>{
-        if(user===false) {
-            setNotif(true,"Under Maintenance","Only for registered users");
+        if(!user) {
+            Authentication.startAuthActivity();
             customRef.current?.blur()
         }
     }
