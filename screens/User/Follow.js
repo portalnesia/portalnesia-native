@@ -17,6 +17,7 @@ import Backdrop from '@pn/components/global/Backdrop'
 import { AuthContext } from '@pn/provider/Context'
 import useAPI from '@pn/utils/API'
 import useSelector from '@pn/provider/actions'
+import Authentication from '@pn/module/Authentication'
 
 const winHeight = Dimensions.get('window').height;
 const OptionIcon=React.memo((props)=><Icon {...props} name="more-vertical" />)
@@ -49,6 +50,7 @@ const RenderUser=React.memo(({item,index,onOpen})=>{
             accessoryLeft={()=><MemoAvatar name={item?.name} image={item?.image} />}
             accessoryRight={()=><RenderIcon item={item} onOpen={onOpen} />}
             onPress={()=>navigation.push("User",{username:item?.username})}
+            onLongPress={()=>onOpen(item)}
         />
     )
 })
@@ -111,25 +113,37 @@ class RenderFollowClass extends React.PureComponent{
     }
 
     handleFollow(menu){
-        const {PNpost,setNotif,mutate} = this.props;
-        this.setState({loading:true})
-        console.log(menu)
-        PNpost(`/backend/follow`,{token:menu?.token_follow}).then((res)=>{
-            if(!res.error){
-                setNotif(false,"Success!",res?.msg);
-                mutate();
-            }
-        })
-        .finally(()=>{
-            this.setState({loading:false})
-        })
+        const {PNpost,setNotif,mutate,user} = this.props;
+        if(user) {
+            this.setState({loading:true})
+            PNpost(`/backend/follow`,{token:menu?.token_follow}).then((res)=>{
+                if(!res.error){
+                    setNotif(false,"Success!",res?.msg);
+                    mutate();
+                }
+            })
+            .finally(()=>{
+                this.setState({loading:false})
+            })
+        } else {
+            Authentication.startAuthActivity();
+        }
     }
 
     renderFooter(){
-        const {isReachingEnd,isLoadingMore}=this.props;
+        const {isReachingEnd,isLoadingMore,dt}=this.props;
+        if(dt?.length == 0) return null;
         if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:10,textAlign:'center'}}>You have reach the bottom of the page</Text>
         if(isLoadingMore) return <View paddingTop={20}><ListSkeleton height={250} number={3} image /></View>
         return null
+    }
+
+    renderEmpty() {
+        return (
+            <View style={{justifyContent:"center",alignItems:"center",flexDirection:"row",height:56}}>
+                <Text>No Data</Text>
+            </View>
+        )
     }
 
     render(){
@@ -176,6 +190,7 @@ class RenderFollowClass extends React.PureComponent{
                     renderItem={(props)=> <RenderUser {...props} onOpen={this.handleOpenMenu.bind(this)} />}
                     ItemSeparatorComponent={Divider}
                     ListFooterComponent={this.renderFooter()}
+                    ListEmptyComponent={this.renderEmpty()}
                     scrollToOverflowEnabled
                     ref={onGetRef}
                     onScroll={Animated.event(

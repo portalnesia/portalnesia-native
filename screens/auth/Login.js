@@ -23,9 +23,9 @@ import GoogleSignInButton from '@pn/components/global/GoogleSignInButton';
 import {FIREBASE_CLIENT_ID,FIREBASE_WEB_CLIENT_ID} from '@env';
 import Backdrop from '@pn/components/global/Backdrop';
 import getInfo from '@pn/utils/Info';
-import { useNavigationState } from '@react-navigation/native';
 import { log, logError } from '@pn/utils/log';
 import useSelector from '@pn/provider/actions'
+import ShareModule from '@pn/module/Share';
 
 const {width} = Dimensions.get('window')
 
@@ -55,6 +55,15 @@ export default function LoginScreen({ navigation,route }) {
 		const request = await loadAsync(loginConfig,discovery);
 		return {location,request};
 	}
+
+	React.useEffect(()=>{
+		const onBackPress=()=>{
+			ShareModule.dismiss();
+			return true;
+		}
+		BackHandler.addEventListener("hardwareBackPress",onBackPress);
+		return ()=>BackHandler.removeEventListener("hardwareBackPress",onBackPress);
+	},[])
 
 	async function handleLogin(email,password) {
 		let error=[];
