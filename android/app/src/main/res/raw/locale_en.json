@@ -87,6 +87,7 @@
         "one":"feature",
         "other":"features"
     },
+    "warning":"Warning",
     "reply":"Reply",
     "delete":"Delete",
     "remove":"Remove",
@@ -129,7 +130,9 @@
         "youtube_service":"You have to install the official youtube apps to be able to watch videos.\n\nClick here to watch in fullscreen mode.",
         "invalid":"Invalid %{type}",
         "sure":"Are you sure?",
-        "location_disabled":"Your location services is not active"
+        "location_disabled":"Your location services is not active",
+        "google_play_available":"Please update your Google Play Services to continue using this application.",
+        "verify_failed":"We failed to verify the application you are using. Make sure you use the official Portalnesia application.\n\nIf you feel we made a mistake, please contact us at support@portalnesia.com"
     },
     "report_placeholder":{
         "placeholder_url":"We are sorry for the inconvenience, it seems that there is a problem with our internal server service. Can you tell us how this happened?",
