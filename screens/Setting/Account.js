@@ -241,7 +241,6 @@ export default function AccountSettingScreen({navigation,route}){
                                     label={i18n.t('form.username')}
                                     value={input.username}
                                     onChangeText={handleChange('username')}
-                                    autoCompleteType="username"
                                     textContentType="username"
                                     disabled={loading!==null}
                                 />
@@ -251,7 +250,6 @@ export default function AccountSettingScreen({navigation,route}){
                                     label={i18n.t('form.email')}
                                     value={input.email}
                                     onChangeText={handleChange('email')}
-                                    autoCompleteType="email"
                                     textContentType="emailAddress"
                                     disabled={loading!==null}
                                 />
@@ -287,7 +285,6 @@ export default function AccountSettingScreen({navigation,route}){
                                     label="Instagram"
                                     value={input.instagram}
                                     onChangeText={handleChange('instagram')}
-                                    autoCompleteType="username"
                                     textContentType="username"
                                     disabled={loading!==null}
                                     caption="Without @"
@@ -298,7 +295,6 @@ export default function AccountSettingScreen({navigation,route}){
                                     label="Line"
                                     value={input.line}
                                     onChangeText={handleChange('line')}
-                                    autoCompleteType="username"
                                     textContentType="username"
                                     disabled={loading!==null}
                                     caption="Without @"
