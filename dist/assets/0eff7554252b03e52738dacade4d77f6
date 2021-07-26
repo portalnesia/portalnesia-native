@@ -1,0 +1,229 @@
+{
+    "net_online":"Anda telah terhubung ke internet!",
+    "net_offline":"Anda tidak terhubung ke internet!",
+    "clipboard":"%{type} disalin",
+    "download_complete":"Unduhan berhasil!",
+    "download_failed":"Unduhan gagal!",
+    "title_external_link":"Buka tautan eksternal?",
+    "desc_external_link":"Kami tidak bertanggung jawab atas konten yang terdapat pada tautan tersebut.",
+    "terms_of_service":"Persyaratan Layanan",
+    "privacy_policy":"Kebijakan Privasi",
+    "donate":"Donasi",
+    "check_update":"Periksa Pembaruan",
+    "contact":"Hubungi Kami",
+    "share":"Bagikan",
+    "reach_end":"Anda telah mencapai batas akhir halaman",
+    "share_type":"Bagikan %{type}",
+    "copy_link":"Salin tautan",
+    "copy":"Salin",
+    "open_in_browser":"Buka di browser",
+    "cancel":"Batal",
+    "back":"Kembali",
+    "more_option":"Opsi Lainnya",
+    "close":"Tutup",
+    "open":"Buka",
+    "recent":"Terbaru",
+    "recent_type":"%{type} Terbaru",
+    "popular":"Terpopuler",
+    "popular_type":"%{type} Terpopuler",
+    "change":"Ubah",
+    "change_type":"Ubah %{type}",
+    "twitter_thread":"Utas Twitter",
+    "news":"Berita",
+    "chord":"Kord",
+    "url":"Tautan",
+    "new_type":"%{type} Baru",
+    "text":"Teks",
+    "setting":"Pengaturan",
+    "setting_type":"Pengaturan %{type}",
+    "without_type":"tanpa %{type}",
+    "appearance":"Tampilan",
+    "clear":"Bersihkan %{type}",
+    "deleted":"%{type} berhasil dihapus",
+    "light":"terang",
+    "dark":"gelap",
+    "device":"perangkat",
+    "profile":"profil",
+    "profile_type":"%{type} profil",
+    "theme":"tema",
+    "theme_type":"Tema %{type}",
+    "image":"gambar",
+    "like":"Suka",
+    "unlike":"Batalkan suka",
+    "picture": {
+        "one":"gambar",
+        "other":"gambar"
+    },
+    "photo":  {
+        "one":"foto",
+        "other":"foto"
+    },
+    "select":"Pilih %{type}",
+    "load_more":"Muat lebih banyak",
+    "see_more":"Lihat Lainnya",
+    "notification":{
+        "one":"pemberitahuan",
+        "other":"pemberitahuan"
+    },
+    "notification_type":"pemberitahuan %{type}",
+    "account":{
+        "one":"akun",
+        "other":"akun"
+    },
+    "security":"keamanan",
+    "comment":{
+        "one":"komentar",
+        "other":"komentar"
+    },
+    "content":{
+        "one":"konten",
+        "other":"konten"
+    },
+    "feature":{
+        "one":"fitur",
+        "other":"fitur"
+    },
+    "warning":"Peringatan",
+    "reply":"Balas",
+    "delete":"Hapus",
+    "remove":"Hapus",
+    "remove_type":"Hapus %{type}",
+    "add_type":"Tambah %{type}",
+    "no_comment":"Belum ada komentar.",
+    "no_reply":"Belum ada balasan.",
+    "language":"Bahasa",
+    "usage_guide":"Panduan Penggunaan %{type}",
+    "button":"tombol",
+    "button_type":"tombol %{type}",
+    "save":"simpan",
+    "show_type":"Tampilkan %{type}",
+    "hide_type":"Sembunyikan %{type}",
+    "table_of_content":"Daftar Isi",
+    "post":"Pos",
+    "others_type":"%{type} Lainnya",
+    "recommended":"Rekomendasi",
+    "recommended_type":"%{type} Rekomendasi",
+    "report":"Lapor",
+    "feedback":"Masukan",
+    "send_type":"Kirim %{type}",
+    "send":"Kirim",
+    "authentication":"otentikasi",
+    "auth_type":"otentikasi %{type}",
+    "fingerprint":"sidik jari",
+    "privacy":"privasi",
+    "social_media":"media sosial",
+    "errors":{
+        "general":"Kesalahan",
+        "server":"Kesalahan internal server",
+        "permission_storage":"Maaf, kami membutuhkan izin penyimpanan internal",
+        "permission_location":"Maaf, kami membutuhkan izin lokasi",
+        "form_validation":"%{type} tidak boleh kosong",
+        "image":"Pilih gambar terlebih dahulu",
+        "no_image":"Tidak dapat menemukan gambar",
+        "upload":"Kesalahan ketika mengunggah gambar Anda",
+        "size_image":"Maaf, ukuran file terlalu besar. Ukuran maksimal gambar adalah 5MB",
+        "youtube_service":"Anda harus menginstal aplikasi youtube resmi untuk dapat menonton video.\n\nKlik di sini untuk menonton dalam mode layar penuh.",
+        "invalid":"%{type} tidak valid",
+        "sure":"Apakah Anda yakin?",
+        "location_disabled":"Layanan lokasi Anda tidak aktif",
+        "google_play_available":"Harap perbarui Google Play Services Anda untuk menggunakan aplikasi ini.",
+        "verify_failed":"Kami gagal memverifikasi aplikasi yang sedang Anda gunakan. Pastikan Anda menggunakan aplikasi resmi Portalnesia.\n\nJika Anda merasa kami melakukan kesalahan, silahkan hubungi kami di support@portalnesia.com"
+    },
+    "report_placeholder":{
+        "placeholder_url":"Mohon maaf atas ketidaknyamanannya, sepertinya ada masalah dengan layanan server internal kami. Bisakah Anda memberi tahu kami bagaimana ini bisa terjadi?",
+        "placeholder":"Punya masukan? Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungan di Kontak kami.",
+        "placeholder_content":"Beritahu kami mengapa Anda melaporkan %{type} ini? Atau jika Anda memiliki masukan, Kami ingin sekali mendengarnya. Tolong jangan membagikan informasi sensitif. Bila memiliki pertanyaan? coba dukungan di Kontak kami."
+    },
+    "form":{
+        "name":"Nama",
+        "email":"Surel",
+        "subject":"Subjek",
+        "message":"Pesan",
+        "username":"Nama Pengguna",
+        "gender":"Jenis Kelamin",
+        "birthday":"Ulang Tahun",
+        "about":"Tentang",
+        "password":"Kata Sandi",
+        "verification_code":"Kode Verifikasi"
+    },
+    "home_not_login":{
+        "news":"Kumpulan berita yang diperbarui setiap harinya.",
+        "chord":"Kumpulan kord gitar dengan fitur transpose, auto scrol, font sizer, dan cetak yang dapat mempermudah Anda belajar gitar.",
+        "url":"Perpendek tautan panjang Anda sehingga mudah untuk dibagikan kepada orang lain.",
+        "twibbon":"Ciptakan twibbon Anda sendiri atau edit gambar Anda menggunakan twibbon yang sudah tersedia dan bagikan hasilnya dengan mudah.",
+        "twitter":"Baca utas dari Twitter.",
+        "transform":"Masukkan pasangan nilai koordinat geografis dan mentransformasikannya menjadi sistem koordinat atau proyeksi kartografi yang berbeda.",
+        "html":"Parsing kode HTML Anda menjadi kode XML yang kompatibel dengan semua template blogger atau sistem mikroblog lainnya.",
+        "blog":"Ubah pemikiran Anda menjadi tulisan dan bagikan kepada yang lainnya dengan mudah.",
+        "images_checker":"Utilitas online yang dapat membantu Anda dengan cepat mengidentifikasi gambar yang tidak pantas",
+        "others":"Dan beberapa fitur lainnya yang pasti berguna."
+    },
+    "transform":{
+        "search_epsg":"Ketik EPSG, nama, atau area untuk mencari...",
+        "form_validation":"%{type} tidak boleh kosong",
+        "transform_desc_1":"Utilitas online ini memungkinkan Anda memasukkan pasangan nilai koordinat geografis dan mentransformasikannya menjadi sistem koordinat atau proyeksi kartografi yang berbeda. Anda dapat memasukkan pasangan nilai ke area teks berlabel \"pasangan koordinat masukkan\" - juga dengan menggunakan salin/tempel bahkan dari MS Excel atau program serupa. Utilitas ini menerima berbagai format masukkan. Yang Anda perlukan hanya memasukkan 1 pasangan nilai per baris. Silahkan lihat contoh di area teks.",
+        "transform_desc_2":"Anda perlu mengatur sistem koordinat masukkan dan sistem koordinat keluaran, sesuai dengan yang Anda inginkan.",
+        "transform_input_label":"Sistem Koordinat Masukkan / Proyeksi",
+        "transform_input_label_2":"Pasangan Koordinat Masukkan",
+        "transform_output_label":"Sistem Koordinat Keluaran / Proyeksi",
+        "transform_output_label_2":"Pasangan Koordinat Keluaran",
+        "beware_1":"Hati-hati!",
+        "beware_2":"Pasangan nilai yang diinput harus dalam urutan koordinat X dan kemudian koordinat Y. Jika Anda memasukkan nilai garis lintang/garis bujur dalam format desimal, maka garis bujur dahulu (koordinat X) dan kemudian garis lintang (koordinat Y). Jika tidak, Anda dapat menggunakan pilihan \"Switch XY\" di bawah area teks masukkan."
+    },
+    "twibbon":{
+        "usage":{
+            "first":"Klik",
+            "second":"Pilih foto.",
+            "third":"Edit foto Anda dengan gerakan menggeser dan menyubit.",
+            "fourth":"Saat Anda telah selesai melakukan editing, klik",
+            "fifth":"Selesai."
+        }
+    },
+    "media":{
+        "video_player":"pemutar video",
+        "music_player":"pemutar musik"
+    },
+    "gender":{
+        "male":"Laki-laki",
+        "female":"Perempuan"
+    },
+    "follow":"ikuti",
+    "follower":"pengikut",
+    "following":"mengikuti",
+    "unfollow":"batal mengikuti",
+    "settings":{
+        "account":{
+            "private":"Setel profil ke pribadi",
+            "media_private":"Setel media profil ke pribadi",
+            "private_tip":"Hanya pengikut Anda yang dapat melihat profil Anda",
+            "media_private_tip":"Hanya pengikut Anda yang dapat melihat media Anda",
+            "change_password":"Ubah Kata Sandi",
+            "deactivate":"Nonaktifkan Akun",
+            "unlink":"Putuskan koneksi ke akun %{type} Anda?",
+            "delete":{
+                "one":"Harap pastikan bahwa Anda akan membuat permintaan untuk menonaktifkan akun Anda.",
+                "two":"Anda dapat mengaktifkan kembali akun Anda kapan saja. Kami akan memberikan instruksi melalui email. Silahkan periksa kotak masuk atau folder spam email Anda.",
+                "three":"Anda tidak akan dapat mengakses akun Anda sampai Anda mengaktifkannya kembali."
+            }
+        },
+        "security":{
+            "logout":"Anda harus \"LOGOUT\" untuk menghapus perangkat ini",
+            "auth_help":"Alih-alih menggunakan kata sandi, Anda dapat menggunakan sidik jari untuk mengontentikasi akun Anda"
+        },
+        "notification":{
+            "title_feature":"Fitur & Promosi",
+            "notif_news":"Terima pemberitahuan push berita terkini setiap hari",
+            "notif_comment":"Terima pemberitahuan push komentar, termasuk jika seseorang mengomentari konten Anda atau jika seseorang membalas komentar Anda",
+            "notif_birthday":"Terima pemberitahuan push ulang tahun seseorang yang Anda ikuti",
+            "notif_message":"Terima pemberitahuan push jika terdapat pesan baru",
+            "notif_feature":"Terima pemberitahuan push tentang fitur baru dan promosi dari Portalnesia",
+            "email_birthday":"Terima pemberitahuan email ulang tahun seseorang yang Anda ikuti",
+            "email_komentar":"Terima pemberitahuan email komentar, termasuk jika seseorang mengomentari konten Anda atau jika seseorang membalas komentar Anda",
+            "email_feature":"Terima pemberitahuan email tentang fitur baru dan promosi dari Portalnesia"
+        }
+    },
+    "auth":{
+        "new_password":"Kata Sandi Lagi",
+        "match":"Kata sandi tidak cocok"
+    }
+}
