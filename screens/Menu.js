@@ -30,7 +30,8 @@ const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 const SettingIcon=(props)=><Icon {...props} name="settings-outline" />
 const supportedAbi = ['arm64-v8a','armeabi-v7a','x86','x86_64']
 
-export default function({navigation}){
+export default function({navigation,route}){
+    const linkAction = route?.params?.action;
     const auth = React.useContext(AuthContext)
     const user = useSelector(state=>state.user);
     const {setNotif,sendReport} = auth;
@@ -129,8 +130,17 @@ export default function({navigation}){
                 }
             }
         })
-        .finally(()=>setLoading(false))
+        .finally(()=>{
+            setLoading(false)
+            navigation?.navigate("Menu",{action:undefined});
+        })
     },[PNget])
+
+    React.useEffect(()=>{
+        if(linkAction === 'check_updates') {
+            checkUpdates();
+        }
+    },[linkAction,checkUpdates,navigation])
 
     return (
         <>
