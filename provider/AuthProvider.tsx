@@ -38,8 +38,8 @@ import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
 import loadResources from '@pn/utils/Assets'
 import { logError,log } from '@pn/utils/log';
-import { UserType } from '@pn/types/UserTypes';
-import { TokenResponse } from 'expo-auth-session';
+//import { UserType } from '@pn/types/UserTypes';
+//import { TokenResponse } from 'expo-auth-session';
 
 const customMap = (mapping as any)
 LogBox.ignoreLogs(['Setting a timer for a long period of time']);

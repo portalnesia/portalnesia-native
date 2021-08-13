@@ -7,6 +7,7 @@ import i18n from 'i18n-js'
 import { log, logError } from './log'
 import * as Secure from 'expo-secure-store'
 import moment from 'moment'
+import NetInfo from '@react-native-community/netinfo'
 
 async function alertWarning(msg: string) {
     return new Promise<void>(res=>{
@@ -55,6 +56,11 @@ async function checkRemoteVerification(force=true): Promise<RemoteResult> {
 
 type LocalResult = {verify:boolean,signature?:string}
 async function checkLocalVerification() {
+    const netinfo = await NetInfo.fetch();
+    console.log(netinfo);
+    if(!netinfo.isConnected) {
+        throw new Error(i18n.t("net_offline"));
+    }
     const local = await Secure.getItemAsync('signature');
     let result: LocalResult = {verify:false,signature:null};
     if(local !== null) {
@@ -120,8 +126,8 @@ export default async function verifyApps() {
         }
         return Promise.resolve();
     } catch(e) {
-        log(`Safety verification ${e?.message}`);
-        logError(e,"Verification error");
+        //log(`Safety verification ${e?.message}`);
+        //logError(e,"Verification error");
         await alertWarning(e?.message)
     }
 }

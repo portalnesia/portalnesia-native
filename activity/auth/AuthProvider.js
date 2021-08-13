@@ -15,7 +15,7 @@ import {PortalProvider} from'@gorhom/portal'
 import RNFS from 'react-native-fs'
 import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
 import {requestPermissionsAsync as AdsRequest} from 'expo-ads-admob'
-
+import verifyApps from '@pn/utils/VerifyApps'
 import * as Notifications from 'expo-notifications'
 import {FontAwesomeIconsPack} from '../../components/utils/FontAwesomeIconsPack'
 import {IoniconsPack} from '../../components/utils/IoniconsPack'
@@ -101,6 +101,7 @@ const AuthProviderFunc = (props) => {
 	useEffect(()=>{
 		async function asyncTask(){
 			try {
+				await verifyApps();
 				let [res,lang,ads] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang"),AsyncStorage.getItem("ads")])
 
 				if(res !== null) {
@@ -117,7 +118,6 @@ const AuthProviderFunc = (props) => {
 						}
 					}
 				} catch(e){}
-
 				await refreshToken();
 				return Promise.resolve();
 			} catch(err){
