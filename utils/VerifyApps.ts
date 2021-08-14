@@ -57,7 +57,6 @@ async function checkRemoteVerification(force=true): Promise<RemoteResult> {
 type LocalResult = {verify:boolean,signature?:string}
 async function checkLocalVerification() {
     const netinfo = await NetInfo.fetch();
-    console.log(netinfo);
     if(!netinfo.isConnected) {
         throw new Error(i18n.t("net_offline"));
     }
