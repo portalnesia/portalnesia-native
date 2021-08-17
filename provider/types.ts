@@ -8,7 +8,9 @@ export interface ReduxState {
     userTheme:'light'|'dark'|'auto';
     lang:'id'|'en'|'auto';
     isLogin:boolean;
-    signature:null|string
+    signature:null|string,
+    musicPlayer:boolean,
+    musicPlayerUpdate:number
 }
 
 export interface ReduxAction {

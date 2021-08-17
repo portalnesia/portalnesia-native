@@ -69,7 +69,7 @@ const NativePlayer=React.memo(({src,poster,height,width: vidWidth})=>{
     )
 })
 
-const YoutubePlayer=React.memo(({youtube,width: vidWidth,style})=>{
+const YoutubePlayer=React.memo(({youtube,width: vidWidth,style,youtubeOptions={}})=>{
     const width = vidWidth||winWidth
     const theme = useTheme();
     const [ytError,setYtError]=React.useState(false)
@@ -113,17 +113,18 @@ const YoutubePlayer=React.memo(({youtube,width: vidWidth,style})=>{
                 style={{...style,width,height:(9*width/16)}}
                 onError={handleError}
                 controls={1}
-                
+                resumePlayAndroid={false}
+                {...youtubeOptions}
             />
         )
     }
     return null;
 })
 
-export default React.memo(({iframe,youtube,width,style,...other})=>{
+export default React.memo(({iframe,youtube,width,style,youtubeOptions,...other})=>{
     if(iframe) return null
     if(youtube) {
-        if(isUpdated) return <YoutubePlayer youtube={youtube} width={width} style={style} />
+        if(isUpdated) return <YoutubePlayer youtube={youtube} width={width} style={style} youtubeOptions={youtubeOptions} />
         else return null;
     }
     return <NativePlayer {...other} width={width} style={style} />

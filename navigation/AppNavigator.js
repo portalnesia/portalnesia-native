@@ -14,7 +14,7 @@ import messaging from '@react-native-firebase/messaging'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {checkAndUpdateOTA} from '@pn/utils/Updates'
 import useSelector from '@pn/provider/actions'
-
+import MusicPlayer from '@pn/components/musicPlayer/MusicPlayer'
 import handleFCMData from '@pn/services/FCMservices';
 import {linking} from './Linking'
 import NotFound from '../screens/NotFound'
@@ -59,6 +59,7 @@ import Comments from '../screens/Modal/Comments'
 import SecondScreen from '../screens/SecondScreen'
 import NotificationEvent from '../screens/Notification/NotificationEvent'
 import ReportScreen from '../screens/ReportScreen'
+import MediaScreen from '../screens/Media'
 import ReportModal from '../screens/Modal/ReportModal'
 import Login from '../screens/auth/Login'
 import Register from '../screens/auth/Register'
@@ -69,6 +70,7 @@ import { AuthContext } from '../provider/Context';
 import useAPI from '@pn/utils/API';
 import { logError } from '@pn/utils/log';
 import ShareModule from '@pn/module/Share';
+import {Portal} from '@gorhom/portal'
 
 const urlParse = require('url-parse')
 
@@ -156,6 +158,7 @@ const getScreen=()=>{
 		{name:"NotificationSettingScreen",component:NotificationSettingScreen},
 		{name:"LikeFilter",component:LikeFilter},
 		{name:"Like",component:Like},
+		{name:"Media",component:MediaScreen},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }
@@ -239,6 +242,7 @@ const tabLabel=(label)=>({focused,color})=>{
 
 const MainTabNavigator=()=>{
 	const theme=useTheme();
+	const musicPlayer = useSelector(state=>state.musicPlayer);
 	return (
 		<Tabs.Navigator
 			initialRouteName="HomeStack"
@@ -248,13 +252,14 @@ const MainTabNavigator=()=>{
 			barStyle={{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],borderTopWidth:1,height:54}}
 			*/
 			//tabBar={props=><BottomTabBar {...props} />}
+			backBehavior="initialRoute"
 			tabBarOptions={{
 				keyboardHidesTabBar:true,
 				tabStyle:{paddingVertical:5},
-				style:{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],height:54},
+				style:{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],height:54,...(musicPlayer ? {marginBottom:80} : {})},
 				inactiveTintColor:theme['text-hint-color'],
 				activeTintColor:theme['color-indicator-bar'],
-				allowFontScaling:true
+				allowFontScaling:true,
 			}}
 			lazy={false}
 		>
@@ -355,27 +360,32 @@ export default React.memo(() => {
 	},[ready,PNpost])
 
 	React.useEffect(()=>{
-		let onNotificationOpenListener=null,onMessageListener=null;
+		let onNotificationOpenListener=null,onMessageListener=null,notifResponse=null;
 
 		/* HANDLE DEEP LINK */
 		async function getInitialLink() {
 			const url = await getInitialURL();
 			if(typeof url === 'string') {
-				const parsed = urlParse(url,true);
-				if(parsed?.query?.msg) {
-					setTimeout(()=>setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg),1000)
+				if(url !== "trackplayer://notification.click") {
+					const parsed = urlParse(url,true);
+					if(parsed?.query?.msg) {
+						setTimeout(()=>setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg),1000)
+					}
+					handleLinking(url);
 				}
-				handleLinking(url);
+				
 			}
 		}
 		function handleURL({url}){
 			//console.log("URL",url);
 			if(url !== null) {
-				const parsed = urlParse(url,true);
-				if(parsed?.query?.msg) {
-					setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg)
+				if(url !== "trackplayer://notification.click") {
+					const parsed = urlParse(url,true);
+					if(parsed?.query?.msg) {
+						setNotif(parsed?.query?.msg_type==='danger' || false,"Notification",parsed?.query?.msg)
+					}
+					handleLinking(url)
 				}
-				handleLinking(url)
 			}
 		}
 		/* HANDLE DEEP LINK */
@@ -392,7 +402,7 @@ export default React.memo(() => {
 
 		if(ready) {
 			onMessageListener = messaging().onMessage(remote=>{
-				if(remote?.data?.link) setNotif("info",remote.notification.title,remote.notification.body,{link:remote.data.link});
+				if(remote?.data?.link) setNotif("info",remote?.notification?.title||remote?.data?.title,remote?.notification?.body||remote?.data?.body,{link:remote.data.link});
 				handleFCMData(remote);
 			})
 			ExpoAddListener('url',handleURL)
@@ -410,10 +420,21 @@ export default React.memo(() => {
 					handleLinking(remote?.data?.link);
 				}
 			})
+			notifResponse = Notifications.addNotificationResponseReceivedListener(remote=>{
+				if(remote?.actionIdentifier==='mark_as_read') {
+					//console.log("MARK AS READ CLICKED",remote?.notification);
+				}
+				if(remote?.actionIdentifier==='reply') {
+					//console.log("REPLY CLICKED",remote?.notification,remote?.userText);
+					const text = remote?.userText;
+				}
+				Notifications.dismissNotificationAsync(remote?.notification?.request?.identifier)
+			})
 		}
 		return ()=>{
 			if(typeof onNotificationOpenListener === 'function') onNotificationOpenListener();
 			if(typeof onMessageListener === 'function') onMessageListener();
+			if(notifResponse !== null) notifResponse.remove();
 			ExpoRemoveListener('url',handleURL);
 			ShareModule.removeListener(shareListener);
 		}
@@ -456,6 +477,11 @@ export default React.memo(() => {
 						<RootStack.Screen name="ReportModal" component={ReportModal} />
 					</RootStack.Navigator>
 				</NavigationContainer>
+			)}
+			{ready && (
+				<Portal>
+					<MusicPlayer />
+				</Portal>
 			)}
 		</>
 	);
