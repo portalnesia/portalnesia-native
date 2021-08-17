@@ -1,74 +1,9 @@
-import React from 'react';
 import {PermissionsAndroid} from 'react-native'
-import * as Notifications from 'expo-notifications'
-import BackgroundService,{BackgroundTaskOptions} from 'react-native-background-actions'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
-import { log, logError } from './log';
-
-Notifications.setNotificationHandler({
-    handleNotification: async()=>({
-        shouldShowAlert:true,
-        shouldPlaySound:true,
-        shouldSetBadge:true
-    })
-})
-
-const baseNotificationRequestInput: Notifications.NotificationRequestInput = {
-    identifier: '',
-    content: {
-        title: '',
-        body: '',
-        vibrate: [250],
-        priority: Notifications.AndroidNotificationPriority.HIGH,
-        sticky: false,
-    },
-    trigger: {
-        channelId: ''
-    }
-};
-
-function initBaseNotificationRequestInput(filename: string, channelId: string) {
-    let baseNotificationRI = {
-        ...baseNotificationRequestInput,
-        content: {
-            ...baseNotificationRequestInput.content,
-            title: filename
-        },
-        trigger: {
-            channelId,
-            seconds: 1,
-            repeats: false
-        }
-    };
-    return baseNotificationRI;
-}
-
-const errorNotification = (identifier: string,baseNotificationRI: Notifications.NotificationRequestInput,uri: string): Notifications.NotificationRequestInput =>({
-    ...baseNotificationRI,
-    identifier:`err${baseNotificationRI.content.title}_${identifier}`,
-    content: {
-        ...baseNotificationRI.content,
-        body:"Download failed",
-        sticky:false,
-        data:{
-            url:uri
-        }
-    }
-});
-
-const finnishNotification = (identifier: string,baseNotificationRI: Notifications.NotificationRequestInput,uri: string): Notifications.NotificationRequestInput =>({
-    ...baseNotificationRI,
-    identifier:`fin${baseNotificationRI.content.title}_${identifier}`,
-    content: {
-        ...baseNotificationRI.content,
-        body:"Download completed",
-        sticky:false,
-        data:{
-            url:uri
-        }
-    }
-});
+import {getFreeDiskStorageAsync} from 'expo-file-system'
+import BackgroundDownloader,{DownloadOption, DownloadTask} from 'react-native-background-downloader'
+import Notification,{NotificationOptions} from '@pn/module/Notification'
 
 export type ArgumentType = {
     url: string,
@@ -77,98 +12,111 @@ export type ArgumentType = {
     completeUri: string 
 }
 
-export interface TaskOptions extends BackgroundTaskOptions {
-    parameters: ArgumentType
-}
-
-const downloadTask = (argument?: ArgumentType) =>{
-    return new Promise<void>((resolve)=>{
-        if(typeof argument !== 'undefined') {
-            const identifier = new Date().getTime().toString();
-            const baseNotificationRI = initBaseNotificationRequestInput(argument.filename, "Download");
-            const errorNot = errorNotification(identifier,baseNotificationRI,argument.uri)
-            const finnishNot = finnishNotification(identifier,baseNotificationRI,argument.completeUri);
-    
-            RNFS.downloadFile({
-                fromUrl:argument.url,
-                toFile: `${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${argument?.filename}`,
-                begin:async(res: RNFS.DownloadBeginCallbackResult)=>{
-                    await BackgroundService.updateNotification({progressBar:{max:res.contentLength,value:0,indeterminate:false},taskDesc:"Prepare download...",taskTitle:argument?.filename})
-                },
-                progress:async(res:RNFS.DownloadProgressCallbackResult)=>{
-                    await BackgroundService.updateNotification({progressBar:{max:res.contentLength,value:res.bytesWritten,indeterminate:false},taskDesc:"Downloading...",taskTitle:argument?.filename})
-                }
-            }).promise
-            .then((res)=>{
-                return new Promise(resolve=>{
-                    if(res.statusCode == 200) {
-                        Notifications.scheduleNotificationAsync(finnishNot).then(resolve)
-                    } else {
-                        Notifications.scheduleNotificationAsync(errorNot).then(resolve)
-                    }
-                })
-            })
-            .then(()=>{
-              resolve();  
-            })
-            .catch((e)=>{
-                log("download Download.ts",{msg:e.message});
-        		logError(e,"download Download.ts");
-                resolve()
-            });
-        } else {
-            resolve();
-        }
-    })
+export interface TaskOptions extends DownloadOption {
+    title: string;
+    notification_id:number;
+    uri: string;
+    completeUri: string;
 }
 
 class PNDownload{
-    task: (taskData?: ArgumentType) => Promise<void>
+    task: DownloadTask
     option: TaskOptions
+    private notification: Pick<NotificationOptions,"title"|"uri">;
 
-    constructor(task: (taskData?: ArgumentType)=>Promise<void>,option: TaskOptions) {
-        this.task = task;
+    constructor(option: TaskOptions) {
         this.option = option
+
+        this.task = BackgroundDownloader.download({
+            id: option.id,
+            url:option.url,
+            destination:option.destination
+        })
+
+        this.notification = {
+            uri:option.uri,
+            title:option.title
+        }
     }
 
-    start(){
-        return BackgroundService.start<ArgumentType>(this.task,this.option)
-    }
-    stop(){
-        return BackgroundService.stop();
+    async start(){
+        const free = await getFreeDiskStorageAsync();
+        this.task.begin(async(bytes)=>{
+            if(free < bytes) {
+                this.task.stop();
+                const notification: NotificationOptions = {
+                    ...this.notification,
+                    body:"Disk storage full",
+                    progress:{max:0,progress:0,intermediate:false},
+                    autoCancel:true,
+                    onGoing:false,
+                    silent:false
+                }
+                Notification.notify(this.option.notification_id,"Download",notification);
+            } else {
+                const notification: NotificationOptions = {
+                    ...this.notification,
+                    body:"Downloading...",
+                    progress:{max:100,progress:0,intermediate:true},
+                    autoCancel:false,
+                    onGoing:true,
+                    silent:true
+                }
+                Notification.notify(this.option.notification_id,"Download",notification);
+            }
+        }).progress((percent,bytes,total)=>{
+            const notification: NotificationOptions = {
+                ...this.notification,
+                body:`${(percent*100).toFixed(0)}% completed`,
+                progress:{max:total,progress:bytes,intermediate:false},
+                autoCancel:false,
+                onGoing:true,
+                silent:true
+            };
+            Notification.notify(this.option.notification_id,"Download",notification);
+        }).done(()=>{
+            const notification: NotificationOptions = {
+                ...this.notification,
+                uri:this.option.completeUri,
+                body:`Download completed`,
+                progress:{max:0,progress:0,intermediate:false},
+                priority:Notification.PRIORITY_HIGH,
+                autoCancel:true,
+                onGoing:false,
+                silent:false
+            };
+            Notification.notify(this.option.notification_id,"Download",notification);
+        }).error((err)=>{
+            const notification: NotificationOptions = {
+                ...this.notification,
+                body:`Download failed. ${String(err)}`,
+                progress:{max:0,progress:0,intermediate:false},
+                autoCancel:true,
+                onGoing:false,
+                silent:false
+            }
+            Notification.notify(this.option.notification_id,"Download",notification);
+        })
     }
 }
 
 export default async function downloadFile(url: string,filename: string,uri: string="pn://news",completeUri: string|null=null){
-    const identifier = new Date().getTime().toString();    
+    const identifier = new Date().getTime();    
     const options: TaskOptions = {
-        taskName:`download_${filename}_${identifier}`,
-        taskTitle:`Task`,
-        taskDesc:`Background Task`,
-        taskIcon:{
-            name:'ic_launcher',
-            type:'mipmap'
-        },
-        parameters:{
-            url,
-            filename,
-            uri,
-            completeUri: (completeUri !== null ? completeUri : uri)
-        },
-        linkingURI:uri,
-        progressBar:{
-            max:100,
-            value:0,
-            indeterminate:true
-        }
+        id:`download_${filename}_${identifier.toString()}`,
+        notification_id:identifier,
+        url,
+        destination: `${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${filename}`,
+        title: filename,
+        uri,
+        completeUri: (completeUri !== null ? completeUri : uri)
     }
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
     
     if(granted !== PermissionsAndroid.RESULTS.GRANTED) {
         throw new Error(i18n.t('errors.permission_storage'));
     }
-
-    const a = new PNDownload(downloadTask,options)
+    const a = new PNDownload(options)
     return a;
 }
 

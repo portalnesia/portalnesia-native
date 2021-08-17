@@ -112,3 +112,33 @@ export interface SafetyInterface {
     getVerification(nonce: string): Promise<string>;
     verifyWithRecaptcha(): Promise<string>;
 }
+
+export interface NotificationOptions {
+    uri?: string;
+    title: string;
+    body?:string;
+    visibility?: number;
+    priority?: number;
+    progress?: {
+        max:number,
+        progress: number,
+        intermediate: boolean
+    };
+    autoCancel?: boolean;
+    onGoing?: boolean;
+    silent?: boolean;
+}
+
+export interface NotificationInterface {
+    notify(id: number, channel_id: string, options: NotificationOptions): Promise<void>;
+    cancel(id: number): void;
+    cancelAll(): void;
+    PRIORITY_DEFAULT: number;
+    PRIORITY_HIGH: number;
+    PRIORITY_LOW: number;
+    PRIORITY_MAX: number;
+    PRIORITY_MIN: number;
+    VISIBILITY_PRIVATE: number;
+    VISIBILITY_PUBLIC: number;
+    VISIBILITY_SECRET: number;
+}
