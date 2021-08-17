@@ -1,7 +1,9 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet,BackHandler,ToastAndroid } from 'react-native';
 import TopNav,{TopNavigationProps} from '../navigation/TopNav';
 import {Layout as Lay} from '@ui-kitten/components'
+import {useFocusEffect} from '@react-navigation/native'
+import { useNavigationState } from '@react-navigation/core';
 
 export interface LayoutProps extends TopNavigationProps {
     children?: React.ReactNode
@@ -14,7 +16,7 @@ export interface LayoutProps extends TopNavigationProps {
  * @param props
  * @returns JSX.Element
  */
- export default class Layout extends React.PureComponent<LayoutProps> {
+class LayoutClass extends React.PureComponent<LayoutProps> {
     constructor(props: LayoutProps){
         super(props);
     }
@@ -49,3 +51,43 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 	},
 });
+
+/**
+ * Portalnesia Parent Layout
+ * 
+ * @param props
+ * @returns JSX.Element
+ */
+export default function Layout(props: LayoutProps) {
+    const {index,routeName} = useNavigationState(state=>{
+        return {index:state.index,routeName:state.routes[0].name};
+    })
+    const [wait,setWait] = React.useState(false);
+
+    React.useEffect(()=>{
+        if(wait) {
+            setTimeout(()=>setWait(false),1500);
+        }
+    },[wait])
+
+    useFocusEffect(
+		React.useCallback(()=>{
+			const onBackPress=()=>{
+				if(index==0 && routeName === "Home") {
+                    if(!wait) {
+                        ToastAndroid.show("Press again to exit",1000);
+                        setWait(true)
+                        return true;
+                    }
+                }
+                return false;
+			}
+
+			BackHandler.addEventListener("hardwareBackPress",onBackPress)
+
+			return ()=>BackHandler.removeEventListener("hardwareBackPress",onBackPress)
+		},[index,wait,routeName])
+	)
+
+    return <LayoutClass {...props} />
+}
