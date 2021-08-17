@@ -407,7 +407,7 @@ export default function UserScreen({navigation,route}){
             if(down) {
                 await handleCloseMenu();
                 setNotif(false,"Download","Start downloading...");
-                await down.start();
+                down.start();
             }
         } catch(err) {
             setNotif(true,"Error",err?.message||"Something went wrong");

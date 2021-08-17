@@ -274,7 +274,7 @@ function URLshortener({navigation}){
                 const down = await downloadFile(url,filename,"pn://url",`pn://second-screen?type=open_file&file=${encodeURIComponent(filename)}&mime=${encodeURIComponent('image/png')}`)
                 if(down) {
                     setNotif(false,"Download","Start downloading...");
-                    await down.start()
+                    down.start();
                 }
             } catch(err) {
                 setNotif(true,"Error",err?.message||"Something went wrong");
