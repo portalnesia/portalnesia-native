@@ -86,6 +86,9 @@ const getScreen={
     Like:{
         path:'like/:filter?',
     },
+    Media:{
+        path:'media/:slug'
+    },
     NotFound: '*',
 }
 

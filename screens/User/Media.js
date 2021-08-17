@@ -12,6 +12,7 @@ import { ucwords } from '@pn/utils/Main'
 import {GridSkeleton} from '@pn/components/global/Skeleton'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
 import { AuthContext } from '@pn/provider/Context';
+import {linkTo} from '@pn/navigation/useRootNavigation'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 
@@ -71,7 +72,6 @@ const RenderMedia=React.forwardRef((props,ref)=>{
     const theme=useTheme();
     const navigation = useNavigation();
     const {data:dt,error:err,...swrProps} = usePagination(props.data && !props?.data?.users?.media_private && !props?.data?.users?.suspend ? `/user/${props.data?.users?.username}/media` : null,'media',24,false)
-    
     return <RenderMediaClass ref={ref} {...props} theme={theme} {...swrProps} dt={dt} err={err} navigation={navigation} setNotif={setNotif} />
 })
 
@@ -119,7 +119,7 @@ class RenderMediaClass extends React.PureComponent{
     handleOpenMenu = (item)=>{
         if(item?.type === 'photo') this.props.onOpen && this.props.onOpen(item)
         else {
-            this.props.setNotif(true,"Under Maintenance","Sorry, this feature is under maintenance.");
+            linkTo(`/media/${item?.id}`);
         }
     }
 

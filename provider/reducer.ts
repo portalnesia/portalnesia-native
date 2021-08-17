@@ -9,7 +9,9 @@ const initialState: ReduxState={
     userTheme:'auto',
     lang:'auto',
     isLogin:false,
-    signature:null
+    signature:null,
+    musicPlayer:false,
+    musicPlayerUpdate:0
 }
 
 const reducer=(state=initialState,action: ReduxAction): ReduxState=>{
@@ -53,6 +55,11 @@ const reducer=(state=initialState,action: ReduxAction): ReduxState=>{
             return {
                 ...state,
                 signature:(action.payload as string)
+            }
+        case "MUSIC_PLAYER":
+            return {
+                ...state,
+                musicPlayerUpdate:state.musicPlayerUpdate+1
             }
 		case "MANUAL":
             payload = (action.payload as Partial<ReduxState>)
