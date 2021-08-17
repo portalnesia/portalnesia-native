@@ -14,7 +14,8 @@
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="pn://setting/account"
-                android:targetPackage="com.portalnesia.app" />
+                android:targetPackage="com.portalnesia.app"
+                android:targetClass="com.portalnesia.app.MainActivity"/>
         </PreferenceScreen>
         <PreferenceScreen
             android:key="security_settings"
@@ -25,7 +26,8 @@
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="pn://setting/security"
-                android:targetPackage="com.portalnesia.app" />
+                android:targetPackage="com.portalnesia.app"
+                android:targetClass="com.portalnesia.app.MainActivity" />
         </PreferenceScreen>
         <PreferenceScreen
             android:key="notification_settings"
@@ -36,7 +38,8 @@
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="pn://setting/notification"
-                android:targetPackage="com.portalnesia.app" />
+                android:targetPackage="com.portalnesia.app"
+                android:targetClass="com.portalnesia.app.MainActivity" />
         </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

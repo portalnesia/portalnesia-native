@@ -215,6 +215,12 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
+    "expo-background-fetch@9.2.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
     "expo-cellular@3.2.0": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
@@ -330,6 +336,12 @@
         "parents": "portal-native"
     },
     "expo-status-bar@1.0.4": {
+        "licenses": "MIT",
+        "repository": "https://github.com/expo/expo",
+        "licenseUrl": "https://github.com/expo/expo",
+        "parents": "portal-native"
+    },
+    "expo-task-manager@9.2.2": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -454,10 +466,10 @@
         "licenseUrl": "https://github.com/iou90/react-native-autoheight-webview/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react-native-background-actions@2.6.2": {
-        "licenses": "MIT",
-        "repository": "https://github.com/Rapsssito/react-native-background-actions",
-        "licenseUrl": "https://github.com/Rapsssito/react-native-background-actions/raw/master/LICENSE",
+    "react-native-background-downloader@2.3.4": {
+        "licenses": "Apache-2.0",
+        "repository": "https://github.com/EkoLabs/react-native-background-downloader",
+        "licenseUrl": "https://github.com/EkoLabs/react-native-background-downloader/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-biometrics@2.1.4": {
@@ -468,6 +480,12 @@
     },
     "react-native-chart-kit@6.11.0": {
         "licenses": "UNKNOWN",
+        "parents": "portal-native"
+    },
+    "react-native-draggable-flatlist@2.6.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/computerjazz/react-native-draggable-flatlist",
+        "licenseUrl": "https://github.com/computerjazz/react-native-draggable-flatlist/raw/master/LICENSE.txt",
         "parents": "portal-native"
     },
     "react-native-dropdownalert@4.3.0": {
@@ -578,7 +596,7 @@
         "licenseUrl": "https://github.com/satya164/react-native-tab-view/raw/master/LICENSE.md",
         "parents": "portal-native"
     },
-    "react-native-track-player@1.2.7": {
+    "react-native-track-player@2.0.1": {
         "licenses": "Apache-2.0",
         "repository": "https://github.com/react-native-kit/react-native-track-player",
         "licenseUrl": "https://github.com/react-native-kit/react-native-track-player/raw/master/LICENSE",

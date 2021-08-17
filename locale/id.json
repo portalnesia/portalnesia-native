@@ -191,6 +191,25 @@
     "follower":"pengikut",
     "following":"mengikuti",
     "unfollow":"batal mengikuti",
+    "random_number":{
+        "animation":"Animasi",
+        "animation_help":"Aktifkan animasi saat mengacak angka",
+        "min":"Angka Minimum",
+        "max":"Angka Maksimum",
+        "specify":{
+            "max":"Harap tentukan angka maksimum",
+            "min":"Harap tentukan angka minimum"
+        },
+        "less":{
+            "max":"Angka maksimum harus lebih kecil dari %{number}",
+            "min":"Angka minimum harus lebih kecil dari %{number}"
+        },
+        "than":{
+            "max":"Angka maksimum harus lebih besar dari angka minimum",
+            "min":"Angka minimum harus lebih kecil dari angka maksimum"
+        },
+        "same":"Angka minimum dan maksimum tidak boleh sama"
+    },
     "settings":{
         "account":{
             "private":"Setel profil ke pribadi",

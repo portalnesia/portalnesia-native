@@ -89,8 +89,8 @@ export default function({navigation,route}){
         .then((res)=>{
             if(!res.error) {
                 const isUpdated = compareVersion.compare(Constants.nativeAppVersion,res?.data?.version,"<");
+                const url = res?.data?.url || false;
                 if(isUpdated) {
-                    const url = res?.data?.url || false;
                     let btn=[
                         {
                             text:"Changelog",
@@ -118,6 +118,9 @@ export default function({navigation,route}){
                         `${res?.data?.version == res?.data?.bundle ? `v${res?.data?.version}` : `Native version ${res?.data?.version}\nBundle version ${res?.data?.bundle}`}`,
                         [
                             {
+                                text:"Download APK",
+                                onPress:()=>handleUpdate(url,res?.data?.version)
+                            },{
                                 text:"Changelog",
                                 onPress:()=>openBrowser(`${DATAS_URL}/native/v${res?.data?.bundle}`,false)
                             },
