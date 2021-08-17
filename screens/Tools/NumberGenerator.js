@@ -1,8 +1,9 @@
 import React from 'react';
 import {  View,ScrollView,useWindowDimensions } from 'react-native';
-import {Layout as Lay,Text,Input,useTheme} from '@ui-kitten/components'
+import {Layout as Lay,Text,Input,useTheme,Toggle} from '@ui-kitten/components'
 import i18n from 'i18n-js'
 
+import Tooltip from '@pn/components/global/Tooltip'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import Image from '@pn/components/global/Image'
@@ -21,6 +22,7 @@ export default function({navigation}){
     const [value,setValue]=React.useState({min:0,max:0});
     const [error,setError]=React.useState({min:false,max:false});
     const [errText,setErrText]=React.useState({min:[],max:[]});
+    const [anim,setAnim]=React.useState(true);
     const [loading,setLoading] = React.useState(false)
     const {copyText} = useClipboard()
     const {height,width}=useWindowDimensions()
@@ -43,10 +45,10 @@ export default function({navigation}){
                     min:true
                 });
                 const text=[];
-                if(val.length === 0) text.push("Please specify a minimum number");
-                if(Number(val) < 0) text.push("The minimum number must be greater than 0")
-                if(Number(value.max) < Number(val)) text.push("The minimum number must be less than the maximum number")
-                if(Number(value.max) === Number(val)) text.push("The minimum number and the maximum number can not be the same number")
+                if(val.length === 0) text.push(i18n.t("random_number.specify.min"));
+                if(Number(val) < 0) text.push(i18n.t("random_number.less.min",{number:"0"}))
+                if(Number(value.max) < Number(val)) text.push(i18n.t("random_number.than.min"))
+                if(Number(value.max) === Number(val)) text.push(i18n.t("random_number.same"))
                 setErrText({
                     max:[],
                     min:text
@@ -64,10 +66,10 @@ export default function({navigation}){
                     max:true
                 });
                 const text=[];
-                if(val.length === 0) text.push("Please specify a maximum number");
-                if(Number(val) > 10000) text.push("The maximum number must be less than 10000")
-                if(Number(value.min) > Number(val)) text.push("The maximum number must be greater than the minimum number")
-                if(Number(value.min) === Number(val)) text.push("The minimum number and the maximum number can not be the same number")
+                if(val.length === 0) text.push(i18n.t("random_number.specify.max"));
+                if(Number(val) > 10000) text.push(i18n.t("random_number.less.max",{number:"10000"}))
+                if(Number(value.min) > Number(val)) text.push(i18n.t("random_number.than.max"))
+                if(Number(value.min) === Number(val)) text.push(i18n.t("random_number.same"))
                 setErrText({
                     min:[],
                     max:text
@@ -97,21 +99,25 @@ export default function({navigation}){
         })
     }
 
-    const handleGenerate=()=>{
-        if(value.min.length === 0 || value.max.length === 0 || Number(value.min) >= Number(value.max) || Number(value.min) < 0 || Number(value.max) > 10000 || error.min || error.max) return setNotif(true,"Error","Minimum number or maximum number error");
-        setLoading(true);
-        let min=value.min,max=value.max,durasi=5000,started = new Date().getTime();
-        let generator=setInterval(function(){
-            if (new Date().getTime() - started > durasi) {
-
-                clearInterval(generator);
-                setLoading(false)
-            } else {
-                let number=Math.floor(Math.random() * (+max+1 - +min)) + +min;
-                setResult(number)
-            }
-        },50);
-    }
+    const handleGenerate=React.useCallback(()=>{
+        let min=Number.parseInt(value.min),max=Number.parseInt(value.max),durasi=5000,started = new Date().getTime();
+        if(value.min.length === 0 || value.max.length === 0 || min >= value.max || min < 0 || max > 10000 || error.min || error.max) return setNotif(true,"Error","Minimum number or maximum number error");
+        
+        if(anim) {
+            setLoading(true);
+            let generator=setInterval(function(){
+                if (new Date().getTime() - started > durasi) {
+                    clearInterval(generator);
+                    setLoading(false)
+                } else {
+                    let number=Math.floor(Math.random() * (+max+1 - +min)) + +min;
+                    setResult(number)
+                }
+            },50);
+        } else {
+            setResult(Math.floor(Math.random() * (+max+1 - +min)) + +min);
+        }
+    },[error,value,anim])
 
     return (
         <>
@@ -121,6 +127,7 @@ export default function({navigation}){
                         flex:1,flexDirection:'column',justifyContent:'flex-start',
                         backgroundColor:theme['background-basic-color-1']
                     }}
+                    keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
                 >
                     <Lay><AdsBanners /></Lay>
                     <Lay key={0} style={{paddingTop:10,flex:1,justifyContent:'flex-start'}}>
@@ -133,7 +140,7 @@ export default function({navigation}){
                                     <Input
                                         value={String(value.min)}
                                         onChangeText={(text)=>handleChange('min',text)}
-                                        label="Minimum Number"
+                                        label={i18n.t("random_number.min")}
                                         caption={(props)=>(
                                             <Text {...props}>{errText.min.join("\n")}</Text>
                                         )}
@@ -152,7 +159,7 @@ export default function({navigation}){
                                         ref={inputMax}
                                         value={String(value.max)}
                                         onChangeText={(text)=>handleChange('max',text)}
-                                        label="Maximum Number"
+                                        label={i18n.t("random_number.max")}
                                         caption={(props)=>(
                                             <Text {...props}>{errText.max.join("\n")}</Text>
                                         )}
@@ -160,15 +167,23 @@ export default function({navigation}){
                                         keyboardType='numeric'
                                         returnKeyType="go"
                                         onSubmitEditing={handleGenerate}
+                                        blurOnSubmit={false}
                                         disabled={loading}
                                     />
                                 </Lay>
+                            </Lay>
+                            <Lay style={[style.container,{flexDirection:'row',alignItems:'center',marginBottom:10,justifyContent:'space-between'}]}>
+                                <View style={{flexDirection:'row',alignItems:'center'}}>
+                                    <Text>{i18n.t('random_number.animation')}</Text>
+                                    <Tooltip style={{marginLeft:5}} tooltip={i18n.t('random_number.animation_help')} name="question-mark-circle-outline" />
+                                </View>
+                                <Toggle  disabled={loading} checked={anim} onChange={setAnim} />
                             </Lay>
                         </Lay>
                         <Lay style={{marginVertical:10}}>
                             <AdsBanner />
                         </Lay>
-                        <Lay style={{flex:1,justifyContent:'flex-end',flexDirection:'column'}}>
+                        <Lay style={{justifyContent:'flex-end',flexDirection:'column'}}>
                             <Lay style={[style.container,{paddingVertical:5}]}>
                                 <Button onPress={handleReset} disabled={loading} status="danger">Reset</Button>
                             </Lay>
