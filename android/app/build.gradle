@@ -141,8 +141,8 @@ android {
         applicationId "com.portalnesia.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 18
-        versionName "2.9.0"
+        versionCode 19
+        versionName "2.10.0"
     }
     splits {
         abi {
@@ -212,6 +212,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
+    implementation "androidx.core:core:1.6.0"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
@@ -232,7 +233,7 @@ dependencies {
     annotationProcessor("com.android.support:support-annotations:28.0.0-alpha3")
     implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
     implementation "com.github.stfalcon-studio:StfalconImageViewer:master-SNAPSHOT"
-    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-background-fetch','expo-image-manipulator','expo-task-manager','unimodules-barcode-scanner-interface','unimodules-camera-interface','unimodules-face-detector-interface','unimodules-sensors-interface','unimodules-task-manager-interface','expo-local-authentication']])
+    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-image-manipulator','unimodules-barcode-scanner-interface','unimodules-camera-interface','unimodules-face-detector-interface','unimodules-sensors-interface','expo-local-authentication']])
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

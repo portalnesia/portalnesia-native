@@ -195,6 +195,25 @@
     "follower":"follower",
     "following":"following",
     "unfollow":"unfollow",
+    "random_number":{
+        "animation":"Animation",
+        "animation_help":"Enable animation when randomize numbers",
+        "min":"Minimum Number",
+        "max":"Maximum Number",
+        "specify":{
+            "max":"Please specify a maximum number",
+            "min":"Please specify a minimum number"
+        },
+        "less":{
+            "max":"The maximum number must be less than %{number}",
+            "min":"The minimum number must be less than %{number}"
+        },
+        "than":{
+            "max":"The maximum number must be greater than the minimum number",
+            "min":"The minimum number must be less than the maximum number"
+        },
+        "same":"The minimum number and the maximum number can not be the same number"
+    },
     "settings":{
         "account":{
             "private":"Set profile to private",
