@@ -6,6 +6,8 @@ import * as Secure from 'expo-secure-store'
 import ShareModule from '@pn/module/Share'
 import Layout from '@pn/components/global/Layout'
 import ListItem from '@pn/components/global/ListItem'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
 
 import TopNavigationAction from '@pn/components/navigation/TopAction'
 import TopNav from '@pn/components/navigation/TopNav'
@@ -155,7 +157,7 @@ const ShareImage=React.memo(({data,user,token,menu,onCloseMenu})=>{
     )
 })
 
-export default function Share(){
+function Share(){
     const [data,setData]=React.useState(null);
     const [user,setUser]=React.useState(null);
     const [token,setToken] = React.useState(null);
@@ -198,7 +200,7 @@ export default function Share(){
     
     return (
         <BaseActivity>
-            <Layout custom={Header} whiteBg >
+            <Layout custom={Header} whiteBg>
                 {data===null ? (
                     <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                         <Spinner size="large" />
@@ -216,5 +218,21 @@ export default function Share(){
                 )}
             </Layout>
         </BaseActivity>
+    )
+}
+
+const MainStack = createStackNavigator();
+
+export default function(){
+    return (
+        <NavigationContainer>
+            <MainStack.Navigator initialRouteName="Share" screenOptions={{
+                headerShown:false,
+                gestureEnabled:true,
+                ...TransitionPresets.SlideFromRightIOS
+            }}>
+                <MainStack.Screen name="Share" component={Share} />
+            </MainStack.Navigator>
+        </NavigationContainer>
     )
 }
