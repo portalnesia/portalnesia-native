@@ -39,7 +39,7 @@ public class HeadlessSyncService extends HeadlessJsTaskService {
             Notification notification = new NotificationCompat.Builder(this,NOTIFICATION_ID)
                 .setContentTitle("Sync Service")
                 .setContentText("Running...")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_notif_icon)
                 .setContentIntent(contentIntent)
                 .setOngoing(true)
                 .build();

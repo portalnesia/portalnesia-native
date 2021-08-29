@@ -51,7 +51,7 @@ public class PNNotification extends ReactContextBaseJavaModule {
     public void notify(int notification_id, String channel_id, ReadableMap options, Promise promise) {
         final String packageName = reactContext.getPackageName();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(reactContext,channel_id);
-        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setSmallIcon(R.mipmap.ic_notif_icon);
 
         Intent openApp = reactContext.getPackageManager().getLaunchIntentForPackage(packageName);
         if(openApp == null) {
