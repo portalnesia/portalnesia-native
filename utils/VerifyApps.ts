@@ -1,5 +1,4 @@
 import {Alert} from 'react-native'
-
 import PNSafety from '@pn/module/Safety'
 import Portalnesia from '@pn/module/Portalnesia'
 import API from '@pn/utils/axios'
@@ -8,7 +7,6 @@ import { log, logError } from './log'
 import * as Secure from 'expo-secure-store'
 import moment from 'moment'
 import NetInfo from '@react-native-community/netinfo'
-
 async function alertWarning(msg: string) {
     return new Promise<void>(res=>{
         Alert.alert(
