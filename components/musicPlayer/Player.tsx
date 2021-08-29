@@ -140,9 +140,9 @@ const RenderPlayer=({animated,queueAnim}:MiniHeaderTypes)=>{
                     <View style={{borderRadius:22,overflow:'hidden',marginLeft:10}}>
                         <Pressable style={{padding:10}} tooltip={muted !== null ? "Unmute" : "Mute"} onPress={handleVolume}>
                             {muted !== null ? (
-                                <VolumeOnIcon style={{width:20,height:20,tintColor:theme['text-hint-color']}} />
-                            ) : (
                                 <VolumeOffIcon style={{width:20,height:20,tintColor:theme['text-hint-color']}} />
+                            ) : (
+                                <VolumeOnIcon style={{width:20,height:20,tintColor:theme['text-hint-color']}} />
                             )}
                         </Pressable>
                     </View>

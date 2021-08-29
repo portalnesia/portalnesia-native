@@ -95,9 +95,12 @@ function MusicPlayer() {
             //handleStyle={{top:13,width:40,height: handle ? 6 : 0,backgroundColor:theme['text-hint-color']}}
         >
             <View style={{height:winHeight-33}}>
-                <MiniHeader animated={animated} modalRef={modalRef} handle={handle} qHandle={qHandle} queueRef={queueRef} queueAnim={queueAnim} />
-                <Player animated={animated} modalRef={modalRef} handle={handle} qHandle={qHandle} queueRef={queueRef} queueAnim={queueAnim} />
-                
+                {track && (
+                    <>
+                        <MiniHeader animated={animated} modalRef={modalRef} handle={handle} qHandle={qHandle} queueRef={queueRef} queueAnim={queueAnim} />
+                        <Player animated={animated} modalRef={modalRef} handle={handle} qHandle={qHandle} queueRef={queueRef} queueAnim={queueAnim} />
+                    </>
+                )}
             </View>
             <Modalize
                 ref={queueRef}
@@ -115,7 +118,7 @@ function MusicPlayer() {
                     elevation:qHandle ? 0 : 4
                 }}
             >
-                <Queue animated={animated} modalRef={modalRef} handle={handle} qHandle={qHandle} queueRef={queueRef} queueAnim={queueAnim} />
+                {track && <Queue animated={animated} modalRef={modalRef} handle={handle} qHandle={qHandle} queueRef={queueRef} queueAnim={queueAnim} /> }
             </Modalize>
         </Modalize>
         </>
