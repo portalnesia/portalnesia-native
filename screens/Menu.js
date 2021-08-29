@@ -5,7 +5,6 @@ import * as Linking from 'expo-linking'
 import {linkTo} from '@pn/navigation/useRootNavigation'
 import compareVersion from 'compare-versions'
 import {useScrollToTop} from '@react-navigation/native'
-
 import {DATAS_URL} from '@env'
 import Button from '@pn/components/global/Button'
 import Backdrop from '@pn/components/global/Backdrop';
@@ -16,14 +15,12 @@ import {menu as getMenu} from '../constants/menu'
 import Header,{useHeader,headerHeight,TopAction} from '@pn/components/navigation/Header'
 import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
-//import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 import Portalnesia from '@pn/module/Portalnesia'
 import downloadFile from '@pn/utils/Download'
 import { openBrowser } from '@pn/utils/Main'
 import Authentication from '@pn/module/Authentication'
 import useSelector from '@pn/provider/actions'
-
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
@@ -59,8 +56,9 @@ export default function({navigation,route}){
         const download_url = getAbi === null ? `${url}/Portalnesia-universal-v${version}.apk` : `${url}/Portalnesia-${getAbi}-v${version}.apk`;
         
         try {
-            const download = await downloadFile(download_url,"Portalnesia.apk","pn://login-callback","pn://second-screen?type=update_app");
-        
+            const filename = getAbi === null ? `Portalnesia-universal-v${version}.apk` : `Portalnesia-${getAbi}-v${version}.apk`;
+            const download = await downloadFile(download_url,filename,"pn://login-callback","application/vnd.android.package-archive");
+            
             if(download) {
                 setNotif(false,"Download","Start downloading...");
                 download.start();

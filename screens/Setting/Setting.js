@@ -17,12 +17,15 @@ import ListItem from '@pn/components/global/ListItem'
 import { linkTo } from '@pn/navigation/useRootNavigation'
 import Authentication from '@pn/module/Authentication';
 import useSelector from '@pn/provider/actions'
+import PNFile from '@pn/module/PNFile'
+import { getSaf } from '@pn/utils/Download'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
 const menuSettingArr=[
     {key:"appearance"},
     {key:"lang"},
+    {key:"directory"},
     {key:"cache"},
     {header:"About"},
     {key:"contact",desc:false,to:"/contact"},
@@ -40,6 +43,7 @@ export default function Setting({navigation}){
     const {user,userTheme,lang} = useSelector(state=>({user:state.user,userTheme:state.userTheme,lang:state.lang}))
     const [open,setOpen]=React.useState(null)
     const [loading,setLoading] = React.useState(false)
+    const [storage,setStorage] = React.useState("Loading...");
     const {width} = useWindowDimensions()
     const theme = useTheme()
     const [cacheSize,setCacheSize]=React.useState("Calculating...")
@@ -106,6 +110,13 @@ export default function Setting({navigation}){
         }
 
         (async function(){
+            const saf = await getSaf(false,true);
+            if(saf===null) {
+                setStorage(`${i18n.t("errors.not_set")}`);
+            } else {
+                const path = await PNFile.getRealPathFromSaf(saf);
+                setStorage(`${path}`)
+            }
             let totalSize=0;
             totalSize += await calculateFolderSize(RNFS.CachesDirectoryPath);
             setCacheSize(totalSize===0 ? "0 KB" : number_size(totalSize))
@@ -144,6 +155,16 @@ export default function Setting({navigation}){
             }]
         )
     },[user])
+
+    const handleStorage=React.useCallback(async()=>{
+        try {
+            const saf = await getSaf(true);
+            const path = await PNFile.getRealPathFromSaf(saf);
+            setStorage(`${path}`);
+        } catch(e) {
+            
+        }
+    },[])
 
     const openNotification = React.useCallback(async()=>{
         if(user) {
@@ -187,6 +208,10 @@ export default function Setting({navigation}){
             name=ucwords(i18n.t(dt?.key,{count:1}));
             if(dt?.desc !== false) desc=ucwords(i18n.t('setting_type',{type:i18n.t(dt?.key,{count:1})}))
             func=()=>linkTo(dt?.to)
+        } else if(dt?.key==='directory') {
+            name=ucwords(i18n.t("settings.storage_location"));
+            desc=storage;
+            func=handleStorage
         }
 
         return (

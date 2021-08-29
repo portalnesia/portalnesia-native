@@ -9,11 +9,10 @@ import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
 import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
-import {useColorScheme,PermissionsAndroid,LogBox,StyleSheet} from 'react-native'
+import {useColorScheme,PermissionsAndroid,LogBox,StyleSheet,PermissionStatus} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
-import RNFS from 'react-native-fs'
 import {captureScreen} from 'react-native-view-shot'
 import compareVersion from 'compare-versions'
 import {Constants} from 'react-native-unimodules'
@@ -38,8 +37,6 @@ import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
 import loadResources from '@pn/utils/Assets'
 import { logError,log } from '@pn/utils/log';
-//import { UserType } from '@pn/types/UserTypes';
-//import { TokenResponse } from 'expo-auth-session';
 
 const customMap = (mapping as any)
 LogBox.ignoreLogs(['Setting a timer for a long period of time']);
@@ -200,12 +197,10 @@ const AuthProviderFunc = () => {
 		}
 
 		async function createFolder() {
-			const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
-			if(granted === PermissionsAndroid.RESULTS.GRANTED) {
-				const ada = await RNFS.exists(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`);
-				if(!ada) {
-					await RNFS.mkdir(`${RNFS.ExternalStorageDirectoryPath}/Portalnesia`)
-				}
+			try {
+				await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+			} catch(e){
+				console.log("Create folder error",e);
 			}
 		}
 

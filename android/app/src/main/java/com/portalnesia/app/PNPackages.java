@@ -40,6 +40,7 @@ public class PNPackages implements ReactPackage {
         modules.add(new PNImageViewModule(reactContext));
         modules.add(new PNSafety(reactContext));
         modules.add(new PNNotification(reactContext));
+        modules.add(new PNFile(reactContext));
         return modules;
     }
 }

@@ -6,7 +6,7 @@ import {
   State,
   TapGestureHandler,
 } from 'react-native-gesture-handler';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, { EasingNode } from 'react-native-reanimated';
 import { timing } from './helpers';
 import { IImageViewerData } from './types';
 import ViewShot from 'react-native-view-shot'
@@ -118,7 +118,7 @@ class ImageViewer extends Component<IProps> {
 
     const timingDefaultParams = {
       duration: 200,
-      easing: Easing.linear,
+      easing: EasingNode.linear,
     };
 
     const maxScale = minScale + 3;
@@ -386,7 +386,7 @@ class ImageViewer extends Component<IProps> {
 
   componentDidUpdate(prevProps: IProps){
     if(prevProps.rotation !== this.props.rotation) {
-      AniTiming(this.rotation,{toValue: this.props.rotation,duration:200,easing:Easing.linear}).start();
+      AniTiming(this.rotation,{toValue: this.props.rotation,duration:200,easing:EasingNode.linear}).start();
     }
   }
 
