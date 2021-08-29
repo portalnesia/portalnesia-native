@@ -1,8 +1,7 @@
 import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
-
 import i18n from 'i18n-js'
-import Portalnesia from '@pn/module/Portalnesia';
+import { PermissionsAndroid } from 'react-native';
 
 type ImageInfo = {
     uri: string;
@@ -29,8 +28,9 @@ type ImageResultExpo = {
 } & ImageInfo
 
 export async function pickImage(options: ImagePicker.ImagePickerOptions): Promise<PickImageResult> {
-    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if(status !== 'granted') throw {type:1,message:i18n.t('errors.permission_storage')}
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+    if(granted !== PermissionsAndroid.RESULTS.GRANTED) throw {type:1,message:i18n.t('errors.permission_storage')}
+
     const image = (await ImagePicker.launchImageLibraryAsync(options) as ImageResultExpo);
     //console.log(image)
     if(image.cancelled) throw {type:0}

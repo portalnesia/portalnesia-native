@@ -127,7 +127,9 @@
         "sure":"Apakah Anda yakin?",
         "location_disabled":"Layanan lokasi Anda tidak aktif",
         "google_play_available":"Harap perbarui Google Play Services Anda untuk menggunakan aplikasi ini.",
-        "verify_failed":"Kami gagal memverifikasi aplikasi yang sedang Anda gunakan. Pastikan Anda menggunakan aplikasi resmi Portalnesia.\n\nJika Anda merasa kami melakukan kesalahan, silahkan hubungi kami di support@portalnesia.com"
+        "verify_failed":"Kami gagal memverifikasi aplikasi yang sedang Anda gunakan. Pastikan Anda menggunakan aplikasi resmi Portalnesia.\n\nJika Anda merasa kami melakukan kesalahan, silahkan hubungi kami di support@portalnesia.com",
+        "ext_permission":"Pilih penyimpanan untuk menyimpan files",
+        "not_set":"Belum disetel"
     },
     "report_placeholder":{
         "placeholder_url":"Mohon maaf atas ketidaknyamanannya, sepertinya ada masalah dengan layanan server internal kami. Bisakah Anda memberi tahu kami bagaimana ini bisa terjadi?",
@@ -239,7 +241,8 @@
             "email_birthday":"Terima pemberitahuan email ulang tahun seseorang yang Anda ikuti",
             "email_komentar":"Terima pemberitahuan email komentar, termasuk jika seseorang mengomentari konten Anda atau jika seseorang membalas komentar Anda",
             "email_feature":"Terima pemberitahuan email tentang fitur baru dan promosi dari Portalnesia"
-        }
+        },
+        "storage_location":"Lokasi penyimpanan"
     },
     "auth":{
         "new_password":"Kata Sandi Lagi",

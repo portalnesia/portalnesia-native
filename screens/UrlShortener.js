@@ -271,7 +271,7 @@ function URLshortener({navigation}){
             const filename = `[portalnesia.com]_${result.custom}.png`;
             
             try {
-                const down = await downloadFile(url,filename,"pn://url",`pn://second-screen?type=open_file&file=${encodeURIComponent(filename)}&mime=${encodeURIComponent('image/png')}`)
+                const down = await downloadFile(url,filename,"pn://url","image/png")
                 if(down) {
                     setNotif(false,"Download","Start downloading...");
                     down.start();

@@ -15,7 +15,7 @@ export interface PortalnesiaInterface {
     SUPPORTED_ABIS: String[];
     /**
      * @argument
-     * path: filepath without file://
+     * path: filepath with file://
      */
     installApk:(path: string) => Promise<boolean>;
     /**
@@ -141,4 +141,15 @@ export interface NotificationInterface {
     VISIBILITY_PRIVATE: number;
     VISIBILITY_PUBLIC: number;
     VISIBILITY_SECRET: number;
+}
+
+export interface FileInterface {
+    /**
+     * @argument
+     * location: filepath with file://
+     */
+    openFolder(location: string): Promise<void>;
+    getRealPathFromSaf(saf: string): Promise<string>;
+    getUriPermission(): Promise<string[]>;
+    removeUriPermission(saf: string): Promise<void>;
 }

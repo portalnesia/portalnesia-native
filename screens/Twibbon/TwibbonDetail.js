@@ -22,6 +22,7 @@ import i18n from 'i18n-js'
 import { ucwords } from '@pn/utils/Main';
 import { pickImage } from '@pn/utils/PickLibrary';
 import {Portal} from '@gorhom/portal'
+import {moveFile} from '@pn/utils/Download'
 
 const {width:winWidth,height:winHeight} = Dimensions.get("window");
 const SupportIcon = (props)=> <Icon {...props} name="question-mark-circle-outline" />
@@ -90,7 +91,7 @@ export default function TwibbonDetail({navigation,route}){
         const uri = await captureRef.current?.capture();
         const date = new Date().getTime();
         const filename = `Twibbon_${data?.twibbon?.slug}_${date}.png`;
-        await RNFS.moveFile(uri,`file://${RNFS.ExternalStorageDirectoryPath}/Portalnesia/${filename}`);
+        await moveFile(uri,filename,"image/png");
         setNotif(false,"Saved!");
         setLoading(false)
     }
@@ -104,7 +105,7 @@ export default function TwibbonDetail({navigation,route}){
 
     return (
         <>
-            <Layout navigation={navigation} title="Twibbon" {...(data && data?.twibbon) ? {subtitle:data?.twibbon?.title} : {}} withBack menu={Menu} margin={35} align="start">
+            <Layout navigation={navigation} title="Twibbon" {...(data && data?.twibbon) ? {subtitle:data?.twibbon?.title} : {}} withBack menu={Menu} margin={35} align="center">
                 <ScrollView
                     contentContainerStyle={{
                         flex:1

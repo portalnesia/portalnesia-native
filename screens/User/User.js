@@ -403,7 +403,7 @@ export default function UserScreen({navigation,route}){
         const filename = `[portalnesia.com]_${data?.users?.username}_QRcode.png`;
 
         try {
-            const down = await downloadFile(url,filename,`pn://user/${data?.users?.username}`,`pn://second-screen?type=open_file&file=${encodeURIComponent(filename)}&mime=${encodeURIComponent('image/png')}`)
+            const down = await downloadFile(url,filename,`pn://user/${data?.users?.username}`,`image/png`)
             if(down) {
                 await handleCloseMenu();
                 setNotif(false,"Download","Start downloading...");

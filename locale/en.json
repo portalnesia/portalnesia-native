@@ -132,7 +132,9 @@
         "sure":"Are you sure?",
         "location_disabled":"Your location services is not active",
         "google_play_available":"Please update your Google Play Services to continue using this application.",
-        "verify_failed":"We failed to verify the application you are using. Make sure you use the official Portalnesia application.\n\nIf you feel we made a mistake, please contact us at support@portalnesia.com"
+        "verify_failed":"We failed to verify the application you are using. Make sure you use the official Portalnesia application.\n\nIf you feel we made a mistake, please contact us at support@portalnesia.com",
+        "ext_permission":"Please select directory to save files",
+        "not_set":"Not set"
     },
     "report_placeholder":{
         "placeholder_url":"We are sorry for the inconvenience, it seems that there is a problem with our internal server service. Can you tell us how this happened?",
@@ -243,7 +245,8 @@
             "email_birthday":"Receive email notifications for the birthdays of someone you are following",
             "email_komentar":"Receive email notifications for comments, including someone commenting on your content or someone replying to your comment",
             "email_feature":"Receive email notifications about the new features and promotion on Portalnesia"
-        }
+        },
+        "storage_location":"Storage location"
     },
     "auth":{
         "new_password":"Password Again",
