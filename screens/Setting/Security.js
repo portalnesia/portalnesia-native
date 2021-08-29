@@ -50,7 +50,6 @@ export default function SecuritySettingScreen({navigation,route}){
 
     React.useEffect(()=>{
         if(data) {
-            //console.log(data);
             setSession(data?.sessions)
             setFingerprint(biometricsExist && data?.security_key);
         }
@@ -66,8 +65,11 @@ export default function SecuritySettingScreen({navigation,route}){
                 if(prompt) {
                     const res = await PNpost(`/setting/native_keys/add`,{public_key,recaptcha})
                     if(!Boolean(res?.error)) {
-                        setFingerprint(true);
                         setNotif(false,"Success",res?.msg);
+                        mutate({
+                            ...data,
+                            security_key:true
+                        })
                     }
                 }
             } catch(e){
@@ -83,7 +85,10 @@ export default function SecuritySettingScreen({navigation,route}){
                     const res = await PNpost(`/setting/native_keys/delete`,{recaptcha})
                     if(!Boolean(res?.error)) {
                         setNotif(false,"Success",res?.msg);
-                        setFingerprint(false);
+                        mutate({
+                            ...data,
+                            security_key:false
+                        })
                     }
                 }
                 else {

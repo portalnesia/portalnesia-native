@@ -278,12 +278,9 @@ public class PNModules extends ReactContextBaseJavaModule {
     @ReactMethod
     public void installApk(String pathname,final Promise promise) {
         try {
-            //if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            //    uri = FileProvider.getUriForFile(reactContext,reactContext.getPackageName() + ".fileprovider",file);
-            //}
-
-            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-            intent.setData(getApkUri(pathname));
+            Uri uri = Uri.parse(pathname);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri,"application/vnd.android.package-archive");
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             reactContext.startActivity(intent);

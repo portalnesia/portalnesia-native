@@ -3,7 +3,7 @@
     "name": "Portalnesia",
     "slug": "portalnesia",
     "scheme": "pn",
-    "version": "2.10.1",
+    "version": "2.11.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "backgroundColor": "#ffffff",
@@ -16,7 +16,7 @@
       "silentLaunch": true
     },
     "extra": {
-      "minimumVersion": "2.10.0"
+      "minimumVersion": "2.11.0"
     },
     "splash": {
       "image": "./assets/splash.png",
@@ -40,6 +40,9 @@
       },
       "useNextNotificationsApi": true,
       "googleServicesFile": "./android/app/google-services.json"
+    },
+    "notification": {
+      "icon":"./android/app/src/main/res/mipmap-xxxhdpi/ic_notif_icon.png"
     }
   }
 }

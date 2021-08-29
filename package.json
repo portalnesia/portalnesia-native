@@ -6,7 +6,8 @@
     "bundle": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "export": "expo export -p https://datas.portalnesia.com/updates -t bare",
     "licenses": "npm-license-crawler -onlyDirectDependencies -json licenses.json",
-    "build-release": "cd android && gradlew assembleRelease -x bundleReleaseJsAndAssets",
+    "build-manifest":"cd android && gradlew createReleaseExpoManifest",
+    "build-release": "cd android && gradlew assembleRelease -x bundleReleaseJsAndAssets -x createReleaseExpoManifest",
     "build-debug": "cd android && gradlew assembleDebug"
   },
   "dependencies": {
@@ -151,7 +152,7 @@
   },
   "private": true,
   "name": "portal-native",
-  "version": "2.10.1",
+  "version": "2.11.0",
   "author": "Putu Aditya <aditya@portalnesia.com>",
   "license": "MIT"
 }
