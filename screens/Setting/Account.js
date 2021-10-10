@@ -12,7 +12,8 @@ import Pressable from "@pn/components/global/Pressable";
 import { AuthContext } from '@pn/provider/Context';
 import NotFound from '@pn/components/global/NotFound'
 import NotFoundScreen from '../NotFound'
-import { openBrowser, ucwords } from '@pn/utils/Main';
+import {ucwords} from '@portalnesia/utils'
+import { openBrowser } from '@pn/utils/Main';
 import useSWR from '@pn/utils/swr';
 import {CONTENT_URL,ACCOUNT_URL} from '@env'
 import useUnsaved from '@pn/utils/useUnsaved'
@@ -48,9 +49,7 @@ export default function AccountSettingScreen({navigation,route}){
     const [dialog,setDialog] = React.useState(null);
     const [password,setPassword]=React.useState("");
     const [newPassword,setNewPassword]=React.useState({newpassword:'',cpassword:''});
-    const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
-    const [recaptcha2,setRecaptcha2] = React.useState("");
     const captchaRef2 = React.useRef(null)
     const passwordRef = React.useRef(null)
 
@@ -122,8 +121,11 @@ export default function AccountSettingScreen({navigation,route}){
     const handleSubmit=React.useCallback((dt)=>{
         if(dt?.password?.match(/\S+/)===null) return setNotif(true,"Error","Password cannot be empty");
         setLoading('save')
-        const daa = {...input,...dt,recaptcha}
-        PNpost('/setting/general',daa)
+        const daa = {...input,...dt}
+        captchaRef.current.getToken()
+        .then(recaptcha=>{
+            return PNpost('/setting/general',{...daa,recaptcha})
+        })
         .then(res=>{
             if(!Boolean(res?.error)) {
                 setCanBack(true);
@@ -136,13 +138,15 @@ export default function AccountSettingScreen({navigation,route}){
         })
         .finally(()=>{
             setLoading(null)
-            captchaRef.current?.refreshToken();
         })
-    },[input,recaptcha,PNpost,password,mutate])
+    },[input,PNpost,password,mutate])
 
     const handleGoogleUnlink=React.useCallback(()=>{
         setLoading('google')
-        PNpost('/auth/google/unlink',{recaptcha:recaptcha2})
+        captchaRef2.current?.getToken()
+        .then(recaptcha=>{
+            return PNpost('/auth/google/unlink',{recaptcha})
+        })
         .then(res=>{
             if(res?.error==0) {
                 setNotif(false,res?.msg);
@@ -151,9 +155,8 @@ export default function AccountSettingScreen({navigation,route}){
         })
         .finally(()=>{
             setLoading(null)
-            captchaRef2.current?.refreshToken();
         })
-    },[recaptcha2,PNpost,mutate])
+    },[PNpost,mutate])
 
     const confirmDelete=()=>{
         const text=[
@@ -192,11 +195,10 @@ export default function AccountSettingScreen({navigation,route}){
             if(type==='success') {
                 let res;
                 try {
-					res = await PNpost('/auth/google/link',{accessToken:user.auth.accessToken||"",idToken:user.auth.idToken||"",recaptcha:recaptcha2})
+                    const recaptcha = await captchaRef2.current?.getToken();
+					res = await PNpost('/auth/google/link',{accessToken:user.auth.accessToken||"",idToken:user.auth.idToken||"",recaptcha:recaptcha})
 				} catch(e){
 					console.log(e);
-				} finally {
-					captchaRef2.current?.refreshToken();
 				}
                 try{
 					await GoogleAuth.disconnectAsync();
@@ -211,7 +213,7 @@ export default function AccountSettingScreen({navigation,route}){
         } finally {
             setLoading(null)
         }
-    },[PNpost,recaptcha2])
+    },[PNpost])
 
     React.useEffect(()=>{
         if(dialog===null) {
@@ -386,8 +388,8 @@ export default function AccountSettingScreen({navigation,route}){
             </Lay>
         </Modal>
         <Backdrop loading visible={loading==='google'} />
-        <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
-        <Recaptcha ref={captchaRef2} onReceiveToken={setRecaptcha2} action="login" />
+        <Recaptcha ref={captchaRef} />
+        <Recaptcha ref={captchaRef2} action="login" />
         <Password supported={fingerprint} loading={loading!==null} ref={passwordRef} onSubmit={handleSubmit} />
         </>
     )

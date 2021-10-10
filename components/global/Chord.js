@@ -3,7 +3,7 @@ import {View,Platform} from 'react-native'
 import {Text} from '@ui-kitten/components'
 import {URL,CONTENT_URL} from '@env'
 
-import {replaceAt,splice,specialHTML} from '@pn/utils/Main'
+import {replaceAt,splice,specialHTML} from '@portalnesia/utils'
 
 const global_style={
     fontFamily:Platform.OS === 'ios' ? 'Menlo-Regular' : 'monospace',

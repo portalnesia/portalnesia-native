@@ -9,7 +9,7 @@ import TopAction from '@pn/components/navigation/TopAction'
 import Pressable from '@pn/components/global/Pressable'
 import Layout from '@pn/components/global/Layout';
 import { AuthContext } from '@pn/provider/Context'
-import { ucwords } from '@pn/utils/Main'
+import { ucwords } from '@portalnesia/utils'
 
 const CloseIcon=(props)=>(
 	<Icon {...props} name='close' />
@@ -19,12 +19,6 @@ const CheckIcon=(props)=>(
 )
 
 async function saveBase64(data,filename) {
-    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE)
-    
-    if(granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        throw new Error(i18n.t('errors.permission_storage'));
-    }
-
     await RNFS.writeFile(filename, data, 'base64');
 }
 

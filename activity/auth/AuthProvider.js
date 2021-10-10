@@ -23,7 +23,7 @@ import {MaterialIconsPack} from '../../components/utils/MaterialIconsPack'
 import i18n from 'i18n-js'
 import {AuthContext} from '../../provider/Context'
 import useLogin from '@pn/utils/Login'
-import Localization from '@pn/module/Localization'
+import Portalnesia from '@portalnesia/react-native-core'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
@@ -186,16 +186,16 @@ const AuthProviderFunc = (props) => {
 				const lng = context.lang === 'id' ? "id-ID" : "en-US";
 				i18n.locale =lng;
 			} else {
-				i18n.locale = Localization.getLocales()[0].languageTag;
+				i18n.locale = Portalnesia.Core.getLocales()[0].languageTag;
 			}
 			forceUpdate();
 		}
 
 		onLocalizationChange();
-		Localization.addEventListener('localizationChange',onLocalizationChange)
+		Portalnesia.Core.addEventListener('localizationChange',onLocalizationChange)
 
 		return ()=>{
-			Localization.removeEventListener('localizationChange',onLocalizationChange)
+			Portalnesia.Core.removeEventListener('localizationChange',onLocalizationChange)
 		}
 	},[context.lang])
 

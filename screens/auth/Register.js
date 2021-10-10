@@ -24,7 +24,6 @@ export default function RegisterScreen({ navigation,route }) {
 	const [username, setUsername] = useState('');
 	const [loading, setLoading] = useState(false);
 	const text2 = React.useRef(null)
-	const [recaptcha,setRecaptcha] = useState("");
 	const captchaRef = React.useRef(null)
 
 	function register() {
@@ -34,7 +33,10 @@ export default function RegisterScreen({ navigation,route }) {
 		if(error.length > 0) return setNotif(true,"Error",error.join("\n"));
 		
 		setLoading(true);
-		PNpost('/auth/register',{email,username,recaptcha})
+		captchaRef.current.getToken()
+		.then(recaptcha=>{
+			return PNpost('/auth/register',{email,username,recaptcha})
+		})
 		.then(res=>{
 			if(!Boolean(res?.error)) {
 				setEmail("")
@@ -54,9 +56,7 @@ export default function RegisterScreen({ navigation,route }) {
 		.finally(()=>{
 			analytics().logSignUp({method:'portalnesia.com'})
 			setLoading(false);
-            captchaRef.current?.refreshToken();
 		})
-		
 	}
 	return (
 		<>
@@ -172,7 +172,7 @@ export default function RegisterScreen({ navigation,route }) {
 					</View>
 				</ScrollView>
 			</Layout>
-			<Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} action="login" />
+			<Recaptcha ref={captchaRef} action="login" />
 		</>
 	);
 }

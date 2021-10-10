@@ -11,11 +11,13 @@ import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/Context';
-import {randomInt} from '@pn/utils/Main'
-import PNSafety from '@pn/module/Safety'
+import {randomInt} from '@portalnesia/utils'
+import Portalnesia from '@portalnesia/react-native-core'
 import ShareModule from '@pn/module/Share';
 
-export default function({navigation}){
+export default function({navigation,route}){
+    const initialType = route.params?.initialType;
+    const initialData = route.params?.initialData;
     const {PNpost} = useAPI(false)
     const context = React.useContext(AuthContext)
     const {setNotif} = context
@@ -31,15 +33,18 @@ export default function({navigation}){
     const handleParse=(input)=>()=>{
         if(input.match(/\S+/) === null) return setNotif(true,"Error","HTML cannot be empty");
         setLoading(true);
-        PNSafety.verifyWithRecaptcha()
+        Portalnesia.Safetynet.verifyWithRecaptcha()
         .then(recaptcha=>{
-            return PNpost(`/parse_html`,{html:input,recaptcha})
+            return PNpost(`/parse_html`,{html:input,recaptcha},undefined,true,false)
         })
         .then((res)=>{
             if(!res?.error) {
                 if(randomInt(3) == 0) showAds();
                 setInput(res.encode);
             }
+        })
+        .catch((e)=>{
+            setNotif(true,"Error",e?.message);
         })
         .finally(()=>{
             setLoading(false)
@@ -54,6 +59,7 @@ export default function({navigation}){
         }
         ShareModule.getSharedData().then(dataListener).catch(console.log)
         ShareModule.addListener(dataListener)
+        return ()=>ShareModule.removeListener(dataListener);
     },[])
 
     return (

@@ -23,8 +23,8 @@
       \"include\":\"https://portalnesia.com/.well-known/assetlinks.json\"
     }]
   </string>
-  <string name="recaptcha_apikey">6Ldevc8aAAAAAB0ljkqw7coT7lcLUfFjRNiOkah6</string>
-  <string name="verification_apikey">AIzaSyAzIjpKFxqj22Gy4AHLJ7PNyx8p4zHVdO0</string>
+  <string name="portalnesia_verification_key">AIzaSyAzIjpKFxqj22Gy4AHLJ7PNyx8p4zHVdO0</string>
+  <string name="portalnesia_recaptcha_key">6Ldevc8aAAAAAB0ljkqw7coT7lcLUfFjRNiOkah6</string>
   <string name="account_settings">Account Settings</string>
   <string name="account_type">com.portalnesia</string>
   <string name="security_settings">Security Settings</string>

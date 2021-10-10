@@ -3,7 +3,7 @@ import * as eva from '@eva-design/eva'
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components'
 import {EvaIconsPack} from '@ui-kitten/eva-icons'
 import {useColorScheme} from 'react-native'
-import Localization from '@pn/module/Localization'
+import Portalnesia from '@portalnesia/react-native-core'
 import i18n from 'i18n-js'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {default as en_locale} from '@pn/locale/en.json'
@@ -57,16 +57,16 @@ function BaseProvider({children}: {children: React.ReactNode}) {
 				const lng = lang === 'id' ? "id-ID" : "en-US";
 				i18n.locale =lng;
 			} else {
-				i18n.locale = Localization.getLocales()[0].languageTag;
+				i18n.locale = Portalnesia.Core.getLocales()[0].languageTag;
 			}
 			forceUpdate();
 		}
 
 		onLocalizationChange();
-		Localization.addEventListener('localizationChange',onLocalizationChange)
+		Portalnesia.Core.addEventListener('localizationChange',onLocalizationChange)
 
 		return ()=>{
-			Localization.removeEventListener('localizationChange',onLocalizationChange)
+			Portalnesia.Core.removeEventListener('localizationChange',onLocalizationChange)
 		}
 	},[lang])
 

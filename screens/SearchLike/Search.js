@@ -12,7 +12,7 @@ import Skeleton from '@pn/components/global/Skeleton'
 import Pressable from '@pn/components/global/Pressable'
 import useAPI from '@pn/utils/API';
 import NotFound from '@pn/components/global/NotFound'
-import {ucwords,specialHTML} from '@pn/utils/Main'
+import {ucwords,specialHTML} from '@portalnesia/utils'
 import Button from '@pn/components/global/Button';
 import ListItem from '@pn/components/global/ListItem';
 import i18n from 'i18n-js';

@@ -9,7 +9,6 @@ import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import style from '@pn/components/global/style'
-import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
 import Button from '@pn/components/global/Button';
 
 const textAnnounce = "Thank you for your patience.\n\nThis feature is experimental and can only be used by a few users.\nIt may cause the application to lag or even hang.\nWe're still trying to optimize it.\n\nIf you get the chance to try this feature, don't forget to leave feedback :)";

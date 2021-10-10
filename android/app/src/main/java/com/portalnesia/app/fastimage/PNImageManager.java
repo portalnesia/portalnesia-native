@@ -211,17 +211,23 @@ public class PNImageManager extends SimpleViewManager<PNImageView> implements PN
         eventEmitter.receiveEvent(viewId, ON_LOAD_START_EVENT, new WritableNativeMap());
 
         if (requestManager != null) {
-            requestManager
-                // This will make this work for remote and local images. e.g.
-                //    - file:///
-                //    - content://
-                //    - res:/
-                //    - android.resource://
-                //    - data:image/png;base64
-                .load(imageSource.getSourceForLoad())
-                .apply(PNImageViewConverter.getOptions(context, imageSource, source))
-                .listener(new PNImageRequestListener(key))
-                .into(view);
+            final PNImageSource imageThumb = PNImageViewConverter.getThumbnailSource(view.getContext(), source);
+            if(imageThumb != null) {
+                requestManager
+                    .load(imageSource.getSourceForLoad())
+                    .thumbnail(
+                        requestManager.load(imageThumb.getSourceForLoad())
+                    )
+                    .apply(PNImageViewConverter.getOptions(context, imageSource, source))
+                    .listener(new PNImageRequestListener(key))
+                    .into(view);
+            } else {
+                requestManager
+                    .load(imageSource.getSourceForLoad())
+                    .apply(PNImageViewConverter.getOptions(context, imageSource, source))
+                    .listener(new PNImageRequestListener(key))
+                    .into(view);
+            }
         }
     }
 
@@ -242,10 +248,21 @@ public class PNImageManager extends SimpleViewManager<PNImageView> implements PN
             ImageLoader<ReadableMap> imageLoader = (imageView, image) -> {
                 final PNImageSource imageSource = PNImageViewConverter.getImageSource(imageView.getContext(), image);
                 if (requestManager != null) {
-                    requestManager
-                        .load(imageSource.getSourceForLoad())
-                        .apply(PNImageViewConverter.getOptions(reactContext, imageSource, image))
-                        .into(imageView);
+                    final PNImageSource imageThumb = PNImageViewConverter.getThumbnailSource(imageView.getContext(), image);
+                    if(imageThumb != null) {
+                        requestManager
+                            .load(imageSource.getSourceForLoad())
+                            .thumbnail(
+                                requestManager.load(imageThumb.getSourceForLoad())
+                            )
+                            .apply(PNImageViewConverter.getOptions(reactContext, imageSource, image))
+                            .into(imageView);
+                    } else {
+                        requestManager
+                            .load(imageSource.getSourceForLoad())
+                            .apply(PNImageViewConverter.getOptions(reactContext, imageSource, image))
+                            .into(imageView);
+                    }
                 }
             };
 

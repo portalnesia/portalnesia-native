@@ -1,0 +1,65 @@
+diff --git a/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.d.ts b/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.d.ts
+index 517c733..0e20149 100644
+--- a/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.d.ts
++++ b/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.d.ts
+@@ -1,6 +1,6 @@
+ /// <reference types="react" />
+ import { ViewStyle } from "react-native";
+-interface SkeletonPlaceholderProps {
++export interface SkeletonPlaceholderProps {
+     /**
+      * Determines component's children.
+      */
+@@ -17,13 +17,14 @@ interface SkeletonPlaceholderProps {
+      * Determines the animation speed in milliseconds. By default is 800
+      */
+     speed?: number;
++    height?: number;
+ }
+ declare function SkeletonPlaceholder({ children, backgroundColor, speed, highlightColor, }: SkeletonPlaceholderProps): JSX.Element;
+ declare namespace SkeletonPlaceholder {
+     var Item: ({ children, ...style }: SkeletonPlaceholderItem) => JSX.Element;
+ }
+ export default SkeletonPlaceholder;
+-interface SkeletonPlaceholderItem extends ViewStyle {
++export interface SkeletonPlaceholderItem extends ViewStyle {
+     children?: JSX.Element | JSX.Element[];
+ }
+ //# sourceMappingURL=SkeletonPlaceholder.d.ts.map
+\ No newline at end of file
+diff --git a/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.js b/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.js
+index ffc2522..965dedb 100644
+--- a/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.js
++++ b/node_modules/react-native-skeleton-placeholder/lib/SkeletonPlaceholder.js
+@@ -37,7 +37,7 @@ const React = __importStar(require("react"));
+ const react_native_1 = require("react-native");
+ const masked_view_1 = __importDefault(require("@react-native-community/masked-view"));
+ const SCREEN_WIDTH = react_native_1.Dimensions.get("window").width;
+-function SkeletonPlaceholder({ children, backgroundColor = "#E1E9EE", speed = 800, highlightColor = "#F2F8FC", }) {
++function SkeletonPlaceholder({ children, backgroundColor = "#E1E9EE", speed = 800, highlightColor = "#F2F8FC", height}) {
+     const [layout, setLayout] = React.useState();
+     const animatedValue = React.useMemo(() => new react_native_1.Animated.Value(0), []);
+     const translateX = React.useMemo(() => animatedValue.interpolate({
+@@ -51,11 +51,11 @@ function SkeletonPlaceholder({ children, backgroundColor = "#E1E9EE", speed = 80
+             easing: react_native_1.Easing.ease,
+             useNativeDriver: true,
+         }));
+-        if ((layout === null || layout === void 0 ? void 0 : layout.width) && (layout === null || layout === void 0 ? void 0 : layout.height)) {
++        if ((layout === null || layout === void 0 ? void 0 : layout.width)) {
+             loop.start();
+         }
+         return () => loop.stop();
+-    }, [animatedValue, speed, layout === null || layout === void 0 ? void 0 : layout.width, layout === null || layout === void 0 ? void 0 : layout.height]);
++    }, [animatedValue, speed, layout === null || layout === void 0 ? void 0 : layout.width]);
+     const absoluteTranslateStyle = React.useMemo(() => (Object.assign(Object.assign({}, react_native_1.StyleSheet.absoluteFillObject), { transform: [{ translateX }] })), [translateX]);
+     const viewStyle = React.useMemo(() => ({ backgroundColor, overflow: "hidden" }), [backgroundColor]);
+     const getChildren = React.useCallback((element) => {
+@@ -80,7 +80,7 @@ function SkeletonPlaceholder({ children, backgroundColor = "#E1E9EE", speed = 80
+             }
+         });
+     }, [viewStyle]);
+-    return (layout === null || layout === void 0 ? void 0 : layout.width) && (layout === null || layout === void 0 ? void 0 : layout.height) ? (<masked_view_1.default style={{ height: layout.height, width: layout.width }} maskElement={<react_native_1.View style={{
++    return (layout === null || layout === void 0 ? void 0 : layout.width) ? (<masked_view_1.default style={{ height, width: layout.width }} maskElement={<react_native_1.View style={{
+         backgroundColor: "transparent",
+     }}>
+           {getChildren(children)}

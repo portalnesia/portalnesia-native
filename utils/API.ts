@@ -13,6 +13,13 @@ import {UserType} from '@pn/types/UserTypes'
 import {TokenResponse} from 'expo-auth-session'
 import { log, logError } from './log';
 
+class ApiError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "ApiError";
+    }
+}
+
 export type ApiResponse<D> = {
     error:number,
     msg: string,
@@ -47,7 +54,7 @@ async function getToken(){
                 await Secure.setItemAsync('token',JSON.stringify(new_token));
                 result.token = new_token;
             }
-        } catch(e) {
+        } catch(e: any) {
             log("refreshToken API error",{msg:e.message});
             logError(e,"refreshToken API");
         }
@@ -65,16 +72,17 @@ async function refreshToken(token: TokenResponse){
 export default function useAPI(){
     const context = React.useContext(AuthContext)
     const {setNotif,sendReport} = context
-    const cancelToken = axios.CancelToken.source();
+    const [cancelPostToken,setCancelPostToken] = React.useState(axios.CancelToken.source());
+    const [cancelGetToken,setCancelGetToken] = React.useState(axios.CancelToken.source());
 
-    const PNpost=React.useCallback(async<D = any>(url: string,data?:{[key: string]: any},formdata?: AxiosRequestConfig,catchError=true): Promise<ApiResponse<D>>=>{
+    const PNpost=React.useCallback(async<D = any>(url: string,data?:{[key: string]: any},formdata?: AxiosRequestConfig,catchError=true,sendNotif=true): Promise<ApiResponse<D>>=>{
         let token: TokenResponse|null=null,session:string="",signature:string="";
         try {
             const result = await getToken();
             token = result.token;
             session = result.session;
             signature = result.signature;
-        } catch(e) {
+        } catch(e: any) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
             setNotif(true,"Error",e.message);
@@ -93,7 +101,7 @@ export default function useAPI(){
                     ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                     ...otherHeader
                 },
-                cancelToken: cancelToken.token,
+                cancelToken: cancelPostToken.token,
                 ...other
             }
             //opt.headers['Content-Type']="multipart/form-data";
@@ -104,36 +112,49 @@ export default function useAPI(){
                     'X-Signature-Id':signature,
                     ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
                 },
-                cancelToken: cancelToken.token
+                cancelToken: cancelPostToken.token
             }
         }
         try {
             const response = await API.post<ApiResponse<D>>(baseURL,dt,opt);
             if(response?.data?.error == 1 && catchError) {
-                setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'));
+                if(sendNotif) setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'));
+                else throw new ApiError(typeof response?.data?.msg=== 'string' ? response?.data?.msg : i18n.t('errors.general'));
             }
             return response.data;
-        } catch(err){
-            if(err?.response?.status==440) {
-                if(token!==undefined && token!==null) refreshToken(token);
-                setNotif("error","Token expired","Please try again!");
-            }
-            else if(catchError) {
-                if(err?.response?.data) {
-                    setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('errors.general'));
+        } catch(err: any){
+            if(axios.isCancel(err)) {
+                if(catchError) {
+                    if(sendNotif) {
+                        setNotif("error","Cancel",err?.message||"");
+                        throw err;
+                    }
+                    else throw new ApiError(err?.message);
                 }
-                else if(err?.response?.status===503||err?.response?.status===500) {
-                    sendReport('url',{force:false,endpoint:baseURL})
-                } else {
-                    setNotif("error","Error",err?.message||i18n.t('errors.general'))
+            } else {
+                if(err?.response?.status==440) {
+                    if(token!==undefined && token!==null) refreshToken(token);
+                    setNotif("error","Token expired","Please try again!");
                 }
+                else if(catchError) {
+                    if(err?.response?.data) {
+                        if(sendNotif) setNotif("error","Error",typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('errors.general'));
+                        else throw new ApiError(typeof err?.response?.data?.msg === 'string' ? err?.response?.data?.msg :i18n.t('errors.general'))
+                    }
+                    else if(err?.response?.status===503||err?.response?.status===500) {
+                        sendReport('url',{force:false,endpoint:baseURL})
+                    } else {
+                        if(sendNotif) setNotif("error","Error",err?.message||i18n.t('errors.general'))
+                        else throw new ApiError(err?.message||i18n.t('errors.general'));
+                    }
+                }
+                log("PNpost error",{msg:err.message});
+                logError(err,"PNpost");
+                console.log("API_ERROR",err?.response||err)
+                throw err;
             }
-            log("PNpost error",{msg:err.message});
-            logError(err,"PNpost");
-            console.log("API_ERROR",err?.response||err)
-            throw err;
         }
-    },[sendReport])
+    },[sendReport,cancelPostToken])
 
     const PNget=React.useCallback(async<D = any>(url: string,catchError=true): Promise<ApiResponse<D>>=>{
         let token: TokenResponse|null=null,session:string="",signature:string="";;
@@ -142,7 +163,7 @@ export default function useAPI(){
             token = result.token;
             session = result.session;
             signature = result.signature;
-        } catch(e) {
+        } catch(e: any) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
             setNotif(true,"Error",e.message);
@@ -155,7 +176,7 @@ export default function useAPI(){
                 'X-Signature-Id':signature,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
-            cancelToken: cancelToken.token
+            cancelToken: cancelGetToken.token
         }
         try {
             const response = await API.get<ApiResponse<D>>(baseURL,opt);
@@ -163,7 +184,13 @@ export default function useAPI(){
                 setNotif("error","Error",typeof response?.data?.msg=== 'string' ? response?.data?.msg : "Something went wrong");
             }
             return response.data;
-        } catch(err){
+        } catch(err: any){
+            if(axios.isCancel(err)) {
+                if(catchError) {
+                    setNotif("error","Cancel",err?.message||"");
+                    throw err;
+                }
+            }
             if(err?.response?.status==440) {
                 if(token!==undefined && token!==null) refreshToken(token);
                 setNotif("error","Token expired","Please try again!");
@@ -182,7 +209,7 @@ export default function useAPI(){
             logError(err,"PNget");
             throw err;
         }
-    },[])
+    },[cancelGetToken])
 
     const fetcher=React.useCallback(async<D = any>(url: string): Promise<ApiResponse<D>>=>{
         let token: TokenResponse|null=null,session:string="",signature:string="";;
@@ -191,7 +218,7 @@ export default function useAPI(){
             token = result.token;
             session = result.session;
             signature = result.signature;
-        } catch(e) {
+        } catch(e: any) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
             throw e;
@@ -203,13 +230,12 @@ export default function useAPI(){
                 'X-Signature-Id':signature,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
-            cancelToken: cancelToken.token
         }
         try {
             const response = await API.get<ApiResponse<D>>(baseURL,opt);
             if(response?.data?.error) return {message:response?.data?.msg||i18n.t('errors.general'),...response?.data}
             else return response.data;
-        } catch(err){
+        } catch(err: any){
             if(err?.response?.status==440) {
                 if(token!==undefined && token!==null) refreshToken(token);
                 setNotif("error","Token expired","Please try again!");
@@ -228,7 +254,7 @@ export default function useAPI(){
             token = result.token;
             session = result.session;
             signature = result.signature;
-        } catch(e) {
+        } catch(e: any) {
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
             throw e;
@@ -253,7 +279,7 @@ export default function useAPI(){
                 throw {message:res?.errors?.[0]?.message}
             }
             return res;
-        } catch(err){
+        } catch(err: any){
             log("PNgraph error",{msg:err.message});
             logError(err,"PNgraph");
             throw err;
@@ -267,7 +293,7 @@ export default function useAPI(){
             token = result.token;
             session = result.session;
             signature = result.signature;
-        } catch(e) {
+        } catch(e: any) {
             setNotif(true,"Error",e.message);
             log("getToken error",{msg:e.message});
             logError(e,"getToken");
@@ -279,7 +305,6 @@ export default function useAPI(){
                 'X-Signature-Id':signature,
                 ...((token===undefined||token === null) ? {} : {'Authorization':`Bearer ${token.accessToken}`,'PN-Client-Id':CLIENT_ID}),
             },
-            cancelToken: cancelToken.token
         }
         try {
             const result=await API.get<ApiResponse<{}>>(`${APII}/v2/pkey`,opt);
@@ -288,7 +313,7 @@ export default function useAPI(){
             } else {
                 throw {message:result?.data?.error_description||i18n.t('errors.general')}
             }
-        } catch(err){
+        } catch(err: any){
             log("PNgetPkey error",{msg:err.message});
             logError(err,"PNgetPkey");
             if(err?.response?.status==440) {
@@ -299,6 +324,16 @@ export default function useAPI(){
             }
         }
     },[])
+    
+    const cancelPost = React.useCallback((reason="Operation cancelled")=>{
+        cancelPostToken.cancel(reason)
+        setCancelPostToken(axios.CancelToken.source());
+    },[cancelPostToken]);
 
-    return {PNpost,PNget,fetcher,PNgraph,PNgetPkey,cancelToken}
+    const cancelGet = React.useCallback((reason="Operation cancelled")=>{
+        cancelGetToken.cancel(reason)
+        setCancelGetToken(axios.CancelToken.source());
+    },[cancelGetToken]);
+
+    return {PNpost,PNget,fetcher,PNgraph,PNgetPkey,cancelPost,cancelGet}
 }

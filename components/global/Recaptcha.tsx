@@ -17,26 +17,31 @@ const patchPostMessageJsCode = `
 const getExecutionFunction = (siteKey: string, action: string) => {
     return `window.grecaptcha.execute('${siteKey}', { action: '${action}' }).then(
       function(args) {
-        window.ReactNativeWebView.postMessage(args);
+        let dt = {type:'token',token:args};
+        window.ReactNativeWebView.postMessage(JSON.stringify(dt));
       }
     )`
 }
 
-const getInvisibleRecaptchaContent = (siteKey: string, action: string) => {
+const getInvisibleRecaptchaContent = (siteKey: string) => {
     return `<!DOCTYPE html><html><head>
       <script src="https://www.google.com/recaptcha/api.js?render=${siteKey}"></script>
-      <script>window.grecaptcha.ready(function() { ${getExecutionFunction(siteKey, action)} });</script>
+      <script>
+        window.grecaptcha.ready(function() {
+            let dt = {type:'ready'};
+            window.ReactNativeWebView.postMessage(JSON.stringify(dt));
+        });</script>
       </head></html>`
 }
 
 export interface RecaptchaProps {
     onReceiveToken?:(token:string)=>void,
     action?:string,
-
+    onReady?(): void;
 }
 
 export default class Recaptcha extends React.PureComponent<RecaptchaProps>{
-
+    private promise: null | ((value: string | PromiseLike<string>) => void)
     private webViewRef: React.RefObject<WebView>
 
     constructor(props: RecaptchaProps){
@@ -46,7 +51,8 @@ export default class Recaptcha extends React.PureComponent<RecaptchaProps>{
 
     static defaultProps={
         action:"social",
-        onReceiveToken:()=>{}
+        onReceiveToken:()=>{},
+        onReady:()=>{}
     }
 
     refreshToken() {
@@ -54,6 +60,28 @@ export default class Recaptcha extends React.PureComponent<RecaptchaProps>{
             this.webViewRef.current.injectJavaScript(getExecutionFunction(RECAPTCHA_SITEKEY, this.props.action||""))
         } else if (Platform.OS === 'android' && this.webViewRef.current !== null) {
             this.webViewRef.current.reload()
+        }
+    }
+
+    getToken() {
+        return new Promise<string>((res)=>{
+            this.promise = res;
+            this.webViewRef.current.injectJavaScript(getExecutionFunction(RECAPTCHA_SITEKEY, this.props.action||""));
+        })
+        .catch(e=>{
+            throw e;
+        })
+    }
+
+    private onMessage(e: WebViewMessageEvent) {
+        const msg = JSON.parse(e.nativeEvent.data);
+        if(msg?.type === 'ready') {
+            this.props.onReady && this.props.onReady();
+        } else if(msg?.type === 'token') {
+            if(this.promise !== null) {
+                this.promise(msg?.token);
+                this.promise = null;
+            }
         }
     }
 
@@ -68,12 +96,10 @@ export default class Recaptcha extends React.PureComponent<RecaptchaProps>{
                     mixedContentMode={'always'}
                     injectedJavaScript={patchPostMessageJsCode}
                     source={{
-                        html: getInvisibleRecaptchaContent(RECAPTCHA_SITEKEY, this.props.action||""),
+                        html: getInvisibleRecaptchaContent(RECAPTCHA_SITEKEY),
                         baseUrl: URL
                     }}
-                    onMessage={(e: WebViewMessageEvent) => {
-                        this.props.onReceiveToken && this.props.onReceiveToken(e.nativeEvent.data)
-                    }}
+                    onMessage={(e: WebViewMessageEvent) => this.onMessage(e)}
                 />
             </View>
         )

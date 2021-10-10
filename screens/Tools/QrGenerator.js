@@ -6,7 +6,7 @@ import Modal from 'react-native-modal'
 import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 
-import PNSafety from '@pn/module/Safety'
+import Portalnesia from '@portalnesia/react-native-core'
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -16,9 +16,8 @@ import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/Context';
-import { ucwords,extractMeta } from '@pn/utils/Main';
+import { ucwords,extractMeta,randomInt } from '@portalnesia/utils';
 import {saveBase64} from '@pn/utils/Download'
-import {randomInt} from '@pn/utils/Main'
 
 const {width:winWidth,height:winHeight} = Dimensions.get("window")
 
@@ -531,7 +530,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight})=>{
             })
         })
         .then(()=>{
-            return PNSafety.verifyWithRecaptcha()
+            return Portalnesia.Safetynet.verifyWithRecaptcha()
         })
         .then(recaptcha=>{
             return PNpost(`/qrcode`,{...input,recaptcha})

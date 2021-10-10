@@ -1,6 +1,6 @@
 import React from 'react'
 import Biometrics,{CreateSignatureOptions,SimplePromptOptions,CreateSignatureResult} from 'react-native-biometrics'
-import { generateRandom } from './Main';
+import { generateRandom } from '@portalnesia/utils';
 
 export function useBiometrics(){
     const [fingerprint,setFingerprint] = React.useState(false)

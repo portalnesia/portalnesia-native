@@ -103,16 +103,14 @@ export const QueueList = React.memo(RenderList)
 
 const RenderQueue=({queueRef,queueAnim,qHandle}: MiniHeaderTypes)=>{
     const [data,setData] = React.useState<Track[]>([]);
-    const {updated,track} = useSelector(state=>({updated:state.musicPlayerUpdate,track:state.musicPlayer}));
+    const {updated} = useSelector(state=>({updated:state.musicPlayerUpdate}));
     const {editQueue,removeQueue}=useTrackPlayer();
 
     React.useEffect(()=>{
-        if(track) {
-            TrackPlayer.getQueue().then((a)=>{
-                setData(a)
-            })
-        }
-    },[updated,track])
+        TrackPlayer.getQueue().then((a)=>{
+            setData(a)
+        })
+    },[updated])
 
     const onPress=React.useCallback(()=>{
         if(!qHandle) {
@@ -124,10 +122,11 @@ const RenderQueue=({queueRef,queueAnim,qHandle}: MiniHeaderTypes)=>{
     },[qHandle])
 
     const onDrag=React.useCallback(({data:dt,from,to}: {data:Track[],from:number,to:number})=>{
-        setData(dt);
-        const removed = data[from];
-        editQueue(removed,from,to)
-        
+        if(from !== to) {
+            setData(dt);
+            const removed = data[from];
+            editQueue(removed,from,to)
+        }
     },[data])
 
     const onRemove=React.useCallback((track:number)=>{

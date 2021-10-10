@@ -1,6 +1,5 @@
 import {Alert} from 'react-native'
-import PNSafety from '@pn/module/Safety'
-import Portalnesia from '@pn/module/Portalnesia'
+import Portalnesia from '@portalnesia/react-native-core'
 import API from '@pn/utils/axios'
 import i18n from 'i18n-js'
 import { log, logError } from './log'
@@ -15,7 +14,7 @@ async function alertWarning(msg: string) {
             [{
                 text:"OK",
                 onPress:()=>{
-                    Portalnesia.exitApp();
+                    Portalnesia.Core.exitApp();
                     res();
                 }
             }]
@@ -24,7 +23,7 @@ async function alertWarning(msg: string) {
 }
 
 async function checkGoogleServices() {
-    const isGooglePlayServicesAvailable = await PNSafety.isGooglePlayServicesAvailable();
+    const isGooglePlayServicesAvailable = await Portalnesia.Safetynet.isGooglePlayServicesAvailable();
     if(!isGooglePlayServicesAvailable) {
         log(`Google Play Service Unavailable`);
         throw new Error(i18n.t("errors.google_play_available"))
@@ -45,7 +44,7 @@ async function checkRemoteVerification(force=true): Promise<RemoteResult> {
         }
         if(res?.nonce) result.nonce = res?.nonce;
         return result;
-    } catch(e) {
+    } catch(e: any) {
         log(`Check remote verification ${e?.message}`);
         logError(e,"Check remote verification error");
         throw new Error(typeof e?.response?.data?.msg === 'string' ? e?.response?.data?.msg : e?.message)
@@ -76,8 +75,8 @@ async function verifyNative(token: string,nonce: string) {
     try {
         let safe: string="";
         try {
-            safe = await PNSafety.getVerification(nonce);
-        } catch(e) {
+            safe = await Portalnesia.Safetynet.getVerification(nonce);
+        } catch(e: any) {
             log(`Safety native verification ${e?.message}`);
             logError(e,"Safety native verification error");
             throw new Error(i18n.t("errors.verify_failed"))
@@ -99,7 +98,7 @@ async function verifyNative(token: string,nonce: string) {
         }
         await Secure.setItemAsync("signature",JSON.stringify(save));
         return Promise.resolve();
-    } catch(e) {
+    } catch(e: any) {
         log(`Remote verification ${e?.message}`);
         logError(e,"Remote verification error");
         if(e?.response?.data?.status==="failed") throw new Error(i18n.t("errors.verify_failed"));
@@ -122,7 +121,7 @@ export default async function verifyApps() {
             await newVerification();
         }
         return Promise.resolve();
-    } catch(e) {
+    } catch(e: any) {
         //log(`Safety verification ${e?.message}`);
         //logError(e,"Verification error");
         await alertWarning(e?.message)

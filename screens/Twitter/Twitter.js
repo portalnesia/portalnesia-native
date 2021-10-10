@@ -12,10 +12,10 @@ import Pressable from '@pn/components/global/Pressable'
 import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
-import {isTwitterURL, isURL, specialHTML} from '@pn/utils/Main'
+import {isTwitterURL, isURL, specialHTML} from '@portalnesia/utils'
 import Skeleton from '@pn/components/global/Skeleton'
 import useAPI from '@pn/utils/API'
-import PNSafety from '@pn/module/Safety'
+import Portalnesia from '@portalnesia/react-native-core'
 import { AuthContext } from '@pn/provider/Context';
 import Carousel from '@pn/components/global/Carousel';
 import useSWR from '@pn/utils/swr';
@@ -81,15 +81,18 @@ const RenderInput=React.memo(({onClose,initialData=""})=>{
 	const handleSubmit=(input)=>{
 		if(isURL(input) && isTwitterURL(input)) {
 			setLoading(true)
-			PNSafety.verifyWithRecaptcha()
+			Portalnesia.Safetynet.verifyWithRecaptcha()
 			.then(recaptcha=>{
-				return PNpost(`/twitter/thread`,{url:input,recaptcha})
+				return PNpost(`/twitter/thread`,{url:input,recaptcha},undefined,true,false)
 			})
 			.then((res)=>{
 				if(!res?.error) {
 					setInput("");
 					setResult(res?.data);
 				}
+			})
+			.catch((e)=>{
+				setNotif(true,"Error",e?.message);
 			})
 			.finally(()=>{
 				setLoading(false)
@@ -322,6 +325,8 @@ const Popular=({headerHeight,navigation,...other})=>{
 
 
 export default function ({ navigation,route }) {
+	const initialType = route.params?.initialType;
+    const initialData = route.params?.initialData;
 	const slug = route?.params?.slug
 	const [tabIndex,setTabIndex] = React.useState(typeof slug === 'string' && slug === 'popular' ? 1 : 0);
 	const [routes]=React.useState([
@@ -386,6 +391,8 @@ export default function ({ navigation,route }) {
         }
         ShareModule.getSharedData().then(dataListener).catch(console.log)
 		ShareModule.addListener(dataListener)
+
+		return ()=>ShareModule.removeListener(dataListener);
     },[])
 
 	return (

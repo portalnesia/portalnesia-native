@@ -6,6 +6,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.Headers;
@@ -49,6 +51,12 @@ public class PNImageViewConverter {
 
     static PNImageSource getImageSource(Context context, ReadableMap source) {
         return new PNImageSource(context, source.getString("uri"), getHeaders(source));
+    }
+
+    @Nullable
+    static PNImageSource getThumbnailSource(Context context, ReadableMap source) {
+        if(!source.hasKey("thumbnail")) return null;
+        return new PNImageSource(context, source.getString("thumbnail"), Headers.DEFAULT);
     }
 
     static Headers getHeaders(ReadableMap source) {

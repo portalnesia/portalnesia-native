@@ -14,16 +14,18 @@ import useAPI from '@pn/utils/API'
 import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/Context';
-import { ucwords,extractMeta,randomInt } from '@pn/utils/Main';
-import PNSafety from '@pn/module/Safety'
-import { convertFile, pickImage } from '@pn/utils/PickLibrary';
+import { ucwords,extractMeta,randomInt } from '@portalnesia/utils';
+import { pickImage } from '@pn/utils/PickLibrary';
 import ShareModule from '@pn/module/Share';
-import Portalnesia from '@pn/module/Portalnesia';
+import Portalnesia from '@portalnesia/react-native-core';
+import { useFocusEffect } from '@react-navigation/core';
 
 const {width:screenWidth} = Dimensions.get("window")
 
-export default function({navigation}){
-    const {PNpost} = useAPI(false)
+export default function({navigation,route}){
+    const initialType = route.params?.initialType;
+    const initialData = route.params?.initialData;
+    const {PNpost,cancelPost} = useAPI(false)
     const context = React.useContext(AuthContext)
     const {setNotif} = context
     const [loading,setLoading] = React.useState(false)
@@ -74,7 +76,7 @@ export default function({navigation}){
                     setProgress(complete);
                 }
             }
-            PNSafety.verifyWithRecaptcha()
+            Portalnesia.Safetynet.verifyWithRecaptcha()
             .then(token=>{
                 return new Promise(res=>{
                     const form=new FormData();
@@ -131,9 +133,14 @@ export default function({navigation}){
         })
     },[])
 
+    const cancelRequest=React.useCallback(()=>{
+        cancelPost();
+        setLoading(false);
+        setBackdrop(false);
+    },[cancelPost])
+
     React.useEffect(()=>{
         const dataListener = (data)=>{
-            console.log(data);
             if(typeof data?.data === 'string' && typeof data?.mimeType === 'string') {
                 if(data?.mimeType==='text/plain') {
                     setUrl(data?.data);
@@ -146,8 +153,10 @@ export default function({navigation}){
                 }
             }
         }
-        ShareModule.getSharedData().then(dataListener).catch(console.log)
+        ShareModule.getSharedData(true).then(dataListener).catch(console.log)
         ShareModule.addListener(dataListener)
+        
+        return ()=>ShareModule.removeListener(dataListener);
     },[])
 
     return (
@@ -239,6 +248,7 @@ export default function({navigation}){
                 visible={backdrop}
                 progress={progress}
                 text={progress<100 ? "Uploading..." : "Processing..."}
+                onCancel={cancelRequest}
             />
         </>
     )

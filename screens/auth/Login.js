@@ -42,7 +42,6 @@ export default function LoginScreen({ navigation,route }) {
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(null);
 	const text2 = React.useRef(null)
-	const [recaptcha,setRecaptcha] = useState("");
 	const captchaRef = React.useRef(null)
 	const [dialog,setDialog]=useState(null);
 	const [ready,setReady]=React.useState(false);
@@ -74,6 +73,8 @@ export default function LoginScreen({ navigation,route }) {
 		setLoading('login');
 		try {
 			const {location,request}=await getLoginLocation();
+			const recaptcha = await captchaRef.current.getToken();
+
 			let res;
 			try {
 				res = await PNpost('/auth/login',{email,password,recaptcha,location,code_challenge:request.codeChallenge,device:JSON.stringify(info)})
@@ -103,7 +104,6 @@ export default function LoginScreen({ navigation,route }) {
 			if(e?.message) setNotif(true,"Error",e?.message);
 		} finally {
 			setLoading(null);
-            captchaRef.current?.refreshToken();
 		}
 	}
 
@@ -111,6 +111,7 @@ export default function LoginScreen({ navigation,route }) {
 		setLoading('google')
 		try {
 			await analytics().logLogin({method:"google.com"});
+			const recaptcha = await captchaRef.current.getToken();
 			await GoogleAuth.initAsync({
 				clientId:FIREBASE_CLIENT_ID,
 				webClientId:FIREBASE_WEB_CLIENT_ID,
@@ -127,8 +128,6 @@ export default function LoginScreen({ navigation,route }) {
 					res = await PNpost('/auth/google/login',body)
 				} catch(e){
 					console.log(e);
-				} finally {
-					captchaRef.current?.refreshToken();
 				}
 				if(res?.dialog) {
 					Alert.alert(
@@ -167,27 +166,23 @@ export default function LoginScreen({ navigation,route }) {
 		} finally {
 			setLoading(null)
 		}
-	},[PNpost,recaptcha])
+	},[PNpost])
 
 	React.useEffect(()=>{
+		setReady(true);
 		(async function(){
-			if(recaptcha.length > 0 && !captchaReady) {
 				try {
 					const creds = await Authentication.prompOneTapSignIn();
 					const {email,password} = creds;
-					setRecaptchaReady(true);
-					handleLogin(email,password);
+					setEmail(email);
+					setPassword(password)
+					setTimeout(()=>handleLogin(email,password),100);
 				} catch(e) {
 					if(["No saved credentials","Request canceled"].indexOf(e?.message) === -1) {
 						setNotif(true,"Error",e?.message);
 					}
 				}
-			}
 		})()
-	},[recaptcha])
-
-	React.useEffect(()=>{
-		setReady(true);
 	},[])
 
 	return (
@@ -330,7 +325,7 @@ export default function LoginScreen({ navigation,route }) {
 				)}
 			</Layout>
 			<Backdrop loading visible={loading==='google'} />
-			<Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} action="login" />
+			<Recaptcha ref={captchaRef} onReady={()=>setRecaptchaReady(true)} action="login" />
 			<Modal
                 isVisible={dialog!==null}
                 style={{margin:0,justifyContent:'center',alignItems:'center'}}

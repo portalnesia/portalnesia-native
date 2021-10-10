@@ -89,6 +89,12 @@ const getScreen={
     Media:{
         path:'media/:slug'
     },
+    EditUserScreen:{
+        path:'user/:username/edit',
+    },
+    DownloadScreen:{
+        path:'download',
+    },
     NotFound: '*',
 }
 
@@ -151,10 +157,6 @@ export const linking: LinkingOptions = {
                     },
                     ReportScreen:{
                         path:'ReportScreen'
-                    },
-                    EditUserScreen:{
-                        path:"user/:username/edit",
-                        exact:true
                     },
                     Login:{
                         path:"login",

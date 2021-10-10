@@ -15,11 +15,10 @@ import Pressable from '@pn/components/global/Pressable'
 import Layout from '@pn/components/global/Layout';
 import usePost from '@pn/utils/API'
 import TopAction from '@pn/components/navigation/TopAction'
-import { jsStyles, ucwords } from '@pn/utils/Main'
-import Localization from '@pn/module/Localization'
+import { jsStyles, ucwords } from '@portalnesia/utils'
 import { AuthContext } from '@pn/provider/Context'
 import Backdrop from '@pn/components/global/Backdrop';
-import PNSafety from '@pn/module/Safety'
+import Portalnesia from '@portalnesia/react-native-core'
 import useSelector from '@pn/provider/actions'
 
 const SendIcon = (props)=><Icon {...props} name="send" pack="material" />
@@ -60,7 +59,7 @@ export default function ReportScreen({navigation,route}){
             {key:"Package version",value:Constants.nativeBuildVersion},
             {key:"Package version name",value:`v${Constants.nativeAppVersion}`},
             {key:"Javascript bundle version",value:`v${Constants.manifest.version}`},
-            {key:"Locale",value:Localization.getLocales()[0].languageTag},
+            {key:"Locale",value:Portalnesia.Core.getLocales()[0].languageTag},
             {key:"Time",value:moment().format("dddd, Do MMMM YYYY, hh:mm")},
             {key:"Device",value:Device.designName},
             {key:"Build ID",value:Device.osBuildId},
@@ -68,6 +67,7 @@ export default function ReportScreen({navigation,route}){
             {key:"Model",value:Device.modelName},
             {key:"Product",value:Device.productName},
             {key:"SDK version",value:Device.platformApiLevel},
+            {key:"OS version",value:Device.osVersion},
             {key:"Brand",value:Device.brand},
             ...(Cellular.carrier !== null ? [{key:"Network provider",value:Cellular.carrier}] : []),
             ...(Cellular.mobileCountryCode !== null ? [{key:"Network MCC code",value:Cellular.mobileCountryCode}] : []),
@@ -94,7 +94,7 @@ export default function ReportScreen({navigation,route}){
                 accu[val]=array.value;
                 return accu;
             },{})
-            const recaptcha = await PNSafety.verifyWithRecaptcha()
+            const recaptcha = await Portalnesia.Safetynet.verifyWithRecaptcha()
             const data={
                 type,
                 text:input,

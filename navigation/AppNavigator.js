@@ -43,6 +43,7 @@ import UrlShortener from '../screens/UrlShortener'
 import Contact from '../screens/Contact'
 import User from '../screens/User/User'
 import EditUserScreen from '../screens/User/Edit'
+import DownloadScreen from '../screens/Download'
 import Setting from '../screens/Setting/Setting'
 import AccountSettingScreen from '../screens/Setting/Account'
 import SecuritySettingScreen from '../screens/Setting/Security'
@@ -159,6 +160,8 @@ const getScreen=()=>{
 		{name:"LikeFilter",component:LikeFilter},
 		{name:"Like",component:Like},
 		{name:"Media",component:MediaScreen},
+		{name:"EditUserScreen",component:EditUserScreen,options:{gestureEnabled:false}},
+		{name:"DownloadScreen",component:DownloadScreen},
 		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }
@@ -280,7 +283,6 @@ const MainNavigator=()=>(
 	}}>
 		<MainStack.Screen name="MainTab" component={MainTabNavigator} />
 		<MainStack.Screen name="ReportScreen" component={ReportScreen} />
-		<MainStack.Screen name="EditUserScreen" component={EditUserScreen} options={{gestureEnabled:false}} />
 		<MainStack.Screen name="Login" component={Login} />
 		<MainStack.Screen name="Register" component={Register} />
 		<MainStack.Screen name="Authentication" component={Authentication} />
@@ -393,7 +395,6 @@ export default React.memo(() => {
 		/* HANDLE NOTIFICATION */
 		
 		function shareListener(data){
-			//console.log("PROVIDER",data);
 			if(data?.extraData?.url) {
 				handleLinking(data?.extraData?.url);
 			}

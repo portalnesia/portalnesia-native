@@ -46,7 +46,7 @@ export async function getProfile(token: ResponseToken){
         } else {
             data = result?.data?.error_description||"Something went wrong"
         }
-    } catch(e){
+    } catch(e: any){
         log("getProfile Login.ts error",{msg:e.message});
         logError(e,"getProfile Login.ts");
         data = "Something went wrong";
@@ -108,7 +108,7 @@ export default function useLogin(setNotif?: UseLoginOptions) {
         try {
             const accounts = await Authentication.getAccounts();
             account = accounts[0];
-        } catch(e){
+        } catch(e: any){
             log("logout getAccounts Login.ts error",{msg:e.message});
             logError(e,"logout getAccounts Login.ts");
         }
@@ -123,7 +123,7 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                 ])
                 dispatch(actionLogout())
                 if(typeof setNotif==='function') setNotif(notify?.type||false,notify?.title||"Sucess",notify?.msg||"You've successfully logged out.")
-            } catch(e) {
+            } catch(e: any) {
                 log("logout Login.ts error",{msg:e.message});
                 logError(e,"logout Login.ts");
                 await Promise.all([
@@ -186,7 +186,7 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                         else {
                             await refreshTokenUtils(token,account,false);
                         }
-                    } catch(e) {
+                    } catch(e: any) {
                         logError(e,"refreshToken Login.ts");
                     }
                 }
@@ -208,7 +208,7 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                     dispatch(actionLogout())
                 }
             }
-        } catch(e) {
+        } catch(e: any) {
             log("refreshToken Login.ts error",{msg:e.message});
             logError(e,"refreshToken Login.ts");
             if(account?.name) await Authentication.removeAccount(account);

@@ -19,8 +19,8 @@ async function getToken(){
         } else {
             return token;
         }
-    } catch(e) {
-        log("getToken SyncService.ts",{msg:e.message});
+    } catch(e: any) {
+        log("getToken SyncService.ts",{msg:e?.message});
         logError(e,"getToken SyncService.ts");
         return token;
     }
@@ -40,8 +40,8 @@ async function SyncAdapter(){
                 await Secure.setItemAsync('user',JSON.stringify(user))
             }
             return Promise.resolve();
-        } catch(e) {
-            log("syncAdapter SyncService.ts",{msg:e.message});
+        } catch(e: any) {
+            log("syncAdapter SyncService.ts",{msg:e?.message});
             logError(e,"syncAdapter SyncService.ts");
             return Promise.resolve();
         }

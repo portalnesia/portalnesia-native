@@ -16,7 +16,7 @@ import Header,{useHeader,headerHeight,TopAction} from '@pn/components/navigation
 import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
 import i18n from 'i18n-js'
-import Portalnesia from '@pn/module/Portalnesia'
+import Portalnesia from '@portalnesia/react-native-core'
 import downloadFile from '@pn/utils/Download'
 import { openBrowser } from '@pn/utils/Main'
 import Authentication from '@pn/module/Authentication'
@@ -32,7 +32,7 @@ export default function({navigation,route}){
     const auth = React.useContext(AuthContext)
     const user = useSelector(state=>state.user);
     const {setNotif,sendReport} = auth;
-    const {PNget} = useAPI(false)
+    const {PNget,cancelGet} = useAPI(false)
     const theme = useTheme()
     const heightt = {...headerHeight,sub:100}
     const {translateY,...other} = useHeader()
@@ -43,7 +43,7 @@ export default function({navigation,route}){
     useScrollToTop(ref)
 
     const handleUpdate=React.useCallback(async(url,version)=>{
-        const myAbi = Portalnesia.SUPPORTED_ABIS;
+        const myAbi = Portalnesia.Core.SUPPORTED_ABIS;
         let getAbi=null;
         let i=0;
 
@@ -137,6 +137,11 @@ export default function({navigation,route}){
         })
     },[PNget])
 
+    const cancelCheckUpdates=React.useCallback(()=>{
+        cancelGet();
+        setLoading(false);
+    },[cancelGet])
+
     React.useEffect(()=>{
         if(linkAction === 'check_updates') {
             checkUpdates();
@@ -182,7 +187,7 @@ export default function({navigation,route}){
                 </View>
             </Animated.ScrollView>
         </Layout>
-        <Backdrop loading visible={loading} />
+        <Backdrop loading visible={loading} onCancel={cancelCheckUpdates} />
         </>
     )
 }

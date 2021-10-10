@@ -83,8 +83,8 @@ function TopNav(props: TopNavigationProps){
 		<>
 			<TopNavigation 
 				{...(withClose && !whiteBg ? {style:{backgroundColor:theme['background-basic-color-2'],...style}} : {style})}
-				title={(evaProps) => <Text {...evaProps}  category="h1" style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{title}</Text>}
-				{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={{...evaProps?.style,marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}} numberOfLines={1}>{subtitle}</Text>} : {})}
+				title={(evaProps) => <Text {...evaProps}  category="h1" style={[evaProps?.style,{marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}]} numberOfLines={1}>{title}</Text>}
+				{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={[evaProps?.style,{marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}]} numberOfLines={1}>{subtitle}</Text>} : {})}
 				alignment={align}
 				{...(accessoryLeft ? {accessoryLeft} : withBack || withClose ? {accessoryLeft:()=><RenderBackBtn withBack={withBack} withClose={withClose} navigation={navigation} /> } : {})}
 				{...(menu ? {accessoryRight:menu} : {})}

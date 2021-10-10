@@ -8,7 +8,8 @@ import RenderPrivate,{RenderSuspend} from './PrivateUser'
 import Button from '@pn/components/global/Button'
 import {Markdown} from '@pn/components/global/Parser'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
-import { openBrowser, ucwords } from '@pn/utils/Main'
+import { openBrowser } from '@pn/utils/Main'
+import {  ucwords } from '@portalnesia/utils'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 

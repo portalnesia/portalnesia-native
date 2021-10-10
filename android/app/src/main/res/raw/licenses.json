@@ -29,6 +29,18 @@
         "licenseUrl": "https://github.com/native-html/plugins",
         "parents": "portal-native"
     },
+    "@portalnesia/react-native-core@1.0.5": {
+        "licenses": "MIT",
+        "repository": "https://github.com/portalnesia/portalnesia",
+        "licenseUrl": "https://github.com/portalnesia/portalnesia",
+        "parents": "portal-native"
+    },
+    "@portalnesia/utils@1.0.3": {
+        "licenses": "MIT",
+        "repository": "https://github.com/portalnesia/portalnesia",
+        "licenseUrl": "https://github.com/portalnesia/portalnesia",
+        "parents": "portal-native"
+    },
     "@react-native-async-storage/async-storage@1.15.5": {
         "licenses": "MIT",
         "repository": "https://github.com/react-native-async-storage/async-storage",

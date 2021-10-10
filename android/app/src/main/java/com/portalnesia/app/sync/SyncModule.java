@@ -13,7 +13,7 @@ public class SyncModule extends ReactContextBaseJavaModule {
     public static final String TASK_NAME = "PN_SYNC_TASK";
     public static final boolean ALLOW_FOREGROUND = true;
     public static final long SYNC_TIMEOUT = 300000;
-    public static final int DEFAULT_SYNC_INTERVAL = 60*60*6; // 6 hours
+    public static final int DEFAULT_SYNC_INTERVAL = 60*60*12; // 24 hours
     public static final int DEFAULT_SYNC_FLEXTIME = 60*30; // 30 minutes
 
     public SyncModule(ReactApplicationContext context){
@@ -29,7 +29,7 @@ public class SyncModule extends ReactContextBaseJavaModule {
     public void sync(Promise promise) {
         if(!ALLOW_FOREGROUND && HeadlessSyncService.isAppOnForeground(reactContext)) {
             if(getCurrentActivity() != null) {
-                promise.reject("ERROR","This sync task has not been configured to run on the basckground!");
+                promise.reject("ERROR","This sync task has not been configured to run on the background!");
             }
             return;
         }
