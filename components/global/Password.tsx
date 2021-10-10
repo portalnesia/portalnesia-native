@@ -59,7 +59,7 @@ class PasswordClass extends React.PureComponent<PassworddProps,IState> {
             if(!prompt.success) return this.setState({show:true})
 
             onSubmit({password:prompt.signature,payload:prompt.payload})
-        } catch(e){
+        } catch(e: any){
             console.log(e)
             if(e?.message) setNotif(true,"Error",e?.message);
             return this.setState({show:true})

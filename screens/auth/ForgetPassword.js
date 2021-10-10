@@ -26,23 +26,19 @@ export default function ForgetPasswordScreen({ navigation,route }) {
 	const [email, setEmail] = useState('');
 	const [loading, setLoading] = useState(false);
 	const text2 = React.useRef(null)
-	const [recaptcha,setRecaptcha] = useState("");
 	const captchaRef = React.useRef(null)
 
-	function handleForget() {
+	async function handleForget() {
 		let error=[];
 		if(email.trim().match(/\S/) === null) error.push(i18n.t('errors.form_validation',{type:`${i18n.t(`form.email`)}`}))
 		if(error.length > 0) return setNotif(true,"Error",error.join("\n"));
 
 		setLoading(true);
-		getLocation()
-		.then(({coords:{latitude,longitude}})=>{
-			return reverseGeocode({latitude,longitude});
-		})
-		.then(loc=>{
-			return PNpost('/auth/forget',{forgot_email:email,recaptcha,location:JSON.stringify(loc[0]),device:JSON.stringify(info)})
-		})
-		.then(res=>{
+		try {
+			const {coords:{latitude,longitude}} = await getLocation();
+			const loc = await reverseGeocode({latitude,longitude});
+			const recaptcha = await captchaRef.current.getToken();
+			const res = await PNpost('/auth/forget',{forgot_email:email,recaptcha,location:JSON.stringify(loc[0]),device:JSON.stringify(info)})
 			if(!Boolean(res?.error)) {
 				setEmail("")
 				Alert.alert(
@@ -55,14 +51,10 @@ export default function ForgetPasswordScreen({ navigation,route }) {
 						}
 					]
 				)
-				
 			}
-		})
-		.finally(()=>{
+		} finally {
 			setLoading(false);
-            captchaRef.current?.refreshToken();
-		})
-		
+		}
 	}
 	return (
 		<>
@@ -159,7 +151,7 @@ export default function ForgetPasswordScreen({ navigation,route }) {
 					</View>
 				</ScrollView>
 			</Layout>
-			<Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} action="login" />
+			<Recaptcha ref={captchaRef} action="login" />
 		</>
 	);
 }

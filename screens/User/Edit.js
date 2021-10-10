@@ -14,7 +14,7 @@ import NotFound from '@pn/components/global/NotFound'
 import NotFoundScreen from '../NotFound'
 import MarkdownEditor from '@pn/components/markdown/Editor'
 import Image from '@pn/components/global/Image'
-import { extractMeta, ucwords } from '@pn/utils/Main';
+import { extractMeta, ucwords } from '@portalnesia/utils';
 import useSWR from '@pn/utils/swr'
 import { FeedbackToggle, MenuContainer } from '@pn/components/global/MoreMenu'
 import Backdrop from '@pn/components/global/Backdrop'
@@ -24,18 +24,20 @@ import Recaptcha from '@pn/components/global/Recaptcha'
 import useAPI from '@pn/utils/API'
 import useUnsaved from '@pn/utils/useUnsaved'
 import useSelector from '@pn/provider/actions'
+import { Portal } from '@gorhom/portal'
 
 const {width}=Dimensions.get('window')
 const dateService = new MomentDateService();
 
 const getGenderArr=()=>([i18n.t('gender.male'),i18n.t('gender.female')]);
 export default function EditUserScreen({navigation,route}){
+    const username = route.params?.username;
     const {user,lang} = useSelector(state=>({user:state.user,lang:state.lang}))
-    if(!user) return <NotFoundScreen navigation={navigation} route={route} />
+    if(!user || !username || user?.username != username) return <NotFoundScreen navigation={navigation} route={route} />
 
     const context = React.useContext(AuthContext);
     const {setNotif} = context;
-    const {PNpost} = useAPI();
+    const {PNpost,cancelPost} = useAPI();
     const theme = useTheme();
     const {data,error,mutate,isValidating}=useSWR(`/user/${user?.username}/edit`,{},true)
     const [name,setName]=React.useState("");
@@ -48,9 +50,9 @@ export default function EditUserScreen({navigation,route}){
     const [loading,setLoading]=React.useState(false);
     const [progressUpload,setProgressUpload]=React.useState(0);
     const [image,setImage]=React.useState(null);
-    const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [validate,setValidate]=React.useState(false);
+    const [initialImage,setInitialImage]=React.useState(null);
     const setCanBack = useUnsaved(true);
 
     const genderArr=React.useMemo(()=>{
@@ -63,7 +65,10 @@ export default function EditUserScreen({navigation,route}){
             if(data?.users?.name) setName(data?.users?.name)
             if(data?.users?.biodata) setAbout(data?.users?.biodata)
             if(data?.users?.gender) setGender(new IndexPath(data?.users?.gender))
-            if(data?.users?.image) setImage(data?.users?.image)
+            if(data?.users?.image) {
+                setImage(data?.users?.image)
+                setInitialImage(data?.users?.image)
+            }
         }
     },[data])
 
@@ -97,16 +102,21 @@ export default function EditUserScreen({navigation,route}){
     const handleRemoveImage=()=>{
         if(!data) return;
         setBackdrop('loading')
-        PNpost(`/user/${data?.users?.username}/edit`,{remove_image:true,recaptcha})
+        captchaRef.current.getToken()
+        .then(recaptcha=>{
+            return PNpost(`/user/${data?.users?.username}/edit`,{remove_image:true,recaptcha})
+        })
         .then((res)=>{
             if(!Boolean(res?.error)) {
                 setImage(null);
                 setNotif(false,res?.msg)
             }
         })
+        .catch(()=>{
+            setImage(initialImage)
+        })
         .finally(()=>{
             setBackdrop(null);
-            captchaRef.current?.refreshToken();
         })
     }
 
@@ -129,8 +139,9 @@ export default function EditUserScreen({navigation,route}){
         pickImage({mediaTypes:MediaTypeOptions.Images,allowsEditing:true,aspect:[500,500]})
         .then((result)=>{
             if(!result.exists) return setNotif(true,"Error",i18n.t('errors.no_image'));
+            if(result?.size > 5242880) return setNotif(true,"Error",i18n.t('errors.size_image'));
             setImage(result.uri);
-            uploadImage();
+            uploadImage(result.uri)
         })
         .catch(err=>{
             if(err?.type === 0) return;
@@ -138,14 +149,14 @@ export default function EditUserScreen({navigation,route}){
         })
     }
 
-    const uploadImage=()=>{
+    const uploadImage=async(image)=>{
         setProgressUpload(0)
         setBackdrop('progress');
         const opt={
             headers:{
                 'Content-Type':'multipart/form-data'
             },
-            onUploadProgress:(progEvent)=>{
+            onUploadProgress:function(progEvent){
                 const complete=Math.round((progEvent.loaded * 100) / progEvent.total);
                 setProgressUpload(complete);
             }
@@ -153,17 +164,26 @@ export default function EditUserScreen({navigation,route}){
         const form = new FormData();
         const {name,match} = extractMeta(image);
         form.append('image',{uri:image,name,type:`image/${match[1]}`});
+        form.append('image_name',name);
+        const recaptcha = await captchaRef.current.getToken();
         form.append('recaptcha',recaptcha);
-        PNpost(`/user/${data?.users?.username}/edit`,form,opt)
-        .then((res)=>{
+        try {
+            const res = await PNpost(`/user/${data?.users?.username}/edit`,form,opt)
             if(!Boolean(res?.error)) setNotif(false,res?.msg);
-        })
-        .finally(()=>{
+        } catch(e) {
+            setImage(initialImage)
+        } finally {
             setProgressUpload(0)
             setBackdrop(null);
-            captchaRef.current?.refreshToken();
-        })
+        }
     }
+
+    const cancelRequest=React.useCallback(()=>{
+        cancelPost();
+        setImage(initialImage)
+        setProgressUpload(0)
+        setBackdrop(null);
+    },[cancelPost,initialImage])
 
     const handleSubmit=()=>{
         if(!data) return;
@@ -174,10 +194,12 @@ export default function EditUserScreen({navigation,route}){
             about,
             gender:gender.row,
             name,
-            birthday,
-            recaptcha
+            birthday
         }
-        PNpost(`/user/${data?.users?.username}/edit`,input)
+        captchaRef.current.getToken()
+        .then(recaptcha=>{
+            return PNpost(`/user/${data?.users?.username}/edit`,{...input,recaptcha})
+        })
         .then((res)=>{
             if(!Boolean(res?.error)) {
                 mutate({data:{users:{...data?.users,name,biodata:about,birthday:date,gender:gender.row}}})
@@ -186,7 +208,6 @@ export default function EditUserScreen({navigation,route}){
         })
         .finally(()=>{
             setLoading(false)
-            captchaRef.current?.refreshToken();
         })
     }
 
@@ -276,7 +297,6 @@ export default function EditUserScreen({navigation,route}){
                 </ScrollView>
             )}
         </Layout>
-        <Backdrop visible={backdrop!==null} {...(backdrop==='progress' ? {progress:progressUpload,text:(progressUpload<100 ? "Uploading..." : "Processing...")} : {loading:true})} />
         <MenuContainer
             visible={photoMenu}
             onClose={()=>setPhotoMenu(false)}
@@ -291,7 +311,14 @@ export default function EditUserScreen({navigation,route}){
                 color:theme['color-danger-500']
             }]}
         />
-        <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
+        <Recaptcha ref={captchaRef} />
+        <Portal>
+            <Backdrop
+                visible={backdrop!==null}
+                {...(backdrop=='progress' ? {progress:progressUpload,text:(progressUpload<100 ? "Uploading..." : "Processing...")} : {loading:true})}
+                onCancel={cancelRequest}
+            />
+        </Portal>
         </>
     )
 }

@@ -13,7 +13,7 @@ import useUnsaved from '@pn/utils/useUnsaved'
 import Recaptcha from '@pn/components/global/Recaptcha'
 import useAPI from '@pn/utils/API';
 import Tooltip from '@pn/components/global/Tooltip'
-import { ucwords } from '@pn/utils/Main';
+import { ucwords } from '@portalnesia/utils';
 import ListItem from '@pn/components/global/ListItem'
 import Button from '@pn/components/global/Button'
 import Spinner from '@pn/components/global/Spinner'
@@ -52,7 +52,6 @@ export default function NotificationSettingScreen({navigation,route}){
     const {data,error,mutate,isValidating} = useSWR('/setting/notification',{},true);
     const [input,setInput] = React.useState({notif_news:true,notif_comment:true,notif_birthday:true,notif_message:true,notif_feature:true,email_birthday:true,email_komentar:true,email_feature:true});
     const setCanBack = useUnsaved(true);
-    const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [validate,setValidate]=React.useState(false)
     const [loading,setLoading]=React.useState(false);
@@ -104,7 +103,10 @@ export default function NotificationSettingScreen({navigation,route}){
 
     const handleSubmit=()=>{
         setLoading(true)
-        PNpost('/setting/notification',{...input,recaptcha})
+        captchaRef.current.getToken()
+        .then(recaptcha=>{
+            return PNpost('/setting/notification',{...input,recaptcha})
+        })
         .then((res)=>{
             if(!Boolean(res?.error)) {
                 setNotif(false,"Success",res?.msg);
@@ -117,7 +119,6 @@ export default function NotificationSettingScreen({navigation,route}){
         })
         .finally(()=>{
             setLoading(false);
-            captchaRef.current?.refreshToken();
         })
     }
 
@@ -147,7 +148,7 @@ export default function NotificationSettingScreen({navigation,route}){
                 { ...(typeof data !== 'undefined' || typeof error !== 'undefined' ? {refreshControl:<RefreshControl refreshing={validate && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>{!validate && (setValidate(true),mutate())}} colors={['white']} progressBackgroundColor="#2f6f4e" />} : {}) }
             />
         </Layout>
-        <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
+        <Recaptcha ref={captchaRef} />
         </>
     )
 }

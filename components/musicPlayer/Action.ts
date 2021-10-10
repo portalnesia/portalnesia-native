@@ -45,7 +45,7 @@ export default function useTrackPlayer(){
                     id: d?.id,
                     id_number:d?.id_number,
                     title:d?.title,
-                    artist:d?.title,
+                    artist:d?.artist,
                     url:d?.url,
                     artwork:d?.thumbs
                 }
@@ -60,9 +60,6 @@ export default function useTrackPlayer(){
             if(typeof val !== 'boolean') return addQueue(val)
             else return Promise.resolve();
         })
-        .then(()=>{
-            dispatch({type:"MUSIC_PLAYER"})
-        })
         .catch(()=>{})
     },[])
 
@@ -73,7 +70,7 @@ export default function useTrackPlayer(){
 
     const removeQueue=React.useCallback(async(tracks:number)=>{
         await TrackPlayer.remove(tracks);
-        dispatch({type:"MUSIC_PLAYER"})
+        //dispatch({type:"MUSIC_PLAYER"})
     },[])
 
     const confirmDestroy=React.useCallback(()=>{
@@ -101,7 +98,7 @@ export default function useTrackPlayer(){
     const editQueue=React.useCallback(async(movedTrack: Track,from: number,to:number)=>{
         await TrackPlayer.remove(from);
         await TrackPlayer.add(movedTrack,to);
-        dispatch({type:"MUSIC_PLAYER"})
+        //dispatch({type:"MUSIC_PLAYER"})
     },[])
 
     return {setupPlayer,addQueue,destroyPlayer,editQueue,removeQueue}

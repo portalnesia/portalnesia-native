@@ -157,7 +157,7 @@ export const getLink=(link,a=true)=>{
     const uri = url.split("?")[0];
     const split = uri.split("/");
     let finalPath=''
-    if(split?.[0] === 'user' && split?.[2] === 'edit' || ['login','register','forgot','authentication'].indexOf(split?.[0]) !== -1) {
+    if(['login','register','forgot','authentication'].indexOf(split?.[0]) !== -1) {
         finalPath = a ? `${URL}/MainStack/${uri}` : `/MainStack/${uri}`
     } else {
         let firstPath='';

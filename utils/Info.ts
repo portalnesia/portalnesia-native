@@ -16,6 +16,7 @@ export default function getInfo() {
         brand:Device.brand,
         networkProvider:Cellular.carrier,
         mccCode:Cellular.mobileCountryCode,
-        mncCode:Cellular.mobileNetworkCode
+        mncCode:Cellular.mobileNetworkCode,
+        osVersion: Device.osVersion
     }
 }

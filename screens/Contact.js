@@ -12,13 +12,11 @@ import Button from '@pn/components/global/Button'
 //import Pagination from '@pn/components/global/Pagination'
 import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
-import {CONTENT_URL,URL} from '@env'
-import { openBrowser, ucwords } from '@pn/utils/Main';
-import PNSafety from '@pn/module/Safety'
+import {URL} from '@env'
+import { openBrowser } from '@pn/utils/Main';
+import Portalnesia from '@portalnesia/react-native-core'
 import i18n from 'i18n-js';
 import useSelector from '@pn/provider/actions'
-
-const user=null;
 
 const dataContact=[
     {
@@ -79,7 +77,7 @@ export default function Contact({navigation,route}){
         if(checkError.length > 0) return setNotif(true,"Error",checkError.join("\n"));
         
         setLoading(true);
-        PNSafety.verifyWithRecaptcha()
+        Portalnesia.Safetynet.verifyWithRecaptcha()
         .then(grecaptcha=>{
             return PNpost('/messages/add',{...input,grecaptcha})
         })

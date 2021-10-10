@@ -10,7 +10,7 @@ import Skeleton from '@pn/components/global/Skeleton'
 import useSelector from '@pn/provider/actions'
 import useSWR from '@pn/utils/swr';
 import NotFound from '@pn/components/global/NotFound'
-import {ucwords,specialHTML} from '@pn/utils/Main'
+import {ucwords,specialHTML} from '@portalnesia/utils'
 import Button from '@pn/components/global/Button';
 import NotFoundScreen from '../NotFound'
 import i18n from 'i18n-js';

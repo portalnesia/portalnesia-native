@@ -36,11 +36,13 @@ public class HeadlessSyncService extends HeadlessJsTaskService {
             createNotification();
             Intent notifIntent = new Intent(this, MainActivity.class);
             PendingIntent contentIntent = PendingIntent.getActivity(this,0,notifIntent,PendingIntent.FLAG_CANCEL_CURRENT);
+            int color = getResources().getColor(R.color.portalnesia_notification_color);
             Notification notification = new NotificationCompat.Builder(this,NOTIFICATION_ID)
                 .setContentTitle("Sync Service")
                 .setContentText("Running...")
-                .setSmallIcon(R.mipmap.ic_notif_icon)
+                .setSmallIcon(R.mipmap.ic_portalnesia_notification_icon)
                 .setContentIntent(contentIntent)
+                .setColor(color)
                 .setOngoing(true)
                 .build();
             startForeground(SERVICE_ID,notification);

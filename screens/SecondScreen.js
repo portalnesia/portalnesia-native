@@ -5,7 +5,7 @@ import {useTheme} from '@ui-kitten/components'
 import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
 import Loading from './utils/Loading'
 import useSelector from '@pn/provider/actions'
-import PNFile from '@pn/module/PNFile'
+import Portalnesia from '@portalnesia/react-native-core'
 
 export default function ({ navigation,route }) {
 	const index = useNavigationState(state=>state.index);
@@ -40,7 +40,7 @@ export default function ({ navigation,route }) {
 			try {
 				const file = decodeURIComponent(route?.params?.file);
 				goBack();
-				PNFile.openFolder(file);
+				Portalnesia.Files.openFolder(file);
 			} catch(e) {
 				console.log(e)
 				goBack();

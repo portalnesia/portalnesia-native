@@ -25,7 +25,8 @@ import {CONTENT_URL} from '@env'
 import WebView from 'react-native-autoheight-webview'
 import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
-import {specialHTML,listToMatrix,openBrowser,Ktruncate} from '@pn/utils/Main'
+import {specialHTML,listToMatrix,truncate as Ktruncate} from '@portalnesia/utils'
+import {openBrowser} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'
 import usePost from '@pn/utils/API'
 import Spinner from '@pn/components/global/Spinner'
@@ -148,7 +149,6 @@ export default function TwitterThread({navigation,route}){
     const [menu,setMenu]=React.useState(null)
     const {copyText} = useClipboard()
     const {PNget,PNpost} = usePost();
-    const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [liked,setLiked] = React.useState(false);
     const [refreshing,setRefreshing] = React.useState(false);
@@ -282,7 +282,11 @@ export default function TwitterThread({navigation,route}){
 
     const handleReload=React.useCallback(()=>{
         setLoading(true);
-        PNpost(`/twitter/reload`,{id:slug,recaptcha}).then(res=>{
+        captchaRef.current.getToken()
+        .then((recaptcha)=>{
+            return PNpost(`/twitter/reload`,{id:slug,recaptcha})
+        })
+        .then(res=>{
             if(!res.error) {
                 const aa = data.tweets
                 const b = aa.concat(res.data)
@@ -293,14 +297,17 @@ export default function TwitterThread({navigation,route}){
             }
         }).finally(()=>{
             setLoading(false)
-            captchaRef.current?.refreshToken();
         })
-    },[PNpost,recaptcha,slug])
+    },[PNpost,slug])
 
     const handleDelete=React.useCallback(()=>{
         if(user?.admin===true) {
             setLoading(true)
-            PNpost(`/twitter/delete`,{id:slug,recaptcha}).then(res=>{
+            captchaRef.current.getToken()
+            .then((recaptcha)=>{
+                return PNpost(`/twitter/delete`,{id:slug,recaptcha})
+            })
+           .then(res=>{
                 console.log(res);
                 if(!res.error) {
                     setNotif(false,"Success",res?.msg);
@@ -311,12 +318,16 @@ export default function TwitterThread({navigation,route}){
                 captchaRef.current?.refreshToken();
             })
         }
-    },[user,PNpost,recaptcha,slug,navigation])
+    },[user,PNpost,slug,navigation])
 
     const handleDeleteTweet=React.useCallback((index)=>{
         if(user?.admin===true) {
             setLoading(true)
-            PNpost(`/twitter/delete_tweet`,{id:slug,index,recaptcha}).then(res=>{
+            captchaRef.current.getToken()
+            .then((recaptcha)=>{
+                return PNpost(`/twitter/delete_tweet`,{id:slug,index,recaptcha})
+            })
+            .then(res=>{
                 if(!res.error) {
                     setNotif(false,"Success",res?.msg);
                     const aa = data?.tweets
@@ -331,7 +342,7 @@ export default function TwitterThread({navigation,route}){
                 captchaRef.current?.refreshToken();
             })
         }
-    },[user,PNpost,recaptcha,slug])
+    },[user,PNpost,slug])
 
     return (
         <>
@@ -358,7 +369,7 @@ export default function TwitterThread({navigation,route}){
                 {...other}
             />
         </Layout>
-        <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
+        <Recaptcha ref={captchaRef} />
         {data && !data?.error && (
                 <>
                     <MenuContainer

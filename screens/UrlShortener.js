@@ -16,10 +16,9 @@ import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
 import {CONTENT_URL} from '@env'
 import downloadFile from '@pn/utils/Download'
-import PNSafety from '@pn/module/Safety'
-import { Ktruncate, openBrowser } from '@pn/utils/Main';
+import { openBrowser } from '@pn/utils/Main';
+import { truncate as Ktruncate } from '@portalnesia/utils';
 import i18n from 'i18n-js'
-import Brightness from '@pn/module/Brightness';
 import usePagination from '@pn/utils/usePagination';
 import Skeleton from '@pn/components/global/Skeleton';
 import ListItem from '@pn/components/global/ListItem';
@@ -29,6 +28,7 @@ import {Portal} from '@gorhom/portal'
 import ShareModule from '@pn/module/Share';
 import useSelector from '@pn/provider/actions'
 import Authentication from '@pn/module/Authentication'
+import Portalnesia from '@portalnesia/react-native-core'
 
 const {width,height} = Dimensions.get('window')
 
@@ -82,9 +82,9 @@ const URLshortenerForm=React.memo(({initialData="",setNotif,user,ads,handleOpenQ
         if(input.url.match(/\S+/) === null) return setNotif(true,"Error","URL cannot be empty");
         setResult(null);
         setLoading(true);
-        PNSafety.verifyWithRecaptcha()
+        Portalnesia.Safetynet.verifyWithRecaptcha()
         .then(recaptcha=>{
-            return PNpost('/url/short',{...input,recaptcha})
+            return PNpost('/url/short',{...input,recaptcha},undefined,true,false)
         })
         .then(res=>{
             if(!res.error) {
@@ -92,6 +92,9 @@ const URLshortenerForm=React.memo(({initialData="",setNotif,user,ads,handleOpenQ
                 setResult(res);
                 onSubmit();
             }
+        })
+        .catch((e)=>{
+            setNotif(true,"Error",e?.message);
         })
         .finally(()=>{
             setLoading(false)
@@ -193,7 +196,9 @@ const RenderURL=React.memo(({index,item,onMenu})=>{
     )
 })
 
-function URLshortener({navigation}){
+function URLshortener({navigation,route}){
+    const initialType = route.params?.initialType;
+    const initialData = route.params?.initialData;
     const user = useSelector(state=>state.user);
     const context = React.useContext(AuthContext)
     const {setNotif} = context
@@ -202,7 +207,6 @@ function URLshortener({navigation}){
     const [menuOpen,setMenuOpen]=React.useState(false)
     const [qrOpen,setQrOpen]=React.useState(false);
     const theme = useTheme()
-    const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [loading,setLoading] = React.useState(false)
     const [input,setInput]=React.useState("");
@@ -213,13 +217,12 @@ function URLshortener({navigation}){
     const [refreshing,setRefreshing]=React.useState(false)
 
     const handleOpenQR=React.useCallback(async()=>{
-        await Brightness.setBrightness(0.8);
+        await Portalnesia.Brightness.setBrightness(0.8);
     },[])
 
     const handleCloseQR=React.useCallback(async()=>{
-        const system = await Brightness.getSystemBrightness();
-        const brightness = system*1/16;
-        await Brightness.setBrightness(brightness)
+        const system = await Portalnesia.Brightness.getSystemBrightness();
+        await Portalnesia.Brightness.setBrightness(system)
     },[])
 
 	React.useEffect(()=>{
@@ -298,7 +301,10 @@ function URLshortener({navigation}){
 
     const handleDelete=()=>{
         setLoading(true);
-        PNpost("/url/remove",{token:menu?.token,recaptcha})
+        captchaRef.current.getToken()
+        .then(recaptcha=>{
+            return PNpost("/url/remove",{token:menu?.token,recaptcha})
+        })
         .then(res=>{
             if(!Boolean(res.error)) {
                 mutate();
@@ -307,7 +313,6 @@ function URLshortener({navigation}){
         })
         .finally(()=>{
             setLoading(false)
-            captchaRef.current?.refreshToken();
         })
     }
 
@@ -321,6 +326,7 @@ function URLshortener({navigation}){
         }
         ShareModule.getSharedData().then(dataListener).catch(console.log)
         ShareModule.addListener(dataListener)
+        return ()=>ShareModule.removeListener(dataListener);
     },[])
     
     return (
@@ -425,7 +431,7 @@ function URLshortener({navigation}){
             >
 				<RenderModal onClose={closeModal} menu={menu} handleDownload={handleDownload} />
 			</Modal>
-            <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
+            <Recaptcha ref={captchaRef} />
             <Backdrop loading visible={loading} />
         </>
     )

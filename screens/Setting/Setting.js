@@ -11,14 +11,15 @@ import {Constants} from 'react-native-unimodules'
 //import Button from '@pn/components/global/Button'
 import Layout from '@pn/components/global/Layout'
 import {AuthContext} from '@pn/provider/Context'
-import { ucwords,number_size } from '@pn/utils/Main';
+import { ucwords,number_size } from '@portalnesia/utils';
 import useLogin from '@pn/utils/Login'
 import ListItem from '@pn/components/global/ListItem'
 import { linkTo } from '@pn/navigation/useRootNavigation'
 import Authentication from '@pn/module/Authentication';
 import useSelector from '@pn/provider/actions'
-import PNFile from '@pn/module/PNFile'
+import Portalnesia from '@portalnesia/react-native-core'
 import { getSaf } from '@pn/utils/Download'
+import FastImage from '@pn/module/FastImage'
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 
@@ -114,7 +115,7 @@ export default function Setting({navigation}){
             if(saf===null) {
                 setStorage(`${i18n.t("errors.not_set")}`);
             } else {
-                const path = await PNFile.getRealPathFromSaf(saf);
+                const path = await Portalnesia.Files.getRealPathFromSaf(saf);
                 setStorage(`${path}`)
             }
             let totalSize=0;
@@ -123,8 +124,13 @@ export default function Setting({navigation}){
         })()
     },[])
 
-    const handleCacheDelete=React.useCallback(async()=>{
-        RNFS.readdir(RNFS.CachesDirectoryPath)
+    const handleCacheDelete=React.useCallback(()=>{
+        setLoading(true);
+        return Promise.all(
+            FastImage.clearDiskCache,
+            FastImage.clearMemoryCache
+        )
+        .then(()=>RNFS.readdir(RNFS.CachesDirectoryPath))
         .then(async(caches)=>{
             for(const cache of caches) {
                 await RNFS.unlink(`${RNFS.CachesDirectoryPath}/${cache}`);
@@ -133,6 +139,7 @@ export default function Setting({navigation}){
             setCacheSize("0 KB")
         })
         .catch(()=>setNotif(true,"Error",i18n.t('errors.general')))
+        .finally(()=>setLoading(false));
     },[])
 
     const handleLogout=React.useCallback(()=>{

@@ -12,12 +12,14 @@ import { createStackNavigator,TransitionPresets } from '@react-navigation/stack'
 import TopNavigationAction from '@pn/components/navigation/TopAction'
 import TopNav from '@pn/components/navigation/TopNav'
 import BaseActivity from '../BaseActivity'
-import Pressable from '@pn/components/global/Pressable';
+import Backdrop from '@pn/components/global/Backdrop';
 import {ImageFull as Image} from '@pn/components/global/Image';
-import { isTwitterURL, isURL } from '@pn/utils/Main';
+import { isTwitterURL, isURL, extractMeta } from '@portalnesia/utils';
 import TopAction from '@pn/components/navigation/TopAction'
 import {Portal} from'@gorhom/portal'
 import { Modalize } from 'react-native-modalize';
+import useAPI from '@pn/utils/API'
+import Recaptcha from '@pn/components/global/Recaptcha'
 
 const CloseIcon=(props)=>(
 	<Icon {...props} name='close' />
@@ -113,6 +115,11 @@ const ShareText=React.memo(({data,user,token,menu,onCloseMenu})=>{
 })
 
 const ShareImage=React.memo(({data,user,token,menu,onCloseMenu})=>{
+    const {PNpost,cancelPost} = useAPI();
+    const [loading,setLoading] = React.useState(false);
+    const [progress,setProgress] = React.useState(0);
+    const captchaRef = React.useRef(null);
+
     const action = React.useMemo(()=>{
         const dt = [{
             text:"Images Checker",
@@ -124,9 +131,45 @@ const ShareImage=React.memo(({data,user,token,menu,onCloseMenu})=>{
         return dt;
     },[token])
 
-    const handleChangeProfile=React.useCallback((data)=>{
-        ToastAndroid.show("Under Maintenance",ToastAndroid.LONG);
-    },[])
+    const handleChangeProfile=React.useCallback(async(image)=>{
+        setProgress(0);
+        setLoading(true);
+        try {
+            const opt={
+                headers:{
+                    'Content-Type':'multipart/form-data'
+                },
+                onUploadProgress:function(progEvent){
+                    const complete=Math.round((progEvent.loaded * 100) / progEvent.total);
+                    setProgress(complete);
+                }
+            }
+            const form = new FormData();
+            const {name,match} = extractMeta(image);
+
+            form.append('image',{uri:image,name,type:`image/${match[1]}`});
+            form.append('image_name',name);
+            const recaptcha = await captchaRef.current.getToken();
+            form.append('recaptcha',recaptcha);
+            console.log(user,user?.username)
+            const res = await PNpost(`/user/${user?.username}/edit`,form,opt,true,false)
+            if(!Boolean(res?.error)) {
+                ShareModule.dismiss();
+            }
+        } catch(e) {
+            console.log(e);
+            ToastAndroid.show(e?.message||i18n.t("errors.general"),ToastAndroid.LONG);
+        } finally {
+            setProgress(0)
+            setLoading(false);
+        }
+    },[PNpost,user])
+
+    const cancelRequest=React.useCallback(()=>{
+        cancelPost();
+        setProgress(0)
+        setLoading(false);
+    },[cancelPost])
 
     const onPress=React.useCallback(async(item)=>{
         if(!item?.key) return ShareModule.continueInApp(data?.mimeType,data?.data,{url: item.url,...item?.extraData});
@@ -153,6 +196,13 @@ const ShareImage=React.memo(({data,user,token,menu,onCloseMenu})=>{
                 </Lay>
             </Lay>
             <ModalMenu action={action} onCloseMenu={onCloseMenu} onPress={onPress} menu={menu} />
+            <Backdrop
+                visible={loading}
+                progress={progress}
+                text={progress<100 ? "Uploading..." : "Processing..."}
+                onCancel={cancelRequest}
+            />
+            <Recaptcha ref={captchaRef} />
         </>
     )
 })
@@ -169,11 +219,17 @@ function Share(){
     },[])
 
     React.useEffect(()=>{
-        Promise.all([Secure.getItemAsync("user"),Secure.getItemAsync("user")])
+        Promise.all([Secure.getItemAsync("user"),Secure.getItemAsync("token")])
         .then(([user,token])=>{
             //console.log("USER",user,token);
-            if(user) setUser(user);
-            if(token) setToken(token);
+            if(user !== null) {
+                setUser(JSON.parse(user));
+            } else {
+                setUser(false);
+            }
+            if(token !== null) {
+                setToken(JSON.parse(token));
+            }
             return Promise.resolve();
         })
         .then(()=>ShareModule.getSharedData(false))
@@ -201,7 +257,7 @@ function Share(){
     return (
         <BaseActivity>
             <Layout custom={Header} whiteBg>
-                {data===null ? (
+                {(data===null || user===null) ? (
                     <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                         <Spinner size="large" />
                     </Lay>

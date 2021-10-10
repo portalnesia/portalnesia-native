@@ -3,9 +3,8 @@ import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 import {EncodingType, getFreeDiskStorageAsync,StorageAccessFramework,cacheDirectory,getContentUriAsync} from 'expo-file-system'
 import BackgroundDownloader,{DownloadOption, DownloadTask} from 'react-native-background-downloader'
-import Notification,{NotificationOptions} from '@pn/module/Notification'
-import {number_size,Ktruncate} from '@pn/utils/Main'
-import PNFile from '@pn/module/PNFile'
+import {number_size,truncate as Ktruncate} from '@portalnesia/utils'
+import Portalnesia,{NotificationOptions} from '@portalnesia/react-native-core'
 
 export type ArgumentType = {
     url: string,
@@ -29,19 +28,19 @@ async function doneTask(option: TaskOptions,size?:number){
         const data = await StorageAccessFramework.readAsStringAsync(`file://${option.destination}`,{encoding:EncodingType.Base64});
         await StorageAccessFramework.writeAsStringAsync(new_file,data,{encoding:EncodingType.Base64});
         await StorageAccessFramework.deleteAsync(`file://${option.destination}`,{idempotent:true});
-        const path = await PNFile.getRealPathFromSaf(option.saf);
+        const path = await Portalnesia.Files.getRealPathFromSaf(option.saf);
         const completeUri = `pn://second-screen?type=open_file&file=${encodeURIComponent(path)}`;
         const notification: NotificationOptions = {
             title:option.title,
             uri:completeUri,
             body:`Download completed`,
             progress:{max:0,progress:0,intermediate:false},
-            priority:Notification.PRIORITY_HIGH,
+            priority:Portalnesia.Notification.PRIORITY_HIGH,
             autoCancel:true,
             onGoing:false,
             silent:false
         };
-        Notification.notify(option.notification_id,"Download",notification);
+        Portalnesia.Notification.notify(option.notification_id,"Download",notification);
     } catch(err) {
         const notification: NotificationOptions = {
             title:option.title,
@@ -52,7 +51,7 @@ async function doneTask(option: TaskOptions,size?:number){
             onGoing:false,
             silent:false
         }
-        Notification.notify(option.notification_id,"Download",notification);
+        Portalnesia.Notification.notify(option.notification_id,"Download",notification);
     }
     return Promise.resolve();
 }
@@ -93,7 +92,7 @@ class PNDownload{
                     onGoing:false,
                     silent:false
                 }
-                Notification.notify(this.option.notification_id,"Download",notification);
+                Portalnesia.Notification.notify(this.option.notification_id,"Download",notification);
             } else {
                 const notification: NotificationOptions = {
                     ...this.notification,
@@ -103,7 +102,7 @@ class PNDownload{
                     onGoing:true,
                     silent:true
                 }
-                Notification.notify(this.option.notification_id,"Download",notification);
+                Portalnesia.Notification.notify(this.option.notification_id,"Download",notification);
             }
         }).progress((percent,bytes,total)=>{
             const split = this.option.title.split(".");
@@ -120,7 +119,7 @@ class PNDownload{
                 onGoing:true,
                 silent:true
             };
-            Notification.notify(this.option.notification_id,"Download",notification);
+            Portalnesia.Notification.notify(this.option.notification_id,"Download",notification);
         }).done(()=>{
             doneTask(this.option,this.size);
         }).error((err)=>{
@@ -132,7 +131,7 @@ class PNDownload{
                 onGoing:false,
                 silent:false
             }
-            Notification.notify(this.option.notification_id,"Download",notification);
+            Portalnesia.Notification.notify(this.option.notification_id,"Download",notification);
         })
     }
 }
@@ -164,7 +163,7 @@ export async function saveBase64(data: string,filename: string,mime="image/png")
 export async function getSaf(force: boolean=false,nullable:boolean=false): Promise<string|null> {
     try{
         if(force) return await requestPermission();
-        const safs = await PNFile.getUriPermission();
+        const safs = await Portalnesia.Files.getUriPermission();
         if(safs.length > 0) {
             const saf = decodeURIComponent(safs[0]);
             return saf;

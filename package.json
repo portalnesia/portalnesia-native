@@ -6,9 +6,10 @@
     "bundle": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "export": "expo export -p https://datas.portalnesia.com/updates -t bare",
     "licenses": "npm-license-crawler -onlyDirectDependencies -json licenses.json",
-    "build-manifest":"cd android && gradlew createReleaseExpoManifest",
+    "build-manifest": "cd android && gradlew createReleaseExpoManifest",
     "build-release": "cd android && gradlew assembleRelease -x bundleReleaseJsAndAssets -x createReleaseExpoManifest",
-    "build-debug": "cd android && gradlew assembleDebug"
+    "build-debug": "cd android && gradlew assembleDebug",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@eva-design/eva": "^2.1.0",
@@ -16,6 +17,8 @@
     "@expo/vector-icons": "^12.0.0",
     "@gorhom/portal": "^1.0.4",
     "@native-html/table-plugin": "^3.1.1",
+    "@portalnesia/react-native-core": "^1.0.5",
+    "@portalnesia/utils": "^1.0.3",
     "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-native-community/datetimepicker": "3.5.2",
     "@react-native-community/masked-view": "0.1.10",
@@ -146,6 +149,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "8.3.0",
     "jest": "^27.0.6",
+    "patch-package": "^6.4.7",
     "react-native-dotenv": "^3.0.0",
     "react-test-renderer": "~16.13.1",
     "typescript": "~4.0.0"

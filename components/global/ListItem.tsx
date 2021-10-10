@@ -69,4 +69,5 @@ function ListItem(props: ListItemProps){
         </Pressable>
     )
 }
-export default React.memo(ListItem);
+const ListItemMemo = React.memo(ListItem);
+export default ListItemMemo

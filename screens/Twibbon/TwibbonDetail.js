@@ -19,7 +19,7 @@ import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {AuthContext} from '@pn/provider/Context'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import i18n from 'i18n-js'
-import { ucwords } from '@pn/utils/Main';
+import { ucwords } from '@portalnesia/utils';
 import { pickImage } from '@pn/utils/PickLibrary';
 import {Portal} from '@gorhom/portal'
 import {moveFile} from '@pn/utils/Download'

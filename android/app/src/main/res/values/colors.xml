@@ -6,4 +6,5 @@
   <color name="backgroundColor">#ffffff</color>
   <color name="text_color">#000000</color>
   <color name="textColorPrimary">#2f6f4e</color>
+  <color name="portalnesia_notification_color">#2f6f4e</color>
 </resources>

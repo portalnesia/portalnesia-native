@@ -29,9 +29,7 @@ export default function AuthenticationScreen({ navigation,route }) {
 	const [wait,setWait] = React.useState(mWait)
 	const [code, setCode] = React.useState("");
 	const [loading, setLoading] = React.useState(null);
-	const [recaptcha,setRecaptcha] = React.useState("");
 	const captchaRef = React.useRef(null)
-	const [recaptchaL,setRecaptchaL] = React.useState("");
 	const captchaRefL = React.useRef(null)
 	const [menu,setMenu] = React.useState(false);
 	const [confirm,setConfirm]=React.useState();
@@ -40,7 +38,10 @@ export default function AuthenticationScreen({ navigation,route }) {
 	const handleSendTelegram=React.useCallback(()=>{
 		if(!telegram) return;
 		setLoading('telegram');
-		PNpost('/backend/authenticator/telegram',{recaptcha,id:userid})
+		captchaRef.current?.getToken()
+		.then(recaptcha=>{
+			return PNpost('/backend/authenticator/telegram',{recaptcha,id:userid})
+		})
 		.then(res=>{
 			if(!Boolean(res?.error)) {
 				if(interval !== null) clearInterval(interval);
@@ -60,9 +61,8 @@ export default function AuthenticationScreen({ navigation,route }) {
 		})
 		.finally(()=>{
 			setLoading(null);
-            captchaRef.current?.refreshToken();
 		})
-	},[recaptcha,userid,telegram,PNpost])
+	},[userid,telegram,PNpost])
 
 	const handleSendSMS=React.useCallback(async()=>{
 		if(sms==false) return;
@@ -90,7 +90,7 @@ export default function AuthenticationScreen({ navigation,route }) {
 		} finally {
 			setLoading(null);
 		}
-	},[sms,recaptcha,PNpost,userid])
+	},[sms,PNpost,userid])
 
 	const menuItems=React.useMemo(()=>{
 		let menu=[];
@@ -140,7 +140,8 @@ export default function AuthenticationScreen({ navigation,route }) {
 					throw e;
 				}
 			} else {
-				const body = {recaptcha:recaptchaL,code:cd ? cd:code,token,...(cd ? {method:'sms'} : {})}
+				const recaptcha = await captchaRefL.current.getToken();
+				const body = {recaptcha,code:(cd ? cd:code),token,...(cd ? {method:'sms'} : {})}
 				try {
 					res = await PNpost('/auth/authentication',body)
 				} catch(e){}
@@ -164,10 +165,9 @@ export default function AuthenticationScreen({ navigation,route }) {
 			if(e?.message) setNotif(true,"Error",e?.message);
 		} finally {
             setLoading(null);
-            captchaRefL.current?.refreshToken();
 		}
 		
-	},[PNpost,recaptchaL,confirm])
+	},[PNpost,confirm])
 
 	return (
 		<>
@@ -252,8 +252,8 @@ export default function AuthenticationScreen({ navigation,route }) {
 					</View>
 				</ScrollView>
 			</Layout>
-			<Recaptcha ref={captchaRefL} onReceiveToken={setRecaptchaL} action="login" />
-			<Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
+			<Recaptcha ref={captchaRefL} action="login" />
+			<Recaptcha ref={captchaRef} />
 			<MenuContainer
 				visible={menu}
 				onClosed={()=>setMenu(false)}

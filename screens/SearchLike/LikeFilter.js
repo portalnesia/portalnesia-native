@@ -7,7 +7,7 @@ import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
 import usePagination from '@pn/utils/usePagination';
 import useSelector from '@pn/provider/actions'
-import {ucwords} from '@pn/utils/Main'
+import {ucwords} from '@portalnesia/utils'
 import NotFoundScreen from '../NotFound'
 import i18n from 'i18n-js';
 import {RenderNoImage,RenderWithImage} from './Like'

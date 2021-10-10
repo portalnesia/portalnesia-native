@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -50,5 +51,34 @@ public class PNImageViewModule extends ReactContextBaseJavaModule {
                     .preload();
             }
         });
+    }
+
+    @ReactMethod
+    public void clearMemoryCache(Promise promise) {
+        final Activity activity = getCurrentActivity();
+        if(activity == null) {
+            promise.resolve(null);
+            return;
+        }
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Glide.get(activity.getApplicationContext()).clearMemory();
+                promise.resolve(null);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void clearDiskCache(Promise promise) {
+        final Activity activity = getCurrentActivity();
+        if(activity == null) {
+            promise.resolve(null);
+            return;
+        }
+
+        Glide.get(activity.getApplicationContext()).clearDiskCache();
+        promise.resolve(null);
     }
 }

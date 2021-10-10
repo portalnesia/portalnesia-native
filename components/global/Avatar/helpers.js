@@ -1,5 +1,5 @@
 import initials from 'initials';
-import {randomInt} from '@pn/utils/Main'
+import {randomInt} from '@portalnesia/utils'
 
 export const abbr = (name) => {
   let abbr = initials(name);

@@ -6,7 +6,7 @@ import {linkTo} from '@pn/navigation/useRootNavigation'
 import Layout from '@pn/components/global/Layout';
 import Skeleton from '@pn/components/global/Skeleton'
 import usePagination from '@pn/utils/usePagination';
-import {ucwords} from '@pn/utils/Main'
+import {ucwords} from '@portalnesia/utils'
 import i18n from 'i18n-js';
 import {RenderNoImage,RenderWithImage} from './Search'
 

@@ -16,9 +16,9 @@ import Button from '@pn/components/global/Button'
 import Pagination from '@pn/components/global/Pagination'
 import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
-import {randomInt} from '@pn/utils/Main'
+import {randomInt} from '@portalnesia/utils'
 import ListItem from '@pn/components/global/ListItem'
-import PNSafety from '@pn/module/Safety'
+import Portalnesia from '@portalnesia/react-native-core'
 import Spinner from '@pn/components/global/Spinner'
 
 const HeaderModal=React.memo(({search,setSearch,setPage})=>{
@@ -83,7 +83,7 @@ export default function({navigation}){
     const onSubmit=()=>{
         if(input?.match(/\S+/g) === null) return  setNotif("error",i18n.t('errors.form_validation',{type:"Input"}))
         setLoading(true)
-        PNSafety.verifyWithRecaptcha()
+        Portalnesia.Safetynet.verifyWithRecaptcha()
         .then(recaptcha=>{
             return PNpost(`/geodata/transform`,{
                 ...switchVal,

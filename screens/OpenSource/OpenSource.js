@@ -25,6 +25,8 @@ const getURL=(urls,title)=>{
         url = `${url}/raw/master/LICENSE`
     } else if(title.match(/^(expo)/)) {
         url = `${urls?.repository}/raw/master/LICENSE`;
+    } else if(title.match(/^(\@portalnesia\/)/)) {
+        url = `${urls?.repository}/raw/main/LICENSE`;
     } else if(title.match(/^(react\-native\-dotenv|react\-native\-print)/)) {
         url = url?.replace(/github\:/,"https://github.com/")
         url = `${url}/raw/master/LICENSE`

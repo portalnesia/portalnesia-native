@@ -5,18 +5,13 @@ import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
 
 import CountUp from '@pn/components/global/Countup'
-import Button from '@pn/components/global/Button';
 import Layout from '@pn/components/global/Layout';
-import Image from '@pn/components/global/Image';
 import NotFound from '@pn/components/global/NotFound'
 import NotFoundScreen from './NotFound'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
-import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
-import {ucwords,openBrowser} from '@pn/utils/Main'
 import Skeleton,{ListSkeleton} from '@pn/components/global/Skeleton'
-import LikeButton from '@pn/components/global/Like'
-import {linkTo,pushTo} from '@pn/navigation/useRootNavigation'
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import Player from '@pn/components/global/VideoPlayer'
 import Avatar from '@pn/components/global/Avatar'
 import ListItem from '@pn/components/global/ListItem'
@@ -69,7 +64,7 @@ export default function MediaScreen({navigation,route}){
                         id:data?.file?.id,
                         id_number:data?.file?.id_number,
                         title:data?.file?.title,
-                        artist:data?.file?.title,
+                        artist:data?.file?.artist,
                         url:data?.file?.url,
                         artwork:`${CONTENT_URL}/img?export=twibbon&source=images&image=lagu.png`
                     })

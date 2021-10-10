@@ -39,6 +39,7 @@ public class PNShareModule extends ReactContextBaseJavaModule {
 
     private final ReactContext reactContext;
     private Promise mPromise;
+    private Bundle initialData = null;
 
     public PNShareModule(ReactApplicationContext context){
         super(context);
@@ -48,6 +49,7 @@ public class PNShareModule extends ReactContextBaseJavaModule {
             @Override
             public void onNewIntent(Intent intent){
                 Bundle data = extractShared(intent);
+                initialData = data;
                 dispatchEvent(data);
             }
             @Override
@@ -192,6 +194,14 @@ public class PNShareModule extends ReactContextBaseJavaModule {
             promise.reject("ERROR","Activity doesn't exist");
             return;
         }
+        if(initialData != null) {
+            Bundle data = initialData;
+            if(clearData) {
+                clearSharedData();
+            }
+            handleResult(promise,data);
+            return;
+        }
         if(!activity.isTaskRoot()){
             Intent newIntent = new Intent(activity.getIntent());
             newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -254,6 +264,7 @@ public class PNShareModule extends ReactContextBaseJavaModule {
     }
 
     private void clearSharedData() {
+        initialData = null;
         Activity activity = getCurrentActivity();
         if(activity == null) {
             return;

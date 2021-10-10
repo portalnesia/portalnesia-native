@@ -8,7 +8,7 @@ import Image from '@pn/module/FastImage'
 import usePagination from '@pn/utils/usePagination'
 import Button from '@pn/components/global/Button'
 import {RenderMediaPrivate,RenderSuspend} from './PrivateUser'
-import { ucwords } from '@pn/utils/Main'
+import { ucwords } from '@portalnesia/utils'
 import {GridSkeleton} from '@pn/components/global/Skeleton'
 import {TabBarHeight,HeaderHeight,ContentMinHeight} from './utils'
 import { AuthContext } from '@pn/provider/Context';

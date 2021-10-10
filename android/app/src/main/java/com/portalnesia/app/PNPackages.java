@@ -31,16 +31,11 @@ public class PNPackages implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext){
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new PNModules(reactContext));
-        modules.add(new PNBrightness(reactContext));
         modules.add(new PNPipModule(reactContext));
         modules.add(new AuthModule(reactContext));
         modules.add(new SyncModule(reactContext));
         modules.add(new PNShareModule(reactContext));
         modules.add(new PNImageViewModule(reactContext));
-        modules.add(new PNSafety(reactContext));
-        modules.add(new PNNotification(reactContext));
-        modules.add(new PNFile(reactContext));
         return modules;
     }
 }

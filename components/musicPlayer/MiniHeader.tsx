@@ -3,7 +3,6 @@ import {View,Dimensions,Animated} from 'react-native'
 import {Text,useTheme} from '@ui-kitten/components'
 import TrackPlayer,{usePlaybackState,State} from 'react-native-track-player'
 
-import FastImage from '@pn/module/FastImage'
 import Pressable from '@pn/components/global/Pressable'
 import {MiniHeaderTypes} from './types'
 import s from './styles'

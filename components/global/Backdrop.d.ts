@@ -5,6 +5,7 @@ export interface BackdropProps {
     onClose?: ()=>void;
     loading?: boolean;
     text?: string;
+    onCancel?(): void;
 }
 
 

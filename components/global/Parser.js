@@ -14,7 +14,8 @@ import {openURL} from 'expo-linking'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import global_style from '@pn/components/global/style'
 import AutoHeightWebView from 'react-native-autoheight-webview'
-import {jsStyles, openBrowser, stripHTML} from '@pn/utils/Main'
+import {jsStyles, stripHTML} from '@portalnesia/utils'
+import {openBrowser} from '@pn/utils/Main'
 
 import {pushTo} from '../../navigation/useRootNavigation'
 
@@ -25,7 +26,7 @@ const Url = require('url-parse')
 const {width: screenWidth} = Dimensions.get('window')
 
 const GlobalImageRender=({src,dataSrc,thumbnail})=>{
-    return <Image source={{uri:src}} fullSize fancybox dataSrc={{uri:dataSrc}} {...(thumbnail ? {thumbnail:{uri:thumbnail}} : {})} />
+    return <Image source={{uri:src,...(thumbnail ? {thumbnail:thumbnail} : {})}} fullSize fancybox dataSrc={{uri:dataSrc,...(thumbnail ? {thumbnail:thumbnail} : {})}} />
 }
 
 export const onLinkPagePress=(id,yLayout=0,scrollRef)=>{

@@ -14,7 +14,7 @@ import Button from '@pn/components/global/Button'
 import Image from '@pn/components/global/Image'
 import style from '@pn/components/global/style'
 import Layout from '@pn/components/global/Layout';
-import {specialHTML} from '@pn/utils/Main'
+import {specialHTML} from '@portalnesia/utils'
 import Skltn from 'react-native-skeleton-placeholder'
 import CountUp from '@pn/components/global/Countup'
 import Skeleton from '@pn/components/global/Skeleton';

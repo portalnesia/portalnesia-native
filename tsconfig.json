@@ -12,6 +12,7 @@
       "target": "esnext",
       "noEmit": true,
       "baseUrl": ".",
+      "importHelpers": true,
       "strictNullChecks": false,
       "resolveJsonModule": true,
       "paths": {

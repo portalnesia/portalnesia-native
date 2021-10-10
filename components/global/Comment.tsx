@@ -19,7 +19,7 @@ import Avatar from '@pn/components/global/Avatar'
 import useAPI from '@pn/utils/API'
 import i18n from 'i18n-js'
 import { AuthContext,ParamsReportType,SendReportType } from '@pn/provider/Context'
-import {Ktruncate, ucwords} from '@pn/utils/Main'
+import {truncate as Ktruncate, ucwords} from '@portalnesia/utils'
 import { FlatList } from 'react-native-gesture-handler'
 import {ListSkeleton as Skeleton} from './Skeleton'
 import Recaptcha from '@pn/components/global/Recaptcha'
@@ -645,7 +645,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
                                 <Input
                                     ref={textRef}
                                     value={value}
-                                    label={ucwords(i18n.t('comment',{count:1}))}
+                                    label={(ucwords(i18n.t('comment',{count:1})) as string)}
                                     onChangeText={(val)=>setValue(val)}
                                     disabled={loading!==null}
                                     textStyle={{minHeight:100,maxHeight:100}}
@@ -667,7 +667,7 @@ const RenderHeader=React.memo((props: HeaderProps)=>{
 })
 
 const MemoAvatar=React.memo(({item,type}: {item: DataResult|ReplyResult,type: 'comment'|'reply'})=>(
-    <Avatar style={{marginRight:10,marginTop:5}} {...(item?.user?.gambar !== null ? {src:`${item?.user?.gambar}&size=40&watermark=no`} : {name:ucwords(item?.nama)})} size={40} />
+    <Avatar style={{marginRight:10,marginTop:5}} {...(item?.user?.gambar !== null ? {src:`${item?.user?.gambar}&size=40&watermark=no`} : {name:(ucwords(item?.nama) as string)})} size={40} />
 ))
 
 //{data:dt,children,isLoading,type,isExpanded,parentId,onExpand,onReply,anyReply,onDelete,linkTo,setNotif,theme,PNpost}
@@ -859,7 +859,7 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
                                 <Menu appearance="noDivider">
                                     {menu.map((it,i)=>{
                                        return (
-                                            <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={ucwords(it.title)} onPress={()=>this.handleMenu(it.type)} />
+                                            <MenuItem style={{paddingHorizontal:12,paddingVertical:12}} key={`${i}`} title={(ucwords(it.title) as string)} onPress={()=>this.handleMenu(it.type)} />
                                         )
                                     })}
                                 </Menu>
@@ -907,7 +907,7 @@ export default class CommentButton extends React.PureComponent<CommentButtonProp
         return (
             <Pressable onPress={this.open} style={{paddingVertical:10,paddingHorizontal:15}}>
                 <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                    <Text category="h5" style={{fontWeight:"600"}}>{ucwords(i18n.t('comment',{count:2}))}</Text>
+                    <Text category="h5" style={{fontWeight:"600"}}>{(ucwords(i18n.t('comment',{count:2})) as string)}</Text>
                     <Text>{total}</Text>
                 </View>
             </Pressable>

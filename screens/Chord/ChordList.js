@@ -8,7 +8,7 @@ import Layout from '@pn/components/global/Layout';
 //import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
-import { ucwords } from '@pn/utils/Main';
+import { ucwords } from '@portalnesia/utils';
 import i18n from 'i18n-js'
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 

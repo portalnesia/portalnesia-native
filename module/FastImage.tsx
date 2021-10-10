@@ -12,7 +12,8 @@ export type Source = {
     uri?:string,
     headers?:Record<string,string>,
     priority?: Priority,
-    cache?: Cache
+    cache?: Cache,
+    thumbnail?: string
 }
 
 export interface OnLoadEvent {
@@ -86,6 +87,14 @@ class FastImage extends React.PureComponent<FastImageProps> {
     
     static preload = function(source: Source[]){
         FastNativeModule.preload(source);
+    }
+
+    static clearMemoryCache = async function() {
+        await FastNativeModule.clearMemoryCache();
+    }
+
+    static clearDiskCache = async function() {
+        await FastNativeModule.clearDiskCache();
     }
 
     render() {

@@ -10,6 +10,7 @@ import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
 import {resetRoot} from '@pn/navigation/useRootNavigation'
 
+import {linkTo} from '@pn/navigation/useRootNavigation'
 import Pressable from "@pn/components/global/Pressable";
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
@@ -18,16 +19,17 @@ import useSWR from '@pn/utils/swr'
 import Button from '@pn/components/global/Button'
 import Avatar from '@pn/components/global/Avatar'
 import {TabBarHeight,HeaderHeight} from './utils'
-import Brightness from '@pn/module/Brightness'
+import Portalnesia from '@portalnesia/react-native-core'
 import TopNavigationAction from '@pn/components/navigation/TopAction'
 import Authentication from '@pn/module/Authentication'
+import Recaptcha from '@pn/components/global/Recaptcha'
 
 import RenderFollow from './Follow'
 import RenderAbout from './About'
 import RenderMedia from './Media'
 import { AuthContext } from '@pn/provider/Context'
 import { CONTENT_URL,URL } from '@env'
-import { ucwords } from '@pn/utils/Main'
+import { ucwords } from '@portalnesia/utils'
 import useAPI from '@pn/utils/API'
 import downloadFile from '@pn/utils/Download'
 import { Portal } from '@gorhom/portal'
@@ -100,6 +102,7 @@ export default function UserScreen({navigation,route}){
     const [openMenu,setOpenMenu]=React.useState(false)
     const [refreshing,setRefreshing]=React.useState(false)
     const [loading,setLoading]=React.useState(false);
+    const captchaRef = React.useRef(null);
 	React.useEffect(()=>{
 		if(!isValidating) setRefreshing(false);
 	},[isValidating])
@@ -287,7 +290,7 @@ export default function UserScreen({navigation,route}){
                             )}
                             <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
                                 {user && user?.id == data?.users?.id ? (
-                                    <Button style={{marginRight:10}} onPress={()=>navigation?.navigate("MainStack",{screen:"EditUserScreen"})}>{`Edit ${i18n.t('profile')}`}</Button>
+                                    <Button style={{marginRight:10}} onPress={()=>linkTo(`/user/${data?.users?.username}/edit`)}>{`Edit ${i18n.t('profile')}`}</Button>
                                 ) : (
                                     <>
                                         <Button
@@ -373,15 +376,14 @@ export default function UserScreen({navigation,route}){
     const handleOpenMenu=(tipe)=>(data)=>{
         setOpen({modal:tipe,...data})
         if(tipe==='qrcode') {
-            Brightness.setBrightness(0.8);
+            Portalnesia.Brightness.setBrightness(0.8);
         }
     }
     
     const handleCloseMenu=async()=>{
         setOpen(null)
-        const system = await Brightness.getSystemBrightness();
-        const brightness = system*1/16;
-        await Brightness.setBrightness(brightness)
+        const system = await Portalnesia.Brightness.getSystemBrightness();
+        await Portalnesia.Brightness.setBrightness(system)
     }
 
     React.useEffect(()=>{
@@ -415,12 +417,44 @@ export default function UserScreen({navigation,route}){
 
     },[data,setNotif,handleCloseMenu])
 
+    const handleSetAsProfile=React.useCallback(async()=>{
+        setLoading(true);
+        let recaptcha="";
+        try {
+            try {
+                recaptcha = await captchaRef.current?.getToken();
+            } catch(e) {
+                setNotif(true,"Error",e?.message||i18n.t("errors.general"));
+            }
+            const res = await PNpost(`/setting/change_profile`,{recaptcha,id:open?.id})
+            if(!Boolean(res?.error)) {
+                setNotif(false,res?.msg);
+                mutate();
+                setOpen(null)
+                const system = await Portalnesia.Brightness.getSystemBrightness();
+                await Portalnesia.Brightness.setBrightness(system)
+            }
+        } finally {
+            setLoading(false)
+        }
+    },[PNpost,open,setNotif])
+
+    const handleDownloadMedia=React.useCallback(()=>{
+        handleCloseMenu();
+        if(open?.token_download) {
+            linkTo(`/download?token=${open?.token_download}`)
+        } else {
+            Authentication.startAuthActivity();
+        }
+    },[open])
+
     return (
         <>
             <Layout navigation={navigation} whiteBg>
                 {renderNavbar()}
                 {renderTabView()}
             </Layout>
+            <Recaptcha ref={captchaRef} />
             <Portal>
                 <Modal
                     isVisible={open !== null && ['media','qrcode'].indexOf(open?.modal) !== -1}
@@ -440,9 +474,13 @@ export default function UserScreen({navigation,route}){
                                 </View>
                             </View>
                         ) : open!==null ? (
-                            <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
+                            <View style={{flexDirection:'column',justifyContent:'center',alignItems:'center',width:'100%'}}>
                                 <ImageFull contentWidth={winWidth-40} source={{uri:`${open.src}&watermark=no`}} thumbnail={{uri:`${open.src}&size=50`}} />
                                 <Text style={{marginTop:10}}>{open?.title}</Text>
+                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:10}}>
+                                    <Button text onPress={handleDownloadMedia}>Download</Button>
+                                    {open?.can_set_profile && !open?.is_profile_picture ? <Button text onPress={handleSetAsProfile} disabled={loading} loading={loading}>Set as Profile Picture</Button> : null }
+                                </View>
                             </View>
                         ) : null}
                     </Lay>

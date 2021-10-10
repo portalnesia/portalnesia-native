@@ -1,16 +1,16 @@
 import React from 'react'
-import {ScrollView,View,Dimensions, Alert,RefreshControl,FlatList} from 'react-native'
-import {Layout as Lay, Text,Input,Select,SelectItem,IndexPath,Datepicker, useTheme,Divider, Icon,Toggle} from '@ui-kitten/components'
+import {View,Dimensions, Alert,RefreshControl,FlatList} from 'react-native'
+import {Layout as Lay, Text, useTheme,Divider, Icon,Toggle,ListItem as LItem} from '@ui-kitten/components'
 import i18n from 'i18n-js'
+import Modal from 'react-native-modal'
 
 import Layout from "@pn/components/global/Layout";
 import Pressable from "@pn/components/global/Pressable";
 import { AuthContext } from '@pn/provider/Context';
 import NotFound from '@pn/components/global/NotFound'
 import NotFoundScreen from '../NotFound'
-import { ucwords } from '@pn/utils/Main';
+import { ucwords } from '@portalnesia/utils';
 import useSWR from '@pn/utils/swr';
-import {CONTENT_URL,ACCOUNT_URL} from '@env'
 import Tooltip from '@pn/components/global/Tooltip'
 import Recaptcha from '@pn/components/global/Recaptcha'
 import Backdrop from '@pn/components/global/Backdrop'
@@ -22,6 +22,7 @@ import { MenuContainer } from '@pn/components/global/MoreMenu';
 import Spinner from '@pn/components/global/Spinner'
 import useSelector from '@pn/provider/actions'
 
+const {width,height} = Dimensions.get('window')
 const OptionIcon=React.memo((props)=><Icon {...props} name="more-vertical" />)
 
 export default function SecuritySettingScreen({navigation,route}){
@@ -37,12 +38,12 @@ export default function SecuritySettingScreen({navigation,route}){
     const {supported:supportKey,biometricsExist} = useBiometrics();
     const [fingerprint,setFingerprint] = React.useState(undefined)
     const [session,setSession]=React.useState([]);
-    const [recaptcha,setRecaptcha] = React.useState("");
     const captchaRef = React.useRef(null)
     const [validate,setValidate]=React.useState(false)
     const passwordRef = React.useRef(null)
     const [menu,setMenu] = React.useState(false);
     const [selectedMenu,setSelectedMenu] = React.useState(null)
+    const [modal,setModal]=React.useState(false)
     
     React.useEffect(()=>{
         if(!isValidating) setValidate(false);
@@ -55,10 +56,38 @@ export default function SecuritySettingScreen({navigation,route}){
         }
     },[biometricsExist,data])
 
+    const SystemInfo=React.useMemo(()=>{
+        let info = [
+            {key:"Device identity",value:selectedMenu?.browser},
+            {key:"Login time",value:`${selectedMenu?.date}, ${selectedMenu?.time}`},
+            {key:"IP Address",value:selectedMenu?.ip_address||`null`},
+            {key:"Location",value:selectedMenu?.location||`null`}
+        ];
+        if(selectedMenu?.info) {
+            info = info.concat([
+                {key:"Package version",value:selectedMenu?.info?.packageVersion ? `v${selectedMenu?.info?.packageVersion}` : `null`},
+                {key:"Javascript bundle version",value:selectedMenu?.info?.jsVersion ? `v${selectedMenu?.info?.jsVersion}` : `null`},
+                {key:"Device",value:selectedMenu?.info?.device||`null`},
+                {key:"Build ID",value:selectedMenu?.info?.buildID||`null`},
+                {key:"Build fingerprint",value:selectedMenu?.info?.buildFingerPrint||`null`},
+                {key:"Model",value:selectedMenu?.info?.model||`null`},
+                {key:"Product",value:selectedMenu?.info?.product||`null`},
+                {key:"SDK version",value:selectedMenu?.info?.sdkVersion||`null`},
+                {key:"OS version",value:selectedMenu?.info?.osVersion||`null`},
+                {key:"Brand",value:selectedMenu?.info?.brand||`null`},
+                {key:"Network provider",value:selectedMenu?.info?.networkProvider||`null`},
+                {key:"Network MCC code",value:selectedMenu?.info?.mccCode||`null`},
+                {key:"Network MNC code",value:selectedMenu?.info?.mncCode||`null`},
+            ]);
+        }
+        return info;
+    },[selectedMenu])
+
     const handleBiometrics=async(val)=>{
         setLoading(true);
         if(val===true) {
             try {
+                const recaptcha = await captchaRef.current.getToken();
                 const public_key = await createKeys();
                 //console.log(public_key);
                 const prompt = await promptAuthentication();
@@ -70,16 +99,17 @@ export default function SecuritySettingScreen({navigation,route}){
                             ...data,
                             security_key:true
                         })
+                        setFingerprint(biometricsExist);
                     }
                 }
             } catch(e){
                 if(e?.message) setNotif(true,"Error",e?.message);
             } finally {
                 setLoading(false);
-                captchaRef.current?.refreshToken();
             }
         } else {
             try {
+                const recaptcha = await captchaRef.current.getToken();
                 const result = await deleteKeys();
                 if(result) {
                     const res = await PNpost(`/setting/native_keys/delete`,{recaptcha})
@@ -98,14 +128,16 @@ export default function SecuritySettingScreen({navigation,route}){
                 if(e?.message) setNotif(true,"Error",e?.message);
             } finally {
                 setLoading(false);
-                captchaRef.current?.refreshToken();
             }
         }
     }
 
     const handleDelete=(dt)=>{
         setLoading(true);
-        PNpost(`/setting/delete_session`,{...dt,recaptcha:recaptcha,session_id:selectedMenu?.id})
+        captchaRef.current.getToken()
+        .then(recaptcha=>{
+            return PNpost(`/setting/delete_session`,{...dt,recaptcha:recaptcha,session_id:selectedMenu?.id})
+        })
         .then((res)=>{
             if(!Boolean(res?.error)) {
                 passwordRef.current?.closeModal();
@@ -122,7 +154,6 @@ export default function SecuritySettingScreen({navigation,route}){
         })
         .finally(()=>{
             setLoading(false);
-            captchaRef.current?.refreshToken();
         })
     }
 
@@ -194,8 +225,18 @@ export default function SecuritySettingScreen({navigation,route}){
                 />
             </Layout>
             <Backdrop visible={loading} loading />
-            <Recaptcha ref={captchaRef} onReceiveToken={setRecaptcha} />
+            <Recaptcha ref={captchaRef} />
             <Password supported={fingerprint} loading={loading} ref={passwordRef} onSubmit={handleDelete} />
+            
+            <Modal
+                isVisible={modal}
+                style={{margin:0,justifyContent:'center',alignItems:'center'}}
+                animationIn="fadeIn"
+                animationOut="fadeOut"
+            >
+				<RenderModal onClose={()=>setModal(false)} theme={theme} systemInfo={SystemInfo} />
+			</Modal>
+            
             <MenuContainer
                 visible={menu}
                 onClose={()=>setMenu(false)}
@@ -205,6 +246,11 @@ export default function SecuritySettingScreen({navigation,route}){
                         onPress:handleRemoveMenuClick,
                         icon:"trash",
                         color:theme['color-danger-500']
+                    },
+                    {
+                        title:"Detail",
+                        onPress:()=>setModal(true),
+                        icon:"info"
                     }
                 ]}
             />
@@ -227,5 +273,33 @@ const RenderItem=React.memo(({item,index,renderIcon})=>{
 
     return (
         <ListItem disabled key={index.toString()} title={item?.browser} description={renderDesc} style={{paddingVertical:5}} accessoryRight={()=>renderIcon(item,index)} />
+    )
+})
+
+const RenderModal=React.memo(({onClose,theme,systemInfo})=>{
+    return (
+        <Lay style={{padding:10,width:width-20,borderRadius:10}}>
+			<View style={{marginBottom:10,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+				<Text>Detail</Text>
+				<View style={{borderRadius:22,overflow:'hidden'}}>
+					<Pressable style={{padding:10}} onPress={()=> onClose && onClose()}>
+						<Icon style={{width:24,height:24,tintColor:theme['text-hint-color']}} name="close-outline" />
+					</Pressable>
+				</View>
+			</View>
+            <Divider style={{backgroundColor:theme['border-text-color']}} />
+            <View style={{marginTop:10,maxHeight:height-155}}>
+                <FlatList
+                    data={systemInfo}
+                    renderItem={(props) => <RenderDetail {...props}/> }
+                />
+            </View>
+        </Lay>
+    )
+})
+
+const RenderDetail=React.memo(({item,index:i})=>{
+    return (
+        <LItem key={i} title={item?.key} description={item?.value} disabled />
     )
 })

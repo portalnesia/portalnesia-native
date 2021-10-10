@@ -31,7 +31,7 @@ import {MaterialIconsPack} from '../components/utils/MaterialIconsPack'
 import i18n from 'i18n-js'
 import {AuthContext} from './Context'
 import useLogin,{refreshingToken} from '@pn/utils/Login'
-import Localization from '@pn/module/Localization'
+import Portalnesia from '@portalnesia/react-native-core'
 import useForceUpdate from '@pn/utils/useFoceUpdate'
 import {default as en_locale} from '@pn/locale/en.json'
 import {default as id_locale} from '@pn/locale/id.json'
@@ -124,16 +124,18 @@ const AuthProviderFunc = () => {
 			const title = ['konten','komentar','url'].indexOf(type) !== -1 ? "Send Report" : "Send Feedback";
 			const {urlreported:urlreport,...other}=params;
 			const urlreported=urlreport||getPath()
-			captureScreen({format:'png',quality:0.9})
-			.then(
-				uri=>{
-					navigationRef?.current?.navigate("ReportScreen",{title,uri,type,urlreported,...other})
-				},
-				error=>{
-					console.log("capture error",error)
-					setNotif(true,"Error","Something went wrong");
-				}
-			)
+			setTimeout(()=>{
+				captureScreen({format:'png',quality:0.9})
+				.then(
+					uri=>{
+						navigationRef?.current?.navigate("ReportScreen",{title,uri,type,urlreported,...other})
+					},
+					error=>{
+						console.log("capture error",error)
+						setNotif(true,"Error","Something went wrong");
+					}
+				)
+			})
 		} else {
 			setNotif(true,"Error","Please update your apps to the latest version");
 		}
@@ -188,7 +190,7 @@ const AuthProviderFunc = () => {
 					Notifications.setNotificationChannelAsync("General", getNotifOption("General","General notifications")),
 					Notifications.setNotificationChannelAsync("News", getNotifOption("News","Notifications for the latest news every day")),
 					Notifications.setNotificationChannelAsync("Features", getNotifOption("Features","New features and promotion on Portalnesia")),
-					Notifications.deleteNotificationChannelAsync("Features & Promotion")
+					Notifications.setNotificationChannelAsync("Services", getNotifOption("Services","Notifications for background services",false)),
 				])
 			} catch(e){
 				console.log("Notification channel error",e);
@@ -237,16 +239,16 @@ const AuthProviderFunc = () => {
 				const lng = context.lang === 'id' ? "id-ID" : "en-US";
 				i18n.locale =lng;
 			} else {
-				i18n.locale = Localization.getLocales()[0].languageTag;
+				i18n.locale = Portalnesia.Core.getLocales()[0].languageTag;
 			}
 			forceUpdate();
 		}
 
 		onLocalizationChange();
-		Localization.addEventListener('localizationChange',onLocalizationChange)
+		Portalnesia.Core.addEventListener('localizationChange',onLocalizationChange)
 
 		return ()=>{
-			Localization.removeEventListener('localizationChange',onLocalizationChange)
+			Portalnesia.Core.removeEventListener('localizationChange',onLocalizationChange)
 		}
 	},[context.lang])
 

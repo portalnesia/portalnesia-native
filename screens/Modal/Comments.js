@@ -3,7 +3,7 @@ import i18n from 'i18n-js'
 
 import Layout from '@pn/components/global/Layout';
 import {Comments} from '@pn/components/global/Comment';
-import { ucwords } from '@pn/utils/Main';
+import { ucwords } from '@portalnesia/utils';
 
 export default function CommentModal({navigation,route}){
     const {type,posId,posUrl,comment_id} = route.params;
