@@ -6,7 +6,6 @@ import {TabView,TabBar} from 'react-native-tab-view'
 
 import {linkTo} from '@pn/navigation/useRootNavigation'
 import Layout from '@pn/components/global/Layout';
-import Header,{useHeader,headerHeight as headerHeightt,Lottie} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Skeleton from '@pn/components/global/Skeleton'
@@ -14,6 +13,10 @@ import i18n from 'i18n-js'
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 import Carousel from '@pn/components/global/Carousel';
 import useSWR from '@pn/utils/swr';
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
+import {getCollapsOpt} from '@pn/utils/Main'
+
+const stickyHeaderHeight = 46;
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
 	return (
@@ -52,7 +55,7 @@ const RenderRecommend=React.memo(({url})=>{
 	)
 })
 
-const Recent=({headerHeight,navigation,url,...other})=>{
+const Recent=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 	const {
 		data,
 		error,
@@ -112,14 +115,15 @@ const Recent=({headerHeight,navigation,url,...other})=>{
 
 	const renderEmpty=()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
+		return <View style={{height:"100%",paddingTop:containerPaddingTop+stickyHeaderHeight}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
 	}
 
 	return (
 		<Animated.FlatList
 			ListEmptyComponent={renderEmpty}
 			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			contentContainerStyle={{paddingTop: containerPaddingTop + stickyHeaderHeight,...(error ? {flex:1} : {})}}
+			scrollIndicatorInsets={{top: scrollIndicatorInsetTop + stickyHeaderHeight}}
 			numColumns={2}
 			data={data}
 			ref={ref}
@@ -133,7 +137,7 @@ const Recent=({headerHeight,navigation,url,...other})=>{
 					style={{zIndex:2}}
 					colors={['white']}
 					progressBackgroundColor="#2f6f4e"
-					progressViewOffset={headerHeight}
+					progressViewOffset={containerPaddingTop + stickyHeaderHeight}
 					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
 					refreshing={refreshing}
 				/>	
@@ -143,12 +147,12 @@ const Recent=({headerHeight,navigation,url,...other})=>{
 					setSize(size+1)
 				}
 			}}
-			{...other}
+			onScroll={onScroll}
 		/>
 	)
 }
 
-const Popular=({headerHeight,navigation,url,...other})=>{
+const Popular=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 	const {
 		data,
 		error,
@@ -208,14 +212,15 @@ const Popular=({headerHeight,navigation,url,...other})=>{
 
 	const renderEmpty=()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
+		return <View style={{height:"100%",paddingTop:containerPaddingTop+stickyHeaderHeight}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
 	}
 
 	return (
 		<Animated.FlatList
 			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 			ListEmptyComponent={renderEmpty}
-			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			contentContainerStyle={{paddingTop: containerPaddingTop + stickyHeaderHeight,...(error ? {flex:1} : {})}}
+			scrollIndicatorInsets={{top: scrollIndicatorInsetTop + stickyHeaderHeight}}
 			numColumns={2}
 			data={data}
 			ref={ref}
@@ -228,7 +233,7 @@ const Popular=({headerHeight,navigation,url,...other})=>{
 				<RefreshControl
 					colors={['white']}
 					progressBackgroundColor="#2f6f4e"
-					progressViewOffset={headerHeight}
+					progressViewOffset={containerPaddingTop+stickyHeaderHeight}
 					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
 					refreshing={refreshing}
 				/>	
@@ -238,7 +243,7 @@ const Popular=({headerHeight,navigation,url,...other})=>{
 					setSize((a)=>a+1)
 				}
 			}}
-			{...other}
+			onScroll={onScroll}
 		/>
 	)
 }
@@ -253,11 +258,9 @@ export default function ({ navigation,route }) {
         {key:'popular',title:i18n.t('popular')},
     ])
 	const theme = useTheme()
-	const {translateY,...other}=useHeader()
 	const {width}=useWindowDimensions()
-	const headerHeight={...headerHeightt,sub:46}
-	const heightHeader = headerHeight?.main + headerHeight?.sub
 	const [url,setUrl] = React.useState({recent:null,popular:null,recommend:null});
+	const {onScroll,containerPaddingTop,scrollIndicatorInsetTop,translateY} = useCollapsibleHeader(getCollapsOpt(theme,false))
 	
 	React.useEffect(()=>{
 		let unsubcribe;
@@ -277,26 +280,24 @@ export default function ({ navigation,route }) {
 	const renderTabBar=(props)=>{
 		
 		return (
-			<Animated.View testID="Test-Header-Chord" style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
-				<Header title="Chord" navigation={navigation} height={56} menu={()=><FeedbackToggle link={`/chord${tabIndex === 1 ? "/popular" : ""}`} />}>
-					<TabBar
-						{...props}
-						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
-						indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
-						renderLabel={({route,focused})=>{
-							return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
-						}}
-						pressColor={theme['color-control-transparent-disabled']}
-                    	pressOpacity={0.8}
-					/>
-				</Header>
+			<Animated.View testID="Test-Header-Chord" style={{zIndex: 1,elevation:5,position:'absolute',backgroundColor: theme['background-basic-color-1'],top:containerPaddingTop,height:stickyHeaderHeight,width: '100%',transform: [{translateY}]}}>
+				<TabBar
+					{...props}
+					style={{height:46,backgroundColor:theme['background-basic-color-1']}}
+					indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
+					renderLabel={({route,focused})=>{
+						return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
+					}}
+					pressColor={theme['color-control-transparent-disabled']}
+					pressOpacity={0.8}
+				/>
 			</Animated.View>
 		)
 	}
 
 	const renderScene=({route})=>{
-        if(route.key == 'recent') return <Recent url={url} headerHeight={heightHeader} {...other} navigation={navigation} />
-        if(route.key == 'popular') return <Popular url={url} headerHeight={heightHeader} {...other} navigation={navigation} />
+        if(route.key == 'recent') return <Recent url={url} onScroll={onScroll} containerPaddingTop={containerPaddingTop} scrollIndicatorInsetTop={scrollIndicatorInsetTop} navigation={navigation} />
+        if(route.key == 'popular') return <Popular url={url} onScroll={onScroll} containerPaddingTop={containerPaddingTop} scrollIndicatorInsetTop={scrollIndicatorInsetTop} navigation={navigation} />
         return null;
     }
 
@@ -314,7 +315,7 @@ export default function ({ navigation,route }) {
     }
 
 	return (
-		<Layout navigation={navigation}>
+		<Layout navigation={navigation} title="Chord" withBack={false} menu={()=><FeedbackToggle link={`/chord${tabIndex === 1 ? "/popular" : ""}`} />}>
 			{renderTabView()}
 		</Layout>
 	);

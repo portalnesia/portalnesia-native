@@ -47,29 +47,22 @@ const SocialWrapper = React.memo(({name,onPress})=>{
     )
 })
 
-function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}){
+function UserAbout({data,error,mutate,isValidating,onGetRef,onScroll,containerPaddingTop,scrollIndicatorInsetTop,onScrollEndDrag}){
     const socialClick=React.useCallback((url)=>{
         openBrowser(url,false)
     },[])
+    const theme = useTheme();
     return (
         <Animated.ScrollView
             scrollToOverflowEnabled
             ref={onGetRef}
-            onScroll={Animated.event(
-                [
-                    {nativeEvent:{contentOffset:{y:scrollY}}}
-                ],
-                {
-                    useNativeDriver:true
-                }
-            )}
-            onMomentumScrollBegin={onMomentumScrollBegin}
-            onMomentumScrollEnd={onMomentumScrollEnd}
-            onScrollEndDrag={onScrollEndDrag}
+            onScroll={onScroll}
             contentContainerStyle={{
-                paddingTop:HeaderHeight + TabBarHeight + 56,
+                paddingTop:HeaderHeight + containerPaddingTop,
                 minHeight:winHeight + ContentMinHeight
             }}
+            onScrollEndDrag={onScrollEndDrag}
+            scrollIndicatorInsets={{top:HeaderHeight+scrollIndicatorInsetTop}}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             refreshControl={
@@ -78,7 +71,7 @@ function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumSc
                     colors={['white']}
                     progressBackgroundColor="#2f6f4e"
                     refreshing={isValidating}
-                    progressViewOffset={HeaderHeight + TabBarHeight + 56}
+                    progressViewOffset={HeaderHeight + containerPaddingTop}
                     title="Refreshing"
                     onRefresh={mutate}
                 />
@@ -92,7 +85,7 @@ function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumSc
                 <RenderSuspend />
             ) : (
                 <Lay style={{paddingVertical:15}}>
-                    <View style={{paddingHorizontal:15,flexDirection:'row',justifyContent:'space-evenly',alignItems:'center'}}>
+                    <View style={{paddingHorizontal:15,paddingBottom:15,flexDirection:'row',justifyContent:'space-evenly',alignItems:'center'}}>
                         {data?.users?.instagram && (
                             <SocialWrapper name="instagram" onPress={()=>socialClick(data?.users?.instagram)} />
                         )}
@@ -109,6 +102,16 @@ function UserAbout({data,error,mutate,isValidating,onGetRef,scrollY,onMomentumSc
                             <SocialWrapper name="telegram" onPress={()=>socialClick(data?.users?.telegram)} />
                         )}
                     </View>
+                    {data?.users?.birthday && (
+                        <Lay style={{elevation:1,paddingHorizontal:15,paddingVertical:15}}>
+                            <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
+                                <View style={{marginRight:15}}>
+                                    <Icon style={{height:20,tintColor:theme['text-hint-color']}} name="birthday-cake" pack="font_awesome" />
+                                </View>
+                                <Text>{data?.users?.birthday}</Text>
+                            </View>
+                        </Lay>
+                    )}
                     {(data?.users?.biodata && data?.users?.biodata?.match(/\S/) !== null) ? (
                         <View style={{marginTop:20}}>
                             <Markdown source={data?.users?.biodata}/>

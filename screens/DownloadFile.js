@@ -24,7 +24,7 @@ import downloadFile from '@pn/utils/Download'
 
 let timeInterval=null,timeLeft=15;
 
-export default function Download({navigation,route}) {
+export default function DownloadFileScreen({navigation,route}) {
     const token = route.params?.token;
     if(!token) return <NotFoundScreen navigation={navigation} route={route} />
 

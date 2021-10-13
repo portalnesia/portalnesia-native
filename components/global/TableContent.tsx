@@ -15,7 +15,7 @@ export interface TableContentTextProps {
     sticky?:boolean;
     scrollAnim?: Animated.Value;
     translateY?: Animated.AnimatedInterpolation;
-    onPress: ()=>void
+    onPress: ()=>void;
 }
 
 const TableContentText=React.memo(({style={},sticky,scrollAnim,translateY,onPress}: TableContentTextProps)=>{
@@ -24,17 +24,16 @@ const TableContentText=React.memo(({style={},sticky,scrollAnim,translateY,onPres
         const translateScroll = Animated.add(
             scrollAnim.interpolate({
                 inputRange:[0,120,220],
-                outputRange:[-57,0,57],
+                outputRange:[-56,0,56],
                 extrapolate:'clamp'
             }),
             translateY
         )
         return (
-            <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY:translateScroll}]}}>
+            <Animated.View style={{position:'absolute',elevation:5,backgroundColor: theme['background-basic-color-1'],width: '100%',zIndex: 1,transform: [{translateY:translateScroll}]}}>
                 <Pressable onPress={()=>onPress && onPress()} style={[{paddingVertical:10,paddingHorizontal:15},style]}>
                     <Text>{i18n.t("table_of_content")}</Text>
                 </Pressable>
-                <Divider />
             </Animated.View>
         )
     }

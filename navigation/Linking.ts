@@ -92,7 +92,7 @@ const getScreen={
     EditUserScreen:{
         path:'user/:username/edit',
     },
-    DownloadScreen:{
+    DownloadFileScreen:{
         path:'download',
     },
     NotFound: '*',

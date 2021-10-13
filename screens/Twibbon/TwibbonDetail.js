@@ -97,10 +97,10 @@ export default function TwibbonDetail({navigation,route}){
     }
 
     const Menu = ()=>(
-        <>
+        <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
             <TopNavigationAction tooltip={i18n.t('usage_guide',{type:"Twibbon"})} icon={SupportIcon} onPress={()=>modalRef.current?.open()} />
             <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />
-        </>
+        </View>
     )
 
     return (
@@ -108,7 +108,7 @@ export default function TwibbonDetail({navigation,route}){
             <Layout navigation={navigation} title="Twibbon" {...(data && data?.twibbon) ? {subtitle:data?.twibbon?.title} : {}} withBack menu={Menu} margin={35} align="center">
                 <ScrollView
                     contentContainerStyle={{
-                        flex:1
+                        flexGrow:1
                     }}
                     refreshControl={
                         <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e"  refreshing={isValidating && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>!isValidating && mutate()}/>

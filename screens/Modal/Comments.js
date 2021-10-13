@@ -8,7 +8,7 @@ import { ucwords } from '@portalnesia/utils';
 export default function CommentModal({navigation,route}){
     const {type,posId,posUrl,comment_id} = route.params;
     return (
-        <Layout navigation={navigation} withBack whiteBg title={ucwords(i18n.t('comment',{count:2}))}>
+        <Layout navigation={navigation} forceEnable whiteBg title={ucwords(i18n.t('comment',{count:2}))}>
             <Comments posId={posId} posUrl={posUrl} type={type} comment_id={comment_id} />
         </Layout>
     )

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View,Dimensions,FlatList,ScrollView} from 'react-native';
+import { View,Dimensions,FlatList,ScrollView,Animated} from 'react-native';
 import {Layout as Lay,Text,Card,useTheme,Input, Icon,Divider} from '@ui-kitten/components'
 import {useScrollToTop} from '@react-navigation/native'
 import Image from '@pn/module/FastImage'
@@ -18,7 +18,7 @@ import ListItem from '@pn/components/global/ListItem';
 import i18n from 'i18n-js';
 
 const arrayMove = require('array-move')
-
+const AnimLay = Animated.createAnimatedComponent(Lay);
 const CloseIcon=(props)=>{
     return <Icon {...props} name="close-circle-outline" style={{...props?.style,marginHorizontal:0,width:24,height:24}} />
 }
@@ -385,13 +385,14 @@ export default function Search({navigation,route}){
         }
     },[])
 
-    React.useEffect(()=>{
-        if (filter) return navigation.navigate("SearchFilter",{...route.params})
-    },[route])
-
-    return (
-        <Layout navigation={navigation} withBack={false}>
-            <Lay style={{paddingHorizontal:15,justifyContent:'flex-start',alignItems:'center',paddingBottom:5,paddingTop:10,borderBottomColor:theme['border-basic-color'],borderBottomWidth:2}}>
+    const customHeader=({scene})=>{
+        const progress = Animated.add(scene.progress.current,scene.progress.next||0);
+        const opacity = progress.interpolate({
+            inputRange:[0,1,2],
+            outputRange:[0,1,0]
+        })
+        return (
+            <AnimLay style={{opacity,elevation:5,paddingHorizontal:15,justifyContent:'flex-start',alignItems:'center',paddingBottom:5,paddingTop:10,borderBottomColor:theme['border-basic-color'],borderBottomWidth:2}}>
                 <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                     <View style={{flexGrow:1,marginRight:5,flexShrink:1}}>
                         <Input
@@ -409,7 +410,16 @@ export default function Search({navigation,route}){
                         <Pressable onPress={()=>getData()} style={{padding:5}}><Icon name="search" width="25" height="25" fill={theme['text-basic-color']} /></Pressable>
                     </View>
                 </View>
-            </Lay>
+            </AnimLay>
+        )
+    }
+
+    React.useEffect(()=>{
+        if (filter) return navigation.navigate("SearchFilter",{...route.params})
+    },[route])
+
+    return (
+        <Layout navigation={navigation} withBack={false} custom={customHeader}>
             <FlatList
                 ref={ref}
                 data={data}

@@ -17,7 +17,6 @@ import CountUp from '@pn/components/global/Countup'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
-import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import Chord,{chord_html} from '@pn/components/global/Chord'
 import Button from '@pn/components/global/Button'
 import {ucwords} from '@portalnesia/utils'
@@ -27,7 +26,10 @@ import {AdsBanner, AdsBanners} from '@pn/components/global/Ads'
 import Player from '@pn/components/global/VideoPlayer'
 import Backdrop from '@pn/components/global/Backdrop';
 import LikeButton from '@pn/components/global/Like'
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
+import {getCollapsOpt} from '@pn/utils/Main'
 
+const heightHeader = 40;
 LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
 
 const AnimLay = Animated.createAnimatedComponent(Lay)
@@ -49,7 +51,6 @@ function ChordDetailScreen({navigation,route}){
     const {data:dataOthers,error:errorOthers,mutate:mutateOthers,isValidating:isValidatingOthers} = useSWR(data?.chord?.id ? `/chord/others/${data?.chord?.id}` : null)
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
-    const heightt = {...headerHeight,sub:40}
     const {width} = useWindowDimensions()
     const [tools,setTools]=React.useState({fontSize:4,transpose:0,autoScroll:0})
     const [showMenu,setShowMenu]=React.useState(null)
@@ -58,6 +59,16 @@ function ChordDetailScreen({navigation,route}){
     const [viewVideo,setViewVideo] = React.useState(false)
     const [liked,setLiked] = React.useState(false)
     const [refreshing,setRefreshing] = React.useState(false);
+    const collapsOpt = React.useMemo(()=>{
+        return getCollapsOpt(theme,false);
+    },[theme])
+    const {onScroll,containerPaddingTop,scrollIndicatorInsetTop,translateY} = useCollapsibleHeader({
+        ...collapsOpt,
+        config:{
+            ...collapsOpt.config,
+            disabled:viewVideo
+        }
+    })
 
     React.useEffect(()=>{
         if(!isValidating) setRefreshing(false)
@@ -69,12 +80,6 @@ function ChordDetailScreen({navigation,route}){
             mutate();
         }
     },[isValidating])
-
-    const heightHeader = React.useMemo(()=>{
-        return heightt?.main + heightt?.sub;
-    },[])
-
-    const {translateY,onScroll,...other} = useHeader()
 
     const transpose = React.useMemo(()=>{
         const angka = tools.transpose
@@ -197,42 +202,40 @@ function ChordDetailScreen({navigation,route}){
             setLiked(data?.chord?.liked);
         }
     },[data])
-
+    
     return (
         <>
-        <Layout navigation={navigation}>
-            <AnimLay style={{left: 0,right: 0,width: '100%',zIndex: 1,...(!viewVideo ? {position:'absolute',transform: [{translateY}]} : {})}}>
-                <Header title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : ``} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
-                    <Lay style={{height:heightt?.sub,flexDirection:'row',alignItems:'center',justifyContent:'space-evenly'}}>
-                        <Lay>
-                            <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('transpose')}}>Transpose</Button>
-                        </Lay>
-                        <Lay>
-                            <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('font size')}}>Font Size</Button>
-                        </Lay>
-                        {isUpdated && (
-                            <Lay>
-                                <Button size="small" status="basic" appearance="ghost" onPress={handlePrint}>Print</Button>
-                            </Lay>
-                        )}
+        <Layout navigation={navigation} title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : undefined} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
+            <AnimLay style={{width: '100%',zIndex: 1,...(!viewVideo ? {position:'absolute',transform: [{translateY}],top:containerPaddingTop,elevation:2,height:heightHeader} : {marginTop:containerPaddingTop})}}>
+                <Lay style={{flexDirection:'row',alignItems:'center',justifyContent:'space-evenly'}}>
+                    <Lay>
+                        <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('transpose')}}>Transpose</Button>
                     </Lay>
-                    {typeof data?.chord?.youtube_id === 'string' && viewVideo ? (
+                    <Lay>
+                        <Button size="small" status="basic" appearance="ghost" onPress={()=>{data && setShowMenu('font size')}}>Font Size</Button>
+                    </Lay>
+                    {isUpdated && (
                         <Lay>
-                            <Player youtube={data?.chord?.youtube_id} />
+                            <Button size="small" status="basic" appearance="ghost" onPress={handlePrint}>Print</Button>
                         </Lay>
-                    ) : null}
-                </Header>
+                    )}
+                </Lay>
             </AnimLay>
+            {typeof data?.chord?.youtube_id === 'string' && viewVideo ? (
+                <Lay>
+                    <Player youtube={data?.chord?.youtube_id} />
+                </Lay>
+            ) : null}
             <Animated.ScrollView
                 contentContainerStyle={{
                     flexGrow: 1,
-                    ...(!viewVideo ? {paddingTop:heightHeader+2} : {})
+                    ...(!viewVideo ? {paddingTop:heightHeader+containerPaddingTop} : {})
                 }}
+                {...(!viewVideo ? {scrollIndicatorInsets:{top:scrollIndicatorInsetTop+heightHeader}} : {})}
                 onScroll={onScroll}
                 refreshControl={
-                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader+containerPaddingTop} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
-                {...other}
             >
                 {!data && !error ? (
                     <View style={{height:'100%',paddingTop:15}}>

@@ -6,10 +6,10 @@ import i18n from 'i18n-js'
 import Modal from 'react-native-modal'
 import {linkTo} from '@pn/navigation/useRootNavigation'
 
+import {getCollapsOpt} from '@pn/utils/Main'
 import Layout from '@pn/components/global/Layout';
 import Button from '@pn/components/global/Button'
 import Pressable from '@pn/components/global/Pressable'
-import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import usePagination from '@pn/utils/usePagination'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import {isTwitterURL, isURL, specialHTML} from '@portalnesia/utils'
@@ -21,7 +21,9 @@ import Carousel from '@pn/components/global/Carousel';
 import useSWR from '@pn/utils/swr';
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import ShareModule from '@pn/module/Share';
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
 
+const headerHeight = 46;
 const {width} = Dimensions.get('window')
 
 const RenderCaraousel = React.memo(({item, index:i}) => {
@@ -142,7 +144,7 @@ const RenderInput=React.memo(({onClose,initialData=""})=>{
 	)
 })
 
-const Recent=({headerHeight,navigation,...other})=>{
+const Recent=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 	const {
 		data,
 		error,
@@ -201,14 +203,15 @@ const Recent=({headerHeight,navigation,...other})=>{
 
 	const renderEmpty=()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
+		return <View style={{height:"100%",paddingTop:headerHeight+containerPaddingTop}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
 	}
 
 	return (
 		<Animated.FlatList
 			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 			ListEmptyComponent={renderEmpty}
-			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			contentContainerStyle={{paddingTop: containerPaddingTop + headerHeight,...(error ? {flex:1} : {})}}
+			scrollIndicatorInsets={{top: scrollIndicatorInsetTop + headerHeight}}
 			numColumns={2}
 			data={data}
 			renderItem={_renderItem}
@@ -218,7 +221,7 @@ const Recent=({headerHeight,navigation,...other})=>{
 				<RefreshControl
 					colors={['white']}
 					progressBackgroundColor="#2f6f4e"
-					progressViewOffset={headerHeight}
+					progressViewOffset={headerHeight+containerPaddingTop}
 					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
 					refreshing={refreshing}
 				/>	
@@ -226,12 +229,12 @@ const Recent=({headerHeight,navigation,...other})=>{
 			onEndReached={()=>{
 				if(!isLoadingMore) setSize(size+1)
 			}}
-			{...other}
+			onScroll={onScroll}
 		/>
 	)
 }
 
-const Popular=({headerHeight,navigation,...other})=>{
+const Popular=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 	const {
 		data,
 		error,
@@ -290,14 +293,15 @@ const Popular=({headerHeight,navigation,...other})=>{
 
 	const renderEmpty=()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
-		return <View style={{height:"100%",paddingTop:headerHeight+8}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
+		return <View style={{height:"100%",paddingTop:headerHeight+containerPaddingTop}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
 	}
 
 	return (
 		<Animated.FlatList
 			columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 			ListEmptyComponent={renderEmpty}
-			contentContainerStyle={{paddingTop: headerHeight+8,...(error ? {flex:1} : {})}}
+			contentContainerStyle={{paddingTop: containerPaddingTop + headerHeight,...(error ? {flex:1} : {})}}
+			scrollIndicatorInsets={{top: scrollIndicatorInsetTop + headerHeight}}
 			numColumns={2}
 			data={data}
 			renderItem={_renderItem}
@@ -309,7 +313,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 				<RefreshControl
 					colors={['white']}
 					progressBackgroundColor="#2f6f4e"
-					progressViewOffset={headerHeight}
+					progressViewOffset={headerHeight+containerPaddingTop}
 					onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
 					refreshing={refreshing}
 				/>	
@@ -317,7 +321,7 @@ const Popular=({headerHeight,navigation,...other})=>{
 			onEndReached={()=>{
 				if(!isLoadingMore) setSize(size+1)
 			}}
-			{...other}
+			onScroll={onScroll}
 		/>
 	)
 }
@@ -334,36 +338,33 @@ export default function ({ navigation,route }) {
         {key:'popular',title:i18n.t('popular')},
     ])
 	const theme = useTheme()
-	const {translateY,...other}=useHeader()
-	const headerHeight={...headerHeightt,sub:46}
-	const heightHeader = headerHeight?.main + headerHeight?.sub
 	const [open,setOpen]=React.useState(false);
 	const [menu,setMenu]=React.useState(false)
 	const [input,setInput] = React.useState("");
 
+	const {onScroll,containerPaddingTop,scrollIndicatorInsetTop,translateY} = useCollapsibleHeader(getCollapsOpt(theme,false))
+
 	const renderTabBar=(props)=>{
 		
 		return (
-			<Animated.View style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
-				<Header title="Twitter Thread Reader" navigation={navigation} height={56} withBack menu={()=><MenuToggle onPress={()=>setMenu(true)} />} >
-					<TabBar
-						{...props}
-						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
-						indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
-						renderLabel={({route,focused})=>{
-							return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
-						}}
-						pressColor={theme['color-control-transparent-disabled']}
-                    	pressOpacity={0.8}
-					/>
-				</Header>
+			<Animated.View style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],height:headerHeight,top:containerPaddingTop,width: '100%',elevation:5,transform: [{translateY}]}}>
+				<TabBar
+					{...props}
+					style={{backgroundColor:theme['background-basic-color-1']}}
+					indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
+					renderLabel={({route,focused})=>{
+						return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
+					}}
+					pressColor={theme['color-control-transparent-disabled']}
+					pressOpacity={0.8}
+				/>
 			</Animated.View>
 		)
 	}
 
 	const renderScene=({route})=>{
-        if(route.key == 'recent') return <Recent headerHeight={heightHeader} {...other} navigation={navigation} />
-        if(route.key == 'popular') return <Popular headerHeight={heightHeader} {...other} navigation={navigation} />
+        if(route.key == 'recent') return <Recent headerHeight={headerHeight} onScroll={onScroll} containerPaddingTop={containerPaddingTop} scrollIndicatorInsetTop={scrollIndicatorInsetTop} navigation={navigation} />
+        if(route.key == 'popular') return <Popular headerHeight={headerHeight} onScroll={onScroll} containerPaddingTop={containerPaddingTop} scrollIndicatorInsetTop={scrollIndicatorInsetTop} navigation={navigation} />
         return null;
     }
 
@@ -396,7 +397,7 @@ export default function ({ navigation,route }) {
     },[])
 
 	return (
-		<Layout navigation={navigation}>
+		<Layout title="Twitter Thread Reader" navigation={navigation} withBack menu={()=><MenuToggle onPress={()=>setMenu(true)} />} >
 			{renderTabView()}
 			<MenuContainer
 				visible={menu}

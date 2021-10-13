@@ -100,7 +100,7 @@ const YoutubePlayer=React.memo(({youtube,width: vidWidth,style,youtubeOptions={}
 
     if(ytError) {
         return (
-            <Pressable onPress={handlePress} style={{marginTop:10,width,height:(9*width/16),flex:1,justifyContent:'center',alignSelf:'center',paddingHorizontal:15,backgroundColor:theme['background-basic-color-2']}}>
+            <Pressable onPress={handlePress} style={[{marginTop:10,width,height:(9*width/16),justifyContent:'center',alignSelf:'center',paddingHorizontal:15,backgroundColor:theme['background-basic-color-2']},style]}>
                 <Text style={{textAlign:'center'}}>{i18n.t('errors.youtube_service')}</Text>
             </Pressable>
         )
@@ -110,7 +110,7 @@ const YoutubePlayer=React.memo(({youtube,width: vidWidth,style,youtubeOptions={}
             <Youtube
                 apiKey={YOUTUBE_KEY}
                 videoId={youtube}
-                style={{...style,width,height:(9*width/16)}}
+                style={[{width,height:(9*width/16)},style]}
                 onError={handleError}
                 controls={1}
                 resumePlayAndroid={false}

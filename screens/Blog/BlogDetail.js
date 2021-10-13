@@ -17,11 +17,14 @@ import CountUp from '@pn/components/global/Countup'
 import {ucwords,slugFormat as PNslug} from '@portalnesia/utils'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import {CONTENT_URL} from '@env'
-import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import i18n from 'i18n-js'
 import usePost from '@pn/utils/API'
 import TableContent from '@pn/components/global/TableContent'
 import LikeButton from '@pn/components/global/Like'
+import {getCollapsOpt} from '@pn/utils/Main'
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
+
+const heightHeader = 46;
 
 function BlogDetail({navigation,route}){
     const {slug} = route.params
@@ -29,8 +32,6 @@ function BlogDetail({navigation,route}){
     const {data,error,mutate,isValidating}=useSWR(`/blog/${slug}`)
     const theme = useTheme()
     const [ready,setReady]=React.useState(false)
-    const heightt = {...headerHeight,sub:0}	
-	const heightHeader = heightt?.main + heightt?.sub
     const {PNget} = usePost();
 
     const scrollRef = React.useRef(null)
@@ -41,6 +42,8 @@ function BlogDetail({navigation,route}){
     const [liked,setLiked] = React.useState(false);
 
     const [refreshing,setRefreshing] = React.useState(false);
+
+    const {containerPaddingTop,scrollIndicatorInsetTop,onScrollWithListener,translateY} = useCollapsibleHeader(getCollapsOpt(theme))
 
     React.useEffect(()=>{
         if(!isValidating) setRefreshing(false)
@@ -53,11 +56,10 @@ function BlogDetail({navigation,route}){
         }
     },[isValidating])
 
-    const scrollAnim = new Animated.Value(0);
-    const onScroll = (e)=>{
+    const scrollAnim = React.useRef(new Animated.Value(0)).current;
+    const onScroll = onScrollWithListener((e)=>{
         scrollAnim.setValue(e?.nativeEvent?.contentOffset?.y);
-    }
-    const {translateY,...other} = useHeader(58,onScroll)
+    })
 
     React.useEffect(()=>{
         let timeout = null;
@@ -116,21 +118,19 @@ function BlogDetail({navigation,route}){
 
     return (
         <>
-        <Layout navigation={navigation}>
-            <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 2,transform: [{translateY}]}}>
-				<Header title='Blog' subtitle={data?.blog?.title||""} withBack navigation={navigation} height={56} menu={()=> <MenuToggle onPress={()=>{data && !data?.error &&setOpen(true)}} />} />
-			</Animated.View>
+        <Layout title='Blog' subtitle={data?.blog?.title||undefined} navigation={navigation} menu={()=> <MenuToggle onPress={()=>{data && !data?.error &&setOpen(true)}} />}>
             {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
             <Animated.ScrollView
                 ref={scrollRef}
                 contentContainerStyle={{
                     flexGrow: 1,
-                    paddingTop:heightHeader+2
+                    paddingTop:heightHeader
                 }}
+                scrollIndicatorInsets={{top:scrollIndicatorInsetTop+heightHeader}}
                 refreshControl={
                     <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
-                {...other}
+                onScroll={onScroll}
             >
                 {!data && !error ? (
                     <View style={{height:'100%',paddingTop:15}}>

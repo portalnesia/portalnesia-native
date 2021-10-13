@@ -167,6 +167,7 @@ export default function({navigation,route}){
                         flexGrow: 1
                     }}
                     ref={scrollRef}
+                    keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
                 >
                     <Lay>
                         <AdsBanners />

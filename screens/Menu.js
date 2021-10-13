@@ -12,15 +12,16 @@ import Layout from '@pn/components/global/Layout'
 import Avatar from '@pn/components/global/Avatar'
 import {AuthContext} from '@pn/provider/Context'
 import {menu as getMenu} from '../constants/menu'
-import Header,{useHeader,headerHeight,TopAction} from '@pn/components/navigation/Header'
+import TopAction from '@pn/components/navigation/TopAction'
 import {Constants} from 'react-native-unimodules'
 import useAPI from '@pn/utils/API'
 import i18n from 'i18n-js'
 import Portalnesia from '@portalnesia/react-native-core'
 import downloadFile from '@pn/utils/Download'
-import { openBrowser } from '@pn/utils/Main'
+import { openBrowser,getCollapsOpt } from '@pn/utils/Main'
 import Authentication from '@pn/module/Authentication'
 import useSelector from '@pn/provider/actions'
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
 LogBox.ignoreLogs(['VirtualizedLists should']);
 
 const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
@@ -34,9 +35,8 @@ export default function({navigation,route}){
     const {setNotif,sendReport} = auth;
     const {PNget,cancelGet} = useAPI(false)
     const theme = useTheme()
-    const heightt = {...headerHeight,sub:100}
-    const {translateY,...other} = useHeader()
-	const heightHeader = heightt?.main + heightt?.sub + 20
+
+    const {translateY,onScroll,containerPaddingTop,scrollIndicatorInsetTop} = useCollapsibleHeader(getCollapsOpt(theme,false))
     const [loading,setLoading] = React.useState(false)
     const menu = getMenu(i18n,user)
     const ref=React.useRef(null);
@@ -150,28 +150,29 @@ export default function({navigation,route}){
 
     return (
         <>
-        <Layout navigation={navigation} >
-            <Animated.View style={{position:'absolute',backgroundColor: theme['color-basic-100'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title="Portalnesia" navigation={navigation} height={56} menu={()=><TopAction tooltip={i18n.t('setting')} icon={SettingIcon} onPress={()=>linkTo("/setting")} />}>
-                    <Lay level="1" style={{height:100,paddingVertical:10,paddingHorizontal:15,alignItems:'center',flexDirection:'row'}}>
-                        <Lay level="1" style={{marginRight:20}}><Avatar size={60} {...(user !== false ? {src:`${user?.picture}&watermark=no`} : {avatar:true})} /></Lay>
-                        <Lay level="1" style={{marginRight:20}}>
-                            <Text style={{fontWeight:'700'}}>{user!==false ? user?.name : "portalnesia.com"}</Text>
-                            <Text style={{fontSize:12}}>{user !==false ? `@${user?.username}` : `© ${new Date().getFullYear()}`}</Text>
-                        </Lay>
-                        <Lay level="1" style={{flex:1}}>
-                            <View style={{alignItems:'flex-end'}}><Button onPress={handleLogin}>{user === false ? "Login" : "Profile"}</Button></View>
-                        </Lay>
+        <Layout navigation={navigation} withBack={false} title="Portalnesia" menu={()=><TopAction tooltip={i18n.t('setting')} icon={SettingIcon} onPress={()=>linkTo("/setting")} />}>
+            <Animated.View style={{position:'absolute',height:100,zIndex:1,top:containerPaddingTop,width: '100%',transform: [{translateY}]}}>
+                <Lay level="1" style={{paddingVertical:10,paddingHorizontal:15,alignItems:'center',flexDirection:'row',elevation:5}}>
+                    <Lay level="1" style={{marginRight:20}}><Avatar size={60} {...(user !== false ? {src:`${user?.picture}&watermark=no`} : {avatar:true})} /></Lay>
+                    <Lay level="1" style={{marginRight:20}}>
+                        <Text style={{fontWeight:'700'}}>{user!==false ? user?.name : "portalnesia.com"}</Text>
+                        <Text style={{fontSize:12}}>{user !==false ? `@${user?.username}` : `© ${new Date().getFullYear()}`}</Text>
                     </Lay>
-				</Header>
-			</Animated.View>
+                    <Lay level="1" style={{flex:1}}>
+                        <View style={{alignItems:'flex-end'}}><Button onPress={handleLogin}>{user === false ? "Login" : "Profile"}</Button></View>
+                    </Lay>
+                </Lay>
+            </Animated.View>
             <Animated.ScrollView
 				contentContainerStyle={{
-					flexGrow: 1,
-                    paddingTop:heightHeader
+                    paddingTop:containerPaddingTop + 100
 				}}
+                scrollIndicatorInsets={{
+                    top:scrollIndicatorInsetTop + 100
+                }}
                 ref={ref}
-                {...other}
+                onScroll={onScroll}
+
 			>
                 {menu.map((dt,i)=>(
                     <React.Fragment key={i}>

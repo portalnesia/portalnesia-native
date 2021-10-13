@@ -24,7 +24,7 @@ export interface TopNavigationProps {
     /**
      * Title of header
      */
-    title?: React.ReactText;
+    title?: React.ReactText|React.FunctionComponent;
     /**
      * Subtitle of header
      */
@@ -51,7 +51,7 @@ const CloseIcon=(props?: StyleIcon)=>(
 	<Icon {...props} name='close' />
 )
 
-const RenderBackBtn=React.memo(({withClose,withBack,navigation}: Pick<TopNavigationProps,'withBack'|'withClose'|'navigation'>)=>{
+export const RenderBackBtn=React.memo(({withClose,withBack,navigation}: Pick<TopNavigationProps,'withBack'|'withClose'|'navigation'>)=>{
 	const index = useNavigationState(state=>state.index)
 	const handleBack=React.useCallback(()=>{
 		if(navigation) {
@@ -75,22 +75,4 @@ const RenderBackBtn=React.memo(({withClose,withBack,navigation}: Pick<TopNavigat
 	else return null;
 })
 
-function TopNav(props: TopNavigationProps){
-    const {accessoryLeft,withBack,title,menu,navigation,align,subtitle,withClose,whiteBg,margin,withDivider,style}=props;
-	const theme = useTheme()
-
-	return(
-		<>
-			<TopNavigation 
-				{...(withClose && !whiteBg ? {style:{backgroundColor:theme['background-basic-color-2'],...style}} : {style})}
-				title={(evaProps) => <Text {...evaProps}  category="h1" style={[evaProps?.style,{marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}]} numberOfLines={1}>{title}</Text>}
-				{...(typeof subtitle === 'string' && subtitle?.length > 0 ? {subtitle:(evaProps)=><Text {...evaProps} style={[evaProps?.style,{marginLeft:(align=='start' ? 10 : 50),marginRight:(margin ? 50 + margin : 50)}]} numberOfLines={1}>{subtitle}</Text>} : {})}
-				alignment={align}
-				{...(accessoryLeft ? {accessoryLeft} : withBack || withClose ? {accessoryLeft:()=><RenderBackBtn withBack={withBack} withClose={withClose} navigation={navigation} /> } : {})}
-				{...(menu ? {accessoryRight:menu} : {})}
-			/>
-			{(withClose && whiteBg) || withDivider===false ? null : <Divider />}
-		</>
-	)
-}
-export default React.memo(TopNav)
+export default RenderBackBtn;
