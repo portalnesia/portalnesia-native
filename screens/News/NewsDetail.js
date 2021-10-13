@@ -14,7 +14,6 @@ import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
 import {Parser} from '@pn/components/global/Parser'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
-import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {ucwords} from '@portalnesia/utils'
 import {openBrowser} from '@pn/utils/Main'
 import Skeleton from '@pn/components/global/Skeleton'
@@ -22,6 +21,8 @@ import Comment from '@pn/components/global/Comment'
 import usePost from '@pn/utils/API'
 import LikeButton from '@pn/components/global/Like'
 import {pushTo} from '@pn/navigation/useRootNavigation'
+import {getCollapsOpt} from '@pn/utils/Main'
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
 
 //const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
 
@@ -33,11 +34,10 @@ export default function({navigation,route}){
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
     const [liked,setLiked] = React.useState(false)
-    const heightt = {...headerHeight,sub:0}	
-    const {translateY,...other} = useHeader()
-	const heightHeader = heightt?.main + heightt?.sub
     const {PNget} = usePost();
     const [refreshing,setRefreshing] = React.useState(false);
+
+    const {onScroll,containerPaddingTop,scrollIndicatorInsetTop} = useCollapsibleHeader(getCollapsOpt(theme))
 
     const onRefresh=React.useCallback(()=>{
         if(!isValidating) {
@@ -91,19 +91,17 @@ export default function({navigation,route}){
 
     return (
         <>
-        <Layout navigation={navigation}>
-            <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title={"News"} subtitle={data?.title||""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />} />
-			</Animated.View>
+        <Layout title={"News"} subtitle={data?.title||undefined} navigation={navigation} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
             <Animated.ScrollView
                 contentContainerStyle={{
                     flexGrow: 1,
-                    paddingTop:heightHeader+2
+                    paddingTop:containerPaddingTop
                 }}
+                scrollIndicatorInsets={{top:scrollIndicatorInsetTop}}
                 refreshControl={
-                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={scrollIndicatorInsetTop} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
-                {...other}
+                onScroll={onScroll}
             >
                 {!data && !error ? (
                     <View style={{height:'100%',paddingTop:15}}>

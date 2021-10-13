@@ -17,7 +17,7 @@ export default function NotificationEvent({navigation,route}){
     const {data,error} = useSWR(`/backend/notification_event/${slug}?token=${token}`,{},true);
 
     return (
-        <Layout navigation={navigation} title="Notification" subtitle={data?.title||""} whiteBg>
+        <Layout navigation={navigation} title="Notification" subtitle={data?.title||undefined} whiteBg>
             {!data && !error ? (
                 <Skltn height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
                     <Skltn.Item key={0} width={width} height={width} marginBottom={15} />

@@ -458,7 +458,7 @@ export function Comments(props: CommentsProps){
     const renderHeader=()=>{
         if(loading==='global') {
             return (
-                <View>
+                <View style={{marginTop:10}}>
                     <Skeleton imageSize={45} image number={data.length > 0 ? 4 : 12} height={data.length > 0 ? 300 : (height-50)} />
                 </View>
             )
@@ -477,7 +477,7 @@ export function Comments(props: CommentsProps){
     const RenderHeaderChild=({item}: {item: DataResult})=>{
         if(loading===`comment-${item.id}`) {
             return (
-                <View style={{marginLeft:55}}>
+                <View style={{marginLeft:55,marginTop:10}}>
                     <Skeleton imageSize={40} image number={2} height={200} />
                 </View>
             )
@@ -545,11 +545,12 @@ export function Comments(props: CommentsProps){
                 adjustToContentHeight
                 alwaysOpen={54}
                 onClosed={onClose}
-                keyboardAvoidingBehavior="height"
+                keyboardAvoidingBehavior="padding"
                 onPositionChange={onPositionChange}
                 disableScrollIfPossible={false}
                 scrollViewProps={{
-                    keyboardShouldPersistTaps:'handled'
+                    keyboardShouldPersistTaps:'handled',
+                    keyboardDismissMode:"on-drag"
                 }}
             >
                 <Lay style={{borderTopLeftRadius:15,borderTopRightRadius:15}}>

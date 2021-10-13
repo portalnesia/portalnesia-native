@@ -8,7 +8,8 @@ import Skltn from 'react-native-skeleton-placeholder'
 import Modal from 'react-native-modal'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
-import {resetRoot} from '@pn/navigation/useRootNavigation'
+import {PanGestureHandler,State} from 'react-native-gesture-handler'
+import Reanimated from 'react-native-reanimated'
 
 import {linkTo} from '@pn/navigation/useRootNavigation'
 import Pressable from "@pn/components/global/Pressable";
@@ -34,6 +35,8 @@ import useAPI from '@pn/utils/API'
 import downloadFile from '@pn/utils/Download'
 import { Portal } from '@gorhom/portal'
 import useSelector from '@pn/provider/actions'
+import {getCollapsOpt} from '@pn/utils/Main'
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
 
 const {height:winHeight,width:winWidth} = Dimensions.get('window');
 const {Value,createAnimatedComponent} = Animated
@@ -47,20 +50,6 @@ const BackIcon=(props)=>(
 const MsgIcon=(props)=>(
 	<Icon {...props} name='message-square-outline' />
 )
-
-const RenderBackButton=React.memo(({navigation})=>{
-    const index = useNavigationState(state=>state.index);
-    const handleBack=React.useCallback(()=>{
-        if(navigation?.canGoBack() && index > 0) {
-            navigation.goBack();
-        } else {
-            resetRoot();
-        }
-},[navigation,index])
-    return (
-        <TopNavigationAction icon={BackIcon} onPress={handleBack} tooltip={i18n.t('back')} />
-    )
-})
 
 const SkeletonHeader=()=>{
     const theme=useTheme();
@@ -88,6 +77,7 @@ const SkeletonHeader=()=>{
 
 
 const tabIndexArray=['about','follower','following','media'];
+const panRef = React.createRef();
 export default function UserScreen({navigation,route}){
     const {user,lang} = useSelector(state=>({user:state.user,lang:state.lang}))
     const context = React.useContext(AuthContext)
@@ -98,7 +88,6 @@ export default function UserScreen({navigation,route}){
     const theme=useTheme();
     const {username,slug}=route.params;
     const {data,error,mutate,isValidating}=useSWR(`/user/${username}`,{},true);
-    //const swrEdit = useSWR(user && user?.id == username ? `/user/${username}/edit` : null);
     const [openMenu,setOpenMenu]=React.useState(false)
     const [refreshing,setRefreshing]=React.useState(false)
     const [loading,setLoading]=React.useState(false);
@@ -112,8 +101,6 @@ export default function UserScreen({navigation,route}){
             mutate();
         }
     }
-    //React.useEffect(()=>console.log(data?.users?.id,user.id),[data,user]);
-    //const data=undefined,error=undefined;
     const [tabIndex,setTabIndex] = React.useState(()=>{
         if(slug) {
             const index = tabIndexArray.findIndex((val)=>val == slug);
@@ -135,17 +122,24 @@ export default function UserScreen({navigation,route}){
         {key:'media',value:undefined}
     ]);
     let listOffset=React.useRef({});
-    let isListGliding = React.useRef(false);
+
+    const collapsOpt = React.useMemo(()=>{
+        return getCollapsOpt(theme,false);
+    },[theme])
+    const {onScrollWithListener,containerPaddingTop,scrollIndicatorInsetTop} = useCollapsibleHeader({
+        ...collapsOpt,
+        config:{
+            ...collapsOpt.config,
+            disabled:true,
+            useNativeDriver:true
+        }
+    },false)
+
+    const onScroll = onScrollWithListener((e)=>{
+        scrollY.setValue(e?.nativeEvent?.contentOffset?.y);
+    })
 
     const [open,setOpen]=React.useState(null)
-
-    const ref={
-        following:React.useRef(null),
-        follower:React.useRef(null),
-        media:React.useRef(null),
-        modal:React.useRef(null),
-        scroll:React.useRef(null)
-    }
 
     React.useEffect(()=>{
         scrollY.addListener(({value})=>{
@@ -154,46 +148,6 @@ export default function UserScreen({navigation,route}){
         })
         return ()=>scrollY.removeAllListeners();
     },[routes,tabIndex])
-
-    const syncScrollOffset=()=>{
-        const curRouteKey = routes[tabIndex].key
-        /*const curRef = listRefArr.current.find(e=>e.key===curRouteKey);
-        if(curRef && curRef?.value) {
-            const y = scrollY._value;
-            const snapToEdgeThreshold = HeaderHeight / 2;
-            if (y < snapToEdgeThreshold) {
-                curRef?.value?.scrollTo ? curRef?.value?.scrollTo({x:0,y:0})
-                : curRef?.value?.scrollToOffset ? curRef?.value?.scrollToOffset({offset:0})
-                : undefined;
-            }
-            if (y >= snapToEdgeThreshold && y < HeaderHeight) {
-                curRef?.value?.scrollTo ? curRef?.value?.scrollTo({x:0,y:HeaderHeight+10})
-                    : curRef?.value?.scrollToOffset ? curRef?.value?.scrollToOffset({offset:HeaderHeight+10})
-                    : undefined;
-            }
-        }*/
-
-        listRefArr.current.filter(e=>e.value!==undefined).forEach((item)=>{
-            if(item.key !== curRouteKey) {
-                if(scrollY?._value < HeaderHeight && scrollY?._value >= 0) {
-                    item?.value?.scrollTo ? item?.value?.scrollTo({x:0,y:scrollY._value,animated:false})
-                    : item?.value?.scrollToOffset ? item?.value?.scrollToOffset({offset:scrollY._value,animated:false})
-                    : undefined;
-                    listOffset.current[item.key] = scrollY._value;
-                } else if(scrollY?._value >= HeaderHeight) {
-                    if(
-                        listOffset.current[item.key] < HeaderHeight ||
-                        listOffset.current[item.key] == null
-                    ) {
-                        item?.value?.scrollTo ? item?.value?.scrollTo({x:0,y:HeaderHeight,animated:false})
-                        : item?.value?.scrollToOffset ? item?.value?.scrollToOffset({offset:HeaderHeight,animated:false})
-                        : undefined;
-                        listOffset.current[item.key] = HeaderHeight;
-                    }
-                }
-            }
-        })
-    }
 
     const handleFollow=()=>{
         if(!loading) {
@@ -222,148 +176,168 @@ export default function UserScreen({navigation,route}){
         }
     }
 
-    const onMomentumScrollBegin=()=>{
-        isListGliding.current = true;
-    }
-    const onMomentumScrollEnd=()=>{
-        isListGliding.current = false;
-        syncScrollOffset();
-    }
-    const onScrollEndDrag = ()=>{
-        syncScrollOffset();
+    const opacity = scrollY.interpolate({
+        inputRange:[0,200,250],
+        outputRange:[0,0,1],
+        extrapolate:'clamp'
+    })
+
+    const translateY = scrollY.interpolate({
+        inputRange:[0,HeaderHeight],
+        outputRange:[0,-(HeaderHeight+1)],
+        extrapolateRight:'clamp',
+        extrapolateLeft:'clamp',
+        extrapolate:'clamp'
+    })
+    const panGestureY = React.useRef(new Animated.Value(0)).current;
+
+    const onScrollEndDrag=()=>{
+        const aa = translateY.__getValue();
+        panGestureY.setValue(-aa)
     }
 
-    const renderNavbar=()=>{
-        const opacity = scrollY.interpolate({
-            inputRange:[0,200,250],
-            outputRange:[0,0,1],
-            extrapolate:'clamp'
-        })
-    
-        return (
-            <View style={{position:'absolute',top:0,width:'100%',zIndex:1}}>
-                <TopNavigation
-                    title={(evaProps) => (
-                        <Animated.View style={{opacity,flexDirection:'row',alignItems:"center",marginHorizontal:50}}>
-                            <Text {...evaProps}  category="h1" style={{...evaProps?.style,...(data?.users?.verify ? {marginRight:5} : {})}} numberOfLines={1}>{data?.users?.username||""}</Text>
-                            {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
-                        </Animated.View>
-                    )}
-                    accessoryLeft={()=><RenderBackButton navigation={navigation} />}
-                    alignment="center"
-                    accessoryRight={()=><MenuToggle onPress={()=>{data && !data?.error && setOpenMenu(true)}} />}
-                />
-            </View>
-        )
+    const onGestureEnd=()=>{
+        const aa = translateY.__getValue();
+        panGestureY.setValue(-aa)
     }
 
-    const renderTabBar=(props)=>{
-        const translateY = scrollY.interpolate({
-            inputRange:[0,HeaderHeight],
-            outputRange:[0,-(HeaderHeight+1)],
-            extrapolateRight:'clamp',
-            extrapolateLeft:'clamp',
-            extrapolate:'clamp'
-        })
+    const onGestureHandle=(e)=>{
+        const ref = listRefArr.current[tabIndex].value;
+        if(tabIndex === 0) {
+            if(ref) ref.scrollTo({animated:false,x:0,y: panGestureY._value + (-(e?.nativeEvent?.translationY))});
+        } else {
+            if(ref) ref.scrollToOffset({offset:panGestureY._value + (-(e?.nativeEvent?.translationY)),animated:false});
+        }
+    }
+
+    const onTabPress=React.useCallback((scene)=>{
+        const found = listRefArr.current.findIndex((e)=>e.key === scene.route.key);
+        if(found !== -1) {
+            const ref = listRefArr.current[found].value;
+            if(ref) {
+                Animated.spring(scrollY,{
+                    toValue:0,
+                    useNativeDriver:true
+                }).start(()=>{
+                    panGestureY.setValue(0)
+                });
+                if(found === 0) ref.scrollTo({animated:true,x:0,y:0})
+                else ref.scrollToOffset({offset:0,animated:true})
+            }
+        }
+    },[])
+
+    const renderTabBar=React.useCallback((props)=>{
+
         return (
-            <Animated.View testID="Header-Test" style={{zIndex:1,top:56,left: 0,right: 0,position:'absolute',width:'100%',transform:[{translateY}]}}>
-                {(!data && !error) || (data?.error || error) ? (
-                    <SkeletonHeader />
-                ) : (
-                    <Lay style={{paddingHorizontal:15,height:HeaderHeight,justifyContent:'flex-end',flex:1,paddingBottom:10}}>
-                        <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                            {typeof data?.users?.image !== 'undefined' && (
-                                <Lay>
-                                    <Lay style={{flexDirection:'row',justifyContent:'center',position:'relative'}}>
-                                        {data?.users?.image !== null ? (
-                                            <Image source={{uri:`${data?.users?.image}&size=100&watermark=no`}} dataSrc={{uri:`${data?.users?.image}&watermark=no`}} style={{height:100,width:100,borderRadius:50}} fancybox />
+            <Animated.View testID="Header-Test" style={{zIndex:1,position:'absolute',width:'100%',transform:[{translateY}]}}>
+                <PanGestureHandler
+                    enabled
+                    ref={panRef}
+                    onGestureEvent={onGestureHandle}
+                    onEnded={onGestureEnd}
+                >
+                    <View>
+                        {(!data && !error) || (data?.error || error) ? (
+                            <SkeletonHeader />
+                        ) : (
+                            <Lay style={{paddingHorizontal:15,height:HeaderHeight,justifyContent:'flex-end',flex:1,paddingBottom:10}}>
+                                <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
+                                    {typeof data?.users?.image !== 'undefined' && (
+                                        <Lay>
+                                            <Lay style={{flexDirection:'row',justifyContent:'center',position:'relative'}}>
+                                                {data?.users?.image !== null ? (
+                                                    <Image source={{uri:`${data?.users?.image}&size=100&watermark=no`}} dataSrc={{uri:`${data?.users?.image}&watermark=no`}} style={{height:100,width:100,borderRadius:50}} fancybox />
+                                                ) : (
+                                                    <Avatar name={ucwords(data?.users?.name)} size={100} />
+                                                )}
+                                                <View style={{backgroundColor:theme['color-danger-600'],height:40,width:40,borderRadius:30,position:'absolute',top:60,left:60,flexDirection:'row',justifyContent:'center',alignItems:'center',overflow:'hidden'}}>
+                                                    <Pressable tooltip="QR Code" style={{padding:8}} onPress={()=>handleOpenMenu('qrcode')({})}>
+                                                        <Icon name="qr-code" style={{width:24,height:24,tintColor:'#fff'}} pack="material" />
+                                                    </Pressable>
+                                                </View>
+                                            </Lay>
+                                        </Lay>
+                                    )}
+                                    <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
+                                        {user && user?.id == data?.users?.id ? (
+                                            <Button style={{marginRight:10}} onPress={()=>linkTo(`/user/${data?.users?.username}/edit`)}>{`Edit ${i18n.t('profile')}`}</Button>
                                         ) : (
-                                            <Avatar name={ucwords(data?.users?.name)} size={100} />
+                                            <>
+                                                <Button
+                                                    onPress={handleFollow}
+                                                    style={{marginRight:10}}
+                                                    status={data?.users?.isFollowing && !data?.users?.isPending ? 'danger' : !data?.users?.isFollowing && data?.users?.isPending ? 'basic' : 'primary'}
+                                                    disabled={loading}
+                                                    loading={loading}
+                                                    tooltip={data?.users?.isFollowing && !data?.users?.isPending ? ucwords(i18n.t('unfollow')) : data?.users?.isPending ? `Pending` : ucwords(i18n.t('follow'))}
+                                                >
+                                                    {data?.users?.isFollowing && !data?.users?.isPending ? ucwords(i18n.t('unfollow')) : data?.users?.isPending ? `Pending` : ucwords(i18n.t('follow'))}
+                                                </Button>
+                                                <Button accessoryLeft={MsgIcon} text onPress={()=>setNotif(true,'Error','Under maintenance')} disabled={loading} tooltip={i18n.t('send_type',{type:i18n.t('form.message')})} />
+                                            </>
                                         )}
-                                        <View style={{backgroundColor:theme['color-danger-600'],height:40,width:40,borderRadius:30,position:'absolute',top:60,left:60,flexDirection:'row',justifyContent:'center',alignItems:'center',overflow:'hidden'}}>
-                                            <Pressable tooltip="QR Code" style={{padding:8}} onPress={()=>handleOpenMenu('qrcode')({})}>
-                                                <Icon name="qr-code" style={{width:24,height:24,tintColor:'#fff'}} pack="material" />
-                                            </Pressable>
-                                        </View>
-                                    </Lay>
-                                </Lay>
-                            )}
-                            <View style={{flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-start'}}>
-                                {user && user?.id == data?.users?.id ? (
-                                    <Button style={{marginRight:10}} onPress={()=>linkTo(`/user/${data?.users?.username}/edit`)}>{`Edit ${i18n.t('profile')}`}</Button>
-                                ) : (
-                                    <>
-                                        <Button
-                                            onPress={handleFollow}
-                                            style={{marginRight:10}}
-                                            status={data?.users?.isFollowing && !data?.users?.isPending ? 'danger' : !data?.users?.isFollowing && data?.users?.isPending ? 'basic' : 'primary'}
-                                            disabled={loading}
-                                            loading={loading}
-                                            tooltip={data?.users?.isFollowing && !data?.users?.isPending ? ucwords(i18n.t('unfollow')) : data?.users?.isPending ? `Pending` : ucwords(i18n.t('follow'))}
-                                        >
-                                            {data?.users?.isFollowing && !data?.users?.isPending ? ucwords(i18n.t('unfollow')) : data?.users?.isPending ? `Pending` : ucwords(i18n.t('follow'))}
-                                        </Button>
-                                        <Button accessoryLeft={MsgIcon} text onPress={()=>setNotif(true,'Error','Under maintenance')} disabled={loading} tooltip={i18n.t('send_type',{type:i18n.t('form.message')})} />
-                                    </>
-                                )}
+                                        
+                                    </View>
+                                </View>
+                                <Text style={{fontSize:30,marginTop:10,fontFamily:"Inter_Bold"}}>{data?.users?.name||""}</Text>
+                                <View style={{flexDirection:"row",alignItems:"center"}}>
+                                    <Text style={{fontSize:15,...(data?.users?.verify ? {marginRight:5} : {})}}>{`@${data?.users?.username}`}</Text>
+                                    {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
+                                </View>
                                 
-                            </View>
-                        </View>
-                        <Text style={{fontSize:30,marginTop:10,fontFamily:"Inter_Bold"}}>{data?.users?.name||""}</Text>
-                        <View style={{flexDirection:"row",alignItems:"center"}}>
-                            <Text style={{fontSize:15,...(data?.users?.verify ? {marginRight:5} : {})}}>{`@${data?.users?.username}`}</Text>
-                            {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
-                        </View>
+                            </Lay>
+                        )}
                         
-                    </Lay>
-                )}
+                    </View>
+                </PanGestureHandler>
                 <TabBar
                     {...props}
-                    onTabPress={({route,preventDefault})=>{
-                        if(isListGliding.current) preventDefault();
-                    }}
-                    style={{height:56,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
+                    style={{height:56,elevation:1,backgroundColor:theme['background-basic-color-1']}}
                     indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
                     renderLabel={({route,focused})=>{
                         return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
                     }}
                     pressColor={theme['color-control-transparent-disabled']}
                     pressOpacity={0.8}
+                    onTabPress={onTabPress}
                 />
             </Animated.View>
         )
-    }
+    },[theme,route,data,loading,handleFollow,error,containerPaddingTop,onGestureHandle,navigation])
 
-    const onGetRef=route=>(ref)=>{
+    const onGetRef=React.useCallback((route)=>(ref)=>{
         if(ref) {
             const found = listRefArr.current.findIndex((e)=>e.key === route.key);
             if(found !== -1) {
                 listRefArr.current[found].value = ref
             }
         }
-    }
+    },[])
 
-    const renderScene=({route})=>{
+    const renderScene=React.useCallback(({route})=>{
         const props={
             data,
             error,
-            scrollY,
-            onMomentumScrollBegin,
-            onMomentumScrollEnd,
+            onScroll,
+            containerPaddingTop,
+            scrollIndicatorInsetTop,
             onScrollEndDrag,
             onGetRef:onGetRef(route)
         }
-        if(route.key == 'follower') return <RenderFollow type="follower" {...props} ref={ref.follower} />
-        if(route.key == 'following') return <RenderFollow type="following" {...props} ref={ref.following} />
-        if(route.key == 'media') return <RenderMedia {...props} ref={ref.media} onOpen={handleOpenMenu('media')} />
+        if(route.key == 'follower') return <RenderFollow type="follower" {...props} />
+        if(route.key == 'following') return <RenderFollow type="following" {...props} />
+        if(route.key == 'media') return <RenderMedia {...props} onOpen={handleOpenMenu('media')} />
         if(route.key == 'about') return <RenderAbout {...props} mutate={handleRefreshing} isValidating={refreshing} />
         return null;
-    }
+    },[data,error,onScroll,containerPaddingTop,scrollIndicatorInsetTop,onGetRef,handleRefreshing,refreshing,handleOpenMenu])
 
-    const renderTabView=()=>{
+    const renderTabView=React.useCallback(()=>{
         return (
             <TabView
-                onIndexChange={(index)=>setTabIndex(index)}
+                onIndexChange={(index)=>{
+                    setTabIndex(index)
+                }}
                 navigationState={{index:tabIndex,routes}}
                 renderScene={renderScene}
                 renderTabBar={renderTabBar}
@@ -371,20 +345,20 @@ export default function UserScreen({navigation,route}){
                 lazy
             />
         )
-    }
+    },[tabIndex,routes,renderScene,renderTabBar])
 
-    const handleOpenMenu=(tipe)=>(data)=>{
+    const handleOpenMenu=React.useCallback((tipe)=>(data)=>{
         setOpen({modal:tipe,...data})
         if(tipe==='qrcode') {
             Portalnesia.Brightness.setBrightness(0.8);
         }
-    }
+    },[])
     
-    const handleCloseMenu=async()=>{
+    const handleCloseMenu=React.useCallback(async()=>{
         setOpen(null)
         const system = await Portalnesia.Brightness.getSystemBrightness();
         await Portalnesia.Brightness.setBrightness(system)
-    }
+    },[])
 
     React.useEffect(()=>{
         if(data && !data?.error && !ready) {
@@ -450,8 +424,13 @@ export default function UserScreen({navigation,route}){
 
     return (
         <>
-            <Layout navigation={navigation} whiteBg>
-                {renderNavbar()}
+            <Layout navigation={navigation} whiteBg title={() => (
+                <Animated.View style={{opacity,flexDirection:'row',alignItems:"center",marginHorizontal:50}}>
+                    <Text category="h1" style={{fontSize:18,...(data?.users?.verify ? {marginRight:5} : {})}} numberOfLines={1}>{data?.users?.username||""}</Text>
+                    {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
+                </Animated.View>
+            )}
+            menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpenMenu(true)}} />}>
                 {renderTabView()}
             </Layout>
             <Recaptcha ref={captchaRef} />

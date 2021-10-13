@@ -101,33 +101,31 @@ export default function ({ navigation }) {
 
 	return (
 		<Layout navigation={navigation} title="Blog" menu={()=><FeedbackToggle link="/blog" />}>
-			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
-				<FlatList
-					ListEmptyComponent={renderEmpty}
-					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
-					contentContainerStyle={{
-						...(error ? {flex:1} : {})
-					}}
-					numColumns={2}
-					data={data}
-					renderItem={renderNews}
-					ListFooterComponent={Footer}
-					refreshControl={
-						<RefreshControl
-							colors={['white']}
-							progressBackgroundColor="#2f6f4e"
-							onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
-							refreshing={refreshing}
-						/>
+			<FlatList
+				ListEmptyComponent={renderEmpty}
+				columnWrapperStyle={{flexWrap:'wrap',flex:1}}
+				contentContainerStyle={{
+					...(error ? {flex:1} : {})
+				}}
+				numColumns={2}
+				data={data}
+				renderItem={renderNews}
+				ListFooterComponent={Footer}
+				refreshControl={
+					<RefreshControl
+						colors={['white']}
+						progressBackgroundColor="#2f6f4e"
+						onRefresh={()=>{!isValidating && (setRefreshing(true),mutate())}}
+						refreshing={refreshing}
+					/>
+				}
+				onEndReachedThreshold={0.01}
+				onEndReached={()=>{
+					if(!isReachingEnd && !isLoadingMore) {
+						setSize(size+1)
 					}
-					onEndReachedThreshold={0.01}
-					onEndReached={()=>{
-						if(!isReachingEnd && !isLoadingMore) {
-							setSize(size+1)
-						}
-					}}
-				/>
-				</Lay>
+				}}
+			/>
 		</Layout>
 	);
 }

@@ -17,7 +17,6 @@ import VideoPlayer from '@pn/components/global/VideoPlayer'
 import useSWR from '@pn/utils/swr'
 import style from '@pn/components/global/style'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
-import Header,{useHeader,headerHeight} from '@pn/components/navigation/Header'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import Image from '@pn/components/global/Image'
 import NotFoundScreen from '../NotFound'
@@ -26,12 +25,13 @@ import WebView from 'react-native-autoheight-webview'
 import { AuthContext } from '@pn/provider/Context';
 import Button from '@pn/components/global/Button'
 import {specialHTML,listToMatrix,truncate as Ktruncate} from '@portalnesia/utils'
-import {openBrowser} from '@pn/utils/Main'
+import {openBrowser,getCollapsOpt} from '@pn/utils/Main'
 import useClipboard from '@pn/utils/clipboard'
 import usePost from '@pn/utils/API'
 import Spinner from '@pn/components/global/Spinner'
 import LikeButton from '@pn/components/global/Like'
 import useSelector from '@pn/provider/actions'
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
 
 LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
 
@@ -143,15 +143,14 @@ export default function TwitterThread({navigation,route}){
     const [open,setOpen]=React.useState(false)
     const [ready,setReady]=React.useState(false)
     const [loading,setLoading]=React.useState(false)
-    const heightt = {...headerHeight,sub:0}
-    const {translateY,...other} = useHeader()
-	const heightHeader = heightt?.main + heightt?.sub
     const [menu,setMenu]=React.useState(null)
     const {copyText} = useClipboard()
     const {PNget,PNpost} = usePost();
     const captchaRef = React.useRef(null)
     const [liked,setLiked] = React.useState(false);
     const [refreshing,setRefreshing] = React.useState(false);
+
+    const {onScroll,containerPaddingTop,scrollIndicatorInsetTop} = useCollapsibleHeader(getCollapsOpt(theme))
 
     React.useEffect(()=>{
         if(!isValidating) setRefreshing(false)
@@ -346,18 +345,16 @@ export default function TwitterThread({navigation,route}){
 
     return (
         <>
-        <Layout navigation={navigation}>
-            <Animated.View style={{position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,right: 0,width: '100%',zIndex: 1,transform: [{translateY}]}}>
-				<Header title={"Twitter Thread Reader"} subtitle={data?.screen_name ? `Thread by @${data?.screen_name}` : ""} withBack navigation={navigation} height={56} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />} />
-            </Animated.View>
+        <Layout navigation={navigation} title={"Twitter Thread Reader"} subtitle={data?.screen_name ? `Thread by @${data?.screen_name}` : undefined} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
             <Animated.FlatList
                 ListEmptyComponent={renderEmpty}
                 ListHeaderComponentStyle={{
                     flexGrow: 1,
-                    paddingTop:heightHeader + 2,
+                    paddingTop:containerPaddingTop,
                 }}
+                scrollIndicatorInsets={{top:scrollIndicatorInsetTop}}
                 refreshControl={
-                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={heightHeader} refreshing={refreshing} onRefresh={onRefresh}/>
+                    <RefreshControl colors={['white']} progressBackgroundColor="#2f6f4e" progressViewOffset={containerPaddingTop} refreshing={refreshing} onRefresh={onRefresh}/>
                 }
                 data={data ? data?.tweets : []}
                 ListHeaderComponent={HeaderComp}
@@ -366,7 +363,7 @@ export default function TwitterThread({navigation,route}){
                 )}
                 keyExtractor={(item, index) => 'twitter-thread-'+index}
                 ListFooterComponent={RenderFooter}
-                {...other}
+                onScroll={onScroll}
             />
         </Layout>
         <Recaptcha ref={captchaRef} />

@@ -70,6 +70,7 @@ export default function({navigation,route}){
                         flexGrow:1,
                         backgroundColor:theme['background-basic-color-1']
                     }}
+                    keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
                 >
                     <Lay key={0} style={{paddingTop:10}}>
                         <Lay style={[style.container,{paddingVertical:10}]}>

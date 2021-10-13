@@ -7,7 +7,6 @@ import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 
 import Portalnesia from '@portalnesia/react-native-core'
-import Header,{useHeader,headerHeight as headerHeightt} from '@pn/components/navigation/Header'
 import {MenuToggle,MenuContainer} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
 import {ImageFull} from '@pn/components/global/Image'
@@ -18,7 +17,10 @@ import Button from '@pn/components/global/Button'
 import { AuthContext } from '@pn/provider/Context';
 import { ucwords,extractMeta,randomInt } from '@portalnesia/utils';
 import {saveBase64} from '@pn/utils/Download'
+import {useCollapsibleHeader} from 'react-navigation-collapsible'
+import {getCollapsOpt} from '@pn/utils/Main'
 
+const headerHeight = 46;
 const {width:winWidth,height:winHeight} = Dimensions.get("window")
 
 const tabArray=['url','text','vcard','email','telephone','sms','wifi','geographic'];
@@ -553,6 +555,7 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight})=>{
             contentContainerStyle={{paddingTop: headerHeight}}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
+            keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
             {...scrollProps}
         >
             <Lay style={{flexGrow:1}}>
@@ -612,35 +615,32 @@ export default function QrCodeGenerator({navigation,route}){
         {key:'geographic',title:'Geographic'}
     ])
 	const theme = useTheme()
-	const {translateY,...other}=useHeader()
-	const headerHeight={...headerHeightt,sub:46}
-	const heightHeader = headerHeight?.main + headerHeight?.sub
     const [openMenu,setOpenMenu]=React.useState(false)
     const [open,setOpen] = React.useState(null)
     const [loading,setLoading]=React.useState(null)
 
+    const {onScroll,containerPaddingTop,scrollIndicatorInsetTop,translateY} = useCollapsibleHeader(getCollapsOpt(theme,false))
+
     const renderTabBar=(props)=>{
         return (
-			<Animated.View style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],left: 0,top:0,width: '100%',transform: [{translateY}]}}>
-				<Header title="QR Code Generator" navigation={navigation} height={56} withBack menu={()=><MenuToggle onPress={()=>{setOpenMenu(true)}} /> } >
-					<TabBar
-						{...props}
-						style={{height:46,elevation:0,shadowOpacity:0,backgroundColor:theme['background-basic-color-1']}}
-						indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
-						renderLabel={({route,focused})=>{
-							return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
-						}}
-						pressColor={theme['color-control-transparent-disabled']}
-                    	pressOpacity={0.8}
-                        scrollEnabled
-					/>
-				</Header>
+			<Animated.View style={{zIndex: 1,position:'absolute',backgroundColor: theme['background-basic-color-1'],elevation:5,height:headerHeight,top:containerPaddingTop,width: '100%',transform: [{translateY}]}}>
+                <TabBar
+                    {...props}
+                    style={{height:headerHeight,backgroundColor:theme['background-basic-color-1']}}
+                    indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
+                    renderLabel={({route,focused})=>{
+                        return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
+                    }}
+                    pressColor={theme['color-control-transparent-disabled']}
+                    pressOpacity={0.8}
+                    scrollEnabled
+                />
 			</Animated.View>
 		)
     }
 
     const renderScene=({route})=>{
-        return <RenderScene route={route} onProcess={onProcess} scrollProps={{...other}} headerHeight={heightHeader} />;
+        return <RenderScene route={route} onProcess={onProcess} scrollProps={{onScroll,contentContainerStyle:{paddingTop: containerPaddingTop+headerHeight},scrollIndicatorInset:{top:scrollIndicatorInsetTop+headerHeight}}} headerHeight={headerHeight} />;
     }
 
     const renderTabView=()=>{
@@ -677,7 +677,7 @@ export default function QrCodeGenerator({navigation,route}){
 
     return (
         <>
-            <Layout navigation={navigation} whiteBg>
+            <Layout title="QR Code Generator" subtitle="Tools" navigation={navigation} menu={()=><MenuToggle onPress={()=>{setOpenMenu(true)}} /> } whiteBg>
                 {renderTabView()}
             </Layout>
             <MenuContainer

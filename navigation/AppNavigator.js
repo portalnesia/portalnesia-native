@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator,TransitionPresets,HeaderStyleInterpolators,TransitionSpecs,CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
@@ -43,7 +43,7 @@ import UrlShortener from '../screens/UrlShortener'
 import Contact from '../screens/Contact'
 import User from '../screens/User/User'
 import EditUserScreen from '../screens/User/Edit'
-import DownloadScreen from '../screens/Download'
+import DownloadFileScreen from '../screens/DownloadFile'
 import Setting from '../screens/Setting/Setting'
 import AccountSettingScreen from '../screens/Setting/Account'
 import SecuritySettingScreen from '../screens/Setting/Security'
@@ -74,6 +74,27 @@ import ShareModule from '@pn/module/Share';
 import {Portal} from '@gorhom/portal'
 
 const urlParse = require('url-parse')
+
+const getScreenOptions=(theme)=>({
+	gestureEnabled:true,
+	headerStyle:{
+		backgroundColor:theme['background-basic-color-1'],
+		elevation:5
+	},
+	headerLeftContainerStyle:{
+		paddingLeft:10
+	},
+	headerRightContainerStyle:{
+		paddingRight:10
+	},
+	...TransitionPresets.SlideFromRightIOS,
+	cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+	transitionSpec:{
+		open: TransitionSpecs.TransitionIOSSpec,
+		close: TransitionSpecs.TransitionIOSSpec
+	},
+	headerStyleInterpolator: HeaderStyleInterpolators.forUIKit
+})
 
 /* CREATE BOTTOM NAVIGATOR */
 const Tabs = createBottomTabNavigator();
@@ -125,44 +146,44 @@ const disableAdsArr = ["Setting","Contact","Pages",'NotFound','ImageModal','Menu
 
 const getScreen=()=>{
 	return [
-		{name:"NotFound",component:NotFound},
-		{name:"NewsDetail",component:NewsDetail},
-		{name:"ChordDetail",component:ChordDetail},
-		{name:"ChordList",component:ChordList},
-		{name:"Pages",component:Pages},
-		{name:"Blog",component:Blog},
-		{name:"BlogDetail",component:BlogDetail},
-		{name:"Twitter",component:Twitter},
-		{name:"TwitterThread",component:TwitterThread},
-		{name:"GeodataTransform",component:GeodataTransform},
-		{name:"NumberGenerator",component:NumberGenerator},
-		{name:"ParseHtml",component:ParseHtml},
-		{name:"ImagesChecker",component:ImagesChecker},
-		{name:"Tuner",component:TunerScreen},
-		{name:"QrGenerator",component:QrGenerator},
-		{name:"UrlShortener",component:UrlShortener},
-		{name:"Contact",component:Contact},
-		{name:"BlogList",component:BlogList},
-		{name:"SearchFilter",component:SearchFilter},
-		{name:"Twibbon",component:Twibbon},
-		{name:"TwibbonDetail",component:TwibbonDetail},
+		{name:"NotFound",component:NotFound,options:{headerTitle:"Not Found"}},
+		{name:"NewsDetail",component:NewsDetail,options:{headerTitle:"News"}},
+		{name:"ChordDetail",component:ChordDetail,options:{headerTitle:"Chord"}},
+		{name:"ChordList",component:ChordList,options:{headerTitle:"Chord"}},
+		{name:"Pages",component:Pages,options:{headerTitle:"Pages"}},
+		{name:"Blog",component:Blog,options:{headerTitle:"Blog"}},
+		{name:"BlogDetail",component:BlogDetail,options:{headerTitle:"Blog"}},
+		{name:"Twitter",component:Twitter,options:{headerTitle:"Twitter Thread Reader"}},
+		{name:"TwitterThread",component:TwitterThread,options:{headerTitle:"Twitter Thread Reader"}},
+		{name:"GeodataTransform",component:GeodataTransform,options:{headerTitle:"Transform Coordinate"}},
+		{name:"NumberGenerator",component:NumberGenerator,options:{headerTitle:"Random Number Generator"}},
+		{name:"ParseHtml",component:ParseHtml,options:{headerTitle:"Parse HTML"}},
+		{name:"ImagesChecker",component:ImagesChecker,options:{headerTitle:"Images Checker"}},
+		{name:"Tuner",component:TunerScreen,options:{headerTitle:"Tuner"}},
+		{name:"QrGenerator",component:QrGenerator,options:{headerTitle:"QR Generator"}},
+		{name:"UrlShortener",component:UrlShortener,options:{headerTitle:"URL Shortener"}},
+		{name:"Contact",component:Contact,options:{headerTitle:"Contact"}},
+		{name:"BlogList",component:BlogList,options:{headerTitle:"Blog"}},
+		{name:"SearchFilter",component:SearchFilter,options:{headerTitle:"Search"}},
+		{name:"Twibbon",component:Twibbon,options:{headerTitle:"Twibbon"}},
+		{name:"TwibbonDetail",component:TwibbonDetail,options:{headerTitle:"Twibbon"}},
 		{name:"User",component:User},
-		{name:"OpenSource",component:OpenSource},
-		{name:"OpenSourceDetail",component:OpenSourceDetail},
-		{name:"SecondScreen",component:SecondScreen},
-		{name:"NotificationEvent",component:NotificationEvent},
-		{name:"ReportScreen",component:ReportScreen},
-		{name:"Comments",component:Comments},
-		{name:"Setting",component:Setting},
-		{name:"AccountSettingScreen",component:AccountSettingScreen},
-		{name:"SecuritySettingScreen",component:SecuritySettingScreen},
-		{name:"NotificationSettingScreen",component:NotificationSettingScreen},
-		{name:"LikeFilter",component:LikeFilter},
-		{name:"Like",component:Like},
-		{name:"Media",component:MediaScreen},
-		{name:"EditUserScreen",component:EditUserScreen,options:{gestureEnabled:false}},
-		{name:"DownloadScreen",component:DownloadScreen},
-		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
+		{name:"OpenSource",component:OpenSource,options:{headerTitle:"Open Source"}},
+		{name:"OpenSourceDetail",component:OpenSourceDetail,options:{headerTitle:"Open Source"}},
+		{name:"SecondScreen",component:SecondScreen,options:{headerShown:false}},
+		{name:"NotificationEvent",component:NotificationEvent,options:{headerTitle:"Notification"}},
+		{name:"ReportScreen",component:ReportScreen,options:{headerTitle:"Report"}},
+		//{name:"Comments",component:Comments,options:{headerTitle:"Comment"}},
+		{name:"Setting",component:Setting,options:{headerTitle:"Setting"}},
+		{name:"AccountSettingScreen",component:AccountSettingScreen,options:{headerTitle:"Account Setting"}},
+		{name:"SecuritySettingScreen",component:SecuritySettingScreen,options:{headerTitle:"Security Setting"}},
+		{name:"NotificationSettingScreen",component:NotificationSettingScreen,options:{headerTitle:"Notification Setting"}},
+		{name:"LikeFilter",component:LikeFilter,options:{headerTitle:"Like"}},
+		{name:"Like",component:Like,options:{headerTitle:"Like"}},
+		{name:"Media",component:MediaScreen,options:{headerTitle:"Media"}},
+		{name:"EditUserScreen",component:EditUserScreen,options:{gestureEnabled:false,headerTitle:"Edit Profile"}},
+		{name:"DownloadFileScreen",component:DownloadFileScreen,options:{headerTitle:"Download"}},
+		{name:"ImageModal",component:ImageModal,options:{gestureEnabled:true,headerShown:false,gestureDirection:'vertical',...TransitionPresets.ModalSlideFromBottomIOS}}
 	]
 }
 
@@ -172,66 +193,61 @@ const ChordStack = createStackNavigator();
 const SearchStack = createStackNavigator();
 const MenuStack = createStackNavigator();
 
-const HomeScreenStack = ()=>(
-	<HomeStack.Navigator initialRouteName="Home" screenOptions={{
-		headerShown: false,
-		gestureEnabled:true,
-		...TransitionPresets.SlideFromRightIOS
-	}}>
-		<HomeStack.Screen  name="Home" component={Home} />
-		{getScreen().map((dt,i)=>(
-			<HomeStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-		))}
-	</HomeStack.Navigator>
-)
-const NewsScreenStack = ()=>(
-	<NewsStack.Navigator initialRouteName="News" screenOptions={{
-		headerShown: false,
-		gestureEnabled:true,
-		...TransitionPresets.SlideFromRightIOS
-	}}>
-		<NewsStack.Screen  name="News" component={News} />
-		{getScreen().map((dt,i)=>(
-			<NewsStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-		))}
-	</NewsStack.Navigator>
-)
-const ChordScreenStack = ()=>(
-	<ChordStack.Navigator initialRouteName="Chord" screenOptions={{
-		headerShown: false,
-		gestureEnabled:true,
-		...TransitionPresets.SlideFromRightIOS
-	}}>
-		<ChordStack.Screen  name="Chord" component={Chord} />
-		{getScreen().map((dt,i)=>(
-			<ChordStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-		))}
-	</ChordStack.Navigator>
-)
-const SearchScreenStack = ()=>(
-	<SearchStack.Navigator initialRouteName="Search" screenOptions={{
-		headerShown: false,
-		gestureEnabled:true,
-		...TransitionPresets.SlideFromRightIOS
-	}}>
-		<SearchStack.Screen  name="Search" component={Search} />
-		{getScreen().map((dt,i)=>(
-			<SearchStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-		))}
-	</SearchStack.Navigator>
-)
-const MenuScreenStack = ()=>(
-	<MenuStack.Navigator initialRouteName="Menu" screenOptions={{
-		headerShown: false,
-		gestureEnabled:true,
-		...TransitionPresets.SlideFromRightIOS
-	}}>
-		<MenuStack.Screen  name="Menu" component={Menu} />
-		{getScreen().map((dt,i)=>(
-			<MenuStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-		))}
-	</MenuStack.Navigator>
-)
+const HomeScreenStack = ()=>{
+	const theme=useTheme();
+	return (
+		<HomeStack.Navigator initialRouteName="Home" headerMode="float" screenOptions={getScreenOptions(theme)}>
+			<HomeStack.Screen  name="Home" component={Home} />
+			{getScreen().map((dt,i)=>(
+				<HomeStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+			))}
+		</HomeStack.Navigator>
+	)
+}
+const NewsScreenStack = ()=>{
+	const theme=useTheme();
+	return (
+		<NewsStack.Navigator initialRouteName="News" headerMode="float" screenOptions={getScreenOptions(theme)}>
+			<NewsStack.Screen  name="News" component={News} />
+			{getScreen().map((dt,i)=>(
+				<NewsStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+			))}
+		</NewsStack.Navigator>
+	)
+}
+const ChordScreenStack = ()=>{
+	const theme=useTheme();
+	return (
+		<ChordStack.Navigator initialRouteName="Chord" headerMode="float" screenOptions={getScreenOptions(theme)}>
+			<ChordStack.Screen  name="Chord" component={Chord} />
+			{getScreen().map((dt,i)=>(
+				<ChordStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+			))}
+		</ChordStack.Navigator>
+	)
+}
+const SearchScreenStack = ()=>{
+	const theme=useTheme();
+	return (
+		<SearchStack.Navigator initialRouteName="Search" headerMode="float" screenOptions={getScreenOptions(theme)}>
+			<SearchStack.Screen  name="Search" component={Search} />
+			{getScreen().map((dt,i)=>(
+				<SearchStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+			))}
+		</SearchStack.Navigator>
+	)
+}
+const MenuScreenStack = ()=>{
+	const theme=useTheme();
+	return (
+		<MenuStack.Navigator initialRouteName="Menu" headerMode="float" screenOptions={getScreenOptions(theme)}>
+			<MenuStack.Screen  name="Menu" component={Menu} />
+			{getScreen().map((dt,i)=>(
+				<MenuStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+			))}
+		</MenuStack.Navigator>
+	)
+}
 
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -249,12 +265,6 @@ const MainTabNavigator=()=>{
 	return (
 		<Tabs.Navigator
 			initialRouteName="HomeStack"
-			/*activeColor={theme['color-indicator-bar']}
-			inactiveColor={theme['text-hint-color']}
-			shifting={true}
-			barStyle={{backgroundColor:theme['background-basic-color-1'],borderTopColor:theme['border-basic-color'],borderTopWidth:1,height:54}}
-			*/
-			//tabBar={props=><BottomTabBar {...props} />}
 			backBehavior="initialRoute"
 			tabBarOptions={{
 				keyboardHidesTabBar:true,
@@ -275,21 +285,25 @@ const MainTabNavigator=()=>{
 	)
 }
 
-const MainNavigator=()=>(
-	<MainStack.Navigator initialRouteName="MainTab" screenOptions={{
-		headerShown:false,
-		gestureEnabled:true,
-		...TransitionPresets.SlideFromRightIOS
-	}}>
-		<MainStack.Screen name="MainTab" component={MainTabNavigator} />
-		<MainStack.Screen name="ReportScreen" component={ReportScreen} />
-		<MainStack.Screen name="Login" component={Login} />
-		<MainStack.Screen name="Register" component={Register} />
-		<MainStack.Screen name="Authentication" component={Authentication} />
-		<MainStack.Screen name="ForgetPassword" component={ForgetPassword} />
-		<MainStack.Screen name="ForgetPasswordForm" component={ForgetPasswordForm} />
-	</MainStack.Navigator>
-)
+const MainNavigator=()=>{
+	const theme=useTheme();
+	return (
+		<MainStack.Navigator initialRouteName="MainTab" screenOptions={{
+			headerShown:false,
+			gestureEnabled:true,
+			...TransitionPresets.SlideFromRightIOS
+		}}>
+			<MainStack.Screen name="MainTab" component={MainTabNavigator} />
+			<MainStack.Screen name="ReportScreen" component={ReportScreen} />
+			<MainStack.Screen name="Login" component={Login} />
+			<MainStack.Screen name="Register" component={Register} />
+			<MainStack.Screen name="Authentication" component={Authentication} />
+			<MainStack.Screen name="ForgetPassword" component={ForgetPassword} />
+			<MainStack.Screen name="ForgetPasswordForm" component={ForgetPasswordForm} />
+			<MainStack.Screen name="Comments" component={Comments} options={getScreenOptions(theme)} />
+		</MainStack.Navigator>
+	)
+}
 
 export default React.memo(() => {
 	const {navigationRef} = useRootNavigation();

@@ -132,28 +132,20 @@ class RenderMediaClass extends React.PureComponent{
     }
 
     render(){
-        const {data,error,dt,isValidating,theme,isLoadingInitialData,onGetRef,scrollY,onMomentumScrollBegin,onMomentumScrollEnd,onScrollEndDrag}=this.props
+        const {data,error,dt,isValidating,theme,isLoadingInitialData,onGetRef,onScroll,containerPaddingTop,scrollIndicatorInsetTop,onScrollEndDrag}=this.props
 
         if(isLoadingInitialData || (!data && !error) || (data?.error || error) || data?.users?.media_private===true || data?.users?.suspend===true) {
             return (
                 <Animated.ScrollView
                     scrollToOverflowEnabled
                     ref={onGetRef}
-                    onScroll={Animated.event(
-                        [
-                            {nativeEvent:{contentOffset:{y:scrollY}}}
-                        ],
-                        {
-                            useNativeDriver:true
-                        }
-                    )}
-                    onMomentumScrollBegin={onMomentumScrollBegin}
-                    onMomentumScrollEnd={onMomentumScrollEnd}
+                    onScroll={onScroll}
                     onScrollEndDrag={onScrollEndDrag}
                     contentContainerStyle={{
-                        paddingTop:HeaderHeight + TabBarHeight + 56,
+                        paddingTop:HeaderHeight + containerPaddingTop,
                         minHeight:winHeight + ContentMinHeight
                     }}
+                    scrollIndicatorInsets={{top:HeaderHeight+scrollIndicatorInsetTop}}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                 >
@@ -162,7 +154,7 @@ class RenderMediaClass extends React.PureComponent{
                     ) : data?.users?.suspend==true ? (
                         <RenderMediaPrivate data={data} />
                     ) : (
-                        <SkeletonFollow />
+                        <View style={{marginTop:5}}><SkeletonFollow /></View>
                     )}
                 </Animated.ScrollView>
             )
@@ -178,31 +170,23 @@ class RenderMediaClass extends React.PureComponent{
                 ListEmptyComponent={this.renderEmpty()}
                 scrollToOverflowEnabled
                 ref={(ref)=>onGetRef(ref)}
-                onScroll={Animated.event(
-                    [
-                        {nativeEvent:{contentOffset:{y:scrollY}}}
-                    ],
-                    {
-                        useNativeDriver:true
-                    }
-                )}
-                onMomentumScrollBegin={onMomentumScrollBegin}
-                onMomentumScrollEnd={onMomentumScrollEnd}
+                onScroll={onScroll}
                 onScrollEndDrag={onScrollEndDrag}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{
-                    paddingTop:HeaderHeight + TabBarHeight + 56,
+                    paddingTop:HeaderHeight + containerPaddingTop,
                     minHeight:winHeight + ContentMinHeight,
                     backgroundColor:theme['background-basic-color-2']
                 }}
+                scrollIndicatorInsets={{top:HeaderHeight+scrollIndicatorInsetTop}}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
                         style={{zIndex:5}}
                         colors={['white']}
                         progressBackgroundColor="#2f6f4e"
                         refreshing={this.state.refreshing}
-                        progressViewOffset={HeaderHeight + TabBarHeight + 56}
+                        progressViewOffset={HeaderHeight + containerPaddingTop}
                         title="Refreshing"
                         onRefresh={()=>this.refresh()}
                     />

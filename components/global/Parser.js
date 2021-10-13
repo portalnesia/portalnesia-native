@@ -412,7 +412,7 @@ const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,o
         return RNElement;
     },[])
 
-    React.useEffect(()=>{
+    React.useLayoutEffect(()=>{
         return ()=>{
             Hid = [];
         }
