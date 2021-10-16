@@ -87,6 +87,7 @@ export async function logoutInit() {
     await Promise.all([
         Secure.deleteItemAsync('user'),
         Secure.deleteItemAsync('token'),
+        Secure.deleteItemAsync('lock_fingerprint'),
         notificationInit('logout')
     ])
     return;
@@ -117,8 +118,6 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                 await Promise.all([
                     revokeToken(token),
                     logoutInit(),
-                    Secure.deleteItemAsync("token"),
-                    Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
                 dispatch(actionLogout())
@@ -128,8 +127,6 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                 logError(e,"logout Login.ts");
                 await Promise.all([
                     logoutInit(),
-                    Secure.deleteItemAsync("token"),
-                    Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
                 dispatch(actionLogout())
@@ -137,8 +134,6 @@ export default function useLogin(setNotif?: UseLoginOptions) {
         } else {
             await Promise.all([
                 logoutInit(),
-                Secure.deleteItemAsync("user"),
-                Secure.deleteItemAsync("token"),
                 [...(account?.name ? [Authentication.removeAccount(account)] : [])]
             ])
             dispatch(actionLogout())

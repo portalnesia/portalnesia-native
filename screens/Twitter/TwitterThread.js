@@ -37,6 +37,17 @@ LogBox.ignoreLogs(['Cannot update a component from inside the function body']);
 
 const MoreIcon=(props)=><Icon {...props} style={{...props?.style,marginHorizontal:0}} name="more-vertical" />
 
+const RenderCaraousel = React.memo(({item, index:i}) => {
+	return (
+		<Card key={i} onPress={()=>pushTo(`/twitter/thread/${item?.id}`)}>
+			<Text category="p1" style={{fontWeight:"600"}}>{specialHTML(item?.title)}</Text>
+            <Text appearance="hint" category="label" style={{marginTop:10}}>{`Thread by @${item?.screen_name}`}</Text>
+		</Card>
+	);
+})
+
+const renderCarousel=(props)=><RenderCaraousel {...props} />
+
 const RenderTwitter=React.memo(({item,index,setMenu})=>{
     const {width} = useWindowDimensions()
     const contextTheme = useSelector(state=>state.theme);
@@ -257,7 +268,7 @@ export default function TwitterThread({navigation,route}){
                         ) : dataOthers?.data?.popular?.length > 0 ? (
                             <Carousel
                                 data={dataOthers?.data?.popular}
-                                renderItem={(props)=><RenderCaraousel {...props} />}
+                                renderItem={renderCarousel}
                                 autoplay
                             />
                         ) : (
@@ -343,9 +354,15 @@ export default function TwitterThread({navigation,route}){
         }
     },[user,PNpost,slug])
 
+    const renderItem=React.useCallback(({item,index})=>(
+        <RenderTwitter index={index} item={item} setMenu={setMenu} />
+    ),[])
+
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />,[data]);
+
     return (
         <>
-        <Layout navigation={navigation} title={"Twitter Thread Reader"} subtitle={data?.screen_name ? `Thread by @${data?.screen_name}` : undefined} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
+        <Layout navigation={navigation} title={"Twitter Thread Reader"} subtitle={data?.screen_name ? `Thread by @${data?.screen_name}` : undefined} menu={menuToggle}>
             <Animated.FlatList
                 ListEmptyComponent={renderEmpty}
                 ListHeaderComponentStyle={{
@@ -358,9 +375,7 @@ export default function TwitterThread({navigation,route}){
                 }
                 data={data ? data?.tweets : []}
                 ListHeaderComponent={HeaderComp}
-                renderItem={({item,index})=>(
-                    <RenderTwitter index={index} item={item} setMenu={setMenu} />
-                )}
+                renderItem={renderItem}
                 keyExtractor={(item, index) => 'twitter-thread-'+index}
                 ListFooterComponent={RenderFooter}
                 onScroll={onScroll}
@@ -430,12 +445,3 @@ export default function TwitterThread({navigation,route}){
         </>
     )
 }
-
-const RenderCaraousel = React.memo(({item, index:i}) => {
-	return (
-		<Card key={i} onPress={()=>pushTo(`/twitter/thread/${item?.id}`)}>
-			<Text category="p1" style={{fontWeight:"600"}}>{specialHTML(item?.title)}</Text>
-            <Text appearance="hint" category="label" style={{marginTop:10}}>{`Thread by @${item?.screen_name}`}</Text>
-		</Card>
-	);
-})

@@ -32,19 +32,19 @@ export default function Tooltip(props: TooltipProps){
 
     const [visible,setVisible]=React.useState(false);
 
-    const onPress=()=>setVisible(true)
+    const onPress=React.useCallback(()=>setVisible(true),[])
 
     const defaultStyle=React.useMemo(()=>{
         return {width:size||defaultSize,height:size||defaultSize,tintColor:theme['text-hint-color']}
     },[theme,size])
 
-    const render=()=>(
+    const render=React.useCallback(()=>(
         <View style={[style,defaultViewStyle(size)]}>
             <Pressable style={[pressableStyle,PressableStyle]} onPress={onPress}>
                 <Icon name={name} pack={pack} style={defaultStyle} />
             </Pressable>
         </View>
-    )
+    ),[defaultStyle,pressableStyle,name,pack,size])
 
     //{(props)=><Text {...props}>{tooltip}</Text>}
     return (

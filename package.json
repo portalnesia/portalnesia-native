@@ -1,4 +1,9 @@
 {
+  "private": true,
+  "name": "portal-native",
+  "version": "2.13.0",
+  "author": "Putu Aditya <aditya@portalnesia.com>",
+  "license": "MIT",
   "scripts": {
     "start": "npx react-native start",
     "android": "npx react-native run-android",
@@ -17,7 +22,7 @@
     "@expo/vector-icons": "^12.0.0",
     "@gorhom/portal": "^1.0.4",
     "@native-html/table-plugin": "^3.1.1",
-    "@portalnesia/react-native-core": "^1.0.5",
+    "@portalnesia/react-native-core": "^1.2.0",
     "@portalnesia/utils": "^1.0.3",
     "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-native-community/datetimepicker": "3.5.2",
@@ -51,7 +56,6 @@
     "expo-asset": "~8.3.2",
     "expo-auth-session": "~3.3.1",
     "expo-av": "~9.2.3",
-    "expo-background-fetch": "^9.2.2",
     "expo-cellular": "~3.2.0",
     "expo-clipboard": "~1.1.0",
     "expo-constants": "~11.0.1",
@@ -72,7 +76,6 @@
     "expo-secure-store": "~10.2.0",
     "expo-splash-screen": "~0.11.2",
     "expo-status-bar": "~1.0.4",
-    "expo-task-manager": "^9.2.2",
     "expo-updates": "~0.8.0",
     "expo-video-player": "^1.6.1",
     "expo-web-browser": "~9.2.0",
@@ -95,6 +98,7 @@
     "react-native-appearance": "~0.3.3",
     "react-native-autoheight-webview": "^1.5.8",
     "react-native-background-downloader": "^2.3.4",
+    "react-native-background-timer": "^2.4.1",
     "react-native-biometrics": "^2.1.4",
     "react-native-chart-kit": "^6.11.0",
     "react-native-draggable-flatlist": "^2.6.2",
@@ -122,6 +126,7 @@
     "react-native-web": "~0.13.12",
     "react-native-webview": "11.6.2",
     "react-native-youtube": "^2.0.1",
+    "react-navigation-collapsible": "^5.10.2",
     "react-redux": "^7.2.4",
     "react-syntax-highlighter": "^15.4.3",
     "redux": "^4.1.0",
@@ -153,10 +158,5 @@
     "react-native-dotenv": "^3.0.0",
     "react-test-renderer": "~16.13.1",
     "typescript": "~4.0.0"
-  },
-  "private": true,
-  "name": "portal-native",
-  "version": "2.11.0",
-  "author": "Putu Aditya <aditya@portalnesia.com>",
-  "license": "MIT"
+  }
 }

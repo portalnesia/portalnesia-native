@@ -59,9 +59,9 @@ interface RenderListProps {
 
 const RenderList = React.memo(({item,index,onPress}: RenderListProps)=>{
     const theme=useTheme()
-    const margin = item?.tag == 'h3' ? 0 : item?.tag == 'h4' ? 15 : 30;
-    const fontSize = item?.tag == 'h3' ? 15 : item?.tag == 'h4' ? 14 : 13;
-    const renderTitle = (props?: PropsType)=>(
+    const margin = React.useMemo(()=>(item?.tag == 'h3' ? 0 : item?.tag == 'h4' ? 15 : 30),[item]);
+    const fontSize = React.useMemo(()=>(item?.tag == 'h3' ? 15 : item?.tag == 'h4' ? 14 : 13),[item]);
+    const renderTitle = React.useCallback((props?: PropsType)=>(
         <View style={{alignItems:'flex-start',flexDirection:'row',justifyContent:'flex-start',marginLeft:margin}}>
             <View
                 style={{
@@ -74,7 +74,7 @@ const RenderList = React.memo(({item,index,onPress}: RenderListProps)=>{
             />
             <Text {...props} style={[props?.style,{fontSize}]}>{item?.name}</Text>
         </View>
-    )
+    ),[fontSize,item,margin])
 
     return (
         <Lay>

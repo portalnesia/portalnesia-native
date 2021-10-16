@@ -328,10 +328,13 @@ function URLshortener({navigation,route}){
         ShareModule.addListener(dataListener)
         return ()=>ShareModule.removeListener(dataListener);
     },[])
+
+    const renderItem=React.useCallback((prop)=><RenderURL {...prop} onMenu={onMenu} />,[onMenu])
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setOpen(true)}} />,[data]);
     
     return (
         <>
-            <Layout navigation={navigation} title="URL Shortener" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
+            <Layout navigation={navigation} title="URL Shortener" withBack menu={menuToggle}>
                 {typeof user==='object' ? (
                     <FlatList
                         contentContainerStyle={{
@@ -340,7 +343,7 @@ function URLshortener({navigation,route}){
                         }}
                         ListHeaderComponent={RenderHeader}
                         data={data}
-                        renderItem={(prop)=><RenderURL {...prop} onMenu={onMenu} />}
+                        renderItem={renderItem}
                         ListEmptyComponent={RenderEmpty}
                         ListFooterComponent={RenderFooter}
                         refreshControl={

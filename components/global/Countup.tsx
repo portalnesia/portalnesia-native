@@ -10,23 +10,24 @@ export type CountUpProps={
 
 function CountUp(props:CountUpProps){
     const {data,suffix,prefix,onComplete} = props;
+    const [count,setCount] = React.useState(false)
     const start = React.useRef(0);
     const prevStart = React.useRef(0);
 
-    const handleComplete=()=>{
+    const handleComplete=React.useCallback(()=>{
         if(start.current !== data.number) {
             prevStart.current = data.number;
         }
         if(onComplete) onComplete();
-    }
+    },[data,onComplete])
 
-    const handleFormatter=(num: number): string=>{
+    const handleFormatter=React.useCallback((num: number): string=>{
         if(num===data?.number) {
             return data?.format;
         } else {
             return num.toFixed(0).toString();
         }
-    }
+    },[data])
 
     React.useEffect(()=>{
         if(prevStart.current !== start.current) {
@@ -34,9 +35,13 @@ function CountUp(props:CountUpProps){
         }
     },[data?.number])
 
+    React.useLayoutEffect(()=>{
+        setCount(true);
+    },[])
+
     return (
         <Countt
-            isCounting
+            isCounting={count}
             start={start.current}
             end={data.number}
             onComplete={handleComplete}

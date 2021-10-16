@@ -21,6 +21,13 @@ import useAPI from '@pn/utils/API'
 
 const winHeight = Dimensions.get('window').height;
 
+const RenderItem=React.memo(({item,index})=>{
+    const accessoryRight=React.useCallback(()=><MemoAvatar src={item?.thumbs} />,[item])
+    return (
+        <ListItem onPress={()=>linkTo(`/media/${item?.id}`)} key={index.toString()} title={item?.title} accessoryLeft={accessoryRight} style={{paddingVertical:5}} />
+    )
+})
+const renderItem=(props)=> <RenderItem {...props} />
 const MemoAvatar=React.memo(({src})=>(
     <Avatar style={{marginRight:10}} src={src} size={45} />
 ))
@@ -60,7 +67,7 @@ export default function MediaScreen({navigation,route}){
             if(data) {
                 if(data?.file?.type === 'audio') {
                     navigation?.goBack()
-                    await setupPlayer({
+                    setupPlayer({
                         id:data?.file?.id,
                         id_number:data?.file?.id_number,
                         title:data?.file?.title,
@@ -68,7 +75,16 @@ export default function MediaScreen({navigation,route}){
                         url:data?.file?.url,
                         artwork:`${CONTENT_URL}/img?export=twibbon&source=images&image=lagu.png`
                     })
-                } else {
+                }
+            }
+        }
+        getData();
+    },[data])
+
+    React.useEffect(()=>{
+        async function getData() {
+            if(data) {
+                if(data?.file?.type !== 'audio') {
                     if(!dataOthers || dataOthers?.error) {
                         mutate();
                     }
@@ -89,6 +105,7 @@ export default function MediaScreen({navigation,route}){
             <Text>No data</Text>
         )
     },[dataOthers,isValidating])
+    const renderHeader=React.useCallback(()=><RenderHeader data={data} />,[data])
 
     return(
         <>
@@ -103,7 +120,7 @@ export default function MediaScreen({navigation,route}){
                     <React.Fragment>
                         {data?.file?.type === 'youtube' && data?.file?.youtube_id ? (
                             <Lay style={{paddingBottom:10}}>
-                                <Player youtube={data?.file?.youtube_id} youtubeOptions={{onChangeState:onChangeState}} />
+                                <Player youtube={data?.file?.youtube_id} youtubeOptions={{onChangeState}} />
                             </Lay>
                         ) : null}
                         <FlatList
@@ -112,8 +129,8 @@ export default function MediaScreen({navigation,route}){
                             keyboardDismissMode="on-drag"
                             keyboardShouldPersistTaps="handled"
                             contentContainerStyle={{backgroundColor:theme['background-basic-color-1'],...(dataOthers && dataOthers?.file?.length === 0 ? {flex:1} : {flexGrow:1})}}
-                            ListHeaderComponent={()=><RenderHeader data={data} />}
-                            renderItem={(props)=> <RenderItem {...props} />}
+                            ListHeaderComponent={renderHeader}
+                            renderItem={renderItem}
                             ItemSeparatorComponent={Divider}
                         />
                     </React.Fragment>
@@ -122,10 +139,3 @@ export default function MediaScreen({navigation,route}){
         </>
     )
 }
-
-const RenderItem=React.memo(({item,index})=>{
-    
-    return (
-        <ListItem onPress={()=>linkTo(`/media/${item?.id}`)} key={index.toString()} title={item?.title} accessoryLeft={()=><MemoAvatar src={item?.thumbs} />} style={{paddingVertical:5}} />
-    )
-})

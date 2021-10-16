@@ -19,13 +19,14 @@ export default function withTooltip<P>(Component: React.ComponentType<P>){
         const onPress=()=>setVisible(true)
 
         const render=()=> <Component {...props} onLongPress={onPress} />
+        const handleVisible=React.useCallback(()=>setVisible(false),[])
 
         if(tooltip) {
             return (
                 <Tooltip
                     anchor={render}
                     visible={visible}
-                    onBackdropPress={()=>setVisible(false)}
+                    onBackdropPress={handleVisible}
                     style={{maxWidth:width-100}}
                 >
                     {tooltip}

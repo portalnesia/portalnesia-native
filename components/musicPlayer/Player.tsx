@@ -1,5 +1,5 @@
 import React from 'react'
-import {View,Dimensions,Animated} from 'react-native'
+import {View,Dimensions,Animated,InteractionManager} from 'react-native'
 import {Text,useTheme} from '@ui-kitten/components'
 import Slider from '@react-native-community/slider'
 import TrackPlayer,{usePlaybackState,useProgress,State} from 'react-native-track-player'
@@ -50,27 +50,37 @@ const RenderPlayer=({animated,queueAnim}:MiniHeaderTypes)=>{
         if(track) setTimeProg(progress);
     },[progress,track])
 
-    const onSliding=React.useCallback(async(value)=>{
-        const aa = {...timeProg,position:value};
-        setTimeProg(aa)
-        await TrackPlayer.seekTo(value)
+    const onSliding=React.useCallback((value)=>{
+        InteractionManager.runAfterInteractions(async()=>{
+            const aa = {...timeProg,position:value};
+            setTimeProg(aa)
+            await TrackPlayer.seekTo(value)
+            return Promise.resolve();
+        })
+        
     },[timeProg])
 
     const handleVolume = React.useCallback(()=>{
-        if(volume !== 0) {
-            setMuted(volume)
-            setVolume(0);
-        }
-        else {
-            setVolume(muted);
-            setMuted(null)
-        }
+        InteractionManager.runAfterInteractions(()=>{
+            if(volume !== 0) {
+                setMuted(volume)
+                setVolume(0);
+            }
+            else {
+                setVolume(muted);
+                setMuted(null)
+            }
+        })
     },[volume,muted])
 
-    const onSkipPrevious=React.useCallback(async()=>{
-        const position = await TrackPlayer.getPosition();
-        if(position < 10) TrackPlayer.skipToPrevious()
-        else TrackPlayer.seekTo(0);
+    const onSkipPrevious=React.useCallback(()=>{
+        InteractionManager.runAfterInteractions(async()=>{
+            const position = await TrackPlayer.getPosition();
+            if(position < 10) TrackPlayer.skipToPrevious()
+            else TrackPlayer.seekTo(0);
+            return Promise.resolve();
+        })
+        
     },[])
 
     return(

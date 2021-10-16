@@ -10,7 +10,6 @@ public class BasePackageList {
         new expo.modules.ads.admob.AdMobPackage(),
         new expo.modules.application.ApplicationPackage(),
         new expo.modules.av.AVPackage(),
-        new expo.modules.backgroundfetch.BackgroundFetchPackage(),
         new expo.modules.cellular.CellularPackage(),
         new expo.modules.clipboard.ClipboardPackage(),
         new expo.modules.constants.ConstantsPackage(),
@@ -30,7 +29,6 @@ public class BasePackageList {
         new expo.modules.permissions.PermissionsPackage(),
         new expo.modules.securestore.SecureStorePackage(),
         new expo.modules.splashscreen.SplashScreenPackage(),
-        new expo.modules.taskManager.TaskManagerPackage(),
         new expo.modules.updates.UpdatesPackage(),
         new expo.modules.webbrowser.WebBrowserPackage()
     );

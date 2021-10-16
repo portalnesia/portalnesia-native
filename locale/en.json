@@ -233,7 +233,9 @@
         },
         "security":{
             "logout":"You must \"LOGOUT\" to remove this device session",
-            "auth_help":"Instead of using a password, you can use your fingerprint to authenticate your account"
+            "auth_help":"Instead of using a password, you can use your fingerprint to authenticate your account",
+            "lock_with":"Lock with %{type}",
+            "lock_help":"Lock your phone with fingerprint after exiting app or 1 minutes after app is backgrounded"
         },
         "notification":{
             "title_feature":"Features & Promotion",

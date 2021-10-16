@@ -229,7 +229,9 @@
         },
         "security":{
             "logout":"Anda harus \"LOGOUT\" untuk menghapus perangkat ini",
-            "auth_help":"Alih-alih menggunakan kata sandi, Anda dapat menggunakan sidik jari untuk mengontentikasi akun Anda"
+            "auth_help":"Alih-alih menggunakan kata sandi, Anda dapat menggunakan sidik jari untuk mengontentikasi akun Anda",
+            "lock_with":"Kunci dengan %{type}",
+            "lock_help":"Kunci perangkat Anda menggunakan sidik jari setelah keluar dari aplikasi atau 1 menit setelah aplikasi berjalan di latar belakang"
         },
         "notification":{
             "title_feature":"Fitur & Promosi",

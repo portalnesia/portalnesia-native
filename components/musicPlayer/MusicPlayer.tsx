@@ -1,5 +1,5 @@
 import React from 'react'
-import {Dimensions,Animated,View} from 'react-native'
+import {Dimensions,Animated,View,InteractionManager} from 'react-native'
 import {Modalize} from 'react-native-modalize'
 import {useTheme} from '@ui-kitten/components'
 import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,EventType,getInitialURL} from 'expo-linking'
@@ -24,21 +24,26 @@ function MusicPlayer() {
     const queueAnim = React.useRef(new Animated.Value(0)).current;
 
     React.useEffect(()=>{
-        if(track) modalRef.current?.open("default");
-        else modalRef.current?.close("default");
+        InteractionManager.runAfterInteractions(()=>{
+            if(track) modalRef.current?.open("default");
+            else modalRef.current?.close("default");
+        })
+        
     },[track])
 
     const onPositionChange=React.useCallback((position)=>{
-        setHandle(position==='top')
-        if(position!=='top') {
-            setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
-            queueRef.current?.close("alwaysOpen")
-        } else {
-            setStatusBarBackgroundColor(theme['background-basic-color-2'],true)
-        }
+        InteractionManager.runAfterInteractions(()=>{
+            setHandle(position==='top')
+            if(position!=='top') {
+                setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
+                queueRef.current?.close("alwaysOpen")
+            } else {
+                setStatusBarBackgroundColor(theme['background-basic-color-2'],true)
+            }
+        })
     },[])
     const onQPositionChange=React.useCallback((position)=>{
-        setQHandle(position==='top')
+        InteractionManager.runAfterInteractions(()=>setQHandle(position==='top'))
     },[])
 
     React.useEffect(()=>{
@@ -67,8 +72,11 @@ function MusicPlayer() {
 				}
 			}
 		}
-        getInitialLink();
-        ExpoAddListener('url',handleURL)
+        InteractionManager.runAfterInteractions(()=>{
+            getInitialLink();
+            ExpoAddListener('url',handleURL)
+        })
+        
         return ()=>{
             ExpoRemoveListener('url',handleURL);
         }

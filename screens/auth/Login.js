@@ -166,7 +166,11 @@ export default function LoginScreen({ navigation,route }) {
 		} finally {
 			setLoading(null)
 		}
-	},[PNpost])
+	},[PNpost,navigation])
+
+	const handleNavigation=React.useCallback((screen)=>()=>{
+		navigation.navigate(screen)
+	},[navigation])
 
 	React.useEffect(()=>{
 		setReady(true);
@@ -291,9 +295,7 @@ export default function LoginScreen({ navigation,route }) {
 									Don't have an account?
 								</Text>
 								<TouchableOpacity
-									onPress={() => {
-										navigation.navigate('Register');
-									}}
+									onPress={handleNavigation("Register")}
 									activeOpacity={0.7}
 								>
 									<Text {...(loading!==null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>
@@ -310,9 +312,7 @@ export default function LoginScreen({ navigation,route }) {
 								}}
 							>
 								<TouchableOpacity
-									onPress={() => {
-										navigation.navigate('ForgetPassword');
-									}}
+									onPress={handleNavigation("ForgetPassword")}
 									activeOpacity={0.7}
 								>
 									<Text {...(loading !== null ? {appearance:"hint"} : {style:{textDecorationLine:"underline"},status:"info"})}>

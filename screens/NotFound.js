@@ -25,11 +25,11 @@ export default function NotFoundScreen({navigation}){
     const theme=useTheme();
     const ref = React.useRef(null);
 
-    const Header = (
+    const Header = React.useMemo(()=>(
         <View style={{alignItems:'center',justifyContent:'center',padding:9}}>
             <View style={{width:60,height:7,backgroundColor:theme['text-hint-color'],borderRadius:5}} />
         </View>
-    )
+    ),[theme])
 
     return (
         <>

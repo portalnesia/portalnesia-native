@@ -101,7 +101,6 @@ type CommentType={
     posUrl: string,
     commentType: CommentsType,
     posId: number,
-    recaptcha: string,
     data: DataResult|ReplyResult,
     parentId?: number,
     children?: React.ReactNode,
@@ -148,7 +147,6 @@ export function Comments(props: CommentsProps){
     const [data,setData]=React.useState<Array<DataResult>>([]);
     const [loadingCom,setLoadingCom]=React.useState<string|number|null>(null)
     //const [expand,setExpand]=React.useState<string|number|null>(null)
-    const [recaptcha,setRecaptcha] = React.useState<string>("")
     const textRef=React.useRef<Input>(null)
     const textNameRef=React.useRef<Input>(null)
     const textEmailRef=React.useRef<Input>(null)
@@ -158,11 +156,7 @@ export function Comments(props: CommentsProps){
     const modalRef = React.useRef<Modalize>();
     //const collapRef: React.Ref<CollapseClass> = React.useRef()
 
-    const onReceiveToken=(token: string)=>{
-        setRecaptcha(token)
-    }
-
-    const getComment=(lastid?: number)=>{
+    const getComment=React.useCallback((lastid?: number)=>{
         setLoading('global')
         PNgraph<SuccessResult>("/graphql",gql`{
             comments(jenis:"${type}",id:"${posId}",last_id:${lastid||0},comment_id:${com_id}){
@@ -213,9 +207,9 @@ export function Comments(props: CommentsProps){
             console.log(err)
         })
         .finally(()=>setLoading(null))
-    }
+    },[type,posId,PNgraph,com_id,data])
 
-    const getReplies=(comment_id: number,lastid?: number)=>{
+    const getReplies=React.useCallback((comment_id: number,lastid?: number)=>{
         setLoading(`comment-${comment_id}`)
         PNgraph<SuccessReplyResult>(`/graphql`,gql`{
             comments_replies(jenis:"${type}",id:"${posId}",last_id:${lastid||0},comments_id:${comment_id}){
@@ -254,9 +248,9 @@ export function Comments(props: CommentsProps){
             
         })
         .finally(()=>setLoading(null))
-    }
+    },[type,posId,PNgraph,com_id,data])
 
-    const handleReply=(params: ReplyValueType)=>{
+    const handleReply=React.useCallback((params: ReplyValueType)=>{
         if(user===false) setNotif(true,"Error","Login to reply a comment")
         else {
             setReply(params)
@@ -265,7 +259,7 @@ export function Comments(props: CommentsProps){
                 textRef?.current?.focus()
             },200)
         }
-    }
+    },[user])
 
     const handleSubmit=()=>{
         if(value?.match(/\S+/) === null) {
@@ -296,9 +290,9 @@ export function Comments(props: CommentsProps){
     const processComment=(send: SendType)=>{
         const dataInput = {
             ...send,
-            recaptcha
         }
-        PNpost<PostSuccess<DataResult>>(`/comments/add`,dataInput)
+        captchaRef.current?.getToken()
+        .then(recaptcha=>PNpost<PostSuccess<DataResult>>(`/comments/add`,{...dataInput,recaptcha}))
         .then(res=>{
             if(res.error===1) {
                 setTimeout(()=>textRef?.current?.focus(),200);
@@ -316,16 +310,15 @@ export function Comments(props: CommentsProps){
             setTimeout(()=>textRef?.current?.focus(),200);
         }).finally(()=>{
             setLoading(null)
-            captchaRef.current?.refreshToken()
         })
     }
 
     const processReply=(send: SendType)=>{
         const dataInput = {
             ...send,
-            recaptcha
         }
-        PNpost<PostSuccess<DataResult>>(`/comments/add`,dataInput)
+        captchaRef.current?.getToken()
+        .then((recaptcha)=>PNpost<PostSuccess<DataResult>>(`/comments/add`,{...dataInput,recaptcha}))
         .then(res=>{
             if(res.error===1) {
                 setTimeout(()=>textRef?.current?.focus(),200);
@@ -354,7 +347,6 @@ export function Comments(props: CommentsProps){
             setTimeout(()=>textRef?.current?.focus(),200);
         }).finally(()=>{
             setLoading(null)
-            captchaRef.current?.refreshToken()
         })
     }
 
@@ -393,7 +385,13 @@ export function Comments(props: CommentsProps){
         getComment();
     },[])
 
-    const renderChild=({data,item,index, ii}: {data: DataResult,item:ReplyResult,index: number,ii: number})=>{
+    const renderEmptyChild=React.useCallback(()=>(
+        <View style={{alignItems:'center',paddingVertical:10}}>
+            <Text style={{fontSize:13}} appearance="hint">{i18n.t('no_reply')}</Text>
+        </View>
+    ),[])
+
+    const renderChild=React.useCallback(({data,item,index, ii}: {data: DataResult,item:ReplyResult,index: number,ii: number})=>{
 
         return (
             <Comment 
@@ -410,7 +408,6 @@ export function Comments(props: CommentsProps){
                 theme={theme}
                 PNpost={PNpost}
                 setNotif={setNotif}
-                recaptcha={recaptcha}
                 copyText={copyText}
                 sendReport={sendReport}
                 posUrl={posUrl}
@@ -418,8 +415,9 @@ export function Comments(props: CommentsProps){
                 commentType={type}
             />
         )
-    }
-    const renderItem=({item,index} : {item: DataResult,index: number})=>{
+    },[type,posId,posUrl,PNpost,handleDelete,handleReply,loadingCom,theme])
+
+    const renderItem=React.useCallback(({item,index} : {item: DataResult,index: number})=>{
 
         return (
             <Comment 
@@ -435,7 +433,6 @@ export function Comments(props: CommentsProps){
                 theme={theme}
                 PNpost={PNpost}
                 setNotif={setNotif}
-                recaptcha={recaptcha}
                 copyText={copyText}
                 totalReply={item.total_reply}
                 sendReport={sendReport}
@@ -453,9 +450,9 @@ export function Comments(props: CommentsProps){
                 />
             </Comment>
         )
-    }
+    },[type,posId,posUrl,PNpost,renderEmptyChild,renderChild,handleDelete,handleReply,loadingCom,theme])
 
-    const renderHeader=()=>{
+    const renderHeader=React.useCallback(()=>{
         if(loading==='global') {
             return (
                 <View style={{marginTop:10}}>
@@ -472,9 +469,9 @@ export function Comments(props: CommentsProps){
             )
         }
         return null;
-    }
+    },[reachEnd,loading,theme,data,getComment])
 
-    const RenderHeaderChild=({item}: {item: DataResult})=>{
+    const RenderHeaderChild=React.useCallback(({item}: {item: DataResult})=>{
         if(loading===`comment-${item.id}`) {
             return (
                 <View style={{marginLeft:55,marginTop:10}}>
@@ -491,15 +488,9 @@ export function Comments(props: CommentsProps){
             )
         }
         return null;
-    }
+    },[loading,getReplies,theme])
 
-    const renderEmptyChild=()=>(
-        <View style={{alignItems:'center',paddingVertical:10}}>
-            <Text style={{fontSize:13}} appearance="hint">{i18n.t('no_reply')}</Text>
-        </View>
-    )
-
-    const renderEmpty=()=>{
+    const renderEmpty=React.useCallback(()=>{
         if(loading===null) {
             return (
                 <View style={{alignItems:'center',paddingVertical:10}}>
@@ -508,20 +499,20 @@ export function Comments(props: CommentsProps){
             )
         }
         return null;
-    }
+    },[loading])
 
-    const onClose=()=>{
+    const onClose=React.useCallback(()=>{
         textRef.current?.blur();
         textEmailRef.current?.blur();
         textNameRef.current?.blur();
         setReply(null)
-    }
+    },[])
 
-    const onPositionChange=(position: "top" | "initial")=>{
+    const onPositionChange=React.useCallback((position: "top" | "initial")=>{
         if(position==='initial') {
             setReply(null)
         }
-    }
+    },[])
 
     return (
         <>
@@ -557,7 +548,7 @@ export function Comments(props: CommentsProps){
                     <RenderHeader onSubmit={handleSubmit} modalRef={modalRef} reply={reply} setReply={setReply} value={value} setValue={setValue} unLogin={unLogin} setUnlogin={setUnlogin} loading={loading} textRef={textRef} textEmailRef={textEmailRef} textNameRef={textNameRef} />
                 </Lay>
             </Modalize>
-            <Recaptcha ref={captchaRef} onReceiveToken={onReceiveToken} />
+            <Recaptcha ref={captchaRef} />
         </>
     )
 }
@@ -735,10 +726,11 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
     }
 
     handleDelete(){
-        const {PNpost,setNotif,data:dt,onDelete,type,parentId,recaptcha}=this.props
+        const {PNpost,data:dt,onDelete,type,parentId}=this.props
         this.setState({loading:true});
-        
-        PNpost(`/comments/delete`,{token:dt?.delete_token,recaptcha}).then((res: any)=>{
+        captchaRef.current?.getToken()
+        .then((recaptcha)=>PNpost(`/comments/delete`,{token:dt?.delete_token,recaptcha}))
+        .then((res: any)=>{
             if(!res.error) {
                 const params: OnDeleteType={
                     type:type,
@@ -752,7 +744,6 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
         })
         .finally(()=>{
             this.setState({loading:false})
-            captchaRef.current?.refreshToken()
         })
     }
 
@@ -793,8 +784,47 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
         this.setState(prev=>({...prev,expand:!prev.expand}));
     }
 
+    renderTitle(props?: TextProps){
+        const {data:dt,theme}=this.props;
+        return (
+            <View style={{alignItems:'flex-start'}}>
+                <Text {...props} style={[props?.style,{fontSize:13,marginHorizontal:0,marginBottom:3,fontFamily:'Inter_SemiBold',textDecorationLine:"underline",...(dt?.user?.user_login !== null ? {color:theme['link-color']} : {})}]} {...(dt.user.user_login !== null ? {onPress:()=>linkTo(`/user/${dt.user.user_login}`)} : {})} >{dt.nama}</Text>
+            </View>
+        )
+    }
+
+    renderDesc(props?: TextProps){
+        const {data:dt,totalReply,type}=this.props;
+        return (
+            <View>
+                <Text style={{fontSize:13}}>{dt?.komentar.replace(/&amp;/g, "\&")}</Text>
+                <View style={{flexDirection:'row',alignItems:'flex-start',justifyContent:'space-between'}}>
+                    <Text  {...props} style={[props?.style,{fontSize:10,marginHorizontal:0}]}>{dt.tanggal}</Text>
+                    {type==='comment' ? (
+                        <Text  {...props} style={[props?.style,{marginLeft:10,fontSize:10,marginHorizontal:0}]}>{`${totalReply} reply`}</Text>
+                    ) : null}
+                </View>
+            </View>
+        )
+    }
+
+    renderAccessory() {
+        return (
+            <View style={{borderRadius:22,overflow:'hidden'}}>
+                <Pressable style={{padding:10}} onPress={()=>this.modalRef.current?.open()}>
+                    <OptionIcon style={{width:24,height:24,tintColor:this.props.theme['text-hint-color']}} />
+                </Pressable>
+            </View>
+        )
+    }
+
+    renderAvatar(){
+        const {data: dt,type}=this.props;
+        return <MemoAvatar item={dt} type={type} />
+    }
+
     render() {
-        const {data:dt,isLoading,type,parentId,onReply,anyReply,onDelete,setNotif,theme,PNpost,children,totalReply} = this.props
+        const {data:dt,type,theme,children} = this.props
         const menu = [...this.menu];
         if(dt?.delete_token !== null) menu.splice(2,0,{type:'delete',title:i18n.t('delete')});
         return (
@@ -809,30 +839,10 @@ class Comment extends React.PureComponent<CommentType,CommentState>{
                     <Lay>
                         <ListItem
                             style={{alignItems:'flex-start',...(type==='comment' ? {paddingVertical:12} : {paddingVertical:5,marginLeft:55})}}
-                            accessoryLeft={()=><MemoAvatar item={dt} type={type} />}
-                            title={(props?: TextProps)=>(
-                                <View style={{alignItems:'flex-start'}}>
-                                    <Text {...props} style={[props?.style,{fontSize:13,marginHorizontal:0,marginBottom:3,fontFamily:'Inter_SemiBold',textDecorationLine:"underline",...(dt?.user?.user_login !== null ? {color:theme['link-color']} : {})}]} {...(dt.user.user_login !== null ? {onPress:()=>linkTo(`/user/${dt.user.user_login}`)} : {})} >{dt.nama}</Text>
-                                </View>
-                            )}
-                            description={(props?: TextProps)=>(
-                                <View>
-                                    <Text style={{fontSize:13}}>{dt?.komentar.replace(/&amp;/g, "\&")}</Text>
-                                    <View style={{flexDirection:'row',alignItems:'flex-start',justifyContent:'space-between'}}>
-                                        <Text  {...props} style={[props?.style,{fontSize:10,marginHorizontal:0}]}>{dt.tanggal}</Text>
-                                        {type==='comment' ? (
-                                            <Text  {...props} style={[props?.style,{marginLeft:10,fontSize:10,marginHorizontal:0}]}>{`${totalReply} reply`}</Text>
-                                        ) : null}
-                                    </View>
-                                </View>
-                            )}
-                            accessoryRight={()=>(
-                                <View style={{borderRadius:22,overflow:'hidden'}}>
-                                    <Pressable style={{padding:10}} onPress={()=>this.modalRef.current?.open()}>
-                                        <OptionIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
-                                    </Pressable>
-                                </View>
-                            )}
+                            accessoryLeft={()=>this.renderAvatar()}
+                            title={(props)=>this.renderTitle(props)}
+                            description={(props)=>this.renderDesc(props)}
+                            accessoryRight={()=>this.renderAccessory()}
                             disabled={type==='reply'}
                             onPress={()=>type === 'comment' && this.handleExpand()}
                         />

@@ -36,6 +36,8 @@ const RenderRecommend=(({item,index:i})=>{
 	);
 })
 
+const renderRecommend=(props)=><RenderRecommend {...props} />
+
 export default function ({ navigation }) {
 	const [url,setUrl] = React.useState({pagination:null,recommend:null});
 	const {
@@ -149,7 +151,7 @@ export default function ({ navigation }) {
 				) : dataRecom?.recommend?.length > 0 ? (
 					<Carousel
 						data={dataRecom?.recommend}
-						renderItem={(props)=><RenderRecommend {...props} />}
+						renderItem={renderRecommend}
 						autoplay
 					/>
 				) : (
@@ -165,9 +167,11 @@ export default function ({ navigation }) {
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
 	}
 
+	const feedbackToggle=React.useCallback(()=><FeedbackToggle link="/news" />,[])
+
 	return (
-		<Layout navigation={navigation} title="News" withBack={false} menu={()=><FeedbackToggle link="/news" />}>
-			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
+		<Layout navigation={navigation} title="News" withBack={false} menu={feedbackToggle}>
+			<Lay style={{flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 				<FlatList
 					ListEmptyComponent={renderEmpty}
 					columnWrapperStyle={{flexWrap:'wrap',flex:1}}

@@ -23,7 +23,9 @@ import { generateRandom, number_size } from '@portalnesia/utils';
 import downloadFile from '@pn/utils/Download'
 
 let timeInterval=null,timeLeft=15;
-
+const renderToggle=()=>(
+    <FeedbackToggle />
+)
 export default function DownloadFileScreen({navigation,route}) {
     const token = route.params?.token;
     if(!token) return <NotFoundScreen navigation={navigation} route={route} />
@@ -126,7 +128,7 @@ export default function DownloadFileScreen({navigation,route}) {
     
     return (
         <>
-            <Layout navigation={navigation} title="Download" withBack menu={()=><FeedbackToggle />}>
+            <Layout navigation={navigation} title="Download" withBack menu={renderToggle}>
                 <ScrollView contentContainerStyle={{backgroundColor:theme['background-basic-color-1'],...(!data && !error ? {flex:1} : {flexGrow:1})}} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled"
                     {...(error || data?.error ? {refreshControl:<RefreshControl refreshing={validate} onRefresh={()=>{!validate && (setValidate(true),mutate())}} colors={['white']} progressBackgroundColor="#2f6f4e" />} : {})}
                 >

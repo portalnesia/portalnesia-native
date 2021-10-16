@@ -131,6 +131,10 @@ class RenderMediaClass extends React.PureComponent{
         return null
     }
 
+    renderItem(props){
+        return <RenderNews {...props} data={this.props.dt} onOpen={(e)=>this.handleOpenMenu(e)} />
+    }
+
     render(){
         const {data,error,dt,isValidating,theme,isLoadingInitialData,onGetRef,onScroll,containerPaddingTop,scrollIndicatorInsetTop,onScrollEndDrag}=this.props
 
@@ -164,7 +168,7 @@ class RenderMediaClass extends React.PureComponent{
                 columnWrapperStyle={{flexWrap:'wrap',flex:1}}
                 data={dt}
                 numColumns={2}
-                renderItem={props=> <RenderNews {...props} data={dt} onOpen={this.handleOpenMenu} />}
+                renderItem={props=> this.renderItem(props)}
                 keyExtractor={(item)=>item?.title}
                 ListFooterComponent={this.renderFooter()}
                 ListEmptyComponent={this.renderEmpty()}

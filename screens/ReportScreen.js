@@ -120,9 +120,11 @@ export default function ReportScreen({navigation,route}){
         }
     }
 
+    const menuToggle=React.useCallback(()=><TopAction icon={SendIcon} tooltip={i18n.t('send')} onPress={handleSend} />,[handleSend])
+
     return (
         <>
-            <Layout navigation={navigation} withBack title={title} whiteBg menu={()=><TopAction icon={SendIcon} tooltip={i18n.t('send')} onPress={handleSend} />}>
+            <Layout navigation={navigation} withBack title={title} whiteBg menu={menuToggle}>
                 <Lay style={{paddingHorizontal:15,paddingVertical:10,paddingTop:20,flexGrow:1,flexShrink:1}}>
                     <TextInput
                         value={input}
@@ -174,6 +176,13 @@ export default function ReportScreen({navigation,route}){
     )
 }
 
+const RenderList=React.memo(({item,index:i})=>{
+    return (
+        <ListItem key={i} title={item?.key} description={item?.value} disabled />
+    )
+})
+const renderList=(props)=> <RenderList {...props}/>
+
 const RenderModal=React.memo(({onClose,theme,systemInfo})=>{
     return (
         <Lay style={{padding:10,width:width-20,borderRadius:10}}>
@@ -189,15 +198,9 @@ const RenderModal=React.memo(({onClose,theme,systemInfo})=>{
             <View style={{marginTop:10,maxHeight:height-155}}>
                 <FlatList
                     data={systemInfo}
-                    renderItem={(props)=> <RenderList {...props}/> }
+                    renderItem={renderList}
                 />
             </View>
         </Lay>
-    )
-})
-
-const RenderList=React.memo(({item,index:i})=>{
-    return (
-        <ListItem key={i} title={item?.key} description={item?.value} disabled />
     )
 })

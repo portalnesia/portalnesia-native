@@ -1,5 +1,5 @@
 import React from 'react'
-import {Alert} from 'react-native'
+import {Alert,InteractionManager} from 'react-native'
 import TrackPlayer,{Track,Capability,State, useTrackPlayerEvents,Event} from 'react-native-track-player'
 import {useSelector,useDispatch} from '@pn/provider/actions'
 import i18n from 'i18n-js'
@@ -9,36 +9,36 @@ export default function useTrackPlayer(){
     const dispatch=useDispatch();
     const {PNget} = useAPI();
 
-    const setupPlayer=React.useCallback(async(tracks:Track)=>{
-        await TrackPlayer.setupPlayer({maxCacheSize:102400});
-        await TrackPlayer.updateOptions({
-            capabilities:[
-                Capability.Pause,
-                Capability.Play,
-                Capability.SkipToNext,
-                Capability.SkipToPrevious,
-                Capability.Stop,
-                Capability.SeekTo
-            ],
-            compactCapabilities:[
-                Capability.Play,
-                Capability.Pause,
-                Capability.Stop,
-            ],
-            notificationCapabilities:[
-                Capability.Play,
-                Capability.Pause,
-                Capability.Stop,
-                Capability.SeekTo,
-                Capability.SkipToNext,
-                Capability.SkipToPrevious
-            ],
+    const setupPlayer=React.useCallback((tracks:Track)=>{
+        return TrackPlayer.setupPlayer({maxCacheSize:102400})
+        .then(()=>{
+            return TrackPlayer.updateOptions({
+                capabilities:[
+                    Capability.Pause,
+                    Capability.Play,
+                    Capability.SkipToNext,
+                    Capability.SkipToPrevious,
+                    Capability.Stop,
+                    Capability.SeekTo
+                ],
+                compactCapabilities:[
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.Stop,
+                ],
+                notificationCapabilities:[
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.Stop,
+                    Capability.SeekTo,
+                    Capability.SkipToNext,
+                    Capability.SkipToPrevious
+                ],
+            })
         })
-        await TrackPlayer.reset();
-        await TrackPlayer.add(tracks);
-        dispatch({type:"MANUAL",payload:{musicPlayer:true,musicPlayerUpdate:0}})
-        await TrackPlayer.play();
-        PNget(`/media/other/${tracks.id}`)
+        .then(()=>TrackPlayer.reset())
+        .then(()=>TrackPlayer.add(tracks))
+        .then(()=>PNget(`/media/other/${tracks.id}`))
         .then((res): Promise<Track[]|boolean> =>{
             const tracks: Track[] = res?.file?.map((d: any)=>{
                 return {
@@ -56,9 +56,16 @@ export default function useTrackPlayer(){
                 return Promise.resolve(false);
             }
         })
-        .then((val)=>{
-            if(typeof val !== 'boolean') return addQueue(val)
-            else return Promise.resolve();
+        .then(async(val)=>{
+            if(typeof val !== 'boolean') {
+                await TrackPlayer.add(val);
+                dispatch({type:"MANUAL",payload:{musicPlayer:true,musicPlayerUpdate:0}})
+                await TrackPlayer.play();
+            } else {
+                dispatch({type:"MANUAL",payload:{musicPlayer:true,musicPlayerUpdate:0}})
+                await TrackPlayer.play();
+            }
+            return Promise.resolve();
         })
         .catch(()=>{})
     },[])
@@ -70,7 +77,7 @@ export default function useTrackPlayer(){
 
     const removeQueue=React.useCallback(async(tracks:number)=>{
         await TrackPlayer.remove(tracks);
-        //dispatch({type:"MUSIC_PLAYER"})
+        return Promise.resolve();
     },[])
 
     const confirmDestroy=React.useCallback(()=>{
@@ -78,26 +85,29 @@ export default function useTrackPlayer(){
         TrackPlayer.destroy();
     },[])
 
-    const destroyPlayer=React.useCallback(async()=>{
-        Alert.alert(
-            i18n.t("errors.sure"),
-            "Remove music player",
-            [
-                {
-                    text:i18n.t("cancel"),
-                    onPress:()=>{}
-                },
-                {
-                    text:"OK",
-                    onPress:confirmDestroy
-                }
-            ]
-        )
+    const destroyPlayer=React.useCallback(()=>{
+        InteractionManager.runAfterInteractions(()=>{
+            Alert.alert(
+                i18n.t("errors.sure"),
+                "Remove music player",
+                [
+                    {
+                        text:i18n.t("cancel"),
+                        onPress:()=>{}
+                    },
+                    {
+                        text:"OK",
+                        onPress:confirmDestroy
+                    }
+                ]
+            )
+        })
     },[])
 
     const editQueue=React.useCallback(async(movedTrack: Track,from: number,to:number)=>{
         await TrackPlayer.remove(from);
         await TrackPlayer.add(movedTrack,to);
+        return Promise.resolve();
         //dispatch({type:"MUSIC_PLAYER"})
     },[])
 

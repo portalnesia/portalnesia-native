@@ -264,11 +264,11 @@ export default function Search({navigation,route}){
         await AsyncStorage.setItem("search_history",JSON.stringify(his));
     }
 
-    const renderItem=(prop)=>{
+    const renderItem=React.useCallback((prop)=>{
         if(['news','blog','users','media','twibbon'].indexOf(prop?.item?.type) !== -1) return <RenderWithImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} navigation={navigation} q={encodeURIComponent(search)} />
         if(['chord','thread'].indexOf(prop?.item?.type) !== -1) return <RenderNoImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} navigation={navigation} q={encodeURIComponent(search)} />
         return null;
-    }
+    },[theme,navigation,search])
 
     const RenderEmpty=()=>{
         if(error) {

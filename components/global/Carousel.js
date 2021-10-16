@@ -17,7 +17,7 @@ export const sliderWidth = viewportWidth;
 export const itemWidth = slideWidth - itemHorizontalMargin;
 
 const Carousel = React.forwardRef(function({data,renderItem,loop,autoplay,...other},ref){
-    const loops = autoplay ? true : loop;
+    const loops = React.useMemo(()=>(autoplay ? true : loop),[loop,autoplay]);
     return (
         <Carousell
             ref={ref}

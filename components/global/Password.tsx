@@ -128,4 +128,4 @@ const Password = React.forwardRef<InstanceType<typeof PasswordClass>,PasswordPro
     return <PasswordClass ref={ref} {...props} theme={theme} setNotif={setNotif} />
 })
 
-export default Password
+export default React.memo(Password)

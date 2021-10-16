@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
  */
 let timeout: number|null=null;
 export default function Layout(props: LayoutProps) {
-    const {withBack=true,withClose,title,align,custom,navigation,subtitle,menu,forceEnable} = props;
+    const {withBack=true,withClose,title,align,custom,navigation,subtitle,menu} = props;
     const {index,routeName} = useNavigationState(state=>{
         return {index:state.index,routeName:state.routes[0].name};
     })
@@ -89,32 +89,36 @@ export default function Layout(props: LayoutProps) {
 
     React.useLayoutEffect(()=>{
         navigation.setOptions({
-            headerTitle: ()=>{
-                if(typeof title !== 'string' && typeof title !== 'number') {
-                    const Title = title;
-                    return <Title />;
-                } else {
-                    if(subtitle) {
-                        return (
-                            <>
-                                <Text category="h1" numberOfLines={1} style={{fontSize:17,textAlign:align==='start' ? "left" : "center"}}>{title}</Text>
-                                <Text category="label" numberOfLines={1} style={{color:theme['text-hint-color'],fontSize:13,textAlign:align==='start' ? "left" : "center"}}>{subtitle}</Text>
-                            </>
-                        )
-                    } else {
-                        return (
-                            <Text category="h1" numberOfLines={1} style={{fontSize:18}}>{title}</Text>
-                        )
-                    }
-                }
-            },
             headerTitleAlign:align==='start' ? "left" : "center",
             ...(withClose || withBack ? {headerLeft:()=><RenderBackBtn withClose={withClose} withBack={withBack} navigation={navigation} />} : {}),
-            ...(custom ? {header:custom} : {}),
             ...(menu ? {headerRight: menu} : {}),
-            ...(forceEnable===true ? {headerShown:true} : {})
+            ...(typeof custom !== 'undefined' ? {
+                headerShown:true,
+                header:custom
+            } : typeof title !== 'undefined' ? {
+                headerShown:true,
+                headerTitle: ()=>{
+                    if(typeof title !== 'string' && typeof title !== 'number') {
+                        const Title = title;
+                        return <Title />;
+                    } else {
+                        if(subtitle) {
+                            return (
+                                <>
+                                    <Text category="h1" numberOfLines={1} style={{fontSize:17,textAlign:align==='start' ? "left" : "center"}}>{title}</Text>
+                                    <Text category="label" numberOfLines={1} style={{color:theme['text-hint-color'],fontSize:13,textAlign:align==='start' ? "left" : "center"}}>{subtitle}</Text>
+                                </>
+                            )
+                        } else {
+                            return (
+                                <Text category="h1" numberOfLines={1} style={{fontSize:18}}>{title}</Text>
+                            )
+                        }
+                    }
+                }
+            } : {headerShown:false})
         })
-    },[navigation,withBack,withClose,title,subtitle,align,custom,menu,forceEnable])
+    },[navigation,withBack,withClose,title,subtitle,align,custom,menu])
 
     return <LayoutClass {...props} />
 }

@@ -9,7 +9,7 @@ import {default as mapping} from '../mapping.json'
 import * as Applications from 'expo-application'
 import NetInfo from '@react-native-community/netinfo'
 import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
-import {useColorScheme,PermissionsAndroid,LogBox,StyleSheet,PermissionStatus} from 'react-native'
+import {useColorScheme,PermissionsAndroid,LogBox,StyleSheet} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Secure from 'expo-secure-store'
 import {PortalProvider} from'@gorhom/portal'
@@ -21,7 +21,9 @@ import 'moment/locale/id';
 import AppLoading from 'expo-app-loading';
 import AppNavigator from '../navigation/AppNavigator';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BgTimer from 'react-native-background-timer'
 
+import initializeLock from '@pn/utils/Lock'
 import verifyApps from '@pn/utils/VerifyApps'
 import {useSelector,changeLang,changeTheme,useDispatch} from '@pn/provider/actions'
 import * as Notifications from 'expo-notifications'
@@ -144,6 +146,7 @@ const AuthProviderFunc = () => {
 	const loadResourcesAsync=React.useCallback(async()=>{
 		async function asyncTask(){
 			try {
+				await initializeLock();
 				await verifyApps();
 				let [res,lang,ads] = await Promise.all([AsyncStorage.getItem("theme"),AsyncStorage.getItem("lang"),AsyncStorage.getItem("ads")])
 
@@ -202,7 +205,7 @@ const AuthProviderFunc = () => {
 			try {
 				await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
 			} catch(e){
-				console.log("Create folder error",e);
+				console.log("Permission request error",e);
 			}
 		}
 
@@ -254,7 +257,7 @@ const AuthProviderFunc = () => {
 
 	/* HANDLE AUTHENTICATION TOKEN */
 	useEffect(()=>{
-		let interval:NodeJS.Timeout|null=null;
+		let interval:number|null=null;
 		async function handleRefreshToken(){
 			const token_string = await Secure.getItemAsync('token');
 			if(token_string!==null) {
@@ -271,7 +274,8 @@ const AuthProviderFunc = () => {
 			}
 		}
 		function handleInterval(){
-			interval = setInterval(handleRefreshToken,295 * 1000)
+			
+			interval = BgTimer.setInterval(handleRefreshToken,295 * 1000)
 		}
 		if(context.isLogin) {
 			//if(currentState.match(/inactive|background/)) handleRefreshToken();
@@ -279,7 +283,7 @@ const AuthProviderFunc = () => {
 		}
 
 		return ()=>{
-			if(interval !== null) clearInterval(interval)
+			if(interval !== null) BgTimer.clearInterval(interval)
 			interval=null;
 		}
 	},[context.isLogin,dispatch])

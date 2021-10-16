@@ -34,10 +34,11 @@ const RenderCaraousel = React.memo(({item, index:i}) => {
 		</Card>
 	);
 })
+const renderCarousel=(props)=><RenderCaraousel {...props} />
 
 const useRecommend=()=>useSWR('/twitter/recommend')
 
-const RenderRecommend=React.memo(({swr})=>{
+const RenderRecommend=React.memo(()=>{
 	const {data,error,mutate} = useRecommend();
 	const theme = useTheme();
 	
@@ -53,7 +54,7 @@ const RenderRecommend=React.memo(({swr})=>{
 			) : data?.recommend?.length > 0 ? (
 				<Carousel
 					data={data?.recommend}
-					renderItem={(props)=><RenderCaraousel {...props} />}
+					renderItem={renderCarousel}
 					autoplay
 				/>
 			) : (
@@ -63,6 +64,7 @@ const RenderRecommend=React.memo(({swr})=>{
 		</Lay>
 	)
 })
+const renderRecommend=()=><RenderRecommend />
 
 const RenderInput=React.memo(({onClose,initialData=""})=>{
 	const [input,setInput]=React.useState("")
@@ -161,7 +163,7 @@ const Recent=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndica
 		if(!isValidating) setRefreshing(false);
 	},[isValidating])
 
-	const _renderItem=({item,index})=>{
+	const _renderItem=React.useCallback(({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 28;
 		const cardSize=(width/2)-7
@@ -193,18 +195,18 @@ const Recent=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndica
 				</React.Fragment>
 			)
 		} else return null
-	}
+	},[width,data])
 
-	const Footer=()=>{
+	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
 		if(isLoadingMore && data?.length > 0) return <View style={{paddingTop:20,height:'100%'}}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View> 
 		else return null
-	}
+	},[isReachingEnd,isLoadingMore,data])
 
-	const renderEmpty=()=>{
+	const renderEmpty=React.useCallback(()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:"100%",paddingTop:headerHeight+containerPaddingTop}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-	}
+	},[error])
 
 	return (
 		<Animated.FlatList
@@ -216,7 +218,7 @@ const Recent=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndica
 			data={data}
 			renderItem={_renderItem}
 			ListFooterComponent={Footer}
-			ListHeaderComponent={()=><RenderRecommend />}
+			ListHeaderComponent={renderRecommend}
 			refreshControl={
 				<RefreshControl
 					colors={['white']}
@@ -251,7 +253,7 @@ const Popular=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndic
 		if(!isValidating) setRefreshing(false);
 	},[isValidating])
 
-	const _renderItem=({item,index})=>{
+	const _renderItem=React.useCallback(({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 40;
 		const cardSize=(width/2)-7
@@ -283,18 +285,18 @@ const Popular=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndic
 				</React.Fragment>
 			)
 		} else return null
-	}
+	},[width,data])
 
-	const Footer=()=>{
+	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>You have reach the bottom of the page</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
 		else return null
-	}
+	},[isReachingEnd,isLoadingMore,data])
 
-	const renderEmpty=()=>{
+	const renderEmpty=React.useCallback(()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:"100%",paddingTop:headerHeight+containerPaddingTop}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-	}
+	},[error])
 
 	return (
 		<Animated.FlatList
@@ -305,7 +307,7 @@ const Popular=({headerHeight,navigation,onScroll,containerPaddingTop,scrollIndic
 			numColumns={2}
 			data={data}
 			renderItem={_renderItem}
-			ListHeaderComponent={()=><RenderRecommend />}
+			ListHeaderComponent={renderRecommend}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.05}
@@ -396,8 +398,10 @@ export default function ({ navigation,route }) {
 		return ()=>ShareModule.removeListener(dataListener);
     },[])
 
+	const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setMenu(true)}} />,[]);
+
 	return (
-		<Layout title="Twitter Thread Reader" navigation={navigation} withBack menu={()=><MenuToggle onPress={()=>setMenu(true)} />} >
+		<Layout title="Twitter Thread Reader" navigation={navigation} withBack menu={menuToggle} >
 			{renderTabView()}
 			<MenuContainer
 				visible={menu}

@@ -202,10 +202,13 @@ function ChordDetailScreen({navigation,route}){
             setLiked(data?.chord?.liked);
         }
     },[data])
-    
+
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />,[data]);
+    const renderCarousel=React.useCallback((props)=><RenderCaraousel {...props} />,[])
+
     return (
         <>
-        <Layout navigation={navigation} title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : undefined} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
+        <Layout navigation={navigation} title={"Chord"} subtitle={data?.chord ? `${data?.chord?.title} - ${data?.chord?.artist}` : undefined} menu={menuToggle}>
             <AnimLay style={{width: '100%',zIndex: 1,...(!viewVideo ? {position:'absolute',transform: [{translateY}],top:containerPaddingTop,elevation:2,height:heightHeader} : {marginTop:containerPaddingTop})}}>
                 <Lay style={{flexDirection:'row',alignItems:'center',justifyContent:'space-evenly'}}>
                     <Lay>
@@ -299,7 +302,7 @@ function ChordDetailScreen({navigation,route}){
                                     ) : dataOthers?.relateds?.length > 0 ? (
                                         <Carousel
                                             data={dataOthers?.relateds}
-                                            renderItem={(props)=><RenderCaraousel {...props} />}
+                                            renderItem={renderCarousel}
                                             autoplay
                                         />
                                     ) : (
@@ -314,7 +317,7 @@ function ChordDetailScreen({navigation,route}){
                                     ) : dataOthers?.populars?.length > 0 ? (
                                         <Carousel
                                             data={dataOthers?.populars}
-                                            renderItem={(props)=><RenderCaraousel {...props} />}
+                                            renderItem={renderCarousel}
                                             autoplay
                                         />
                                     ) : (
@@ -329,7 +332,7 @@ function ChordDetailScreen({navigation,route}){
                                     ) : dataOthers?.recents?.length > 0 ? (
                                         <Carousel
                                             data={dataOthers?.recents}
-                                            renderItem={(props)=><RenderCaraousel {...props} />}
+                                            renderItem={renderCarousel}
                                             autoplay
                                         />
                                     ) : (

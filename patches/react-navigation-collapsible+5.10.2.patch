@@ -1,0 +1,52 @@
+diff --git a/node_modules/react-navigation-collapsible/lib/src/core.d.ts b/node_modules/react-navigation-collapsible/lib/src/core.d.ts
+index 34836ba..447f6f1 100644
+--- a/node_modules/react-navigation-collapsible/lib/src/core.d.ts
++++ b/node_modules/react-navigation-collapsible/lib/src/core.d.ts
+@@ -26,6 +26,7 @@ export declare type UseCollapsibleOptions = {
+         collapsedColor?: string;
+         disableOpacity?: boolean;
+         createHeaderBackground?: (params: createHeaderBackgroundParams) => React.ReactNode;
++        disabled?:boolean;
+     };
+ };
+ declare const useCollapsibleHeader: (options?: UseCollapsibleOptions, collapsibleHeaderType?: CollapsibleHeaderType) => Collapsible;
+diff --git a/node_modules/react-navigation-collapsible/lib/src/core.js b/node_modules/react-navigation-collapsible/lib/src/core.js
+index dfc3084..9633272 100644
+--- a/node_modules/react-navigation-collapsible/lib/src/core.js
++++ b/node_modules/react-navigation-collapsible/lib/src/core.js
+@@ -78,7 +78,17 @@ var useCollapsibleHeader = function (options, collapsibleHeaderType) {
+         var translateY = Animated.multiply(progress, -headerHeight);
+         var opacity = Animated.subtract(1, disableOpacity ? 0 : progress);
+         if (collapsibleHeaderType === CollapsibleHeaderType.Default) {
+-            var options_1 = __assign(__assign({}, navigationOptions), { headerStyle: __assign(__assign({}, headerStyle), { transform: [{ translateY: translateY }], opacity: opacity }), headerBackground: createHeaderBackground({
++            if(config && typeof config.disabled === 'boolean' && config.disabled) {
++                var options_1 = __assign(__assign({}, navigationOptions), { headerBackground: createHeaderBackground({
++                    translateY: new Animated.Value(0),
++                    opacity: 1,
++                    backgroundColor: headerStyle === null || headerStyle === void 0 ? void 0 : headerStyle.backgroundColor,
++                    collapsedColor: collapsedColor || (headerStyle === null || headerStyle === void 0 ? void 0 : headerStyle.backgroundColor),
++                    elevation: elevation,
++                    headerBackground: navigationOptions.headerBackground,
++                }), headerTransparent: true });
++            } else {
++                var options_1 = __assign(__assign({}, navigationOptions), { headerStyle: __assign(__assign({}, headerStyle), { transform: [{ translateY: translateY }], opacity: opacity }), headerBackground: createHeaderBackground({
+                     translateY: translateY,
+                     opacity: opacity,
+                     backgroundColor: headerStyle === null || headerStyle === void 0 ? void 0 : headerStyle.backgroundColor,
+@@ -86,6 +96,7 @@ var useCollapsibleHeader = function (options, collapsibleHeaderType) {
+                     elevation: elevation,
+                     headerBackground: navigationOptions.headerBackground,
+                 }), headerTransparent: true });
++            }
+             if (navigationOptions.header) {
+                 Object.assign(options_1, {
+                     header: createCollapsibleCustomHeaderAnimator(navigationOptions.header),
+@@ -107,7 +118,7 @@ var useCollapsibleHeader = function (options, collapsibleHeaderType) {
+             showHeader: showHeader,
+         };
+         setCollapsible(collapsible);
+-    }, [isLandscape, headerStyle, subHeaderHeight, customHeaderHeight]);
++    }, [isLandscape, headerStyle, subHeaderHeight, customHeaderHeight,config.disabled]);
+     return (collapsible || {
+         onScroll: null,
+         onScrollWithListener: function (e) { return null; },
