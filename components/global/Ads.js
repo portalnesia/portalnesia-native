@@ -93,7 +93,8 @@ export function showInterstisial(){
             await AdMobInterstitial.requestAdAsync({servePersonalizedAds:personalized})
             await AdMobInterstitial.showAdAsync();
         } catch(e){
-
+            console.log("showAds Error",e);
+            log("showAds Error",{extra: String(e)});
         }
     }
     return {showAds}

@@ -219,7 +219,7 @@ export default function Setting({navigation}){
             name=ucwords(i18n.t("settings.storage_location"));
             desc=storage;
             func=handleStorage
-        }
+        } 
 
         return (
             <ListItem title={name} description={desc} key={`menu${i}`} accessoryRight={ForwardIcon} onPress={func} />

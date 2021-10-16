@@ -29,7 +29,7 @@
         "licenseUrl": "https://github.com/native-html/plugins",
         "parents": "portal-native"
     },
-    "@portalnesia/react-native-core@1.0.5": {
+    "@portalnesia/react-native-core@1.2.0": {
         "licenses": "MIT",
         "repository": "https://github.com/portalnesia/portalnesia",
         "licenseUrl": "https://github.com/portalnesia/portalnesia",
@@ -173,7 +173,7 @@
         "licenseUrl": "https://github.com/sindresorhus/array-move/raw/master/license",
         "parents": "portal-native"
     },
-    "axios@0.21.1": {
+    "axios@0.21.4": {
         "licenses": "MIT",
         "repository": "https://github.com/axios/axios",
         "licenseUrl": "https://github.com/axios/axios/raw/master/LICENSE",
@@ -209,7 +209,7 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
-    "expo-asset@8.3.2": {
+    "expo-asset@8.3.3": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -222,12 +222,6 @@
         "parents": "portal-native"
     },
     "expo-av@9.2.3": {
-        "licenses": "MIT",
-        "repository": "https://github.com/expo/expo",
-        "licenseUrl": "https://github.com/expo/expo",
-        "parents": "portal-native"
-    },
-    "expo-background-fetch@9.2.2": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -317,7 +311,7 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
-    "expo-notifications@0.12.2": {
+    "expo-notifications@0.12.3": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -353,13 +347,7 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
-    "expo-task-manager@9.2.2": {
-        "licenses": "MIT",
-        "repository": "https://github.com/expo/expo",
-        "licenseUrl": "https://github.com/expo/expo",
-        "parents": "portal-native"
-    },
-    "expo-updates@0.8.0": {
+    "expo-updates@0.8.5": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -376,7 +364,7 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
-    "expo@42.0.0": {
+    "expo@42.0.5": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo",
@@ -482,6 +470,12 @@
         "licenses": "Apache-2.0",
         "repository": "https://github.com/EkoLabs/react-native-background-downloader",
         "licenseUrl": "https://github.com/EkoLabs/react-native-background-downloader/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-background-timer@2.4.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/ocetnik/react-native-background-timer",
+        "licenseUrl": "https://github.com/ocetnik/react-native-background-timer/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-biometrics@2.1.4": {
@@ -614,7 +608,7 @@
         "licenseUrl": "https://github.com/react-native-kit/react-native-track-player/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "react-native-unimodules@0.14.3": {
+    "react-native-unimodules@0.14.10": {
         "licenses": "MIT",
         "repository": "https://github.com/expo/expo",
         "licenseUrl": "https://github.com/expo/expo/raw/master/LICENSE.md",
@@ -648,6 +642,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/facebook/react-native",
         "licenseUrl": "https://github.com/facebook/react-native/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-navigation-collapsible@5.10.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/benevbright/react-navigation-collapsible",
+        "licenseUrl": "https://github.com/benevbright/react-navigation-collapsible/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-redux@7.2.4": {
@@ -692,7 +692,7 @@
         "licenseUrl": "https://github.com/vercel/swr/raw/master/LICENSE",
         "parents": "portal-native"
     },
-    "url-parse@1.5.1": {
+    "url-parse@1.5.3": {
         "licenses": "MIT",
         "repository": "https://github.com/unshiftio/url-parse",
         "licenseUrl": "https://github.com/unshiftio/url-parse/raw/master/LICENSE",

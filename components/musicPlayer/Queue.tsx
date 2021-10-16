@@ -1,5 +1,5 @@
 import React from 'react'
-import {View,Dimensions,Animated,LogBox} from 'react-native'
+import {View,Dimensions,Animated,LogBox,InteractionManager} from 'react-native'
 import {Text,useTheme,Divider} from '@ui-kitten/components'
 import TrackPlayer,{Track} from 'react-native-track-player'
 import {useSelector,useDispatch} from '@pn/provider/actions'
@@ -36,9 +36,12 @@ const RenderList=({item,index,drag,isActive,onRemove}: ListTypes)=>{
 
     React.useEffect(()=>{
         if(track) {
-            TrackPlayer.getCurrentTrack().then(curr=>{
-                setCurrent(curr);
+            InteractionManager.runAfterInteractions(()=>{
+                TrackPlayer.getCurrentTrack().then(curr=>{
+                    setCurrent(curr);
+                })
             })
+            
         }
     },[title,track,updated])
 
@@ -54,6 +57,13 @@ const RenderList=({item,index,drag,isActive,onRemove}: ListTypes)=>{
         onRemove(index)
     },[])
 
+    const renderList=React.useCallback(()=><MemoAvatar src={(item?.artwork as string)} />,[item])
+    const accessoryRight=React.useCallback(()=>(
+        <Pressable default onPressIn={drag}>
+            <DragIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
+        </Pressable>
+    ),[theme,drag])
+
     return (
         <>
             {current !== index ? (
@@ -68,15 +78,9 @@ const RenderList=({item,index,drag,isActive,onRemove}: ListTypes)=>{
                         key={index.toString()}
                         title={item?.title}
                         description={item?.artist}
-                        accessoryLeft={()=><MemoAvatar src={(item?.artwork as string)} />}
+                        accessoryLeft={renderList}
                         style={{paddingVertical:10,paddingHorizontal:5,...(current === index ? {backgroundColor:theme['background-basic-color-2']} : isActive ? {backgroundColor:theme['background-basic-color-3']} : {backgroundColor:theme['background-basic-color-1']})}} 
-                        {...(current !== index ? {
-                            accessoryRight:()=>(
-                                <Pressable default onPressIn={drag}>
-                                    <DragIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
-                                </Pressable>
-                            )
-                        } : {})}
+                        accessoryRight={accessoryRight}
                     />
                 </Swipeable>
             ) : (
@@ -85,15 +89,8 @@ const RenderList=({item,index,drag,isActive,onRemove}: ListTypes)=>{
                     key={index.toString()}
                     title={item?.title}
                     description={item?.artist}
-                    accessoryLeft={()=><MemoAvatar src={(item?.artwork as string)} />}
+                    accessoryLeft={renderList}
                     style={{paddingVertical:10,paddingHorizontal:5,...(current === index ? {backgroundColor:theme['background-basic-color-2']} : isActive ? {backgroundColor:theme['background-basic-color-3']} : {backgroundColor:theme['background-basic-color-1']})}} 
-                    {...(current !== index ? {
-                        accessoryRight:()=>(
-                            <Pressable default onPressIn={drag}>
-                                <DragIcon style={{width:24,height:24,tintColor:theme['text-hint-color']}} />
-                            </Pressable>
-                        )
-                    } : {})}
                 />
             )}
         </>
@@ -136,6 +133,8 @@ const RenderQueue=({queueRef,queueAnim,qHandle}: MiniHeaderTypes)=>{
         setData(dt)
     },[data])
 
+    const renderList=React.useCallback((props)=><QueueList {...props} onRemove={onRemove} />,[onRemove])
+
     return(
         <>
             <Animated.View
@@ -150,7 +149,7 @@ const RenderQueue=({queueRef,queueAnim,qHandle}: MiniHeaderTypes)=>{
 
             <Draggable
                 data={data}
-                renderItem={(props)=><QueueList {...props} onRemove={onRemove} />}
+                renderItem={renderList}
                 keyExtractor={(i,ii)=>`draggable_item_${i.id}_${ii}`}
                 onDragEnd={onDrag}
             />

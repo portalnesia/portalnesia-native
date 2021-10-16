@@ -27,6 +27,10 @@ const RenderCaraousel = React.memo(({item, index:i}) => {
 	);
 })
 
+const renderCarousel=(props)=>(
+	<RenderCaraousel {...props} />
+)
+
 const RenderRecommend=React.memo(({url})=>{
 	const {data,error,mutate} = useSWR(url.recommend);
 	const theme = useTheme();
@@ -44,7 +48,7 @@ const RenderRecommend=React.memo(({url})=>{
 			) : data?.recommend?.length > 0 ? (
 				<Carousel
 					data={data?.recommend}
-					renderItem={(props)=><RenderCaraousel {...props} />}
+					renderItem={renderCarousel}
 					autoplay
 				/>
 			) : (
@@ -55,7 +59,7 @@ const RenderRecommend=React.memo(({url})=>{
 	)
 })
 
-const Recent=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
+const Recent=React.memo(({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 	const {
 		data,
 		error,
@@ -75,7 +79,7 @@ const Recent=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 		if(!isValidating) setRefreshing(false);
 	},[isValidating])
 
-	const _renderItem=({item,index})=>{
+	const _renderItem=React.useCallback(({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 40;
 		const cardSize=(width/2)-7
@@ -105,18 +109,20 @@ const Recent=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 				</React.Fragment>
 			)
 		} else return null
-	}
+	},[width,data])
 
-	const Footer=()=>{
+	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View style={{paddingTop:20,height:'100%'}}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View> 
 		else return null
-	}
+	},[isReachingEnd,isLoadingMore,data])
 
-	const renderEmpty=()=>{
+	const renderEmpty=React.useCallback(()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:"100%",paddingTop:containerPaddingTop+stickyHeaderHeight}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-	}
+	},[error])
+
+	const renderHeader=React.useCallback(()=><RenderRecommend url={url} />,[url])
 
 	return (
 		<Animated.FlatList
@@ -128,7 +134,7 @@ const Recent=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 			data={data}
 			ref={ref}
 			renderItem={_renderItem}
-			ListHeaderComponent={()=><RenderRecommend url={url} />}
+			ListHeaderComponent={renderHeader}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.01}
@@ -150,9 +156,9 @@ const Recent=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 			onScroll={onScroll}
 		/>
 	)
-}
+})
 
-const Popular=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
+const Popular=React.memo(({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 	const {
 		data,
 		error,
@@ -172,7 +178,7 @@ const Popular=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 		if(!isValidating) setRefreshing(false);
 	},[isValidating])
 
-	const _renderItem=({item,index})=>{
+	const _renderItem=React.useCallback(({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 40;
 		const cardSize=(width/2)-7
@@ -202,18 +208,20 @@ const Popular=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 				</React.Fragment>
 			)
 		} else return null
-	}
+	},[width,data])
 
-	const Footer=()=>{
+	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton height={200} type="grid" number={4} gridStyle={{marginBottom:20}} /></View>
 		else return null
-	}
+	},[isReachingEnd,isLoadingMore,data])
 
-	const renderEmpty=()=>{
+	const renderEmpty=React.useCallback(()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:"100%",paddingTop:containerPaddingTop+stickyHeaderHeight}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
-	}
+	},[error])
+
+	const renderHeader=React.useCallback(()=><RenderRecommend url={url} />,[url])
 
 	return (
 		<Animated.FlatList
@@ -225,7 +233,7 @@ const Popular=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 			data={data}
 			ref={ref}
 			renderItem={_renderItem}
-			ListHeaderComponent={()=><RenderRecommend url={url} />}
+			ListHeaderComponent={renderHeader}
 			//keyExtractor={(item, index) => `list-item-${index}-${item.color}`}
 			ListFooterComponent={Footer}
 			//onEndReachedThreshold={0.02}
@@ -246,9 +254,7 @@ const Popular=({url,onScroll,containerPaddingTop,scrollIndicatorInsetTop})=>{
 			onScroll={onScroll}
 		/>
 	)
-}
-
-
+})
 
 export default function ({ navigation,route }) {
 	const slug = route?.params?.slug
@@ -277,31 +283,32 @@ export default function ({ navigation,route }) {
 		}
 	},[navigation])
 
-	const renderTabBar=(props)=>{
-		
+	const renderLabel=React.useCallback(({route,focused})=>{
+		return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
+	},[])
+
+	const renderTabBar=React.useCallback((props)=>{
 		return (
 			<Animated.View testID="Test-Header-Chord" style={{zIndex: 1,elevation:5,position:'absolute',backgroundColor: theme['background-basic-color-1'],top:containerPaddingTop,height:stickyHeaderHeight,width: '100%',transform: [{translateY}]}}>
 				<TabBar
 					{...props}
 					style={{height:46,backgroundColor:theme['background-basic-color-1']}}
 					indicatorStyle={{backgroundColor:theme['color-indicator-bar'],height:3}}
-					renderLabel={({route,focused})=>{
-						return <Text appearance={focused ? 'default' : 'hint'}>{route.title||""}</Text>
-					}}
+					renderLabel={renderLabel}
 					pressColor={theme['color-control-transparent-disabled']}
 					pressOpacity={0.8}
 				/>
 			</Animated.View>
 		)
-	}
+	},[theme,containerPaddingTop])
 
-	const renderScene=({route})=>{
+	const renderScene=React.useCallback(({route})=>{
         if(route.key == 'recent') return <Recent url={url} onScroll={onScroll} containerPaddingTop={containerPaddingTop} scrollIndicatorInsetTop={scrollIndicatorInsetTop} navigation={navigation} />
         if(route.key == 'popular') return <Popular url={url} onScroll={onScroll} containerPaddingTop={containerPaddingTop} scrollIndicatorInsetTop={scrollIndicatorInsetTop} navigation={navigation} />
         return null;
-    }
+    },[onScroll,url,containerPaddingTop,navigation])
 
-	const renderTabView=()=>{
+	const renderTabView=React.useCallback(()=>{
         return (
             <TabView
                 onIndexChange={(index)=>setTabIndex(index)}
@@ -312,10 +319,12 @@ export default function ({ navigation,route }) {
                 lazy
             />
         )
-    }
+    },[renderScene,renderTabBar])
+
+	const feedbackToggle=React.useCallback(()=><FeedbackToggle link={`/chord${tabIndex === 1 ? "/popular" : ""}`} />,[tabIndex])
 
 	return (
-		<Layout navigation={navigation} title="Chord" withBack={false} menu={()=><FeedbackToggle link={`/chord${tabIndex === 1 ? "/popular" : ""}`} />}>
+		<Layout navigation={navigation} title="Chord" withBack={false} menu={feedbackToggle}>
 			{renderTabView()}
 		</Layout>
 	);

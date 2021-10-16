@@ -96,13 +96,15 @@ export default function OpenSourceScreen({navigation}){
         })
     },[])
 
+    const renderItem = React.useCallback((props)=> <RenderItem {...props} navigation={navigation} />,[navigation])
+
     return (
         <Layout navigation={navigation} withBack title="Open Source Libraries">
             <Lay>
                 <FlatList
                     ListHeaderComponent={RenderHeader}
                     data={licenses}
-                    renderItem={(props)=> <RenderItem {...props} navigation={navigation} />}
+                    renderItem={renderItem}
                     ItemSeparatorComponent={Divider}
                     keyExtractor={(item)=>item.title}
                     contentContainerStyle={{paddingBottom:65}}

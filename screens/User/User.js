@@ -422,15 +422,17 @@ export default function UserScreen({navigation,route}){
         }
     },[open])
 
+    const renderTitle=React.useCallback(() => (
+        <Animated.View style={{opacity,flexDirection:'row',alignItems:"center",marginHorizontal:50}}>
+            <Text category="h1" style={{fontSize:18,...(data?.users?.verify ? {marginRight:5} : {})}} numberOfLines={1}>{data?.users?.username||""}</Text>
+            {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
+        </Animated.View>
+    ),[data,theme])
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{data && !data?.error && setOpenMenu(true)}} />,[data]);
+
     return (
         <>
-            <Layout navigation={navigation} whiteBg title={() => (
-                <Animated.View style={{opacity,flexDirection:'row',alignItems:"center",marginHorizontal:50}}>
-                    <Text category="h1" style={{fontSize:18,...(data?.users?.verify ? {marginRight:5} : {})}} numberOfLines={1}>{data?.users?.username||""}</Text>
-                    {data?.users?.verify && <Icon style={{height:15,width:15,tintColor:theme['color-indicator-bar']}} name="verified" pack="material" />}
-                </Animated.View>
-            )}
-            menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpenMenu(true)}} />}>
+            <Layout navigation={navigation} whiteBg title={renderTitle} menu={menuToggle}>
                 {renderTabView()}
             </Layout>
             <Recaptcha ref={captchaRef} />

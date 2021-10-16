@@ -33,16 +33,16 @@ const NativePlayer=React.memo(({src,poster,height,width: vidWidth})=>{
         }
     },[height])
 
-    const handleFullScreen=(isFull)=>()=>{
+    const handleFullScreen=React.useCallback((isFull)=>()=>{
         setFull(isFull)
         if(isFull) videoRef?.presentFullscreenPlayer()
         else videoRef?.dismissFullscreenPlayer()
-    }
-    const onFullscreenUpdate=({fullscreenUpdate})=>{
+    },[])
+    const onFullscreenUpdate=React.useCallback(({fullscreenUpdate})=>{
         if(fullscreenUpdate === Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS) {
             setFull(false)
         }
-    }
+    },[])
 
     return (
         <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>

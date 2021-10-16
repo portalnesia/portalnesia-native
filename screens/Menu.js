@@ -38,7 +38,7 @@ export default function({navigation,route}){
 
     const {translateY,onScroll,containerPaddingTop,scrollIndicatorInsetTop} = useCollapsibleHeader(getCollapsOpt(theme,false))
     const [loading,setLoading] = React.useState(false)
-    const menu = getMenu(i18n,user)
+    const menu = React.useMemo(()=>getMenu(i18n,user),[user])
     const ref=React.useRef(null);
     useScrollToTop(ref)
 
@@ -148,9 +148,21 @@ export default function({navigation,route}){
         }
     },[linkAction,checkUpdates,navigation])
 
+    const RenderMenu=React.useMemo(()=>{
+        return menu.map((dt,i)=>(
+            <React.Fragment key={i}>
+                <Text appearance="hint" style={{paddingLeft:15,paddingRight:15,marginBottom:5,fontSize:13}}>{dt.title}</Text>
+                <Lay level="2" style={{marginBottom:20}}>
+                    {_renderMenu(dt.menu,i,navigation,theme,checkUpdates,sendReport)}
+                </Lay>
+            </React.Fragment>
+        ))
+    },[menu,navigation,theme,checkUpdates,sendReport])
+
+    const menuToggle=React.useCallback(()=><TopAction tooltip={i18n.t('setting')} icon={SettingIcon} onPress={()=>linkTo("/setting")} />,[])
     return (
         <>
-        <Layout navigation={navigation} withBack={false} title="Portalnesia" menu={()=><TopAction tooltip={i18n.t('setting')} icon={SettingIcon} onPress={()=>linkTo("/setting")} />}>
+        <Layout navigation={navigation} withBack={false} title="Portalnesia" menu={menuToggle}>
             <Animated.View style={{position:'absolute',height:100,zIndex:1,top:containerPaddingTop,width: '100%',transform: [{translateY}]}}>
                 <Lay level="1" style={{paddingVertical:10,paddingHorizontal:15,alignItems:'center',flexDirection:'row',elevation:5}}>
                     <Lay level="1" style={{marginRight:20}}><Avatar size={60} {...(user !== false ? {src:`${user?.picture}&watermark=no`} : {avatar:true})} /></Lay>
@@ -174,14 +186,7 @@ export default function({navigation,route}){
                 onScroll={onScroll}
 
 			>
-                {menu.map((dt,i)=>(
-                    <React.Fragment key={i}>
-                        <Text appearance="hint" style={{paddingLeft:15,paddingRight:15,marginBottom:5,fontSize:13}}>{dt.title}</Text>
-                        <Lay level="2" style={{marginBottom:20}}>
-                            {_renderMenu(dt.menu,i,navigation,theme,checkUpdates,sendReport)}
-                        </Lay>
-                    </React.Fragment>
-                ))}
+                {RenderMenu}
                 <View style={{paddingLeft:15,paddingRight:15,paddingBottom:20,flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                     <Text style={{fontSize:12}} appearance="hint">{`v${Constants.nativeAppVersion}`}</Text>
                     <Text style={{fontSize:12}} appearance="hint">{`Portalnesia © ${new Date().getFullYear()}`}</Text>

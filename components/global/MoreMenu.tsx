@@ -23,11 +23,13 @@ const FeedbackMenuIcon=(props?: Partial<ImageProps>)=><View style={{marginRight:
 const ShareIcon=(props?: Partial<ImageProps>)=><Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15}]} name="share" />
 const BrowserIcon=(props?: Partial<ImageProps>)=><Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15}]} name="browser" />
 const LinkIcon=(props?: Partial<ImageProps>)=><Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15}]} name="link-2" />
+
 const LikeIcon=(value: boolean)=>(props?: Partial<ImageProps>)=>{
     const theme = useTheme();
     const name = value ? "heart" : "heart-outline";
     return <Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15,tintColor:theme['color-danger-500']}]} name={name} />
 }
+
 const CustomIcon=(prop: {name:string,pack?:string}|string,color?:ColorValue)=>(props?: Partial<ImageProps>)=>{
     const name = typeof prop === 'string' ? prop : prop?.name;
     const pack = typeof prop === 'object' && prop?.pack ? prop?.pack : undefined;
@@ -40,7 +42,7 @@ const CustomIcon=(prop: {name:string,pack?:string}|string,color?:ColorValue)=>(p
     }
     return <Icon {...props} style={[props?.style,{marginHorizontal:0,marginRight:15,...(color ? {tintColor:color} : {})}]} name={name} />
 }
-const LoadingComp=()=> <Spinner style={{marginLeft:5}} />
+const LoadingComp=React.memo(()=> <Spinner style={{marginLeft:5}} />)
 
 export type FeedbackToggleProps = {
     link?: string
@@ -103,6 +105,15 @@ function getIcon(action?: string,value?: any) {
     return undefined;
 }
 
+const Header=React.memo(()=>{
+    const theme=useTheme();
+    return (
+        <View style={{alignItems:'center',justifyContent:'center',padding:9}}>
+            <View style={{width:60,height:7,backgroundColor:theme['text-hint-color'],borderRadius:5}} />
+        </View>
+    )
+})
+
 const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContainerProps)=>{
     const context = React.useContext(AuthContext)
     const {sendReport,setNotif} = context
@@ -114,11 +125,6 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
     //const {width}=useWindowDimensions()
     const theme=useTheme()
     const ref = React.useRef<Modalize>();
-    const Header = (
-        <View style={{alignItems:'center',justifyContent:'center',padding:9}}>
-            <View style={{width:60,height:7,backgroundColor:theme['text-hint-color'],borderRadius:5}} />
-        </View>
-    )
 
     React.useEffect(()=>{
         if(visible) {
@@ -197,6 +203,16 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
         if(onClosed) onClosed();
     }
 
+    const RenderMenu=React.useMemo(()=>{
+        return menu.map((dt,i)=>{
+            const disabled = dt?.action==='like' && loading;
+            const accessRight = (dt?.action==='like' && loading) ? LoadingComp : undefined;
+            const color = dt?.color;
+            const icon = dt?.icon ? CustomIcon(dt?.icon,color) : getIcon(dt?.action,(dt?.action==='like' ? dt?.like?.value : undefined));
+            return <MenuItem disabled={disabled} accessoryLeft={icon} accessoryRight={accessRight} style={{paddingHorizontal:15,paddingVertical:12,justifyContent:'flex-start'}} key={`${i}`} title={()=><Text>{dt.title||""}</Text>} onPress={()=>handleOnPress(dt)} />
+        })
+    },[menu,loading,handleOnPress])
+
     return (
         <Portal>
             <Modalize
@@ -211,16 +227,10 @@ const MenuCont=({menu,visible,onClose,onClosed,share,type,item_id}: MenuContaine
             >
                 <Layout style={{borderTopLeftRadius:20,
                     borderTopRightRadius:20}}>
-                    {Header}
+                    <Header />
                     <Layout style={{marginBottom:15,paddingTop:10}}>
                         <Menu appearance="noDivider">
-                            {menu?.map((dt,i)=>{
-                                const disabled = dt?.action==='like' && loading;
-                                const accessRight = (dt?.action==='like' && loading) ? LoadingComp : undefined;
-                                const color = dt?.color;
-                                const icon = dt?.icon ? CustomIcon(dt?.icon,color) : getIcon(dt?.action,(dt?.action==='like' ? dt?.like?.value : undefined));
-                                return <MenuItem disabled={disabled} accessoryLeft={icon} accessoryRight={accessRight} style={{paddingHorizontal:15,paddingVertical:12,justifyContent:'flex-start'}} key={`${i}`} title={()=><Text>{dt.title||""}</Text>} onPress={()=>handleOnPress(dt)} />
-                            })}
+                            {RenderMenu}
                         </Menu>
                     </Layout>
                 </Layout>

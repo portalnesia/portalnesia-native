@@ -96,12 +96,12 @@ export default function TwibbonDetail({navigation,route}){
         setLoading(false)
     }
 
-    const Menu = ()=>(
+    const Menu = React.useCallback(()=>(
         <View style={{flexDirection:'row',justifyContent:'center',alignItems:'center'}}>
             <TopNavigationAction tooltip={i18n.t('usage_guide',{type:"Twibbon"})} icon={SupportIcon} onPress={()=>modalRef.current?.open()} />
             <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />
         </View>
-    )
+    ),[data])
 
     return (
         <>

@@ -28,13 +28,13 @@ export default function Twibbon({ navigation }) {
 		if(!isValidating) setRefreshing(false);
 	},[isValidating])
 
-	const Footer=()=>{
+	const Footer=React.useCallback(()=>{
 		if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t('reach_end')}</Text>
 		if(isLoadingMore && data?.length > 0) return <View paddingTop={20}><Skeleton type="grid" height={300} number={2} image /></View> 
 		else return null
-	}
+	},[isReachingEnd,isLoadingMore,data])
 
-	const renderTwibbon=({item,index})=>{
+	const renderTwibbon=React.useCallback(({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 20;
 		const cardSize=(width/2)-7
@@ -115,15 +115,17 @@ export default function Twibbon({ navigation }) {
 		} else {
 			return null
 		}
-	}
+	},[width,data])
 
-	const renderEmpty=()=>{
+	const renderEmpty=React.useCallback(()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={8} image /></View>
-	}
+	},[error])
+
+	const feedbackToggle=React.useCallback(()=><FeedbackToggle link="/twibbon" />,[])
 
 	return (
-		<Layout navigation={navigation} title="Twibbon" withBack menu={()=><FeedbackToggle link="/twibbon" />}>
+		<Layout navigation={navigation} title="Twibbon" withBack menu={feedbackToggle}>
 			<FlatList
 				columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 				ListEmptyComponent={renderEmpty}

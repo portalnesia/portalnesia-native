@@ -28,11 +28,11 @@ export default function SearchFilter({navigation,route}){
         if(!isValidating) setRefreshing(false)
     },[isValidating])
 
-    const renderItem=(prop)=>{
+    const renderItem=React.useCallback((prop)=>{
         if(['news','blog','users','media','twibbon'].indexOf(filter) !== -1) return <RenderWithImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} withType={false} navigation={navigation} data={data} />
         if(['chord','thread'].indexOf(filter) !== -1) return <RenderNoImage key={`${prop?.item?.type}-${prop?.index}`} {...prop} theme={theme} linkTo={linkTo} withType={false} navigation={navigation} data={data} />
         return null;
-    }
+    },[filter,theme,navigation,data])
 
     const Footer=()=>{
         if(isReachingEnd) return <Text style={{marginTop:10,marginBottom:40,textAlign:'center'}}>{i18n.t("reach_end")}</Text>

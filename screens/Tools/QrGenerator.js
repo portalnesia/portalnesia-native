@@ -675,9 +675,11 @@ export default function QrCodeGenerator({navigation,route}){
         .finally(()=>setLoading(false))
     }
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setOpenMenu(true)}} />,[]);
+
     return (
         <>
-            <Layout title="QR Code Generator" subtitle="Tools" navigation={navigation} menu={()=><MenuToggle onPress={()=>{setOpenMenu(true)}} /> } whiteBg>
+            <Layout title="QR Code Generator" subtitle="Tools" navigation={navigation} menu={menuToggle} whiteBg>
                 {renderTabView()}
             </Layout>
             <MenuContainer

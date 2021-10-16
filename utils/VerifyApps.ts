@@ -1,4 +1,4 @@
-import {Alert} from 'react-native'
+import {Alert,BackHandler} from 'react-native'
 import Portalnesia from '@portalnesia/react-native-core'
 import API from '@pn/utils/axios'
 import i18n from 'i18n-js'
@@ -6,7 +6,7 @@ import { log, logError } from './log'
 import * as Secure from 'expo-secure-store'
 import moment from 'moment'
 import NetInfo from '@react-native-community/netinfo'
-async function alertWarning(msg: string) {
+export async function alertWarning(msg: string) {
     return new Promise<void>(res=>{
         Alert.alert(
             `${i18n.t("warning")}!`,
@@ -14,7 +14,7 @@ async function alertWarning(msg: string) {
             [{
                 text:"OK",
                 onPress:()=>{
-                    Portalnesia.Core.exitApp();
+                    BackHandler.exitApp();
                     res();
                 }
             }]
@@ -122,8 +122,8 @@ export default async function verifyApps() {
         }
         return Promise.resolve();
     } catch(e: any) {
-        //log(`Safety verification ${e?.message}`);
-        //logError(e,"Verification error");
+        log(`Safety verification ${e?.message}`);
+        logError(e,"Verification error");
         await alertWarning(e?.message)
     }
 }

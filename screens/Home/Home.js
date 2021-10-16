@@ -49,6 +49,7 @@ const RenderNews = React.memo(({item:dt, index:i}) => {
 		</Card>
 	);
 })
+const renderNews = (props)=><RenderNews {...props} />
 
 const RenderChord = React.memo(({item:dt, index:i}) => {
 	const onPress=()=>{
@@ -70,8 +71,9 @@ const RenderChord = React.memo(({item:dt, index:i}) => {
 		</Card>
 	);
 })
+const renderChord = (props)=><RenderChord {...props} />
 
-const RenderTwibbon = React.memo(({item:dt, index:i,naviation}) => {
+const RenderTwibbon = React.memo(({item:dt, index:i}) => {
 	
 	return (
 		<Card key={i} onPress={()=>linkTo(`/twibbon/${dt?.slug}`)}>
@@ -90,8 +92,9 @@ const RenderTwibbon = React.memo(({item:dt, index:i,naviation}) => {
 		</Card>
 	);
 })
+const renderTwibbon = (props)=><RenderTwibbon {...props} />
 
-const RenderThread = React.memo(({item:dt, index:i,navigation}) => {
+const RenderThread = React.memo(({item:dt, index:i}) => {
 	const title=React.useMemo(()=>{
 		if(dt?.screen_name) return `Thread by @${dt.screen_name}`
 		else return dt?.title;
@@ -111,6 +114,7 @@ const RenderThread = React.memo(({item:dt, index:i,navigation}) => {
 		</Card>
 	);
 })
+const renderThread = (props)=><RenderThread {...props} />
 
 const About=React.memo(({title,txt,right,last,screen})=>{
 	useSelector(state=>state.lang)
@@ -175,16 +179,16 @@ const loginArray=()=>([
 ])
 
 const RenderInformation=React.memo(({data,item,index})=>{
-	const angka = index % 2;
-	const cardSize=(width/2)-7
-	const next = data?.[index+1]?.key ? data?.[index+1] : false;
+	const angka = React.useMemo(()=>(index % 2),[index]);
+	const cardSize=React.useMemo(()=>((width/2)-7),[])
+	const next = React.useMemo(()=>(data?.[index+1]?.key ? data?.[index+1] : false),[data]);
 	const theme = useTheme();
 
-	const onPress=(it)=>()=>{
+	const onPress=React.useCallback((it)=>()=>{
 		if(it?.to) {
 			linkTo(it?.to)
 		}
-	}
+	},[])
 	
 	if(angka===0) {
 		return (
@@ -281,7 +285,7 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 		return obj;
 	},[data,loading,error,cuaca])
 
-	const renderFooter=()=>(
+	const renderFooter=React.useCallback(()=>(
 		<React.Fragment>
 			<View style={{paddingVertical:30,marginBottom:15}}>
 				<View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',paddingHorizontal:15}}>
@@ -290,13 +294,13 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				</View>
 				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
-				{loading || (data && data?.data?.news?.length === 0) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' image height={300} /></View>
+				{loading || (data && data?.data?.news?.length === 0) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton card type='caraousel' image height={300} /></View>
 				: error ? (
 					<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
 				) : data?.data?.news?.length > 0 ? (
 					<Carousel
 						data={data?.data?.news}
-						renderItem={(props)=><RenderNews {...props} />}
+						renderItem={renderNews}
 						autoplay
 					/>
 				) : (
@@ -310,13 +314,13 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				</View>
 				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
-				{loading || (data && data?.data?.chord?.length === 0) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
+				{loading || (data && data?.data?.chord?.length === 0) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton card type='caraousel' height={100} /></View>
 				: error ? (
 					<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
 				) : data?.data?.chord?.length > 0 ? (
 					<Carousel
 						data={data?.data?.chord}
-						renderItem={(props)=><RenderChord {...props} />}
+						renderItem={renderChord}
 						autoplay
 					/>
 				) : (
@@ -330,13 +334,13 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				</View>
 				
 				<Divider style={{marginVertical:10,backgroundColor:theme['border-text-color']}} />
-				{loading || (data && data?.data?.thread?.length === 0 ) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton type='caraousel' height={100} /></View>
+				{loading || (data && data?.data?.thread?.length === 0 ) ? <View style={{paddingHorizontal:15,paddingVertical:10}}><Skeleton card type='caraousel' height={100} /></View>
 				: error ? (
 					<Text style={{paddingHorizontal:15}}>Failed to load data</Text>
 				) : data?.data?.thread?.length > 0 ? (
 					<Carousel
 						data={data?.data?.thread}
-						renderItem={(props)=><RenderThread {...props} />}
+						renderItem={renderThread}
 						autoplay
 					/>
 				) : (
@@ -344,13 +348,11 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 				)}
 			</View>
 		</React.Fragment>
-	)
+	),[data,loading])
 
-	const toggle = ()=>(
-		<>
-			<FeedbackToggle />
-		</>
-	)
+	const toggle = React.useCallback(()=>(
+		<FeedbackToggle />
+	),[])
 
 	const getCuaca=React.useCallback(()=>{
 		if(AppState.currentState==='active') {
@@ -391,12 +393,14 @@ const Dashboard=React.memo(({loading,data,error,navigation,onMutate})=>{
 		}
 	},[])
 
+	const renderItem=React.useCallback((props)=><RenderInformation data={dt} {...props} />,[dt])
+
 	return (
-		<Layout navigation={navigation} title="Portalnesia" align="start" withBack={false} menu={toggle}>
+		<Layout navigation={navigation} title="Portalnesia" align="start" withBack={false} menu={toggle} forceEnable>
 			<FlatList
 				columnWrapperStyle={{flexWrap:'wrap',flex:1}}
 				data={dt}
-				renderItem={(props)=><RenderInformation data={dt} {...props} />}
+				renderItem={renderItem}
 				numColumns={2}
 				ref={ref}
 				ListFooterComponent={renderFooter}
@@ -461,7 +465,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					) : (
 						<Carousel
 							data={data?.news}
-							renderItem={(props)=><RenderNews {...props} navigation={navigation} />}
+							renderItem={renderNews}
 						/>
 					)}
 					<Button style={{marginTop:10,marginBottom:40}} onPress={()=>linkTo("/news")}>{i18n.t('see_more')}</Button>
@@ -477,7 +481,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					) : (
 						<Carousel
 							data={data?.chord}
-							renderItem={(props)=><RenderChord {...props} navigation={navigation} />}
+							renderItem={renderChord}
 						/>
 					)}
 					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>linkTo("/chord")}>{i18n.t('see_more')}</Button>
@@ -493,7 +497,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					) : (
 						<Carousel
 							data={data?.twibbon}
-							renderItem={(props)=><RenderTwibbon {...props} navigation={navigation} />}
+							renderItem={renderTwibbon}
 						/>
 					)}
 					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>linkTo("/twibbon")}>{i18n.t('see_more')}</Button>
@@ -509,7 +513,7 @@ const NotLogin=React.memo(({loading,data,error,navigation})=>{
 					) : (
 						<Carousel
 							data={data?.thread}
-							renderItem={(props)=><RenderThread {...props} navigation={navigation} />}
+							renderItem={renderThread}
 						/>
 					)}
 					<Button style={{marginTop:10,marginBottom:40}} size="small" onPress={()=>linkTo("/twitter/thread")}>{i18n.t('see_more')}</Button>

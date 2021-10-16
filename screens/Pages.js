@@ -91,9 +91,11 @@ export default function({navigation,route}){
         setTableShow(false)
     },[])
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />,[data]);
+
     return (
         <>
-            <Layout title={navbar||"Pages"} navigation={navigation} menu={()=> <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
+            <Layout title={navbar||"Pages"} navigation={navigation} menu={menuToggle}>
                 {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
                 
                 <Animated.ScrollView

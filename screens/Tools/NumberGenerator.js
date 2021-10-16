@@ -119,9 +119,11 @@ export default function({navigation}){
         }
     },[error,value,anim])
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setOpen(true)}} />,[]);
+
     return (
         <>
-            <Layout navigation={navigation} title="Random Number Generator" subtitle="Tools" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
+            <Layout navigation={navigation} title="Random Number Generator" subtitle="Tools" withBack menu={menuToggle}>
                 <ScrollView
                     contentContainerStyle={{
                         flex:1,flexDirection:'column',justifyContent:'flex-start',

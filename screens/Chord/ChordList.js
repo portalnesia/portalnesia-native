@@ -109,8 +109,14 @@ export default function ({ navigation,route }) {
 		return <View style={{height:"100%"}}><Skeleton type="grid" number={14} gridStyle={{marginBottom:40}} /></View>
 	}
 
+	const feedbackToggle=React.useCallback(()=><FeedbackToggle link={`/chord/artist${slug ? `/${slug}` : ""}`} />,[slug])
+	const renderItem=React.useCallback(({item,index})=>{
+		if(slug) return <RenderChord item={item} index={index} width={width} data={data} navigation={navigation} />
+		else return <RenderArtist item={item} index={index} width={width} data={data} navigation={navigation} />
+	},[width,data,navigation,slug])
+
 	return (
-		<Layout navigation={navigation} title={slug ? `Chord By ${artist}` : "Chord Artists"} menu={()=><FeedbackToggle />}>
+		<Layout navigation={navigation} title={slug ? `Chord By ${artist}` : "Chord Artists"} menu={feedbackToggle}>
 			<Lay style={{paddingBottom:60,flexGrow:1,alignItems:'center',justifyContent:'center',flexDirection:'column'}} level="2">
 				<FlatList
 					columnWrapperStyle={{flexWrap:'wrap',flex:1}}
@@ -120,10 +126,7 @@ export default function ({ navigation,route }) {
 						...(error ? {flex:1} : {})
 					}}
 					data={data}
-					renderItem={({item,index})=>{
-						if(slug) return <RenderChord item={item} index={index} width={width} data={data} navigation={navigation} />
-						else return <RenderArtist item={item} index={index} width={width} data={data} navigation={navigation} />
-					}}
+					renderItem={renderItem}
 					ListFooterComponent={Footer}
 					refreshControl={
 						<RefreshControl

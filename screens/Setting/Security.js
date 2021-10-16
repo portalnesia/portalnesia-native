@@ -3,18 +3,19 @@ import {View,Dimensions, Alert,RefreshControl,FlatList} from 'react-native'
 import {Layout as Lay, Text, useTheme,Divider, Icon,Toggle,ListItem as LItem} from '@ui-kitten/components'
 import i18n from 'i18n-js'
 import Modal from 'react-native-modal'
+import * as Secure from 'expo-secure-store'
 
 import Layout from "@pn/components/global/Layout";
 import Pressable from "@pn/components/global/Pressable";
 import { AuthContext } from '@pn/provider/Context';
 import NotFound from '@pn/components/global/NotFound'
 import NotFoundScreen from '../NotFound'
-import { ucwords } from '@portalnesia/utils';
+import { ucwords,firstToUpper } from '@portalnesia/utils';
 import useSWR from '@pn/utils/swr';
 import Tooltip from '@pn/components/global/Tooltip'
 import Recaptcha from '@pn/components/global/Recaptcha'
 import Backdrop from '@pn/components/global/Backdrop'
-import { useBiometrics,createKeys,promptAuthentication,deleteKeys } from '@pn/utils/Biometrics';
+import { useBiometrics,createKeys,promptAuthentication,deleteKeys,enableLockSetting,disableLockSetting } from '@pn/utils/Biometrics';
 import useAPI from '@pn/utils/API';
 import ListItem from '@pn/components/global/ListItem'
 import Password from '@pn/components/global/Password'
@@ -37,6 +38,7 @@ export default function SecuritySettingScreen({navigation,route}){
     const [loading,setLoading]=React.useState(false);
     const {supported:supportKey,biometricsExist} = useBiometrics();
     const [fingerprint,setFingerprint] = React.useState(undefined)
+    const [lockEnable,setLockEnable] = React.useState(false)
     const [session,setSession]=React.useState([]);
     const captchaRef = React.useRef(null)
     const [validate,setValidate]=React.useState(false)
@@ -48,6 +50,11 @@ export default function SecuritySettingScreen({navigation,route}){
     React.useEffect(()=>{
         if(!isValidating) setValidate(false);
     },[isValidating])
+
+    React.useEffect(()=>{
+        Secure.getItemAsync("lock_fingerprint")
+        .then((aa)=>setLockEnable(aa!==null))
+    },[])
 
     React.useEffect(()=>{
         if(data) {
@@ -83,7 +90,26 @@ export default function SecuritySettingScreen({navigation,route}){
         return info;
     },[selectedMenu])
 
-    const handleBiometrics=async(val)=>{
+    const handleLockSetting=React.useCallback(async(val)=>{
+        setLockEnable(val)
+        setLoading(true)
+        try {
+            if(val) {
+                await enableLockSetting();
+            }
+            else {
+                await disableLockSetting();
+            }
+        } catch(e) {
+            setLockEnable(!val);
+            setNotif(true,"Error",e?.message);
+        } finally {
+            setLoading(false);
+        }
+    },[])
+
+    const handleBiometrics=React.useCallback(async(val)=>{
+        setFingerprint(val);
         setLoading(true);
         if(val===true) {
             try {
@@ -99,10 +125,10 @@ export default function SecuritySettingScreen({navigation,route}){
                             ...data,
                             security_key:true
                         })
-                        setFingerprint(biometricsExist);
-                    }
-                }
+                    } else setFingerprint(!val);
+                } else setFingerprint(!val);
             } catch(e){
+                setFingerprint(!val);
                 if(e?.message) setNotif(true,"Error",e?.message);
             } finally {
                 setLoading(false);
@@ -119,20 +145,24 @@ export default function SecuritySettingScreen({navigation,route}){
                             ...data,
                             security_key:false
                         })
+                    } else {
+                        setFingerprint(!val);
                     }
                 }
                 else {
+                    setFingerprint(!val);
                     setNotif(false,"Error","Something went wrong");
                 }
             } catch(e){
+                setFingerprint(!val);
                 if(e?.message) setNotif(true,"Error",e?.message);
             } finally {
                 setLoading(false);
             }
         }
-    }
+    },[PNpost,data])
 
-    const handleDelete=(dt)=>{
+    const handleDelete=React.useCallback((dt)=>{
         setLoading(true);
         captchaRef.current.getToken()
         .then(recaptcha=>{
@@ -155,9 +185,9 @@ export default function SecuritySettingScreen({navigation,route}){
         .finally(()=>{
             setLoading(false);
         })
-    }
+    },[data,PNpost,selectedMenu,session])
 
-    const renderHeader=()=>(
+    const renderHeader=React.useCallback(()=>(
         <Lay>
             {supportKey && (
                 <>
@@ -165,11 +195,20 @@ export default function SecuritySettingScreen({navigation,route}){
                     <Text category="h5" style={{paddingHorizontal:15,paddingBottom:5,borderBottomColor:theme['border-text-color'],borderBottomWidth:2,marginBottom:10}}>{ucwords(i18n.t('authentication'))}</Text>
                     <View style={{paddingHorizontal:15,flexDirection:'row',alignItems:'center',marginBottom:10,justifyContent:'space-between'}}>
                         <View style={{flexDirection:'row',alignItems:'center'}}>
-                            <Text>{ucwords(i18n.t('auth_type',{type:ucwords(i18n.t('fingerprint'))}))}</Text>
+                            <Text>{firstToUpper(i18n.t('auth_type',{type:i18n.t('fingerprint')}))}</Text>
                             <Tooltip style={{marginLeft:5}} tooltip={i18n.t('settings.security.auth_help')} name="question-mark-circle-outline" />
                         </View>
                         <Toggle disabled={loading} checked={fingerprint} onChange={handleBiometrics} />
                     </View>
+                    {fingerprint && (
+                        <View style={{paddingHorizontal:15,flexDirection:'row',alignItems:'center',marginBottom:10,justifyContent:'space-between'}}>
+                            <View style={{flexDirection:'row',alignItems:'center'}}>
+                                <Text>{firstToUpper(i18n.t('settings.security.lock_with',{type:i18n.t('fingerprint')}))}</Text>
+                                <Tooltip style={{marginLeft:5}} tooltip={i18n.t('settings.security.lock_help')} name="question-mark-circle-outline" />
+                            </View>
+                            <Toggle disabled={loading} checked={lockEnable} onChange={handleLockSetting} />
+                        </View>
+                    )}
                 </Lay>
                 {session.length > 0 && (
                     <Lay style={{paddingTop:15}}>
@@ -179,7 +218,7 @@ export default function SecuritySettingScreen({navigation,route}){
                 </>
             )}
         </Lay>
-    )
+    ),[supportKey,session,fingerprint,handleBiometrics,theme,loading,lockEnable,handleLockSetting])
 
     const handleRemoveMenuClick=React.useCallback(()=>{
         if(selectedMenu.this_browser) {
@@ -199,14 +238,16 @@ export default function SecuritySettingScreen({navigation,route}){
         )
     },[theme])
 
-    const renderEmpty=()=>{
+    const renderEmpty=React.useCallback(()=>{
         if(error || data?.error) return <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
         else return (
             <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                 <Spinner size="large" />
             </Lay>
         )
-    }
+    },[data,error])
+
+    const renderItem=React.useCallback((props)=> <RenderItem {...props} renderIcon={renderIcon} />,[renderIcon])
 
     return (
         <>
@@ -218,7 +259,7 @@ export default function SecuritySettingScreen({navigation,route}){
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={{backgroundColor:theme['background-basic-color-1'],paddingTop:15,...(session.length === 0 ? {flex:1} : {})}}
                     ListHeaderComponent={renderHeader}
-                    renderItem={(props)=> <RenderItem {...props} renderIcon={renderIcon} />}
+                    renderItem={renderItem}
                     ItemSeparatorComponent={Divider}
                     keyExtractor={(_,i)=>i.toString()}
                     { ...(typeof data !== 'undefined' || typeof error !== 'undefined' ? {refreshControl:<RefreshControl refreshing={validate && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>{!validate && (setValidate(true),mutate())}} colors={['white']} progressBackgroundColor="#2f6f4e" />} : {}) }

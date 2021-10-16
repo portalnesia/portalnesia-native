@@ -146,6 +146,10 @@ class RenderFollowClass extends React.PureComponent{
         )
     }
 
+    renderItem(props){
+        return <RenderUser {...props} onOpen={(e)=>this.handleOpenMenu(e)} />
+    }
+
     render(){
         const {menu,loading}=this.state;
         const {navigation,user,data,error,theme,dt,isValidating,isLoadingInitialData,onGetRef,onScroll,containerPaddingTop,scrollIndicatorInsetTop,onScrollEndDrag}=this.props
@@ -179,7 +183,7 @@ class RenderFollowClass extends React.PureComponent{
             <>
                 <Animated.FlatList
                     data={dt}
-                    renderItem={(props)=> <RenderUser {...props} onOpen={this.handleOpenMenu.bind(this)} />}
+                    renderItem={(props)=> this.renderItem(props)}
                     ItemSeparatorComponent={Divider}
                     ListFooterComponent={this.renderFooter()}
                     ListEmptyComponent={this.renderEmpty()}

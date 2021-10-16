@@ -37,7 +37,7 @@ export default function ({ navigation }) {
 		else return null
 	},[isReachingEnd,isLoadingMore])
 
-	const renderNews=({item,index})=>{
+	const renderNews=React.useCallback(({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 20;
 		const cardSize=(width/2)-7
@@ -92,15 +92,17 @@ export default function ({ navigation }) {
 		} else {
 			return null
 		}
-	}
+	},[data,width])
 
-	const renderEmpty=()=>{
+	const renderEmpty=React.useCallback(()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={4} image /></View>
-	}
+	},[error])
+
+	const feedbackToggle=React.useCallback(()=><FeedbackToggle link="/blog" />,[])
 
 	return (
-		<Layout navigation={navigation} title="Blog" menu={()=><FeedbackToggle link="/blog" />}>
+		<Layout navigation={navigation} title="Blog" menu={feedbackToggle}>
 			<FlatList
 				ListEmptyComponent={renderEmpty}
 				columnWrapperStyle={{flexWrap:'wrap',flex:1}}

@@ -92,14 +92,14 @@ export default function NotificationSettingScreen({navigation,route}){
         setInput(prev=>({...prev,[type]:val}))
     }
 
-    const renderEmpty=()=>{
+    const renderEmpty=React.useCallback(()=>{
         if(error || data?.error) return <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
         else return (
             <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                 <Spinner size="large" />
             </Lay>
         )
-    }
+    },[data,error])
 
     const handleSubmit=()=>{
         setLoading(true)
@@ -122,7 +122,7 @@ export default function NotificationSettingScreen({navigation,route}){
         })
     }
 
-    const renderFooter=()=>{
+    const renderFooter=React.useCallback(()=>{
         if(data?.notification) {
             return (
                 <Lay level="2" style={{paddingTop:30,paddingBottom:10,paddingHorizontal:15}}>
@@ -131,7 +131,9 @@ export default function NotificationSettingScreen({navigation,route}){
             )
         }
         return null;
-    }
+    },[data,loading,handleSubmit])
+
+    const renderItem=React.useCallback((props)=><RenderItem {...props} input={input} handleChange={handleChange} loading={loading} />,[input,handleChange,loading])
 
     return (
         <>
@@ -143,7 +145,7 @@ export default function NotificationSettingScreen({navigation,route}){
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{...(notification?.length === 0 ? {flex:1} : {})}}
-                renderItem={(props)=> <RenderItem {...props} input={input} handleChange={handleChange} loading={loading} />}
+                renderItem={renderItem}
                 ItemSeparatorComponent={Divider}
                 { ...(typeof data !== 'undefined' || typeof error !== 'undefined' ? {refreshControl:<RefreshControl refreshing={validate && (typeof data !== 'undefined' || typeof error !== 'undefined')} onRefresh={()=>{!validate && (setValidate(true),mutate())}} colors={['white']} progressBackgroundColor="#2f6f4e" />} : {}) }
             />

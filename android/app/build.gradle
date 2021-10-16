@@ -141,8 +141,8 @@ android {
         applicationId "com.portalnesia.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 21
-        versionName "2.12.0"
+        versionCode 22
+        versionName "2.13.0"
     }
     splits {
         abi {
@@ -234,7 +234,7 @@ dependencies {
     implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
     implementation "com.github.stfalcon-studio:StfalconImageViewer:master-SNAPSHOT"
     implementation "io.grpc:grpc-okhttp:1.32.2"
-    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-image-manipulator','unimodules-barcode-scanner-interface','unimodules-camera-interface','unimodules-face-detector-interface','unimodules-sensors-interface','expo-local-authentication']])
+    addUnimodulesDependencies([exclude:['expo-keep-awake','expo-linear-gradient','expo-sqlite','expo-sharing','expo-image-manipulator','unimodules-barcode-scanner-interface','unimodules-camera-interface','unimodules-face-detector-interface','unimodules-sensors-interface','expo-local-authentication','expo-task-manager','expo-background-fetch']])
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

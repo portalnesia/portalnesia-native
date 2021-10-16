@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import {AppState} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator,TransitionPresets,HeaderStyleInterpolators,TransitionSpecs,CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -6,6 +7,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
 import {Icon,useTheme,Text} from '@ui-kitten/components'
 import analytics from '@react-native-firebase/analytics'
+import Modal from 'react-native-modal'
+import BgTimer from 'react-native-background-timer'
+
+import initializeLock,{isLockedActive} from '@pn/utils/Lock'
 import useRootNavigation,{handleLinking,getPath} from '../navigation/useRootNavigation'
 import {showInterstisial} from '../components/global/Ads'
 import {addEventListener as ExpoAddListener,removeEventListener as ExpoRemoveListener,getInitialURL} from 'expo-linking'
@@ -195,56 +200,76 @@ const MenuStack = createStackNavigator();
 
 const HomeScreenStack = ()=>{
 	const theme=useTheme();
+	const {user} = useSelector(state=>({user:state.user}))
+	const renderScreen=React.useCallback(()=>{
+		return getScreen().map((dt,i)=>(
+			<HomeStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+		))
+	},[user])
 	return (
 		<HomeStack.Navigator initialRouteName="Home" headerMode="float" screenOptions={getScreenOptions(theme)}>
-			<HomeStack.Screen  name="Home" component={Home} />
-			{getScreen().map((dt,i)=>(
-				<HomeStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-			))}
+			<HomeStack.Screen  name="Home" component={Home} options={{headerShown:false}} />
+			{renderScreen()}
 		</HomeStack.Navigator>
 	)
 }
 const NewsScreenStack = ()=>{
 	const theme=useTheme();
+	const {user} = useSelector(state=>({user:state.user}))
+	const renderScreen=React.useCallback(()=>{
+		return getScreen().map((dt,i)=>(
+			<NewsStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+		))
+	},[user])
 	return (
 		<NewsStack.Navigator initialRouteName="News" headerMode="float" screenOptions={getScreenOptions(theme)}>
 			<NewsStack.Screen  name="News" component={News} />
-			{getScreen().map((dt,i)=>(
-				<NewsStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-			))}
+			{renderScreen()}
 		</NewsStack.Navigator>
 	)
 }
 const ChordScreenStack = ()=>{
 	const theme=useTheme();
+	const {user} = useSelector(state=>({user:state.user}))
+	const renderScreen=React.useCallback(()=>{
+		return getScreen().map((dt,i)=>(
+			<ChordStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+		))
+	},[user])
 	return (
 		<ChordStack.Navigator initialRouteName="Chord" headerMode="float" screenOptions={getScreenOptions(theme)}>
 			<ChordStack.Screen  name="Chord" component={Chord} />
-			{getScreen().map((dt,i)=>(
-				<ChordStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-			))}
+			{renderScreen()}
 		</ChordStack.Navigator>
 	)
 }
 const SearchScreenStack = ()=>{
 	const theme=useTheme();
+	const {user} = useSelector(state=>({user:state.user}))
+	const renderScreen=React.useCallback(()=>{
+		return getScreen().map((dt,i)=>(
+			<SearchStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+		))
+	},[user])
 	return (
 		<SearchStack.Navigator initialRouteName="Search" headerMode="float" screenOptions={getScreenOptions(theme)}>
 			<SearchStack.Screen  name="Search" component={Search} />
-			{getScreen().map((dt,i)=>(
-				<SearchStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-			))}
+			{renderScreen()}
 		</SearchStack.Navigator>
 	)
 }
 const MenuScreenStack = ()=>{
 	const theme=useTheme();
+	const {user} = useSelector(state=>({user:state.user}))
+	const renderScreen=React.useCallback(()=>{
+		return getScreen().map((dt,i)=>(
+			<MenuStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
+		))
+	},[user])
 	return (
 		<MenuStack.Navigator initialRouteName="Menu" headerMode="float" screenOptions={getScreenOptions(theme)}>
 			<MenuStack.Screen  name="Menu" component={Menu} />
-			{getScreen().map((dt,i)=>(
-				<MenuStack.Screen key={i} name={dt?.name} component={dt?.component} {...(dt?.options ? {options:dt?.options} : {})} />
-			))}
+			{renderScreen()}
 		</MenuStack.Navigator>
 	)
 }
@@ -294,7 +319,7 @@ const MainNavigator=()=>{
 			...TransitionPresets.SlideFromRightIOS
 		}}>
 			<MainStack.Screen name="MainTab" component={MainTabNavigator} />
-			<MainStack.Screen name="ReportScreen" component={ReportScreen} />
+			<MainStack.Screen name="ReportScreen" component={ReportScreen} options={{headerShown:true}} />
 			<MainStack.Screen name="Login" component={Login} />
 			<MainStack.Screen name="Register" component={Register} />
 			<MainStack.Screen name="Authentication" component={Authentication} />
@@ -315,6 +340,7 @@ export default React.memo(() => {
 	const {PNpost} = useAPI();
 	const {showAds} = showInterstisial();
 	const [ready,setReady]=React.useState(false);
+	const [lock,setLock] = React.useState(false);
 	const lastNotif = Notifications.useLastNotificationResponse();
 
 	function onReady(){
@@ -474,6 +500,50 @@ export default React.memo(() => {
 			checkNotification();
 		}
 	},[lastNotif,ready])
+
+	React.useEffect(()=>{
+		let timeout=null,llock=false;
+		const unregister = async()=>{
+			if(timeout !== null) {
+				BgTimer.clearTimeout(timeout);
+				timeout=null;
+			}
+			if(llock) {
+				await initializeLock();
+				llock=false;
+				setLock(false);
+			}
+		}
+		const listener = async(state)=>{
+			if(ready) {
+				if(state==="background") {
+					timeout = BgTimer.setTimeout(async()=>{
+						const active = await isLockedActive();
+						if(active) {
+							llock=true;
+							setLock(true);
+						}
+					},60 * 1000)
+				} else {
+					unregister();
+					if(llock) {
+						await initializeLock();
+					}
+					llock=false;
+					setLock(false);
+				}
+			}
+		}
+
+		AppState.addEventListener("change",listener);
+		return ()=>{
+			if(timeout !== null) {
+				BgTimer.clearTimeout(timeout);
+				timeout=null;
+			}
+			AppState.removeEventListener("change",listener);
+		}
+	},[ready])
 	
 	return (
 		<>
@@ -496,6 +566,13 @@ export default React.memo(() => {
 			{ready && (
 				<Portal>
 					<MusicPlayer />
+					<Modal
+						isVisible={lock}
+						style={{margin:0,justifyContent:'center'}}
+						coverScreen={false}
+					>
+						<Loading />
+					</Modal>
 				</Portal>
 			)}
 		</>

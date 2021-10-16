@@ -22,6 +22,8 @@ import { useFocusEffect } from '@react-navigation/core';
 
 const {width:screenWidth} = Dimensions.get("window")
 
+const renderRow=(prop)=> <RenderRow {...prop} />
+
 export default function({navigation,route}){
     const initialType = route.params?.initialType;
     const initialData = route.params?.initialData;
@@ -159,9 +161,11 @@ export default function({navigation,route}){
         return ()=>ShareModule.removeListener(dataListener);
     },[])
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setOpen(true)}} />,[]);
+
     return (
         <>
-            <Layout navigation={navigation} title="Images Checker" subtitle="Tools" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
+            <Layout navigation={navigation} title="Images Checker" subtitle="Tools" withBack menu={menuToggle}>
                 <ScrollView
                     contentContainerStyle={{
                         flexGrow: 1
@@ -201,7 +205,7 @@ export default function({navigation,route}){
                                     <Lay>
                                         <Text style={[style.container,{marginBottom:10}]}>Result:</Text>
                                         <List
-                                            renderItem={(prop)=> <RenderRow {...prop} />}
+                                            renderItem={renderRow}
                                             ItemSeparatorComponent={Divider}
                                             data={result}
                                         />

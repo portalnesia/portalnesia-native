@@ -110,15 +110,19 @@ function BlogDetail({navigation,route}){
         })
     },[data,mutate])
 
+    const renderItem=React.useCallback((props)=><RenderCaraousel {...props} />,[])
+
     React.useEffect(()=>{
         if(data) {
             setLiked(data?.blog?.liked);
         }
     },[data])
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />,[data]);
+
     return (
         <>
-        <Layout title='Blog' subtitle={data?.blog?.title||undefined} navigation={navigation} menu={()=> <MenuToggle onPress={()=>{data && !data?.error &&setOpen(true)}} />}>
+        <Layout title='Blog' subtitle={data?.blog?.title||undefined} navigation={navigation} menu={menuToggle}>
             {content?.length > 0 && <TableContent.Text style={{alignItems:'center'}} sticky scrollAnim={scrollAnim} translateY={translateY} onPress={onShowContent} /> }
             <Animated.ScrollView
                 ref={scrollRef}
@@ -185,7 +189,7 @@ function BlogDetail({navigation,route}){
                                 <Text category="h5" style={{paddingHorizontal:15,marginBottom:15}}>{i18n.t('others_type',{type:i18n.t('post')})}</Text>
                                 <Carousel
                                     data={data?.others}
-                                    renderItem={(props)=><RenderCaraousel {...props} />}
+                                    renderItem={renderItem}
                                     autoplay
                                 />
                             </Lay>

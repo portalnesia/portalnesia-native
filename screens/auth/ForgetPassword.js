@@ -56,6 +56,11 @@ export default function ForgetPasswordScreen({ navigation,route }) {
 			setLoading(false);
 		}
 	}
+
+	const handleNavigation=React.useCallback((screen)=>()=>{
+		navigation.navigate(screen)
+	},[navigation])
+
 	return (
 		<>
 			<Layout navigation={navigation} whiteBg withClose>
@@ -132,9 +137,7 @@ export default function ForgetPasswordScreen({ navigation,route }) {
 								Already have an account?
 							</Text>
 							<TouchableOpacity
-								onPress={() => {
-									navigation.navigate("Login")
-								}}
+								onPress={handleNavigation("Login")}
 								activeOpacity={0.7}
 							>
 								<Text

@@ -62,9 +62,11 @@ export default function({navigation,route}){
         return ()=>ShareModule.removeListener(dataListener);
     },[])
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setOpen(true)}} />,[]);
+
     return (
         <>
-            <Layout navigation={navigation} title="Parse HTML" subtitle="Tools" withBack menu={()=><MenuToggle onPress={()=>{setOpen(true)}} />}>
+            <Layout navigation={navigation} title="Parse HTML" subtitle="Tools" withBack menu={menuToggle}>
                 <ScrollView
                     contentContainerStyle={{
                         flexGrow:1,

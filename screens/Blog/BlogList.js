@@ -40,7 +40,7 @@ export default function BlogList({navigation,route}){
 	},[isReachingEnd,isLoadingMore])
 
 
-    const renderNews=({item,index})=>{
+    const renderNews=React.useCallback(({item,index})=>{
 		const angka = index % 2;
 		const ads = index % 20;
 		const cardSize=(width/2)-7
@@ -95,15 +95,17 @@ export default function BlogList({navigation,route}){
 		} else {
 			return null
 		}
-	}
+	},[data,width])
 
-	const renderEmpty=()=>{
+	const renderEmpty=React.useCallback(()=>{
 		if(error) return <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
 		return <View style={{height:'100%'}}><Skeleton type="grid" number={4} image /></View>
-	}
+	},[error])
+
+	const feedbackToggle=React.useCallback(()=><FeedbackToggle link={`/blog/${blogType}/${slug}`} />,[blogType,slug])
 
     return (
-		<Layout navigation={navigation} title={`${ucwords(blogType)} - Blog`} subtitle={ucwords(slug.replace(/\-/g," "))} menu={()=><FeedbackToggle />}>
+		<Layout navigation={navigation} title={`${ucwords(blogType)} - Blog`} subtitle={ucwords(slug.replace(/\-/g," "))} menu={feedbackToggle}>
 			{['tags','category'].indexOf(blogType) === -1 ? (
                 <Lay level="2" style={{flex:1,alignItems:'center',justifyContent:'center'}}><Text>{i18n.t('errors.general')}</Text></Lay>
             ) : (

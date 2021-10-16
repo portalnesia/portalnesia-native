@@ -110,17 +110,6 @@ const ARender=(attribs,children,style,props)=>{
 
 const PictureRender=(attribs,children,style,props)=>{
     return children;
-    const node = props?.domNode;
-    const child = node?.children?.[node?.children?.length - 1];
-    if(child?.name === 'img') {
-        const {src}=child?.attribs;
-        const srrrc=child?.attribs?.['data-src']||src;
-        const withPng = child?.attribs?.['data-png'] == "true";
-        const srrc=!srrrc?.match(/portalnesia\.com\/+/) && !srrrc?.match(/^\/+/) ? `${CONTENT_URL}/img/url?image=${encodeURIComponent(srrrc)}&size=400${withPng ? '&output=png' : ''}` : `${srrrc}${withPng ? '&output=png' : ''}`;
-        //console.log(srrc);
-        return <View key={props?.key} style={{marginTop:10}}><GlobalImageRender src={srrc} /></View>
-    }
-    return children;
 }
 const TableRender=(attribs,children,style,props)=>{
     return TableRenderer(attribs,children,style,props)
@@ -418,6 +407,27 @@ const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,o
         }
     },[source])
 
+    const ul=React.useCallback(()=>(
+        <View
+            style={{
+                marginRight: 10,
+                width: 15 / 2.8,
+                height: 15 / 2.8,
+                marginTop: 15 / 1.5,
+                borderRadius: 15 / 2.8,
+                backgroundColor: theme['text-basic-color'],
+            }}
+        />
+    ),[theme]);
+
+    const ol=React.useCallback((a,b,c,props)=>(
+        <Text
+            style={{ marginRight: 5, fontSize:15,marginTop:1 }}
+        >
+            {`${props?.nodeIndex + 1})`}
+        </Text>
+    ),[]);
+
     return (
         <HTML
             source={{html:source}}
@@ -454,25 +464,8 @@ const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,o
                 }
             }}
             listsPrefixesRenderers={{
-                ul:()=>(
-                    <View
-                        style={{
-                            marginRight: 10,
-                            width: 15 / 2.8,
-                            height: 15 / 2.8,
-                            marginTop: 15 / 1.5,
-                            borderRadius: 15 / 2.8,
-                            backgroundColor: theme['text-basic-color'],
-                        }}
-                    />
-                ),
-                ol:(a,b,c,props)=>(
-                    <Text
-                        style={{ marginRight: 5, fontSize:15,marginTop:1 }}
-                    >
-                        {`${props?.nodeIndex + 1})`}
-                    </Text>
-                )
+                ul,
+                ol
             }}
             renderersProps={renderersProps}
         />

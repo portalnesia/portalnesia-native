@@ -4,7 +4,7 @@ import {Divider, Icon, Input,Layout as Lay, Text} from '@ui-kitten/components'
 import { Markdown } from '../global/Parser';
 import withTheme from '../HOC/withTheme';
 import { MarkdownEditorProps,MarkdownEditorState } from './types';
-import { renderFormatButtons } from './renderButtons';
+import { RenderFormatButtons } from './renderButtons';
 import Button from '../global/Button';
 
 export * from './types'
@@ -106,15 +106,7 @@ export default class MarkdownEditor extends React.PureComponent<MarkdownEditorPr
                 <Divider />
                 <View style={{flex:0,flexDirection:'row',paddingVertical:5,paddingHorizontal:15}}>
                     <Button tooltip={showPreview ? "Hide preview" : "Show preview"} text accessoryLeft={(props)=><Icon {...props} name={showPreview ? 'eye-off-outline' : 'eye-outline'} />} onPress={()=>this.toggle()} />
-                    {renderFormatButtons({
-                        getState:()=>this._getState(),
-                        setState:(state,callback)=>{
-                            this.setState({...state},callback);
-                        },
-                        setSelection:(state,callback)=>{
-                            this.setState(state,callback);
-                        }
-                    })}
+                    <RenderFormatButtons getState={()=>this._getState()} setState={(state,callback)=>this.setState({...state},callback)} setSelection={(state,callback)=>this.setState(state,callback)} />
                 </View>
                 <Divider />
             </Lay>

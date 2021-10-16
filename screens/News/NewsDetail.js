@@ -24,7 +24,7 @@ import {pushTo} from '@pn/navigation/useRootNavigation'
 import {getCollapsOpt} from '@pn/utils/Main'
 import {useCollapsibleHeader} from 'react-navigation-collapsible'
 
-//const MoreIcon=(props)=><Icon {...props} name="more-vertical" />
+const renderCarousel=(props)=><RenderCaraousel {...props} />
 
 export default function({navigation,route}){
     const {source,title} = route.params
@@ -89,9 +89,11 @@ export default function({navigation,route}){
         }
     },[data])
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />,[data]);
+
     return (
         <>
-        <Layout title={"News"} subtitle={data?.title||undefined} navigation={navigation} menu={()=><MenuToggle onPress={()=>{data && !data?.error && setOpen(true)}} />}>
+        <Layout title={"News"} subtitle={data?.title||undefined} navigation={navigation} menu={menuToggle}>
             <Animated.ScrollView
                 contentContainerStyle={{
                     flexGrow: 1,
@@ -139,7 +141,7 @@ export default function({navigation,route}){
                                     ) : dataOthers?.data?.length > 0 ? (
                                         <Carousel
                                             data={dataOthers?.data}
-                                            renderItem={(props)=><RenderCaraousel {...props} />}
+                                            renderItem={renderCarousel}
                                             autoplay
                                         />
                                     ) : (

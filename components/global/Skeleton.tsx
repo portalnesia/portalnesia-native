@@ -1,7 +1,7 @@
 import React from 'react'
 import Sklton,{SkeletonPlaceholderItem,SkeletonPlaceholderProps} from 'react-native-skeleton-placeholder'
 import {useWindowDimensions,View} from 'react-native'
-import {useTheme} from '@ui-kitten/components'
+import {useTheme,Card} from '@ui-kitten/components'
 import withTheme from '../HOC/withTheme'
 
 export type SkeletonProps={
@@ -11,7 +11,8 @@ export type SkeletonProps={
     textProps?: SkeletonPlaceholderItem
     image?: boolean,
     gridStyle?:SkeletonPlaceholderItem
-    height?:number
+    height?:number,
+    card?: boolean
 }
 
 interface TextProps extends SkeletonPlaceholderItem{
@@ -54,11 +55,10 @@ export const RectSkeleton=React.memo(({width=200,height}:{width?:number,height:n
     )
 })
 
-export const GridSkeleton=React.memo(({number=6,image,gridStyle={},height}:{height:number,number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
-    
+export const GridSkeleton=React.memo(({number=6,image,gridStyle={},height}:{height:number,number:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem,card?:boolean})=>{
     const {width} = useWindowDimensions();
     const theme=useTheme();
-    const renderItemWithImage=(index:number)=>{
+    const renderItemWithImage=React.useCallback((index:number)=>{
         const cardSize=(width/2)-7
         return(
             <Sklton.Item flexDirection="row" justifyContent="space-between" alignItems="center" key={index} {...gridStyle}>
@@ -76,9 +76,9 @@ export const GridSkeleton=React.memo(({number=6,image,gridStyle={},height}:{heig
                 </Sklton.Item>
             </Sklton.Item>
         )
-    }
+    },[width,gridStyle])
 
-    const renderItemNoImage=(index:number)=>{
+    const renderItemNoImage=React.useCallback((index:number)=>{
         const cardSize=(width/2)-7
         return(
             <Sklton.Item flexDirection="row" justifyContent="space-between" alignItems="center" key={index} {...gridStyle}>
@@ -92,15 +92,24 @@ export const GridSkeleton=React.memo(({number=6,image,gridStyle={},height}:{heig
                 </Sklton.Item>
             </Sklton.Item>
         )
-    }
+    },[width,gridStyle])
+
+    const RenderSkeleton=React.useMemo(()=>{
+        return [...Array(Math.floor(number/2)).keys()].map((_,index)=>{
+            if(image) {
+                return renderItemWithImage(index)
+            } else {
+                return renderItemNoImage(index)
+            }
+        })
+    },[renderItemWithImage,renderItemNoImage,number,image])
+
+
 
     return (
         <Sklton height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
             <Sklton.Item>
-                {[...Array(Math.floor(number/2)).keys()].map((_,index)=>{
-                    if(image) return renderItemWithImage(index)
-                    else return renderItemNoImage(index)
-                })}
+                {RenderSkeleton}
             </Sklton.Item>
         </Sklton>
     )
@@ -188,13 +197,14 @@ export const ArticleSkeleton=React.memo(({height}:{height:number})=>{
     )
 })
 
-export const CaraouselSkeleton=React.memo(({image,gridStyle={},height}:{height:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem})=>{
+export const CaraouselSkeleton=React.memo(({image,height,card}:{height:number,image?:boolean,gridStyle?:SkeletonPlaceholderItem,card?:boolean})=>{
     
     const {width} = useWindowDimensions();
     const theme=useTheme();
-    const textWidth = width-30
-    const cardSize=(width/2)-7
-    const renderItemWithImage=()=>{
+    const textWidth = React.useMemo(()=>(width-30),[width])
+    const cardSize=React.useMemo(()=>((width/2)-7),[width])
+
+    const renderItemWithImage=React.useCallback(()=>{
         return(
             <Sklton.Item width={textWidth}>
                 <Sklton.Item flexDirection="row" justifyContent="center" alignItems="center">
@@ -205,22 +215,44 @@ export const CaraouselSkeleton=React.memo(({image,gridStyle={},height}:{height:n
                 <Sklton.Item height={15} width={textWidth/3} borderRadius={4} />
             </Sklton.Item>
         )
-    }
+    },[textWidth,cardSize])
 
-    const renderItemNoImage=()=>{
+    const renderItemNoImage=React.useCallback(()=>{
         return(
             <Sklton.Item width={textWidth}>
                 <Sklton.Item height={27} width={textWidth} borderRadius={4} marginBottom={5} />
                 <Sklton.Item height={15} width={textWidth/2} borderRadius={4} marginBottom={2} />
             </Sklton.Item>
         )
-    }
+    },[textWidth])
+
+    const RenderSkeleton=React.useMemo(()=>{
+        if(image) {
+            if(card) {
+                return (
+                    <Card disabled style={{width:textWidth}}>
+                        {renderItemWithImage()}
+                    </Card>
+                )
+            } else {
+                return renderItemWithImage();
+            }
+        } else {
+            if(card) {
+                return (
+                    <Card disabled style={{width:textWidth}}>
+                        {renderItemNoImage()}
+                    </Card>
+                )
+            } else {
+                return renderItemNoImage();
+            }
+        }
+    },[image,card,renderItemNoImage,renderItemWithImage,textWidth])
 
     return (
         <Sklton height={height} backgroundColor={theme['skeleton-background-color']} highlightColor={theme['skeleton-hightlight-color']}>
-            <Sklton.Item>
-                {image ? renderItemWithImage() : renderItemNoImage()}
-            </Sklton.Item>
+            {RenderSkeleton}
         </Sklton>
     )
 })
@@ -245,16 +277,16 @@ export const SkltnView=React.memo((props: SkeletonPlaceholderItem)=>{
 
 export const Skltn = React.memo(withTheme<SkltnProps>(Skltnn));
 
-function Skeleton({type,number=3,width,textProps,image,gridStyle,height}: SkeletonProps): JSX.Element|null {
+function Skeleton({type,number=3,width,textProps,image,gridStyle,height,card}: SkeletonProps): JSX.Element|null {
     const {height:winHeight}=useWindowDimensions()
     height=height||winHeight
     if(type==='paragraph') return <PararaphSkeleton type={type} number={number} height={height} />
     else if(type==='rect') return <RectSkeleton width={width} height={height} />
     else if(type==='text' && textProps) return <TextSkeleton {...textProps} rootHeight={height} />
-    else if(type==='grid') return <GridSkeleton number={number} image={image} gridStyle={gridStyle} height={height} />
+    else if(type==='grid') return <GridSkeleton number={number} image={image} gridStyle={gridStyle} height={height} card={card} />
     else if(type==='article') return <ArticleSkeleton height={height} />
     else if(type==='list') return <ListSkeleton height={height} number={number} image={image} />
-    else if(type=='caraousel') return <CaraouselSkeleton image={image} gridStyle={gridStyle} height={height} />
+    else if(type=='caraousel') return <CaraouselSkeleton image={image} gridStyle={gridStyle} height={height} card={card} />
     return null;
 }
 export default React.memo(Skeleton);

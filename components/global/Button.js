@@ -11,22 +11,23 @@ export const LoadingComponent=React.memo((props)=>(
 ))
 
 const Button=React.forwardRef(({size,onPress,onLongPress,disabled,loading,status,appearance,outlined,children,text,accessoryLeft: accessLeft,accessoryRight: accessRight,...others},ref)=>{
-    const stat = outlined ? "basic" : text ? "basic" : status;
-    const appear = outlined ? "outline" : text ? "ghost" : appearance;
+    const stat = React.useMemo(()=>(outlined ? "basic" : text ? "basic" : status),[outlined,text,status]);
+    const appear = React.useMemo(()=>(outlined ? "outline" : text ? "ghost" : appearance),[outlined,text,appearance]);
     const theme = useTheme();
     
-    const accessoryLeft = (props)=>{
+    const accessoryLeft = React.useCallback((props)=>{
         if(typeof children === 'undefined') {
             if(loading) return <LoadingComponent {...props} />
         }
         return accessLeft ? accessLeft(props) : null;
-    }
-    const accessoryRight=(props)=>{
+    },[loading,accessLeft,children])
+
+    const accessoryRight=React.useCallback((props)=>{
         if(typeof children !== 'undefined') {
             if(loading) return <LoadingComponent {...props} />
         }
         return accessRight ? accessRight(props) : null;
-    }
+    },[loading,accessRight,children])
 
     if(text || (appearance==='ghost' && status==='basic')) {
         return (
@@ -67,7 +68,6 @@ const Button=React.forwardRef(({size,onPress,onLongPress,disabled,loading,status
             onLongPress={onLongPress}
             ref={ref}
             {...others}
-            
         >
             {children}
         </Btn>

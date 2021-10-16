@@ -36,9 +36,11 @@ export default function TuenrScreen({navigation,route}){
         })
     },[navigation])
 
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setMenu(true)}} />,[]);
+
     return (
         <>
-            <Layout navigation={navigation} title="Tuner" subtitle="Tools" withBack menu={()=><MenuToggle onPress={()=>{setMenu(true)}} />}>
+            <Layout navigation={navigation} title="Tuner" subtitle="Tools" withBack menu={menuToggle}>
                 <ScrollView contentContainerStyle={{flex:1}}>
                     <Lay><AdsBanner /></Lay>
                     <Lay style={[style.container,{paddingTop:15,flexGrow:1,flexShrink:1}]}>

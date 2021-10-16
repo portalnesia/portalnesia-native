@@ -1,6 +1,27 @@
 import React from 'react'
 import Biometrics,{CreateSignatureOptions,SimplePromptOptions,CreateSignatureResult} from 'react-native-biometrics'
 import { generateRandom } from '@portalnesia/utils';
+import * as Secure from 'expo-secure-store'
+
+class BiometricsError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "BiometricsError";
+    }
+}
+
+export async function enableLockSetting() {
+    const {biometryType,available} = await Biometrics.isSensorAvailable();
+    if(available && biometryType === Biometrics.Biometrics) {
+        const exist = await biometricsExist();
+        if(exist) {
+            await Secure.setItemAsync("lock_fingerprint","true");
+        }
+    }
+}
+export async function disableLockSetting() {
+    await Secure.deleteItemAsync("lock_fingerprint");
+}
 
 export function useBiometrics(){
     const [fingerprint,setFingerprint] = React.useState(false)
@@ -34,7 +55,7 @@ export async function createKeys(){
     const exist = await biometricsExist();
     if(exist) {
         const deleted = await deleteKeys();
-        if(!deleted) throw {message:"Key exists! Error when delete the keys"}
+        if(!deleted) throw new BiometricsError("Key exists! Error when delete the keys")
     }
 
     const {publicKey} = await Biometrics.createKeys();
@@ -42,6 +63,7 @@ export async function createKeys(){
 }
 
 export async function deleteKeys(){
+    await disableLockSetting();
     const {keysDeleted} = await Biometrics.deleteKeys()
     return keysDeleted;
 }
@@ -65,7 +87,7 @@ export async function verifyAuthentication(options?: Partial<CreateSignatureOpti
     }
 
     const result = await Biometrics.createSignature(option);
-    if(result.error && result?.error != 'User cancellation') throw {message:result.error}
+    if(result.error && result?.error != 'User cancellation') throw new BiometricsError(result?.error);
 
     return {...result,payload};
 }
@@ -76,7 +98,7 @@ export async function promptAuthentication(options?: Partial<SimplePromptOptions
         promptMessage:"Verify Your Identity"
     }
     const result = await Biometrics.simplePrompt(option);
-    if(result.error) throw {message:result.error}
+    if(result.error) throw new BiometricsError(result?.error == 'User cancellation' ? "Verification failed" : result?.error)
 
     return result.success;
 }

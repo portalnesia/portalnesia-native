@@ -59,11 +59,11 @@ export default function({navigation}){
     const modalRef = React.useRef(null)
     const {showAds} = showInterstisial()
 
-    const onModalChange=type=>value=>{
+    const onModalChange=React.useCallback((type)=>(value)=>{
         setSistem({...sistem,[type]:value})
         setModal(null)
         modalRef?.current?.close();
-    }
+    },[sistem])
 
     React.useEffect(()=>{
         if(data) setTotal(data?.total_page)
@@ -104,9 +104,12 @@ export default function({navigation}){
         })
     }
 
+    const renderItem=React.useCallback((props)=><RenderRow key={props?.item?.epsg} {...props} onChange={onModalChange(modal)} />,[onModalChange,modal])
+    const menuToggle=React.useCallback(()=> <MenuToggle onPress={()=>{setOpen(true)}} />,[]);
+
     return (
         <>
-            <Layout navigation={navigation} title="Transform Coordinate" subtitle="Geodata" withBack menu={()=> <MenuToggle onPress={()=>{setOpen(true)}} />}>
+            <Layout navigation={navigation} title="Transform Coordinate" subtitle="Geodata" withBack menu={menuToggle}>
                 <ScrollView
                     contentContainerStyle={{
                         flexGrow: 1
@@ -190,7 +193,7 @@ export default function({navigation}){
                         ListFooterComponent:footerModal,
                         data:(data?.data||[]),
                         stickyHeaderIndices:[0],
-                        renderItem:(props)=><RenderRow key={props?.item?.epsg} {...props} onChange={onModalChange(modal)} />,
+                        renderItem,
                         ItemSeparatorComponent:Divider,
                         keyExtractor:(item)=>item.epsg,
                     }}

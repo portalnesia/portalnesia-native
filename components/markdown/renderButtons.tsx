@@ -11,21 +11,24 @@ interface DefaultMarkdownProps extends FunctionArg {
 
 const renderIcon=(name: string, pack?: string)=>(props?:Partial<ImageProps>)=><Icon {...props} name={name} pack={pack} />
 
-const defaultMarkdownButton = ({ item, getState, setState,index,setSelection }: DefaultMarkdownProps) => {
+const DefaultMarkdownButton = React.memo(({ item, getState, setState,index,setSelection }: DefaultMarkdownProps) => {
   return (
     <Button tooltip={item.title} key={index.toString()} text onPress={() => item.onPress({ getState, setState, item, setSelection })} {...(item.icon ? {accessoryLeft:renderIcon(item?.icon?.name,item?.icon?.pack)} : {children:item.key})} />
   );
-};
+});
 
-export const renderFormatButtons = ({ getState, setState,setSelection }: Pick<FunctionArg,'getState'|'setState'|'setSelection'>, formats?: FormatType[]) => {
+export const RenderFormatButtons = React.memo(({ getState, setState,setSelection }: Pick<FunctionArg,'getState'|'setState'|'setSelection'>)=>{
+  const renderItem=React.useCallback((props)=>(
+    <DefaultMarkdownButton {...props} getState={getState} setState={setState} setSelection={setSelection} />
+  ),[])
   return (
     <FlatList
-      data={formats ? formats : Formats}
+      data={Formats}
       keyboardShouldPersistTaps="always"
-      renderItem={({ item, index }) => defaultMarkdownButton({ item, getState, setState,index,setSelection })}
+      renderItem={renderItem}
       horizontal
       showsHorizontalScrollIndicator={false}
       keyboardDismissMode="none"
     />
   )
-};
+})
