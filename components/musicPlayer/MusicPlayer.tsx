@@ -28,23 +28,28 @@ function MusicPlayer() {
             if(track) modalRef.current?.open("default");
             else modalRef.current?.close("default");
         })
-        
     },[track])
 
     const onPositionChange=React.useCallback((position)=>{
         InteractionManager.runAfterInteractions(()=>{
-            setHandle(position==='top')
-            if(position!=='top') {
-                setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
-                queueRef.current?.close("alwaysOpen")
+            if(track) {
+                setHandle(position==='top')
+                if(position!=='top') {
+                    setStatusBarBackgroundColor(theme['background-basic-color-1'],true)
+                    queueRef.current?.close("alwaysOpen")
+                } else {
+                    setStatusBarBackgroundColor(theme['background-basic-color-2'],true)
+                }
             } else {
-                setStatusBarBackgroundColor(theme['background-basic-color-2'],true)
+                modalRef.current?.close("default");
             }
         })
-    },[])
+    },[track])
     const onQPositionChange=React.useCallback((position)=>{
-        InteractionManager.runAfterInteractions(()=>setQHandle(position==='top'))
-    },[])
+        InteractionManager.runAfterInteractions(()=>{
+            if(track) setQHandle(position==='top')
+        })
+    },[track])
 
     React.useEffect(()=>{
         function handleURL({url}: EventType){

@@ -137,7 +137,7 @@ function BlogDetail({navigation,route}){
                 onScroll={onScroll}
             >
                 {!data && !error ? (
-                    <View style={{height:'100%',paddingTop:15}}>
+                    <View style={{height:'100%',paddingTop:30}}>
                         <Skeleton type="article" />
                     </View>
                 ) : error || data?.error ? (

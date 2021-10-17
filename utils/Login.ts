@@ -118,6 +118,8 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                 await Promise.all([
                     revokeToken(token),
                     logoutInit(),
+                    Secure.deleteItemAsync("token"),
+                    Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
                 dispatch(actionLogout())
@@ -127,6 +129,8 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                 logError(e,"logout Login.ts");
                 await Promise.all([
                     logoutInit(),
+                    Secure.deleteItemAsync("token"),
+                    Secure.deleteItemAsync("user"),
                     [...(account?.name ? [Authentication.removeAccount(account)] : [])]
                 ])
                 dispatch(actionLogout())
@@ -134,6 +138,8 @@ export default function useLogin(setNotif?: UseLoginOptions) {
         } else {
             await Promise.all([
                 logoutInit(),
+                Secure.deleteItemAsync("token"),
+                Secure.deleteItemAsync("user"),
                 [...(account?.name ? [Authentication.removeAccount(account)] : [])]
             ])
             dispatch(actionLogout())
@@ -183,39 +189,22 @@ export default function useLogin(setNotif?: UseLoginOptions) {
                         }
                     } catch(e: any) {
                         logError(e,"refreshToken Login.ts");
+                        logout(token);
                     }
                 }
                 // JS token != native token;
                 else {
-                    await Authentication.removeAccount(account);
-                    dispatch(actionLogout())
+                    logout();
                 }
             } 
             // Account manager empty
             else {
-                if(token !== null) {
-                    await Promise.all([
-                        logout(token),
-                        Secure.deleteItemAsync("token"),
-                        Secure.deleteItemAsync("user")
-                    ])
-                } else {
-                    dispatch(actionLogout())
-                }
+                logout(token !== null ? token: undefined);
             }
         } catch(e: any) {
             log("refreshToken Login.ts error",{msg:e.message});
             logError(e,"refreshToken Login.ts");
-            if(account?.name) await Authentication.removeAccount(account);
-            if(token !== null) {
-                await Promise.all([
-                    logout(token),
-                    Secure.deleteItemAsync("token"),
-                    Secure.deleteItemAsync("user")
-                ])
-            } else {
-                dispatch(actionLogout())
-            }
+            logout(token !== null ? token: undefined);
         }
         return Promise.resolve();
     },[logout,dispatch,refreshTokenUtils])

@@ -287,7 +287,7 @@ export default function TwitterThread({navigation,route}){
 
     const renderEmpty=()=>{
 		if(error || Boolean(data?.error)) return <NotFound status={data?.code||503}><Text>{data?.msg||"Something went wrong"}</Text></NotFound>
-		return <View style={{height:'100%',paddingVertical:10}}><Skeleton type="article" /></View>
+		return <View style={{height:'100%',paddingVertical:15}}><Skeleton type="article" /></View>
 	}
 
     const handleReload=React.useCallback(()=>{

@@ -351,6 +351,17 @@ const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,o
     const theme = useTheme()
     if(source.length === 0 ) return null;
 
+    const renderersProps=React.useMemo(()=>({
+        theme,
+        iklan,
+        //selectedTheme,
+        scrollRef,
+        yLayout,
+        onReceiveId,
+        padding,
+        editor
+    }),[theme,iklan,onReceiveId,padding,editor,yLayout,scrollRef])
+
     const renderers=React.useMemo(()=>({
         table:{renderer:TableRender,wrapper:"Text"},
         p:{renderer:TextRender,wrapper:'View'},
@@ -377,17 +388,6 @@ const ParserComponent=({source,selectable=false,iklan=true,scrollRef,yLayout=0,o
         figure:{renderer:FigureRender,wrapper:"View"},
         del:{renderer:DelRender,wrapper:"Text"},
         del:{renderer:DelRender,wrapper:"View"},
-    }),[])
-
-    const renderersProps=React.useMemo(()=>({
-        theme,
-        iklan,
-        //selectedTheme,
-        scrollRef,
-        yLayout,
-        onReceiveId,
-        padding,
-        editor
     }),[theme,iklan,onReceiveId,padding,editor,yLayout,scrollRef])
 
     /*const alterData=(node)=>{
