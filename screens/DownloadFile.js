@@ -160,7 +160,7 @@ export default function DownloadFileScreen({navigation,route}) {
                                 )}
                                 {canDownload && (
                                     <View style={{marginVertical:15}}>
-                                        <Button disabled={loading} loading={loading} onPress={handleGenerateDownload}><Text>{token2 !== null ? "Download" : "Generate Link"}</Text></Button>
+                                        <Button disabled={loading} loading={loading} onPress={handleGenerateDownload}><Text style={{color:"white"}}>{token2 !== null ? "Download" : "Generate Link"}</Text></Button>
                                     </View>
                                 )}
                                 

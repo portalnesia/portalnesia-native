@@ -21,13 +21,13 @@ import useAPI from '@pn/utils/API'
 
 const winHeight = Dimensions.get('window').height;
 
-const RenderItem=React.memo(({item,index})=>{
+const RenderItem=React.memo(({item,index,goTO})=>{
     const accessoryRight=React.useCallback(()=><MemoAvatar src={item?.thumbs} />,[item])
     return (
-        <ListItem onPress={()=>linkTo(`/media/${item?.id}`)} key={index.toString()} title={item?.title} accessoryLeft={accessoryRight} style={{paddingVertical:5}} />
+        <ListItem onPress={()=>goTO(item)} key={index.toString()} title={item?.title} accessoryLeft={accessoryRight} style={{paddingVertical:5}} />
     )
 })
-const renderItem=(props)=> <RenderItem {...props} />
+
 const MemoAvatar=React.memo(({src})=>(
     <Avatar style={{marginRight:10}} src={src} size={45} />
 ))
@@ -61,6 +61,7 @@ export default function MediaScreen({navigation,route}){
     const theme = useTheme();
     const {PNget} = useAPI();
     const {setupPlayer} = useTrackPlayer();
+    const prevMedia = React.useRef(null);
 
     React.useEffect(()=>{
         async function getData() {
@@ -85,10 +86,13 @@ export default function MediaScreen({navigation,route}){
         async function getData() {
             if(data) {
                 if(data?.file?.type !== 'audio') {
-                    if(!dataOthers || dataOthers?.error) {
-                        mutate();
+                    if(prevMedia.current !== data?.file?.id) {
+                        if(!dataOthers || dataOthers?.error) {
+                            mutate();
+                        }
+                        prevMedia.current = data?.file?.id;
+                        if(!__DEV__) await PNget(`/media/${data?.file?.id}/update`);
                     }
-                    if(!__DEV__) await PNget(`/media/${data?.file?.id}/update`);
                 }
             }
         }
@@ -106,6 +110,14 @@ export default function MediaScreen({navigation,route}){
         )
     },[dataOthers,isValidating])
     const renderHeader=React.useCallback(()=><RenderHeader data={data} />,[data])
+
+    const goTO=React.useCallback((item)=>{
+        navigation?.setParams({
+            slug:item?.id
+        })
+    },[navigation])
+
+    const renderItem=React.useCallback((props)=><RenderItem goTO={goTO} {...props} />,[goTO])
 
     return(
         <>
