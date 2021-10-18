@@ -17,7 +17,7 @@ const NativePlayer=React.memo(({src,poster,height,width: vidWidth})=>{
     const width = vidWidth||winWidth;
     const [ratio,setRatio] = React.useState(null)
     const [full,setFull] = React.useState(false)
-    const [videoRef,setVideoRef]=React.useState(null)
+    const videoRef=React.useRef(null)
     
     const finalHeight = React.useMemo(()=>{
         if(height) return height
@@ -35,8 +35,8 @@ const NativePlayer=React.memo(({src,poster,height,width: vidWidth})=>{
 
     const handleFullScreen=React.useCallback((isFull)=>()=>{
         setFull(isFull)
-        if(isFull) videoRef?.presentFullscreenPlayer()
-        else videoRef?.dismissFullscreenPlayer()
+        if(isFull) videoRef.current?.presentFullscreenPlayer()
+        else videoRef.current?.dismissFullscreenPlayer()
     },[])
     const onFullscreenUpdate=React.useCallback(({fullscreenUpdate})=>{
         if(fullscreenUpdate === Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS) {
@@ -48,6 +48,7 @@ const NativePlayer=React.memo(({src,poster,height,width: vidWidth})=>{
         <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
             <VideoPlayer
                 videoProps={{
+                    shouldPlay:false,
                     resizeMode: Video.RESIZE_MODE_CONTAIN,
                     source: {
                         uri: src,
@@ -56,14 +57,18 @@ const NativePlayer=React.memo(({src,poster,height,width: vidWidth})=>{
                         uri:`${CONTENT_URL}/img/url?size=800&image=${poster}`
                     },
                     usePoster:true,
-                    videoRef:(ref)=>setVideoRef(ref),
+                    ref:videoRef,
                     onFullscreenUpdate
                 }}
-                inFullscreen={full}
-                width={width}
-                height={finalHeight}
-                switchToLandscape={handleFullScreen(true)}
-                switchToPortrait={handleFullScreen(false)}
+                fullscreen={{
+                    inFullscreen:full,
+                    enterFullscreen:handleFullScreen(true),
+                    exitFullscreen:handleFullScreen(false)
+                }}
+                style={{
+                    width,
+                    height:finalHeight
+                }}
             />
         </View>
     )
