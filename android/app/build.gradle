@@ -141,8 +141,8 @@ android {
         applicationId "com.portalnesia.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 22
-        versionName "2.13.0"
+        versionCode 23
+        versionName "2.14.0"
     }
     splits {
         abi {
@@ -207,6 +207,11 @@ android {
             output.outputFileName = "Portalnesia-${abiName}-v${defaultConfig.versionName}.apk"
         }
     }
+}
+
+configurations.all {
+    resolutionStrategy.force 'com.squareup.okhttp3:okhttp:4.9.1'
+    resolutionStrategy.force 'com.squareup.okhttp3:okhttp-urlconnection:4.9.1'
 }
 
 dependencies {

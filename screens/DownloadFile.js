@@ -4,28 +4,23 @@ import {Layout as Lay,Text,Spinner,useTheme } from '@ui-kitten/components'
 
 import {FeedbackToggle} from '@pn/components/global/MoreMenu'
 import Layout from '@pn/components/global/Layout';
-import Image from '@pn/components/global/Image'
 import axios from 'axios'
-import style from '@pn/components/global/style'
 import Button from '@pn/components/global/Button'
-import useClipboard from '@pn/utils/clipboard'
 import { AuthContext } from '@pn/provider/Context';
-import { openBrowser } from '@pn/utils/Main';
-import Portalnesia from '@portalnesia/react-native-core'
 import i18n from 'i18n-js';
-import useSelector from '@pn/provider/actions'
 import {AdsBanner,AdsBanners} from '@pn/components/global/Ads'
 import NotFoundScreen from './NotFound'
 import NotFound from '@pn/components/global/NotFound'
 import {CONTENT_URL,URL} from '@env'
 import useSWR from '@pn/utils/swr'
 import { generateRandom, number_size } from '@portalnesia/utils';
-import downloadFile from '@pn/utils/Download'
+import downloadFile,{DIRECTORY_DOWNLOADS,DIRECTORY_MUSIC,DIRECTORY_PICTURES} from '@pn/utils/Download'
 
 let timeInterval=null,timeLeft=15;
 const renderToggle=()=>(
     <FeedbackToggle />
 )
+
 export default function DownloadFileScreen({navigation,route}) {
     const token = route.params?.token;
     if(!token) return <NotFoundScreen navigation={navigation} route={route} />
@@ -89,9 +84,14 @@ export default function DownloadFileScreen({navigation,route}) {
     const handleDownload=React.useCallback(async(token)=>{
         const filename = generateRandom(10) + "_" + data?.file?.title;
         const url = CONTENT_URL + "/download_files?token=" + token;
-
+        let dirType = DIRECTORY_DOWNLOADS;
+        if(data?.file?.type?.match(/images\/+/) != null) {
+            dirType = DIRECTORY_PICTURES;
+        } else if(data?.file?.type?.match(/audio\/+/) != null) {
+            dirType = DIRECTORY_MUSIC;
+        }
         try {
-            const down = await downloadFile(url,filename,"pn://login-callback",data?.file?.type)
+            const down = downloadFile(url,filename,data?.file?.type,dirType)
             if(down) {
                 setNotif(false,"Download","Start downloading...");
                 down.start();

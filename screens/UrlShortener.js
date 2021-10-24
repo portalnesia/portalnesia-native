@@ -80,11 +80,11 @@ const URLshortenerForm=React.memo(({initialData="",setNotif,user,ads,handleOpenQ
 
     const handleSubmit=()=>{
         if(input.url.match(/\S+/) === null) return setNotif(true,"Error","URL cannot be empty");
-        setResult(null);
-        setLoading(true);
         Portalnesia.Safetynet.verifyWithRecaptcha()
-        .then(recaptcha=>{
-            return PNpost('/url/short',{...input,recaptcha},undefined,true,false)
+        .then(async(recaptcha)=>{
+            setResult(null);
+            setLoading(true);
+            return await PNpost('/url/short',{...input,recaptcha},undefined,true,false)
         })
         .then(res=>{
             if(!res.error) {
@@ -274,7 +274,7 @@ function URLshortener({navigation,route}){
             const filename = `[portalnesia.com]_${result.custom}.png`;
             
             try {
-                const down = await downloadFile(url,filename,"pn://url","image/png")
+                const down = downloadFile(url,filename,"image/png",Portalnesia.Files.DIRECTORY_PICTURES)
                 if(down) {
                     setNotif(false,"Download","Start downloading...");
                     down.start();

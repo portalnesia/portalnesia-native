@@ -519,7 +519,6 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight})=>{
     }
 
     const handleSubmit=()=>{
-        setLoading(true);
         validCheck(route.key,input)
         .then((checkError)=>{
             return new Promise((res,rej)=>{
@@ -534,8 +533,9 @@ const RenderScene=React.memo(({route,onProcess,scrollProps,headerHeight})=>{
         .then(()=>{
             return Portalnesia.Safetynet.verifyWithRecaptcha()
         })
-        .then(recaptcha=>{
-            return PNpost(`/qrcode`,{...input,recaptcha})
+        .then(async(recaptcha)=>{
+            setLoading(true);
+            return await PNpost(`/qrcode`,{...input,recaptcha})
         })
         .then((res)=>{
             if(!res.error) {

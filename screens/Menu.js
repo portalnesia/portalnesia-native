@@ -57,7 +57,7 @@ export default function({navigation,route}){
         
         try {
             const filename = getAbi === null ? `Portalnesia-universal-v${version}.apk` : `Portalnesia-${getAbi}-v${version}.apk`;
-            const download = await downloadFile(download_url,filename,"pn://login-callback","application/vnd.android.package-archive");
+            const download = downloadFile(download_url,filename,"application/vnd.android.package-archive",Portalnesia.Files.DIRECTORY_DOWNLOADS);
             
             if(download) {
                 setNotif(false,"Download","Start downloading...");

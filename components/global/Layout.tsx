@@ -5,11 +5,14 @@ import {Layout as Lay,Text,useTheme} from '@ui-kitten/components'
 import {useFocusEffect} from '@react-navigation/native'
 import { useNavigationState } from '@react-navigation/core';
 import {StackHeaderProps} from '@react-navigation/stack'
+import Portalnesia from '@portalnesia/react-native-core'
 
 export interface LayoutProps extends TopNavigationProps {
     children?: React.ReactNode
     custom?: (config: StackHeaderProps)=>React.ReactNode;
     forceEnable?:boolean;
+    notAskExit?:boolean;
+    left?:()=>React.ReactElement
 }
 
 /**
@@ -53,7 +56,7 @@ const styles = StyleSheet.create({
  */
 let timeout: number|null=null;
 export default function Layout(props: LayoutProps) {
-    const {withBack=true,withClose,title,align,custom,navigation,subtitle,menu} = props;
+    const {withBack=true,withClose,title,align,custom,navigation,subtitle,menu,notAskExit,left} = props;
     const {index,routeName} = useNavigationState(state=>{
         return {index:state.index,routeName:state.routes[0].name};
     })
@@ -69,13 +72,20 @@ export default function Layout(props: LayoutProps) {
     useFocusEffect(
 		React.useCallback(()=>{
 			const onBackPress=()=>{
-				if(index==0 && routeName === "Home") {
+				if(index==0 && routeName === "Home" && typeof notAskExit === 'undefined') {
                     if(!wait) {
                         ToastAndroid.show("Press again to exit",1000);
                         setWait(true)
                         return true;
                     } else {
                         if(timeout!==null) clearTimeout(timeout);
+                        try {
+                            Portalnesia.Core.exitApp();
+                        } catch(e) {
+                            console.log("ERROR",e);
+                        }
+                        
+                        return true;
                     }
                 }
                 return false;
@@ -84,15 +94,15 @@ export default function Layout(props: LayoutProps) {
 			BackHandler.addEventListener("hardwareBackPress",onBackPress)
 
 			return ()=>BackHandler.removeEventListener("hardwareBackPress",onBackPress)
-		},[index,wait,routeName])
+		},[index,wait,routeName,notAskExit])
 	)
 
     React.useLayoutEffect(()=>{
         navigation.setOptions({
             headerTitleAlign:align==='start' ? "left" : "center",
-            ...(withClose || withBack ? {headerLeft:()=><RenderBackBtn withClose={withClose} withBack={withBack} navigation={navigation} />} : {}),
+            ...(left ? {headerLeft:left} : withClose || withBack ? {headerLeft:()=><RenderBackBtn withClose={withClose} withBack={withBack} navigation={navigation} />} : {}),
             ...(menu ? {headerRight: menu} : {}),
-            ...(typeof custom !== 'undefined' ? {
+            ...(typeof custom === 'function' ? {
                 headerShown:true,
                 header:custom
             } : typeof title !== 'undefined' ? {
@@ -118,7 +128,7 @@ export default function Layout(props: LayoutProps) {
                 }
             } : {headerShown:false})
         })
-    },[navigation,withBack,withClose,title,subtitle,align,custom,menu])
+    },[navigation,withBack,withClose,title,subtitle,align,custom,menu,left])
 
     return <LayoutClass {...props} />
 }

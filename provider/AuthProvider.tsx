@@ -51,23 +51,6 @@ Notifications.setNotificationHandler({
     })
 })
 
-Notifications.setNotificationCategoryAsync(
-    "message_category",
-    [
-        {
-            identifier:"mark_as_read",
-            buttonTitle:"Mark as read"
-        },{
-            identifier:"reply",
-            buttonTitle:'Reply',
-            textInput:{
-                submitButtonTitle:"Send",
-                placeholder:"Message"
-            }
-        }
-    ]
-);
-
 const getNotifOption=(id: string,desc: string,importance=true)=>({
 	name:id,
 	description:desc,
@@ -189,11 +172,11 @@ const AuthProviderFunc = () => {
 		async function setNotificationChannel(){
 			try {
 				await Promise.all([
-					Notifications.setNotificationChannelAsync("Download", getNotifOption("Download","Notifications for download services",false)),
+					Notifications.setNotificationChannelAsync("Download", getNotifOption("Download","Notifications for background download services",false)),
+					Notifications.setNotificationChannelAsync("Upload", getNotifOption("Upload","Notifications for background upload services",false)),
 					Notifications.setNotificationChannelAsync("General", getNotifOption("General","General notifications")),
 					Notifications.setNotificationChannelAsync("News", getNotifOption("News","Notifications for the latest news every day")),
 					Notifications.setNotificationChannelAsync("Features", getNotifOption("Features","New features and promotion on Portalnesia")),
-					Notifications.setNotificationChannelAsync("Services", getNotifOption("Services","Notifications for background services",false)),
 				])
 			} catch(e){
 				console.log("Notification channel error",e);

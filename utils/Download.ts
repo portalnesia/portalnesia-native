@@ -3,8 +3,8 @@ import RNFS from 'react-native-fs'
 import i18n from 'i18n-js'
 import {EncodingType, getFreeDiskStorageAsync,StorageAccessFramework,cacheDirectory,getContentUriAsync} from 'expo-file-system'
 import BackgroundDownloader,{DownloadOption, DownloadTask} from 'react-native-background-downloader'
-import {number_size,truncate as Ktruncate} from '@portalnesia/utils'
-import Portalnesia,{NotificationOptions} from '@portalnesia/react-native-core'
+import {number_size,truncate as Ktruncate,generateRandom} from '@portalnesia/utils'
+import Portalnesia,{NotificationOptions,DownloadOptions} from '@portalnesia/react-native-core'
 
 export type ArgumentType = {
     url: string,
@@ -21,6 +21,11 @@ export interface TaskOptions extends DownloadOption {
     saf: string;
     identifier:number;
 }
+
+export const DIRECTORY_DOWNLOADS = Portalnesia.Files.DIRECTORY_DOWNLOADS;
+export const DIRECTORY_PICTURES = Portalnesia.Files.DIRECTORY_PICTURES;
+export const DIRECTORY_MOVIES = Portalnesia.Files.DIRECTORY_MOVIES;
+export const DIRECTORY_MUSIC = Portalnesia.Files.DIRECTORY_MUSIC;
 
 async function doneTask(option: TaskOptions,size?:number){
     try {
@@ -136,7 +141,7 @@ class PNDownload{
     }
 }
 
-export default async function downloadFile(url: string,filename: string,uri: string="pn://news",mime: string){
+export async function downloadFile(url: string,filename: string,uri: string="pn://news",mime: string){
     const identifier = new Date().getTime();
     const saf = await getSaf();  
     const options: TaskOptions = {
@@ -154,10 +159,40 @@ export default async function downloadFile(url: string,filename: string,uri: str
     return a;
 }
 
+class DownloadManager {
+    options: DownloadOptions;
+
+    constructor(option: DownloadOptions) {
+        this.options = option;
+    }
+
+    async start() {
+        return Portalnesia.Files.download(this.options);
+    }
+}
+
+export default function new_download(uri: string,filename: string,mime: string,dirType: "Download" | "Movies" | "Pictures" | "Music") {
+    filename = dirType === DIRECTORY_PICTURES ? `Portalnesia/${filename}` : filename;
+    const options: DownloadOptions = {
+        title: filename,
+        uri,
+        mimeType: mime,
+        channel_id:"Download",
+        destination:{
+            type:dirType,
+            path:filename
+        }
+    }
+    const a = new DownloadManager(options);
+    return a;
+}
+
 export async function saveBase64(data: string,filename: string,mime="image/png") {
-    const saf = await getSaf();
-    const file = await StorageAccessFramework.createFileAsync(saf,filename,mime);
-    await StorageAccessFramework.writeAsStringAsync(file,data,{encoding:EncodingType.Base64});
+    try {
+        return await RNFS.writeFile(`${RNFS.ExternalStorageDirectoryPath}/Download/[portalnesia.com]_${filename}`,data,"base64");
+    } catch(e) {
+        console.log(e)
+    }
 }
 
 export async function getSaf(force: boolean=false,nullable:boolean=false): Promise<string|null> {
@@ -209,10 +244,11 @@ function showRequestDialog() {
  * @param mime mimetype
  */
 export async function moveFile(from:string,filename:string,mime:string){
-    const saf = await getSaf();
-    const data = await StorageAccessFramework.readAsStringAsync(from,{encoding:EncodingType.Base64});
-    const file = await StorageAccessFramework.createFileAsync(saf,filename,mime);
-    await StorageAccessFramework.writeAsStringAsync(file,data,{encoding:EncodingType.Base64});
-    await StorageAccessFramework.deleteAsync(from,{idempotent:true});
-    return Promise.resolve();
+    let dirType: "Download" | "Movies" | "Pictures" | "Music" = DIRECTORY_DOWNLOADS;
+    if(mime?.match(/images\/+/) != null) {
+        dirType = DIRECTORY_PICTURES;
+    } else if(mime?.match(/audio\/+/) != null) {
+        dirType = DIRECTORY_MUSIC;
+    }
+    return await RNFS.moveFile(from,`${RNFS.ExternalStorageDirectoryPath}/${dirType}/${filename}`);
 }

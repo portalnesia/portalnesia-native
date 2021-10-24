@@ -14,7 +14,7 @@ export async function alertWarning(msg: string) {
             [{
                 text:"OK",
                 onPress:()=>{
-                    BackHandler.exitApp();
+                    Portalnesia.Core.exitApp();
                     res();
                 }
             }]

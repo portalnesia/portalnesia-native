@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator,TransitionPresets,HeaderStyleInterpolators,TransitionSpecs,CardStyleInterpolators } from '@react-navigation/stack';
 import {useTheme} from '@ui-kitten/components'
 import {setStatusBarBackgroundColor,setStatusBarStyle} from 'expo-status-bar'
 import analytics from '@react-native-firebase/analytics'
@@ -49,7 +49,13 @@ export default function(){
             <MainStack.Navigator initialRouteName="Login" screenOptions={{
                 headerShown:false,
                 gestureEnabled:true,
-                ...TransitionPresets.SlideFromRightIOS
+                ...TransitionPresets.SlideFromRightIOS,
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                transitionSpec:{
+                    open: TransitionSpecs.TransitionIOSSpec,
+                    close: TransitionSpecs.TransitionIOSSpec
+                },
+                headerStyleInterpolator: HeaderStyleInterpolators.forUIKit
             }}>
                 <MainStack.Screen name="Login" component={Login} />
                 <MainStack.Screen name="Register" component={Register} />

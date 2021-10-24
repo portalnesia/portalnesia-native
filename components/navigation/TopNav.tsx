@@ -1,10 +1,9 @@
 import React from 'react';
 import {resetRoot} from '@pn/navigation/useRootNavigation'
-import {Icon,Divider, TopNavigation,Text,useTheme, TextProps} from '@ui-kitten/components'
+import {Icon} from '@ui-kitten/components'
 import TopNavigationAction from './TopAction'
 import i18n from 'i18n-js'
 import { useNavigationState } from '@react-navigation/core';
-import { Alert, BackHandler } from 'react-native';
 
 export interface TopNavigationProps {
     /**

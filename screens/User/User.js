@@ -2,14 +2,11 @@ import React from 'react'
 import {View,Dimensions,Animated} from 'react-native'
 import {Layout as Lay,Text,useTheme,TopNavigation,Icon} from '@ui-kitten/components'
 import {TabView,TabBar} from 'react-native-tab-view'
-import {useNavigationState} from '@react-navigation/native'
-import {Modalize} from 'react-native-modalize'
 import Skltn from 'react-native-skeleton-placeholder'
 import Modal from 'react-native-modal'
 import analytics from '@react-native-firebase/analytics'
 import i18n from 'i18n-js'
-import {PanGestureHandler,State} from 'react-native-gesture-handler'
-import Reanimated from 'react-native-reanimated'
+import {PanGestureHandler} from 'react-native-gesture-handler'
 
 import {linkTo} from '@pn/navigation/useRootNavigation'
 import Pressable from "@pn/components/global/Pressable";
@@ -19,9 +16,8 @@ import Image,{ImageFull} from '@pn/components/global/Image'
 import useSWR from '@pn/utils/swr'
 import Button from '@pn/components/global/Button'
 import Avatar from '@pn/components/global/Avatar'
-import {TabBarHeight,HeaderHeight} from './utils'
+import {HeaderHeight} from './utils'
 import Portalnesia from '@portalnesia/react-native-core'
-import TopNavigationAction from '@pn/components/navigation/TopAction'
 import Authentication from '@pn/module/Authentication'
 import Recaptcha from '@pn/components/global/Recaptcha'
 
@@ -32,7 +28,7 @@ import { AuthContext } from '@pn/provider/Context'
 import { CONTENT_URL,URL } from '@env'
 import { ucwords } from '@portalnesia/utils'
 import useAPI from '@pn/utils/API'
-import downloadFile from '@pn/utils/Download'
+import downloadFile,{DIRECTORY_PICTURES} from '@pn/utils/Download'
 import { Portal } from '@gorhom/portal'
 import useSelector from '@pn/provider/actions'
 import {getCollapsOpt} from '@pn/utils/Main'
@@ -379,7 +375,7 @@ export default function UserScreen({navigation,route}){
         const filename = `[portalnesia.com]_${data?.users?.username}_QRcode.png`;
 
         try {
-            const down = await downloadFile(url,filename,`pn://user/${data?.users?.username}`,`image/png`)
+            const down = downloadFile(url,filename,`image/png`,DIRECTORY_PICTURES)
             if(down) {
                 await handleCloseMenu();
                 setNotif(false,"Download","Start downloading...");

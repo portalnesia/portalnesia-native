@@ -27,3 +27,4 @@
 -keep class io.invertase.firebase.** { *; }
 -dontwarn io.invertase.firebase.**
 -keep class com.facebook.react.turbomodule.** { *; }
+-keep class net.gotev.uploadservice.** { *; }
