@@ -7,9 +7,8 @@ import ShareModule from '@pn/module/Share'
 import Layout from '@pn/components/global/Layout'
 import ListItem from '@pn/components/global/ListItem'
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator,TransitionPresets } from '@react-navigation/stack';
+import { createStackNavigator,TransitionPresets,HeaderStyleInterpolators,TransitionSpecs,CardStyleInterpolators } from '@react-navigation/stack';
 
-import TopNavigationAction from '@pn/components/navigation/TopAction'
 import TopNav from '@pn/components/navigation/TopNav'
 import BaseActivity from '../BaseActivity'
 import Backdrop from '@pn/components/global/Backdrop';
@@ -207,7 +206,7 @@ const ShareImage=React.memo(({data,user,token,menu,onCloseMenu})=>{
     )
 })
 
-function Share(){
+function Share({navigation}){
     const [data,setData]=React.useState(null);
     const [user,setUser]=React.useState(null);
     const [token,setToken] = React.useState(null);
@@ -247,48 +246,71 @@ function Share(){
     },[])
 
     const accessoryLeft=React.useCallback(()=>{
-        return <TopNavigationAction tooltip={i18n.t('close')} icon={CloseIcon} onPress={handleBack} />
+        return <TopAction tooltip={i18n.t('close')} icon={CloseIcon} onPress={handleBack} />
     },[])
 
-    const Header=React.useMemo(()=>(
-        <TopNav title="Portalnesia Share" accessoryLeft={accessoryLeft} align="center" menu={()=><TopAction icon={SendIcon} tooltip={i18n.t('send')} onPress={()=>setMenu(true)} />} />
+    const accessoryRight=React.useCallback(()=>(
+        <TopAction icon={SendIcon} tooltip={i18n.t('send')} onPress={()=>setMenu(true)} />
     ),[])
     
     return (
-        <BaseActivity>
-            <Layout custom={Header} whiteBg>
-                {(data===null || user===null) ? (
-                    <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
-                        <Spinner size="large" />
-                    </Lay>
-                ) : (
-                    <ScrollView
-                        contentContainerStyle={{flexGrow:1,backgroundColor:theme['background-basic-color-1']}}
-                    >
-                        {data?.mimeType==='text/plain' ? (
-                            <ShareText data={data} user={user} token={token} menu={menu} onCloseMenu={onCloseMenu} />
-                        ) : data?.mimeType?.match(/^image\/+/) ? (
-                            <ShareImage data={data} user={user} token={token} menu={menu} onCloseMenu={onCloseMenu} />
-                        ) : null }
-                    </ScrollView>
-                )}
-            </Layout>
-        </BaseActivity>
+        <Layout navigation={navigation} title="Portalnesia Share" left={accessoryLeft} menu={accessoryRight} whiteBg notAskExit>
+            {(data===null || user===null) ? (
+                <Lay style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+                    <Spinner size="large" />
+                </Lay>
+            ) : (
+                <ScrollView
+                    contentContainerStyle={{flexGrow:1,backgroundColor:theme['background-basic-color-1']}}
+                >
+                    {data?.mimeType==='text/plain' ? (
+                        <ShareText data={data} user={user} token={token} menu={menu} onCloseMenu={onCloseMenu} />
+                    ) : data?.mimeType?.match(/^image\/+/) ? (
+                        <ShareImage data={data} user={user} token={token} menu={menu} onCloseMenu={onCloseMenu} />
+                    ) : null }
+                </ScrollView>
+            )}
+        </Layout>
     )
 }
 
 const MainStack = createStackNavigator();
 
-export default function(){
+const Navigator=React.memo(()=>{
+    const theme=useTheme();
     return (
         <NavigationContainer>
             <MainStack.Navigator initialRouteName="Share" screenOptions={{
-                headerShown:false,
+                headerShown:true,
                 gestureEnabled:true,
-                ...TransitionPresets.SlideFromRightIOS
+                headerStyle:{
+                    backgroundColor:theme['background-basic-color-1'],
+                    elevation:5
+                },
+                headerLeftContainerStyle:{
+                    paddingLeft:10
+                },
+                headerRightContainerStyle:{
+                    paddingRight:10
+                },
+                ...TransitionPresets.SlideFromRightIOS,
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                transitionSpec:{
+                    open: TransitionSpecs.TransitionIOSSpec,
+                    close: TransitionSpecs.TransitionIOSSpec
+                },
+                headerStyleInterpolator: HeaderStyleInterpolators.forUIKit
             }}>
                 <MainStack.Screen name="Share" component={Share} />
             </MainStack.Navigator>
         </NavigationContainer>
+    )
+})
+
+export default function(){
+    return (
+        <BaseActivity>
+            <Navigator />
+        </BaseActivity>
     )
 }

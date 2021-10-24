@@ -29,7 +29,7 @@
         "licenseUrl": "https://github.com/native-html/plugins",
         "parents": "portal-native"
     },
-    "@portalnesia/react-native-core@1.2.0": {
+    "@portalnesia/react-native-core@1.4.2": {
         "licenses": "MIT",
         "repository": "https://github.com/portalnesia/portalnesia",
         "licenseUrl": "https://github.com/portalnesia/portalnesia",
@@ -353,7 +353,7 @@
         "licenseUrl": "https://github.com/expo/expo",
         "parents": "portal-native"
     },
-    "expo-video-player@1.6.1": {
+    "expo-video-player@2.0.1": {
         "licenses": "MIT",
         "licenseUrl": "https://github.com/ihmpavel/expo-video-player",
         "parents": "portal-native"
@@ -476,6 +476,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/ocetnik/react-native-background-timer",
         "licenseUrl": "https://github.com/ocetnik/react-native-background-timer/raw/master/LICENSE",
+        "parents": "portal-native"
+    },
+    "react-native-background-upload@6.5.0": {
+        "licenses": "BSD-3-Clause",
+        "repository": "https://github.com/Vydia/react-native-background-upload",
+        "licenseUrl": "https://github.com/Vydia/react-native-background-upload/raw/master/LICENSE",
         "parents": "portal-native"
     },
     "react-native-biometrics@2.1.4": {

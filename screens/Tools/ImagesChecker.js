@@ -66,9 +66,7 @@ export default function({navigation,route}){
         setResult([])
         if(file===null && url.trim().match(/^https?\:\/\//i) === null) setNotif(true,"Error",i18n.t('errors.image'));
         else {
-            setLoading(true)
             setProgress(0)
-            setBackdrop(true);
             const opt={
                 headers:{
                     'Content-Type':'multipart/form-data'
@@ -81,6 +79,8 @@ export default function({navigation,route}){
             Portalnesia.Safetynet.verifyWithRecaptcha()
             .then(token=>{
                 return new Promise(res=>{
+                    setLoading(true)
+                    setBackdrop(true);
                     const form=new FormData();
                     if(file !== null) {
                         const {name,match} = extractMeta(file)
@@ -146,12 +146,12 @@ export default function({navigation,route}){
             if(typeof data?.data === 'string' && typeof data?.mimeType === 'string') {
                 if(data?.mimeType==='text/plain') {
                     setUrl(data?.data);
-                    uploadImage(null,data?.data)();
+                    setTimeout(()=>uploadImage(null,data?.data)(),500);
                     
                 } else {
                     setFile(data?.data)
                     setDataFile(data?.data)
-                    uploadImage(data?.data,"")();
+                    setTimeout(()=>uploadImage(data?.data,"")(),500);
                 }
             }
         }

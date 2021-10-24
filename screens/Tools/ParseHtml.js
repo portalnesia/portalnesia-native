@@ -32,10 +32,10 @@ export default function({navigation,route}){
 
     const handleParse=(input)=>()=>{
         if(input.match(/\S+/) === null) return setNotif(true,"Error","HTML cannot be empty");
-        setLoading(true);
         Portalnesia.Safetynet.verifyWithRecaptcha()
-        .then(recaptcha=>{
-            return PNpost(`/parse_html`,{html:input,recaptcha},undefined,true,false)
+        .then(async(recaptcha)=>{
+            setLoading(true);
+            return await PNpost(`/parse_html`,{html:input,recaptcha},undefined,true,false)
         })
         .then((res)=>{
             if(!res?.error) {
@@ -54,7 +54,8 @@ export default function({navigation,route}){
     React.useEffect(()=>{
         const dataListener = (data)=>{
             if(typeof data?.data === 'string') {
-                handleParse(data?.data)();
+                setInput(data?.data)
+                setTimeout(()=>handleParse(data?.data)(),500);
             }
         }
         ShareModule.getSharedData().then(dataListener).catch(console.log)

@@ -26,7 +26,7 @@ const ForwardIcon=(props)=><Icon {...props} name="arrow-ios-forward" />
 const menuSettingArr=[
     {key:"appearance"},
     {key:"lang"},
-    {key:"directory"},
+    //{key:"directory"},
     {key:"cache"},
     {header:"About"},
     {key:"contact",desc:false,to:"/contact"},
@@ -166,10 +166,10 @@ export default function Setting({navigation}){
     const handleStorage=React.useCallback(async()=>{
         try {
             const saf = await getSaf(true);
-            const path = await PNFile.getRealPathFromSaf(saf);
-            setStorage(`${path}`);
+            const path = await Portalnesia.Files.getRealPathFromSaf(saf);
+            setStorage(`${path}`)
         } catch(e) {
-            
+            console.log(e);
         }
     },[])
 

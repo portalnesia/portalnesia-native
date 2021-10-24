@@ -78,16 +78,16 @@ const RenderInput=React.memo(({onClose,initialData=""})=>{
 	React.useEffect(()=>{
 		if(initialData?.length > 0) {
 			setInput(initialData);
-			handleSubmit(initialData);
+			setTimeout(()=>handleSubmit(initialData),500);
 		}
 	},[initialData])
 
 	const handleSubmit=(input)=>{
 		if(isURL(input) && isTwitterURL(input)) {
-			setLoading(true)
 			Portalnesia.Safetynet.verifyWithRecaptcha()
-			.then(recaptcha=>{
-				return PNpost(`/twitter/thread`,{url:input,recaptcha},undefined,true,false)
+			.then(async(recaptcha)=>{
+				setLoading(true)
+				return await PNpost(`/twitter/thread`,{url:input,recaptcha},undefined,true,false)
 			})
 			.then((res)=>{
 				if(!res?.error) {
